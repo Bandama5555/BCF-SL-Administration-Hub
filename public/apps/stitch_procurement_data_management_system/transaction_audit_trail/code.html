@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover"/>
+  <title>Central Transaction Audit Trail — BCF-SL Integrated Procurement</title>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: {
+            primary: "#0037b0",
+            "primary-dark": "#00247d",
+            secondary: "#565e74",
+            tertiary: "#006948",
+            "tertiary-dark": "#004f35",
+            surface: "#f8f9ff",
+            "surface-container": "#eff4ff",
+            "on-surface": "#0b1c30",
+            "on-surface-variant": "#434655",
+            outline: "#747686",
+            error: "#ba1a1a"
+          },
+          fontFamily: {
+            sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+            body: ['"Inter"', 'sans-serif'],
+            mono: ['"JetBrains Mono"', 'monospace']
+          }
+        }
+      }
+    };
+  </script>
+  <style>
+    body { font-family: 'Inter', sans-serif; background-color: #f8f9ff; }
+    h1, h2, h3, h4, .font-headline { font-family: 'Plus Jakarta Sans', sans-serif; }
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-thumb { background-color: #cbd5e1; border-radius: 4px; }
+  </style>
+</head>
+<body class="text-on-surface flex flex-col min-h-screen">
+
+  <!-- UNIFIED PROCUREMENT TOP NAVIGATION & WORKFLOW TABS -->
+  <div id="bcf-procurement-nav-header"></div>
+
+  <!-- MAIN VIEWPORT -->
+  <main class="flex-grow p-4 sm:p-6 max-w-7xl mx-auto w-full flex flex-col gap-6">
+
+    <!-- HERO -->
+    <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+      <div>
+        <div class="flex items-center gap-2 mb-1">
+          <span class="inline-flex items-center justify-center w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+          <span class="text-xs font-extrabold uppercase tracking-wider text-emerald-800 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200">
+            Unified Transaction Lifecycle Tracker
+          </span>
+          <span class="text-xs text-slate-500">• BCF-TXN Audit Engine</span>
+        </div>
+        <h1 class="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight font-headline">
+          Central Transaction Audit Trail
+        </h1>
+        <p class="text-xs sm:text-sm text-slate-600 mt-1 max-w-2xl">
+          Trace any procurement transaction across its complete lifecycle: <strong>Requisition &rarr; RFQ &rarr; PO &rarr; GRN &rarr; 3-Way Match &rarr; Payment</strong> using the shared master ID.
+        </p>
+      </div>
+
+      <div class="flex items-center gap-2.5 flex-wrap shrink-0">
+        <button onclick="window.print()" class="px-3.5 py-2 rounded-xl border border-slate-300 bg-white hover:bg-slate-50 text-xs font-bold text-slate-700 flex items-center gap-1.5 transition shadow-2xs cursor-pointer">
+          <span class="material-symbols-outlined text-[18px]">print</span>
+          <span>Print Audit Dossier</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- TRANSACTION SEARCH BAR -->
+    <div class="bg-white p-4 sm:p-5 rounded-2xl border border-slate-200 shadow-sm flex flex-col sm:flex-row sm:items-center gap-3">
+      <div class="relative flex-1">
+        <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-primary text-[22px]">manage_search</span>
+        <input
+          id="txn-search-input"
+          type="text"
+          value="BCF-TXN-2026-000001"
+          placeholder="Enter Master TXN ID (e.g. BCF-TXN-2026-000001) or PR/PO/GRN Ref..."
+          class="w-full pl-10 pr-4 py-2.5 rounded-xl border border-slate-300 bg-slate-50 text-sm font-mono font-bold text-slate-900 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition"
+        />
+      </div>
+
+      <button onclick="searchTransaction()" class="px-5 py-2.5 rounded-xl bg-primary hover:bg-primary-dark text-white text-xs font-extrabold shadow-md flex items-center justify-center gap-1.5 cursor-pointer active:scale-95 shrink-0">
+        <span class="material-symbols-outlined text-[18px]">travel_explore</span>
+        <span>Track Transaction</span>
+      </button>
+    </div>
+
+    <!-- ACTIVE TRANSACTION LIFECYCLE STEPPER -->
+    <div class="bg-white p-5 sm:p-6 rounded-2xl border border-slate-200 shadow-xs space-y-4">
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-100 pb-3">
+        <div class="flex items-center gap-2.5">
+          <div class="w-9 h-9 rounded-xl bg-primary/10 text-primary flex items-center justify-center">
+            <span class="material-symbols-outlined text-[20px]">timeline</span>
+          </div>
+          <div>
+            <div class="flex items-center gap-2">
+              <span class="text-xs uppercase font-extrabold text-slate-400">Master Transaction Key:</span>
+              <span id="disp-active-txnid" class="font-mono text-sm font-black text-primary bg-blue-50 px-2 py-0.5 rounded border border-blue-200">
+                BCF-TXN-2026-000001
+              </span>
+            </div>
+            <h2 id="disp-active-title" class="text-base font-extrabold text-slate-900 font-headline mt-0.5">Rice Supply for School Feeding – Bo District</h2>
+          </div>
+        </div>
+
+        <span id="disp-active-stage" class="px-3 py-1 rounded-full text-xs font-extrabold bg-emerald-100 text-emerald-800 border border-emerald-300 self-start sm:self-center">
+          Invoiced / 3-Way Matched
+        </span>
+      </div>
+
+      <!-- VISUAL TIMELINE STEPPER -->
+      <div class="grid grid-cols-2 sm:grid-cols-5 gap-2 pt-2" id="timeline-stepper">
+        <!-- Step 1: PR -->
+        <div class="p-3 rounded-xl border border-emerald-300 bg-emerald-50/70 text-emerald-950 flex flex-col justify-between">
+          <div class="flex items-center justify-between mb-1">
+            <span class="text-[10px] font-black uppercase text-emerald-800">1. Requisition</span>
+            <span class="material-symbols-outlined text-[16px] text-emerald-700">check_circle</span>
+          </div>
+          <span class="font-mono font-bold text-xs" id="step-pr-id">BCF-PR-2026-0001</span>
+          <span class="text-[10px] text-emerald-700 mt-0.5">Budget Approved</span>
+        </div>
+
+        <!-- Step 2: RFQ -->
+        <div class="p-3 rounded-xl border border-emerald-300 bg-emerald-50/70 text-emerald-950 flex flex-col justify-between">
+          <div class="flex items-center justify-between mb-1">
+            <span class="text-[10px] font-black uppercase text-emerald-800">2. RFQ &amp; Bids</span>
+            <span class="material-symbols-outlined text-[16px] text-emerald-700">check_circle</span>
+          </div>
+          <span class="font-mono font-bold text-xs" id="step-rfq-id">BCF-RFQ-2026-0001</span>
+          <span class="text-[10px] text-emerald-700 mt-0.5">Awarded &amp; Scored</span>
+        </div>
+
+        <!-- Step 3: PO -->
+        <div class="p-3 rounded-xl border border-emerald-300 bg-emerald-50/70 text-emerald-950 flex flex-col justify-between">
+          <div class="flex items-center justify-between mb-1">
+            <span class="text-[10px] font-black uppercase text-emerald-800">3. Purchase Order</span>
+            <span class="material-symbols-outlined text-[16px] text-emerald-700">check_circle</span>
+          </div>
+          <span class="font-mono font-bold text-xs" id="step-po-id">PO-2026-0042</span>
+          <span class="text-[10px] text-emerald-700 mt-0.5">Funds Committed</span>
+        </div>
+
+        <!-- Step 4: GRN -->
+        <div class="p-3 rounded-xl border border-emerald-300 bg-emerald-50/70 text-emerald-950 flex flex-col justify-between">
+          <div class="flex items-center justify-between mb-1">
+            <span class="text-[10px] font-black uppercase text-emerald-800">4. Goods Receipt</span>
+            <span class="material-symbols-outlined text-[16px] text-emerald-700">check_circle</span>
+          </div>
+          <span class="font-mono font-bold text-xs" id="step-grn-id">GRN-2026-0019</span>
+          <span class="text-[10px] text-emerald-700 mt-0.5">Inspected &amp; Intaken</span>
+        </div>
+
+        <!-- Step 5: INVOICE -->
+        <div class="p-3 rounded-xl border border-emerald-300 bg-emerald-50/70 text-emerald-950 flex flex-col justify-between col-span-2 sm:col-span-1">
+          <div class="flex items-center justify-between mb-1">
+            <span class="text-[10px] font-black uppercase text-emerald-800">5. 3-Way Match</span>
+            <span class="material-symbols-outlined text-[16px] text-emerald-700">verified</span>
+          </div>
+          <span class="font-mono font-bold text-xs" id="step-inv-id">INV-SLA-9021</span>
+          <span class="text-[10px] text-emerald-700 mt-0.5">Payment Certified</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- INHERITED DATA VERIFICATION MATRIX -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <!-- Cross Module Data Inheritance Card -->
+      <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-xs space-y-3">
+        <div class="flex items-center justify-between border-b border-slate-100 pb-2.5">
+          <span class="text-xs font-extrabold uppercase text-slate-800 tracking-wider flex items-center gap-1.5">
+            <span class="material-symbols-outlined text-[18px] text-primary">account_tree</span>
+            <span>Inherited Master Data Attributes</span>
+          </span>
+          <span class="text-[10px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">
+            Reused Seamlessly
+          </span>
+        </div>
+
+        <div class="space-y-2 text-xs" id="matrix-inherited-attributes">
+          <!-- Populated via script -->
+        </div>
+      </div>
+
+      <!-- Financial Commitment & Tax Settlement Card -->
+      <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-xs space-y-3">
+        <div class="flex items-center justify-between border-b border-slate-100 pb-2.5">
+          <span class="text-xs font-extrabold uppercase text-slate-800 tracking-wider flex items-center gap-1.5">
+            <span class="material-symbols-outlined text-[18px] text-tertiary">account_balance_wallet</span>
+            <span>Financial Commitment Ledger</span>
+          </span>
+          <span class="text-[10px] font-bold text-blue-700 bg-blue-50 px-2 py-0.5 rounded border border-blue-200">
+            Audited &bull; FY26
+          </span>
+        </div>
+
+        <div class="space-y-2 text-xs" id="matrix-financial-attributes">
+          <!-- Populated via script -->
+        </div>
+      </div>
+    </div>
+
+    <!-- CENTRAL AUDIT LOG TABLE -->
+    <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-xs space-y-3">
+      <div class="flex items-center justify-between border-b border-slate-100 pb-2.5">
+        <span class="text-xs font-extrabold uppercase text-slate-800 tracking-wider flex items-center gap-1.5">
+          <span class="material-symbols-outlined text-[18px] text-slate-600">history</span>
+          <span>Central Audit Trail Log</span>
+        </span>
+        <span class="text-xs text-slate-400 font-mono" id="audit-log-count">0 Recorded Events</span>
+      </div>
+
+      <div class="overflow-x-auto rounded-xl border border-slate-200">
+        <table class="w-full text-left text-xs border-collapse">
+          <thead class="bg-slate-50 border-b border-slate-200 font-bold text-slate-600">
+            <tr>
+              <th class="py-2.5 px-3">Timestamp</th>
+              <th class="py-2.5 px-3">Module</th>
+              <th class="py-2.5 px-3">Reference Key</th>
+              <th class="py-2.5 px-3">Action</th>
+              <th class="py-2.5 px-3">Event Detail</th>
+              <th class="py-2.5 px-3">Initiating Actor</th>
+            </tr>
+          </thead>
+          <tbody id="audit-log-body" class="divide-y divide-slate-100">
+            <!-- Populated via script -->
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- Shared Library -->
+  <script src="../bcf_procurement_shared.js"></script>
+
+  <!-- Controller Logic -->
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      // Shared top navigation
+      BCF_PROCUREMENT.renderHeaderAndTabs('transaction-audit-trail');
+
+      // Check if TXN was passed from another tab
+      const passedTxn = localStorage.getItem('bcf_selected_txn_id');
+      if (passedTxn) {
+        localStorage.removeItem('bcf_selected_txn_id');
+        document.getElementById('txn-search-input').value = passedTxn;
+      }
+
+      searchTransaction();
+
+      // Enter key handler
+      document.getElementById('txn-search-input')?.addEventListener('keyup', (e) => {
+        if (e.key === 'Enter') searchTransaction();
+      });
+    });
+
+    function searchTransaction() {
+      const input = document.getElementById('txn-search-input').value.trim();
+      if (!input) return;
+
+      const txn = BCF_PROCUREMENT.getTransaction(input);
+      if (!txn || (!txn.requisition && !txn.purchaseOrder && !txn.rfq && !txn.grn && !txn.invoice)) {
+        alert(`No transaction record found matching "${input}".\n\nPlease check the Transaction or PR reference number.`);
+        return;
+      }
+
+      renderTxnDetails(txn);
+    }
+
+    function renderTxnDetails(txn) {
+      const pr = txn.requisition || {};
+      const rfq = txn.rfq || {};
+      const po = txn.purchaseOrder || {};
+      const grn = txn.grn || {};
+      const inv = txn.invoice || {};
+
+      document.getElementById('disp-active-txnid').textContent = txn.txnId;
+      document.getElementById('disp-active-title').textContent = pr.title || po.supplierName || 'Procurement Transaction';
+      document.getElementById('disp-active-stage').textContent = txn.stage;
+
+      // Update Stepper
+      document.getElementById('step-pr-id').textContent = pr.id || 'Not Raised';
+      document.getElementById('step-rfq-id').textContent = rfq.id || 'N/A';
+      document.getElementById('step-po-id').textContent = po.poNumber || po.id || 'Pending PO';
+      document.getElementById('step-grn-id').textContent = grn.grnNumber || grn.id || 'Awaiting Delivery';
+      document.getElementById('step-inv-id').textContent = inv.invoiceNumber || 'Pending Invoice';
+
+      // Stepper card visual states
+      const stepperCards = document.querySelectorAll('#timeline-stepper > div');
+      const setCardState = (card, isDone) => {
+        if (isDone) {
+          card.className = 'p-3 rounded-xl border border-emerald-300 bg-emerald-50/70 text-emerald-950 flex flex-col justify-between';
+          card.querySelector('.material-symbols-outlined').textContent = 'check_circle';
+          card.querySelector('.material-symbols-outlined').className = 'material-symbols-outlined text-[16px] text-emerald-700';
+        } else {
+          card.className = 'p-3 rounded-xl border border-slate-200 bg-slate-50 text-slate-500 flex flex-col justify-between';
+          card.querySelector('.material-symbols-outlined').textContent = 'radio_button_unchecked';
+          card.querySelector('.material-symbols-outlined').className = 'material-symbols-outlined text-[16px] text-slate-400';
+        }
+      };
+
+      if (stepperCards.length === 5) {
+        setCardState(stepperCards[0], !!pr.id);
+        setCardState(stepperCards[1], !!rfq.id);
+        setCardState(stepperCards[2], !!po.id);
+        setCardState(stepperCards[3], !!grn.id);
+        setCardState(stepperCards[4], !!inv.id);
+      }
+
+      // Inherited Attributes Card
+      const inheritedEl = document.getElementById('matrix-inherited-attributes');
+      inheritedEl.innerHTML = `
+        <div class="p-2.5 rounded-lg bg-slate-50 border border-slate-200 flex items-center justify-between">
+          <span class="text-slate-500">Programme:</span>
+          <span class="font-bold text-slate-900">${pr.programmeName || po.programmeName || '—'}</span>
+        </div>
+        <div class="p-2.5 rounded-lg bg-slate-50 border border-slate-200 flex items-center justify-between">
+          <span class="text-slate-500">Donor Partner:</span>
+          <span class="font-bold text-slate-900">${pr.donorName || po.donorName || '—'}</span>
+        </div>
+        <div class="p-2.5 rounded-lg bg-slate-50 border border-slate-200 flex items-center justify-between">
+          <span class="text-slate-500">Contracted Supplier:</span>
+          <span class="font-bold text-slate-900">${po.supplierName || rfq.awardedSupplierName || 'Pending Selection'}</span>
+        </div>
+        <div class="p-2.5 rounded-lg bg-slate-50 border border-slate-200 flex items-center justify-between">
+          <span class="text-slate-500">Delivery Warehouse:</span>
+          <span class="font-bold text-slate-900">${grn.warehouseName || po.deliveryLocation || pr.deliveryLocation || '—'}</span>
+        </div>
+        <div class="p-2.5 rounded-lg bg-slate-50 border border-slate-200 flex items-center justify-between">
+          <span class="text-slate-500">Requesting Officer:</span>
+          <span class="font-bold text-slate-900">${pr.requestedBy || 'Staff'}</span>
+        </div>
+      `;
+
+      // Financial Settlement Card
+      const finEl = document.getElementById('matrix-financial-attributes');
+      const totalAmt = inv.totalAmount || po.totalAmount || pr.estimatedTotal || 0;
+      const taxAmt = inv.taxWithholding || totalAmt * 0.05;
+      const netPayable = inv.netPayable || totalAmt - taxAmt;
+
+      finEl.innerHTML = `
+        <div class="p-2.5 rounded-lg bg-slate-50 border border-slate-200 flex items-center justify-between">
+          <span class="text-slate-500">Estimated PR Value:</span>
+          <span class="font-mono font-bold text-slate-800">${BCF_PROCUREMENT.formatCurrency(pr.estimatedTotal || 0)}</span>
+        </div>
+        <div class="p-2.5 rounded-lg bg-slate-50 border border-slate-200 flex items-center justify-between">
+          <span class="text-slate-500">Contracted PO Amount:</span>
+          <span class="font-mono font-bold text-slate-800">${BCF_PROCUREMENT.formatCurrency(po.totalAmount || 0)}</span>
+        </div>
+        <div class="p-2.5 rounded-lg bg-slate-50 border border-slate-200 flex items-center justify-between">
+          <span class="text-slate-500">NRA 5% Withholding Tax:</span>
+          <span class="font-mono font-bold text-amber-700">${BCF_PROCUREMENT.formatCurrency(taxAmt)}</span>
+        </div>
+        <div class="p-2.5 rounded-lg bg-blue-50 border border-blue-200 flex items-center justify-between">
+          <span class="text-blue-900 font-bold">Net Payable Settlement:</span>
+          <span class="font-mono font-black text-primary text-sm">${BCF_PROCUREMENT.formatCurrency(netPayable)}</span>
+        </div>
+        <div class="p-2.5 rounded-lg bg-emerald-50 border border-emerald-200 flex items-center justify-between">
+          <span class="text-emerald-900 font-bold">Settlement Release:</span>
+          <span class="font-bold text-emerald-700">${inv.paymentStatus || 'Ready for Disbursement'}</span>
+        </div>
+      `;
+
+      // Central Audit Log Table
+      const trail = txn.auditTrail || [];
+      document.getElementById('audit-log-count').textContent = `${trail.length} Recorded Events`;
+
+      const tbody = document.getElementById('audit-log-body');
+      if (trail.length === 0) {
+        tbody.innerHTML = `
+          <tr>
+            <td colspan="6" class="py-4 text-center text-slate-400">No events logged yet for this transaction.</td>
+          </tr>
+        `;
+        return;
+      }
+
+      tbody.innerHTML = trail.map(entry => `
+        <tr>
+          <td class="py-2.5 px-3 font-mono text-slate-500">${BCF_PROCUREMENT.formatDateTime(entry.timestamp)}</td>
+          <td class="py-2.5 px-3 font-semibold text-slate-800">${entry.module}</td>
+          <td class="py-2.5 px-3 font-mono font-bold text-primary">${entry.referenceId}</td>
+          <td class="py-2.5 px-3">
+            <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-slate-100 text-slate-700">
+              ${entry.action}
+            </span>
+          </td>
+          <td class="py-2.5 px-3 text-slate-600">${entry.detail}</td>
+          <td class="py-2.5 px-3 font-semibold text-slate-700">${entry.user || 'System'}</td>
+        </tr>
+      `).join('');
+    }
+  </script>
+</body>
+</html>

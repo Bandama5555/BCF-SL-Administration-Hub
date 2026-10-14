@@ -1,0 +1,180 @@
+@import "tailwindcss";
+
+:root {
+  /* ─── BCF-SL Official Brand Palette — Light ─── */
+  /* Purple  #7B2FBE  |  Green  #22A849  |  Blue  #1A56DB  |  White  #FFFFFF */
+
+  --primary: #7B2FBE;           /* BCF Purple */
+  --primary-light: #9B59D0;
+  --primary-container: #EDE0FF;
+  --on-primary: #ffffff;
+  --on-primary-container: #4A1580;
+
+  --secondary: #22A849;         /* BCF Green */
+  --secondary-light: #34C15D;
+  --secondary-container: #D1FAE5;
+  --on-secondary: #ffffff;
+  --on-secondary-container: #145C2B;
+
+  --tertiary: #1A56DB;          /* BCF Blue */
+  --tertiary-container: #DBEAFE;
+  --on-tertiary: #ffffff;
+  --on-tertiary-container: #1E3A8A;
+
+  --surface: #F8F7FF;
+  --surface-container-lowest: #ffffff;
+  --surface-container-low: #F3F0FF;
+  --surface-container: #EBE5FF;
+  --surface-container-high: #DDD5F9;
+  --surface-container-highest: #D0C6F5;
+
+  --on-surface: #1C0A3A;
+  --on-surface-variant: #4A4360;
+  --outline: #7A7494;
+  --outline-variant: #C8C3DC;
+
+  --error: #BA1A1A;
+  --on-error: #ffffff;
+
+  /* Shell-specific */
+  --sidebar-width: 240px;
+  --topbar-height: 64px;
+  --sidebar-bg: #ffffff;
+  --topbar-bg: rgba(248, 247, 255, 0.88);
+  --border: rgba(200, 195, 220, 0.45);
+}
+
+.dark {
+  /* ─── BCF-SL Official Brand Palette — Dark ─── */
+  --primary: #C084FC;
+  --primary-light: #D8B4FE;
+  --primary-container: #5B21B6;
+  --on-primary: #1C0A3A;
+  --on-primary-container: #EDE0FF;
+
+  --secondary: #4ADE80;
+  --secondary-light: #86EFAC;
+  --secondary-container: #166534;
+  --on-secondary: #052E12;
+  --on-secondary-container: #BBF7D0;
+
+  --tertiary: #60A5FA;
+  --tertiary-container: #1E3A8A;
+  --on-tertiary: #172554;
+  --on-tertiary-container: #DBEAFE;
+
+  --surface: #100826;
+  --surface-container-lowest: #0A0518;
+  --surface-container-low: #180D30;
+  --surface-container: #201438;
+  --surface-container-high: #2A1C46;
+  --surface-container-highest: #342558;
+
+  --on-surface: #EDE0FF;
+  --on-surface-variant: #C8C3DC;
+  --outline: #9590AA;
+  --outline-variant: #4A4360;
+
+  --error: #FFB4AB;
+  --on-error: #690005;
+
+  /* Shell-specific */
+  --sidebar-bg: #100826;
+  --topbar-bg: rgba(16, 8, 38, 0.88);
+  --border: rgba(74, 67, 96, 0.55);
+}
+
+
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+  -webkit-text-size-adjust: 100%;
+  -webkit-tap-highlight-color: transparent;
+}
+
+body {
+  font-family: "Inter", system-ui, sans-serif;
+  background-color: var(--surface);
+  color: var(--on-surface);
+  margin: 0;
+  padding: 0;
+  min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  -webkit-overflow-scrolling: touch;
+  touch-action: pan-y;
+  overflow-x: hidden;
+}
+
+/* Hide scrollbars globally but keep scrolling */
+::-webkit-scrollbar {
+  width: 0;
+  height: 0;
+}
+
+/* Material Symbols */
+.material-symbols-outlined {
+  font-family: "Material Symbols Outlined";
+  font-weight: normal;
+  font-style: normal;
+  font-size: 24px;
+  line-height: 1;
+  letter-spacing: normal;
+  text-transform: none;
+  display: inline-block;
+  white-space: nowrap;
+  word-wrap: normal;
+  direction: ltr;
+  -webkit-font-feature-settings: "liga";
+  font-feature-settings: "liga";
+  -webkit-font-smoothing: antialiased;
+  user-select: none;
+}
+
+/* Animated gradient for hero banner */
+@keyframes gradient-shift {
+  0%   { background-position: 0% 50%; }
+  50%  { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+.animate-gradient {
+  background-size: 200% 200%;
+  animation: gradient-shift 8s ease infinite;
+}
+
+/* Skeleton shimmer */
+@keyframes shimmer {
+  0%   { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+.skeleton {
+  background: linear-gradient(
+    90deg,
+    var(--surface-container) 25%,
+    var(--surface-container-high) 50%,
+    var(--surface-container) 75%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+  border-radius: 0.5rem;
+}
+
+/* Glass morphism helper */
+.glass {
+  background: var(--topbar-bg);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-bottom: 1px solid var(--border);
+}
+
+/* Focus ring override for accessibility */
+:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+  border-radius: 4px;
+}

@@ -1,0 +1,1160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover"/>
+  <title>BCF-SL Leave Management Module — Institutional Audit Trail &amp; FOMS Payment Console</title>
+  
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
+  
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: {
+            primary: "#004328",
+            "primary-dark": "#002d1a",
+            secondary: "#465f88",
+            tertiary: "#ca8a04",
+            surface: "#f8fafd",
+            "surface-container": "#eff5f8",
+            "on-surface": "#0f191d"
+          },
+          fontFamily: {
+            sans: ['"Inter"', 'sans-serif'],
+            headline: ['"Plus Jakarta Sans"', 'sans-serif'],
+            mono: ['"JetBrains Mono"', 'monospace']
+          }
+        }
+      }
+    };
+  </script>
+
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"/>
+  <meta http-equiv="Pragma" content="no-cache"/>
+  <meta http-equiv="Expires" content="0"/>
+
+  <style>
+    body { font-family: 'Inter', sans-serif; background-color: #f8fafd; }
+    h1, h2, h3, h4, h5, .font-headline { font-family: 'Plus Jakarta Sans', sans-serif; }
+    .badge-soft { display: inline-flex; align-items: center; gap: 0.25rem; font-size: 0.72rem; font-weight: 700; padding: 0.25rem 0.6rem; border-radius: 9999px; }
+    .hidden { display: none !important; }
+    @media print {
+      body * { visibility: hidden; }
+      #printable-voucher, #printable-voucher * { visibility: visible; }
+      #printable-voucher { position: absolute; left: 0; top: 0; width: 100%; }
+    }
+  </style>
+
+  <script src="../bcf_leave_shared.js?v=20261006_FINAL_REV1"></script>
+</head>
+<body class="text-on-surface flex flex-col min-h-screen">
+
+  <!-- TOP HEADER -->
+  <header class="bg-white border-b border-slate-200 sticky top-0 z-40 shadow-xs">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between gap-4">
+      <div class="flex items-center gap-3 min-w-0">
+        <a href="../bcf_sl_leave_allowance_dashboard/code.html" class="p-1.5 rounded-lg border border-slate-200 hover:bg-slate-100 text-slate-600 transition" title="Back to Leave Dashboard">
+          <span class="material-symbols-outlined text-[20px]">arrow_back</span>
+        </a>
+        <img src="/bcf-logo.jpg" onerror="this.src='../bcf-logo.jpg'; this.onerror=function(){this.src='../../bcf-logo.jpg'}" alt="BCF-SL Logo" class="h-8 w-auto object-contain shrink-0 rounded"/>
+        <div class="flex flex-col min-w-0">
+          <span class="font-extrabold text-sm sm:text-base text-primary tracking-tight uppercase leading-none">
+            Bandama Charity Foundation
+          </span>
+          <span class="text-[11px] font-semibold text-slate-500 truncate mt-0.5">
+            Audit Trail &amp; FOMS Payment Gateway • Sections 20, 32, 33 &amp; 34
+          </span>
+        </div>
+      </div>
+
+      <div class="flex items-center gap-2">
+        <div class="flex items-center gap-1.5 bg-slate-100 border border-slate-300 rounded-xl px-2.5 py-1">
+          <span class="material-symbols-outlined text-[16px] text-primary">account_balance</span>
+          <select id="finance-officer-select" class="bg-transparent text-xs font-bold text-slate-800 outline-none cursor-pointer">
+            <option value="Aminata Turay (Finance Director)">Aminata Turay (Finance Director)</option>
+            <option value="Albert Joseph Bandama (CEO)">Albert J. Bandama (CEO)</option>
+            <option value="Joe Ansumana Conteh (HR Director)">Joe A. Conteh (HR Director)</option>
+            <option value="Internal Audit Inspector">Internal Audit Inspector</option>
+          </select>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- MAIN VIEWPORT -->
+  <main class="flex-grow p-4 sm:p-6 max-w-7xl mx-auto w-full flex flex-col gap-6">
+
+    <!-- DOSSIER SELECTION & KPI STRIP -->
+    <div class="bg-white rounded-2xl border border-slate-200 p-5 shadow-xs flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+      <div class="space-y-1">
+        <div class="flex items-center gap-2">
+          <span class="badge-soft bg-emerald-100 text-emerald-800">Payroll &amp; Finance Gateway</span>
+          <span class="text-xs text-slate-400 font-mono">Sierra Leone NGO Standard</span>
+        </div>
+        <h2 class="text-xl font-extrabold text-slate-900 tracking-tight">Institutional Audit Trail &amp; Payment Settlement</h2>
+        <p class="text-xs text-slate-500">Track 6-stage lifecycle progression, inspect FOMS payment vouchers, and execute direct EFT disbursements.</p>
+      </div>
+
+      <!-- Dossier Selector Dropdown -->
+      <div class="w-full md:w-auto flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
+        <label for="dossier-select" class="text-xs font-bold text-slate-600 whitespace-nowrap">Select Record:</label>
+        <select id="dossier-select" onchange="loadSelectedDossier(this.value)" class="bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-xs font-bold text-slate-900 outline-none focus:border-primary shadow-2xs">
+          <!-- Dynamically populated -->
+        </select>
+      </div>
+    </div>
+
+    <!-- MAIN TWO-COLUMN WORKSPACE: LEFT = 6-STAGE TIMELINE, RIGHT = FINANCIAL LEDGER -->
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+
+      <!-- LEFT COLUMN: 6-STAGE AUDIT TIMELINE (Cols 1-7) -->
+      <div class="lg:col-span-7 space-y-6">
+
+        <!-- Progress Velocity Card -->
+        <div class="bg-white rounded-2xl border border-slate-200 p-5 shadow-xs space-y-2.5">
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-bold uppercase tracking-wider text-primary flex items-center gap-1.5 font-headline">
+              <span class="material-symbols-outlined text-[18px]">speed</span>
+              Audit Pipeline Velocity
+            </span>
+            <span id="pipeline-velocity-label" class="text-xs font-extrabold font-mono text-primary">
+              Stage 5 of 6 (83%)
+            </span>
+          </div>
+          <div class="w-full bg-slate-100 h-2.5 rounded-full overflow-hidden">
+            <div id="pipeline-progress-bar" class="bg-primary h-full rounded-full transition-all duration-500" style="width: 83.3%;"></div>
+          </div>
+          <p id="pipeline-velocity-subtext" class="text-[11px] text-slate-500">
+            Payment voucher queued in FOMS Finance Gateway. Pending final bank settlement batch.
+          </p>
+        </div>
+
+        <!-- 6-Stage Audit Trail Timeline (Section 20 & 34) -->
+        <div class="bg-white rounded-2xl border border-slate-200 p-6 shadow-xs space-y-5">
+          <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+            <div>
+              <h3 class="font-extrabold text-base text-slate-900 font-headline">Institutional Audit Pipeline</h3>
+              <p class="text-xs text-slate-500">Immutable permanent record authenticated under BCF-SL HR Policy &amp; Sierra Leone Labor Law</p>
+            </div>
+            <span class="material-symbols-outlined text-primary text-2xl">verified_user</span>
+          </div>
+
+          <!-- Dynamic 6 Stages Container -->
+          <div id="timeline-stages-container" class="space-y-6 relative">
+            <!-- Dynamically populated -->
+          </div>
+        </div>
+
+      </div>
+
+      <!-- RIGHT COLUMN: FOMS FINANCIAL BREAKDOWN & ACTIONS (Cols 8-12) -->
+      <div class="lg:col-span-5 space-y-6">
+
+        <!-- FOMS Financial Card (Section 9, 10, 32, 33) -->
+        <div class="bg-white rounded-2xl border border-slate-200 p-5 shadow-xs space-y-4">
+          <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+            <div class="flex items-center gap-2">
+              <div class="w-8 h-8 rounded-lg bg-emerald-50 text-primary flex items-center justify-center">
+                <span class="material-symbols-outlined text-[20px]">account_balance_wallet</span>
+              </div>
+              <div>
+                <h4 class="font-extrabold text-sm text-slate-900">FOMS Finance Breakdown</h4>
+                <p class="text-[10px] uppercase font-bold text-slate-400">Payroll Integration Verified</p>
+              </div>
+            </div>
+            <span id="foms-status-pill" class="badge-soft bg-emerald-100 text-emerald-800">Verified</span>
+          </div>
+
+          <!-- Highlight Amount -->
+          <div class="bg-slate-50 border border-slate-200/80 rounded-xl p-3.5 flex items-baseline justify-between">
+            <div>
+              <span class="text-[10px] uppercase font-bold text-slate-400 block">Leave Allowance Sum</span>
+              <span id="foms-allowance-amount" class="text-xl font-extrabold text-primary font-mono">NLe 24,000.00</span>
+            </div>
+            <span id="foms-rate-badge" class="badge-soft bg-amber-100 text-amber-900">5% Annual Basic</span>
+          </div>
+
+          <!-- Detailed Ledger Rows -->
+          <div class="space-y-2 text-xs">
+            <div class="flex items-center justify-between py-1 border-b border-slate-50">
+              <span class="text-slate-500">Voucher Identifier</span>
+              <span id="foms-voucher-id" class="font-mono font-bold text-slate-800">PV-BCF-FOMS-2026-0429</span>
+            </div>
+            <div class="flex items-center justify-between py-1 border-b border-slate-50">
+              <span class="text-slate-500">Beneficiary Staff</span>
+              <span id="foms-beneficiary-name" class="font-bold text-slate-800">John Kamara</span>
+            </div>
+            <div class="flex items-center justify-between py-1 border-b border-slate-50">
+              <span class="text-slate-500">Staff Advice Email</span>
+              <div class="flex items-center gap-1.5 max-w-[210px] w-full justify-end">
+                <span class="material-symbols-outlined text-[14px] text-primary">mail</span>
+                <input id="foms-staff-email" type="email" class="font-mono text-[11px] text-slate-800 bg-slate-50 hover:bg-white focus:bg-white border border-slate-200 focus:border-primary rounded px-2 py-0.5 w-full text-right transition outline-none" placeholder="staff@bcf-sl.org" title="Beneficiary email for official EFT disbursement advice" />
+              </div>
+            </div>
+            <div class="flex items-center justify-between py-1 border-b border-slate-50">
+              <span class="text-slate-500">Monthly Basic Salary</span>
+              <span id="foms-monthly-salary" class="font-mono font-bold text-slate-800">NLe 40,000.00</span>
+            </div>
+            <div class="flex items-center justify-between py-1 border-b border-slate-50">
+              <span class="text-slate-500">Annual Basic (x 12)</span>
+              <span id="foms-annual-salary" class="font-mono font-bold text-slate-800">NLe 480,000.00</span>
+            </div>
+            <div class="flex items-center justify-between py-1 border-b border-slate-50">
+              <span class="text-slate-500">Bank Destination</span>
+              <span id="foms-bank-name" class="font-bold text-slate-800">Rokel Commercial Bank</span>
+            </div>
+            <div class="flex items-center justify-between py-1 border-b border-slate-50">
+              <span class="text-slate-500">Account Number</span>
+              <span id="foms-account-no" class="font-mono font-bold text-slate-800">******4821</span>
+            </div>
+            <div class="flex items-center justify-between py-1 border-b border-slate-50">
+              <span class="text-slate-500">Statutory Deductions</span>
+              <span class="font-mono text-emerald-700 font-bold">NLe 0.00 (Exempt)</span>
+            </div>
+            <div class="flex items-center justify-between pt-1">
+              <span class="font-bold text-slate-900">Net Disbursable Sum</span>
+              <span id="foms-net-sum" class="font-mono font-extrabold text-base text-primary">NLe 24,000.00</span>
+            </div>
+          </div>
+
+          <!-- EFT Reference if Paid -->
+          <div id="eft-ref-box" class="p-3 bg-emerald-50 rounded-xl border border-emerald-200 text-xs text-emerald-950 flex items-center justify-between">
+            <div class="flex items-center gap-1.5">
+              <span class="material-symbols-outlined text-[18px] text-emerald-700">task_alt</span>
+              <span class="font-bold">EFT Reference:</span>
+            </div>
+            <span id="foms-eft-ref" class="font-mono font-extrabold text-emerald-800">SL-CB-EFT-994411</span>
+          </div>
+
+          <!-- Email Advice Status (When Paid) -->
+          <div id="email-dispatch-box" class="p-3 bg-blue-50/80 rounded-xl border border-blue-200 text-xs text-blue-950 space-y-1.5 hidden">
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-1.5">
+                <span class="material-symbols-outlined text-[18px] text-blue-700">mark_email_read</span>
+                <span class="font-bold text-slate-900">Email Advice Status:</span>
+              </div>
+              <span id="foms-email-status-badge" class="px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-blue-100 text-blue-800 border border-blue-300">Dispatched</span>
+            </div>
+            <div class="flex items-center justify-between text-[11px] text-slate-600">
+              <span>Recipient:</span>
+              <span id="foms-email-recipient" class="font-mono font-bold text-slate-800 truncate max-w-[190px]">staff@bcf-sl.org</span>
+            </div>
+            <div class="flex items-center justify-between text-[11px] text-slate-500">
+              <span>Dispatched At:</span>
+              <span id="foms-email-date" class="font-mono text-[10px] text-slate-700">Just now</span>
+            </div>
+            <div class="pt-1 flex items-center justify-between border-t border-blue-100/80 mt-1">
+              <span id="foms-email-msgid" class="text-[10px] font-mono text-blue-600 truncate max-w-[150px]">MSG-DISB-OK</span>
+              <button type="button" id="btn-resend-disb-email" onclick="handleResendDisbursementEmail()" class="text-[11px] font-bold text-primary hover:text-primary-dark hover:underline flex items-center gap-1 cursor-pointer">
+                <span class="material-symbols-outlined text-[13px]">forward_to_inbox</span>
+                <span>Resend Email</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Notification Preview Notice (Before Disbursement) -->
+          <div id="disburse-email-preview-notice" class="flex items-start gap-2 p-2.5 rounded-xl bg-slate-50 border border-slate-200 text-[11px] text-slate-600">
+            <span class="material-symbols-outlined text-[16px] text-primary shrink-0 mt-0.5">forward_to_inbox</span>
+            <span>Authorizing EFT will automatically dispatch an official FOMS disbursement advice email with EFT ref, voucher ID, and tax-exempt breakdown to the staff member.</span>
+          </div>
+
+          <!-- Action Buttons Stack -->
+          <div class="space-y-2 pt-2 border-t border-slate-100">
+            <!-- Disburse Button (If pending) -->
+            <button id="btn-disburse" onclick="handleDisbursePayment()" class="w-full py-2.5 px-4 rounded-xl bg-primary hover:bg-primary-dark text-white font-extrabold text-xs shadow-xs flex items-center justify-center gap-2 cursor-pointer transition">
+              <span class="material-symbols-outlined text-[18px]">payments</span>
+              <span>Authorize Bank EFT Disbursement</span>
+            </button>
+
+            <!-- Download Official Slip -->
+            <button onclick="openVoucherModal()" class="w-full py-2 px-4 rounded-xl border border-slate-300 hover:bg-slate-50 text-slate-700 font-bold text-xs flex items-center justify-center gap-2 cursor-pointer transition">
+              <span class="material-symbols-outlined text-[18px]">receipt_long</span>
+              <span>View / Print FOMS Payment Voucher</span>
+            </button>
+
+            <button onclick="downloadOfficialApprovalSlip()" class="w-full py-2 px-4 rounded-xl border border-slate-300 hover:bg-slate-50 text-slate-700 font-bold text-xs flex items-center justify-center gap-2 cursor-pointer transition">
+              <span class="material-symbols-outlined text-[18px]">download</span>
+              <span>Export Official HR Approval Certificate</span>
+            </button>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+
+    <!-- FINANCE ALLOWANCE REGISTER & EXPORT (Section 38) -->
+    <div class="bg-white rounded-2xl border border-slate-200 p-5 shadow-xs space-y-4">
+      <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+        <div>
+          <h3 class="font-extrabold text-base text-slate-900 font-headline">Leave Allowance Disbursement Register</h3>
+          <p class="text-xs text-slate-500">Live reconciliation of all staff leave allowances across BCF-SL departments and field hubs.</p>
+        </div>
+        <div class="flex items-center gap-2">
+          <button onclick="exportAllowanceRegisterCSV()" class="px-3.5 py-1.5 rounded-xl border border-slate-300 hover:bg-slate-50 text-slate-700 font-bold text-xs flex items-center gap-1.5 shadow-2xs">
+            <span class="material-symbols-outlined text-[16px]">file_download</span>
+            <span>Export Register (CSV)</span>
+          </button>
+        </div>
+      </div>
+
+      <div class="overflow-x-auto">
+        <table class="w-full text-left border-collapse text-xs">
+          <thead>
+            <tr class="bg-slate-50 border-b border-slate-200 text-slate-500 uppercase text-[10px] font-bold tracking-wider">
+              <th class="py-2.5 px-3">Voucher Ref</th>
+              <th class="py-2.5 px-3">Employee</th>
+              <th class="py-2.5 px-3">Department</th>
+              <th class="py-2.5 px-3">Monthly Basic</th>
+              <th class="py-2.5 px-3">Annual Basic</th>
+              <th class="py-2.5 px-3">Allowance (5%)</th>
+              <th class="py-2.5 px-3">Disbursement Bank</th>
+              <th class="py-2.5 px-3">EFT Ref</th>
+              <th class="py-2.5 px-3">Status</th>
+            </tr>
+          </thead>
+          <tbody id="allowance-register-tbody" class="divide-y divide-slate-100">
+            <!-- Dynamically populated -->
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- INSTITUTIONAL AUDIT LEDGER (Section 34) -->
+    <div class="bg-white rounded-2xl border border-slate-200 p-5 shadow-xs space-y-4">
+      <div class="flex items-center justify-between">
+        <div>
+          <h3 class="font-extrabold text-base text-slate-900 font-headline">Institutional System Audit Ledger</h3>
+          <p class="text-xs text-slate-500">Chronological tamper-evident audit record of all leave calculations, approvals, recalls, and payments.</p>
+        </div>
+        <span class="text-xs font-mono text-slate-400">Real-Time Sync</span>
+      </div>
+
+      <div class="overflow-x-auto">
+        <table class="w-full text-left border-collapse text-xs">
+          <thead>
+            <tr class="bg-slate-50 border-b border-slate-200 text-slate-500 uppercase text-[10px] font-bold tracking-wider">
+              <th class="py-2.5 px-3">Timestamp</th>
+              <th class="py-2.5 px-3">Actor / Authority</th>
+              <th class="py-2.5 px-3">Event Code</th>
+              <th class="py-2.5 px-3">Audit Details</th>
+              <th class="py-2.5 px-3">Impacted Staff</th>
+            </tr>
+          </thead>
+          <tbody id="audit-log-tbody" class="divide-y divide-slate-100 font-mono text-[11px]">
+            <!-- Dynamically populated -->
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- MODAL: PRINTABLE FOMS PAYMENT VOUCHER -->
+  <div id="voucher-modal" class="hidden fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl border border-slate-200 max-w-2xl w-full p-6 shadow-2xl space-y-4 max-h-[90vh] overflow-y-auto">
+      
+      <!-- Voucher Content for Printing -->
+      <div id="printable-voucher" class="p-6 border border-slate-300 rounded-xl bg-white space-y-4">
+        <!-- Letterhead -->
+        <div class="flex items-center justify-between border-b-2 border-primary pb-3">
+          <div class="flex items-center gap-3">
+            <img src="/bcf-logo.jpg" onerror="this.src='../bcf-logo.jpg'" alt="BCF-SL Logo" class="h-10 w-auto rounded"/>
+            <div>
+              <h2 class="text-base font-extrabold text-primary uppercase font-headline">Bandama Charity Foundation Sierra Leone</h2>
+              <p class="text-[11px] text-slate-500 font-sans">Humanitarian Relief &amp; Sustainable Development • Freetown HQ</p>
+            </div>
+          </div>
+          <div class="text-right">
+            <span class="text-xs font-bold font-mono text-primary block">OFFICIAL DISBURSEMENT VOUCHER</span>
+            <span id="modal-voucher-no" class="text-xs font-mono font-bold text-slate-700">PV-BCF-FOMS-2026-0429</span>
+          </div>
+        </div>
+
+        <!-- Voucher Details Grid -->
+        <div class="grid grid-cols-2 gap-3 text-xs font-sans">
+          <div>
+            <span class="text-[10px] text-slate-400 uppercase font-bold block">Beneficiary Name</span>
+            <span id="modal-v-name" class="font-bold text-slate-900 text-sm">John Kamara</span>
+          </div>
+          <div>
+            <span class="text-[10px] text-slate-400 uppercase font-bold block">Staff ID &amp; Cost Centre</span>
+            <span id="modal-v-id" class="font-mono font-bold text-slate-800">BCF-EMP-00025 (Programmes)</span>
+          </div>
+          <div>
+            <span class="text-[10px] text-slate-400 uppercase font-bold block">Payment Purpose</span>
+            <span class="font-bold text-slate-800">Statutory Annual Leave Allowance (5% Annual Basic)</span>
+          </div>
+          <div>
+            <span class="text-[10px] text-slate-400 uppercase font-bold block">Disbursement Channel</span>
+            <span id="modal-v-bank" class="font-bold text-slate-800">Rokel Commercial Bank</span>
+          </div>
+        </div>
+
+        <!-- Amounts Table -->
+        <table class="w-full text-xs font-sans border border-slate-200 mt-2">
+          <tr class="bg-slate-50 font-bold">
+            <th class="p-2 border-b border-slate-200">Description</th>
+            <th class="p-2 border-b border-slate-200 text-right">Calculation Basis</th>
+            <th class="p-2 border-b border-slate-200 text-right">Amount (NLe)</th>
+          </tr>
+          <tr>
+            <td class="p-2 border-b border-slate-100">Annual Basic Salary</td>
+            <td id="modal-v-basis" class="p-2 border-b border-slate-100 text-right font-mono">NLe 40,000 x 12</td>
+            <td id="modal-v-annual" class="p-2 border-b border-slate-100 text-right font-mono">480,000.00</td>
+          </tr>
+          <tr>
+            <td class="p-2 border-b border-slate-100 font-bold">Approved Leave Allowance</td>
+            <td class="p-2 border-b border-slate-100 text-right font-mono">5% Applicable Rate</td>
+            <td id="modal-v-gross" class="p-2 border-b border-slate-100 text-right font-mono font-bold text-primary">24,000.00</td>
+          </tr>
+          <tr>
+            <td class="p-2 border-b border-slate-100 text-slate-500">Statutory Withholdings</td>
+            <td class="p-2 border-b border-slate-100 text-right text-slate-500">Exempt (Policy Sec. 9)</td>
+            <td class="p-2 border-b border-slate-100 text-right font-mono text-slate-500">0.00</td>
+          </tr>
+          <tr class="bg-slate-50 font-bold text-sm">
+            <td class="p-2">NET DISBURSED AMOUNT</td>
+            <td class="p-2 text-right">Sierra Leone New Leones</td>
+            <td id="modal-v-net" class="p-2 text-right font-mono text-primary font-extrabold">NLe 24,000.00</td>
+          </tr>
+        </table>
+
+        <!-- Signatures Section -->
+        <div class="grid grid-cols-3 gap-3 pt-6 text-center text-[10px] font-sans border-t border-slate-200">
+          <div>
+            <div class="h-8 border-b border-dashed border-slate-400"></div>
+            <p class="font-bold text-slate-700 mt-1">Prepared by: HR Office</p>
+            <p class="text-slate-400">Joe A. Conteh</p>
+          </div>
+          <div>
+            <div class="h-8 border-b border-dashed border-slate-400"></div>
+            <p class="font-bold text-slate-700 mt-1">Verified by: FOMS Finance</p>
+            <p class="text-slate-400">Aminata Turay</p>
+          </div>
+          <div>
+            <div class="h-8 border-b border-dashed border-slate-400"></div>
+            <p class="font-bold text-slate-700 mt-1">Authorized by: CEO</p>
+            <p class="text-slate-400">Albert J. Bandama</p>
+          </div>
+        </div>
+
+        <div class="text-[9px] text-slate-400 font-mono text-center pt-2">
+          System Verification Hash: SHA256#8c92a9b34f71a0029b47e8cd3f1e • FOMS Automated Accounting Engine
+        </div>
+      </div>
+
+      <!-- Modal Footer -->
+      <div class="flex items-center justify-end gap-2 pt-2 border-t border-slate-100">
+        <button type="button" onclick="closeVoucherModal()" class="px-4 py-2 rounded-xl border border-slate-300 text-slate-700 font-bold text-xs">Close</button>
+        <button type="button" onclick="window.print()" class="px-5 py-2 rounded-xl bg-primary hover:bg-primary-dark text-white font-extrabold text-xs flex items-center gap-1.5">
+          <span class="material-symbols-outlined text-[16px]">print</span>
+          <span>Print Voucher</span>
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+  <script>
+    let currentDossier = null;
+
+    document.addEventListener('DOMContentLoaded', () => {
+      initAuditPage();
+    });
+
+    function initAuditPage() {
+      if (typeof BCF_LEAVE === 'undefined') {
+        setTimeout(initAuditPage, 40);
+        return;
+      }
+      populateDossierSelector();
+      renderAllowanceRegister();
+      renderAuditLogs();
+    }
+
+    // ─────────────────────────────────────────────────────────────
+    // DOSSIER SELECTOR POPULATION
+    // ─────────────────────────────────────────────────────────────
+    function populateDossierSelector() {
+      const select = document.getElementById('dossier-select');
+      if (!select) return;
+
+      const allowances = BCF_LEAVE.getAllowances();
+      const apps = BCF_LEAVE.getApplications();
+
+      select.innerHTML = '';
+
+      if (allowances.length === 0 && apps.length === 0) {
+        select.innerHTML = '<option value="">No dossiers registered</option>';
+        return;
+      }
+
+      allowances.forEach(alw => {
+        const opt = document.createElement('option');
+        opt.value = `ALLOWANCE:${alw.id}`;
+        opt.textContent = `${alw.id} — ${alw.employeeName} (${BCF_LEAVE.formatCurrency(alw.allowanceAmount)} - ${alw.status})`;
+        select.appendChild(opt);
+      });
+
+      // Also list applications without separate allowance
+      apps.forEach(app => {
+        if (!app.allowanceId) {
+          const opt = document.createElement('option');
+          opt.value = `APP:${app.id}`;
+          opt.textContent = `${app.id} — ${app.employeeName} (${app.daysRequested}d Leave - ${app.status})`;
+          select.appendChild(opt);
+        }
+      });
+
+      // Default load first item
+      if (select.options.length > 0) {
+        select.selectedIndex = 0;
+        loadSelectedDossier(select.value);
+      }
+    }
+
+    function loadSelectedDossier(compositeVal) {
+      if (!compositeVal) return;
+      const [type, id] = compositeVal.split(':');
+
+      let alw = null;
+      let app = null;
+      let emp = null;
+
+      if (type === 'ALLOWANCE') {
+        alw = BCF_LEAVE.getAllowance(id);
+        if (alw) {
+          emp = BCF_LEAVE.getEmployee(alw.employeeId) || (BCF_LEAVE.getEmployees ? BCF_LEAVE.getEmployees().find(e => e.fullName === alw.employeeName) : null);
+          app = BCF_LEAVE.getApplications().find(a => a.allowanceId === alw.id || a.reqRef === alw.reqRef || a.id === alw.reqRef) || null;
+        }
+      } else {
+        app = BCF_LEAVE.getApplication(id);
+        if (app) {
+          emp = BCF_LEAVE.getEmployee(app.employeeId) || (BCF_LEAVE.getEmployees ? BCF_LEAVE.getEmployees().find(e => e.fullName === app.employeeName) : null);
+          alw = (app.allowanceId ? BCF_LEAVE.getAllowance(app.allowanceId) : null) || BCF_LEAVE.getAllowances().find(a => a.reqRef === app.id || a.employeeId === app.employeeId || a.employeeName === app.employeeName) || null;
+        }
+      }
+
+      currentDossier = { type, id, alw, app, emp };
+      renderAuditTimeline(currentDossier);
+      renderFomsBreakdown(currentDossier);
+    }
+
+    // ─────────────────────────────────────────────────────────────
+    // RENDER 6-STAGE AUDIT TIMELINE
+    // ─────────────────────────────────────────────────────────────
+    function renderAuditTimeline(dossier) {
+      const container = document.getElementById('timeline-stages-container');
+      if (!container) return;
+
+      const { alw, app, emp } = dossier;
+      const empName = emp ? emp.fullName : (alw ? alw.employeeName : (app ? app.employeeName : 'Employee'));
+      const empId = emp ? emp.id : (alw ? alw.employeeId : (app ? app.employeeId : 'BCF-EMP-00000'));
+      const subDate = (app ? app.submittedDate : (alw ? alw.claimDate : '2026-10-01'));
+
+      const isSupervisorDone = app ? !!app.supervisorApproval?.approved : true;
+      const supervisorOfficer = app?.supervisorApproval?.officer || 'Department Supervisor';
+
+      const isHrDone = alw ? alw.hrVerified : !!app?.hrVerification?.approved;
+      const hrOfficer = app?.hrVerification?.officer || 'Joe A. Conteh (HR Director)';
+
+      const isFinalDone = app ? !!app.finalApproval?.approved : (alw ? alw.financeApproved : false);
+      const executiveOfficer = app?.finalApproval?.officer || 'Albert J. Bandama (CEO)';
+
+      const isVoucherRaised = alw ? !!alw.paymentVoucher : (isFinalDone);
+      const voucherNo = alw?.paymentVoucher || `PV-BCF-FOMS-${new Date().getFullYear()}-0429`;
+
+      const isPaid = alw ? alw.status === 'Paid' : (app?.status === 'Completed (Returned)');
+      const eftRef = alw?.paymentRef || 'SL-CB-EFT-994411';
+
+      // Calculate progress velocity
+      let completedStages = 1; // Stage 1 submitted is true
+      if (isSupervisorDone) completedStages++;
+      if (isHrDone) completedStages++;
+      if (isFinalDone) completedStages++;
+      if (isVoucherRaised) completedStages++;
+      if (isPaid) completedStages++;
+
+      const velocityPct = Math.round((completedStages / 6) * 100);
+      document.getElementById('pipeline-velocity-label').textContent = `Stage ${completedStages} of 6 (${velocityPct}%)`;
+      document.getElementById('pipeline-progress-bar').style.width = `${velocityPct}%`;
+
+      if (completedStages === 6) {
+        document.getElementById('pipeline-velocity-subtext').textContent = 'Electronic remittance settlement completed. Archived in staff ledger.';
+      } else if (completedStages === 5) {
+        document.getElementById('pipeline-velocity-subtext').textContent = 'Fiscal voucher queued in FOMS Finance Gateway. Pending bank clearing cycle.';
+      } else {
+        document.getElementById('pipeline-velocity-subtext').textContent = 'Dossier progressing through hierarchical compliance review.';
+      }
+
+      // Render Stages HTML
+      container.innerHTML = `
+        <!-- Stage 1 -->
+        <div class="flex gap-4 relative">
+          <div class="flex flex-col items-center shrink-0">
+            <div class="w-8 h-8 rounded-full bg-emerald-600 text-white flex items-center justify-center shadow-xs z-10">
+              <span class="material-symbols-outlined text-[18px]">check</span>
+            </div>
+            <div class="w-0.5 bg-emerald-600 absolute top-8 bottom-0 left-4 -translate-x-1/2"></div>
+          </div>
+          <div class="min-w-0 flex-1 pb-6">
+            <div class="flex items-center justify-between">
+              <h4 class="font-extrabold text-sm text-slate-900">1. Electronic Dossier Submitted</h4>
+              <span class="text-[11px] text-slate-400 font-mono">${subDate}</span>
+            </div>
+            <p class="text-xs text-slate-500 mt-0.5">Filed electronically via BCF-SL Staff Portal by ${empName} (${empId}).</p>
+            <span class="text-[10px] font-mono text-emerald-700 font-bold block mt-1">IP: 197.234.12.89 • Node: HQ-FREETOWN-PORTAL</span>
+          </div>
+        </div>
+
+        <!-- Stage 2 -->
+        <div class="flex gap-4 relative">
+          <div class="flex flex-col items-center shrink-0">
+            <div class="w-8 h-8 rounded-full ${isSupervisorDone ? 'bg-emerald-600 text-white' : 'bg-slate-200 text-slate-500'} flex items-center justify-center shadow-xs z-10">
+              <span class="material-symbols-outlined text-[18px]">${isSupervisorDone ? 'check' : 'pending'}</span>
+            </div>
+            <div class="w-0.5 ${isSupervisorDone ? 'bg-emerald-600' : 'bg-slate-200'} absolute top-8 bottom-0 left-4 -translate-x-1/2"></div>
+          </div>
+          <div class="min-w-0 flex-1 pb-6">
+            <div class="flex items-center justify-between">
+              <h4 class="font-extrabold text-sm ${isSupervisorDone ? 'text-slate-900' : 'text-slate-400'}">2. Supervisor Operational Review</h4>
+              <span class="text-[11px] text-slate-400 font-mono">${isSupervisorDone ? 'Verified' : 'Pending'}</span>
+            </div>
+            <p class="text-xs text-slate-500 mt-0.5">Line manager duty coverage verification and departmental staffing conflict signoff.</p>
+            <span class="text-[10px] font-bold text-slate-600 block mt-1">Officer: ${supervisorOfficer}</span>
+          </div>
+        </div>
+
+        <!-- Stage 3 -->
+        <div class="flex gap-4 relative">
+          <div class="flex flex-col items-center shrink-0">
+            <div class="w-8 h-8 rounded-full ${isHrDone ? 'bg-emerald-600 text-white' : 'bg-slate-200 text-slate-500'} flex items-center justify-center shadow-xs z-10">
+              <span class="material-symbols-outlined text-[18px]">${isHrDone ? 'check' : 'pending'}</span>
+            </div>
+            <div class="w-0.5 ${isHrDone ? 'bg-emerald-600' : 'bg-slate-200'} absolute top-8 bottom-0 left-4 -translate-x-1/2"></div>
+          </div>
+          <div class="min-w-0 flex-1 pb-6">
+            <div class="flex items-center justify-between">
+              <h4 class="font-extrabold text-sm ${isHrDone ? 'text-slate-900' : 'text-slate-400'}">3. HR Statutory &amp; Tenure Eligibility</h4>
+              <span class="text-[11px] text-slate-400 font-mono">${isHrDone ? 'Approved' : 'Pending'}</span>
+            </div>
+            <p class="text-xs text-slate-500 mt-0.5">Continuous service anniversary verification (&ge;12 months) and 31-day annual ledger debit verification.</p>
+            <span class="text-[10px] font-bold text-slate-600 block mt-1">Officer: ${hrOfficer}</span>
+          </div>
+        </div>
+
+        <!-- Stage 4 -->
+        <div class="flex gap-4 relative">
+          <div class="flex flex-col items-center shrink-0">
+            <div class="w-8 h-8 rounded-full ${isFinalDone ? 'bg-emerald-600 text-white' : 'bg-slate-200 text-slate-500'} flex items-center justify-center shadow-xs z-10">
+              <span class="material-symbols-outlined text-[18px]">${isFinalDone ? 'check' : 'pending'}</span>
+            </div>
+            <div class="w-0.5 ${isFinalDone ? 'bg-emerald-600' : 'bg-slate-200'} absolute top-8 bottom-0 left-4 -translate-x-1/2"></div>
+          </div>
+          <div class="min-w-0 flex-1 pb-6">
+            <div class="flex items-center justify-between">
+              <h4 class="font-extrabold text-sm ${isFinalDone ? 'text-slate-900' : 'text-slate-400'}">4. Executive Management Authorization</h4>
+              <span class="text-[11px] text-slate-400 font-mono">${isFinalDone ? 'Authorized' : 'Pending'}</span>
+            </div>
+            <p class="text-xs text-slate-500 mt-0.5">Statutory leave authorized. Cryptographic token applied.</p>
+            <span class="text-[10px] font-mono text-primary font-bold block mt-1">Signatory: ${executiveOfficer} • Hash: SHA-256#8c92a9b34...</span>
+          </div>
+        </div>
+
+        <!-- Stage 5 -->
+        <div class="flex gap-4 relative">
+          <div class="flex flex-col items-center shrink-0">
+            <div class="w-8 h-8 rounded-full ${isVoucherRaised ? 'bg-emerald-600 text-white' : 'bg-amber-100 text-amber-700 animate-pulse'} flex items-center justify-center shadow-xs z-10">
+              <span class="material-symbols-outlined text-[18px]">${isVoucherRaised ? 'receipt' : 'sync'}</span>
+            </div>
+            <div class="w-0.5 ${isPaid ? 'bg-emerald-600' : 'bg-slate-200'} absolute top-8 bottom-0 left-4 -translate-x-1/2"></div>
+          </div>
+          <div class="min-w-0 flex-1 pb-6">
+            <div class="flex items-center justify-between">
+              <h4 class="font-extrabold text-sm ${isVoucherRaised ? 'text-slate-900' : 'text-slate-400'}">5. FOMS Fiscal Payment Voucher Raised</h4>
+              <span class="text-[11px] text-slate-400 font-mono">${isVoucherRaised ? 'Generated' : 'Queued'}</span>
+            </div>
+            <p class="text-xs text-slate-500 mt-0.5">Financial voucher generated under Cost Centre <strong>${emp?.department || 'Programmes'}</strong>.</p>
+            <span class="font-mono text-[11px] font-bold text-primary bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200 inline-block mt-1">${voucherNo}</span>
+          </div>
+        </div>
+
+        <!-- Stage 6 -->
+        <div class="flex gap-4 relative">
+          <div class="flex flex-col items-center shrink-0">
+            <div class="w-8 h-8 rounded-full ${isPaid ? 'bg-emerald-600 text-white' : 'bg-slate-200 text-slate-400'} flex items-center justify-center shadow-xs z-10">
+              <span class="material-symbols-outlined text-[18px]">${isPaid ? 'task_alt' : 'hourglass_empty'}</span>
+            </div>
+          </div>
+          <div class="min-w-0 flex-1">
+            <div class="flex items-center justify-between">
+              <h4 class="font-extrabold text-sm ${isPaid ? 'text-slate-900' : 'text-slate-400'}">6. Bank Settlement &amp; Electronic Remittance</h4>
+              <span class="badge-soft ${isPaid ? 'bg-emerald-100 text-emerald-800' : 'bg-slate-100 text-slate-500'}">${isPaid ? 'PAID' : 'Pending Settlement'}</span>
+            </div>
+            <p class="text-xs text-slate-500 mt-0.5">Automated clearing house protocol transmitted to partner bank with digital advice.</p>
+            ${isPaid ? `<span class="text-[10px] font-mono text-emerald-700 font-bold block mt-1">EFT Ref: ${eftRef}</span>` : ''}
+          </div>
+        </div>
+      `;
+    }
+
+    // ─────────────────────────────────────────────────────────────
+    // RENDER FOMS FINANCIAL CARD
+    // ─────────────────────────────────────────────────────────────
+    function renderFomsBreakdown(dossier) {
+      const { alw, app, emp } = dossier;
+
+      const monthlyBasic = emp ? emp.monthlyBasic : (alw ? alw.monthlyBasic : 40000);
+      const annualBasic = monthlyBasic * 12;
+      const allowanceAmount = alw ? alw.allowanceAmount : (annualBasic * 0.05);
+      const voucherNo = alw?.paymentVoucher || `PV-BCF-FOMS-${new Date().getFullYear()}-0429`;
+      const bankName = emp?.bankName || alw?.disbursementBank || 'Sierra Leone Commercial Bank (SLCB)';
+      const accountNo = emp?.accountNo ? `******${emp.accountNo.slice(-4)}` : '******9977';
+      const status = alw ? alw.status : (app?.status || 'Pending');
+      const isPaid = (status === 'Paid');
+
+      document.getElementById('foms-allowance-amount').textContent = BCF_LEAVE.formatCurrency(allowanceAmount);
+      document.getElementById('foms-voucher-id').textContent = voucherNo;
+      document.getElementById('foms-beneficiary-name').textContent = emp ? emp.fullName : (alw ? alw.employeeName : (app ? app.employeeName : 'Staff Member'));
+      document.getElementById('foms-monthly-salary').textContent = BCF_LEAVE.formatCurrency(monthlyBasic);
+      document.getElementById('foms-annual-salary').textContent = BCF_LEAVE.formatCurrency(annualBasic);
+      document.getElementById('foms-bank-name').textContent = bankName;
+      document.getElementById('foms-account-no').textContent = accountNo;
+      document.getElementById('foms-net-sum').textContent = BCF_LEAVE.formatCurrency(allowanceAmount);
+
+      // Staff Advice Email field
+      const staffEmailInput = document.getElementById('foms-staff-email');
+      if (staffEmailInput) {
+        const staffEmail = alw?.employeeEmail || app?.employeeEmail || emp?.email || '';
+        staffEmailInput.value = staffEmail;
+        if (!staffEmail) {
+          const empName = (emp ? emp.fullName : (alw ? alw.employeeName : (app ? app.employeeName : 'staff'))).toLowerCase().replace(/[^a-z0-9]/g, '.').replace(/\.+/g, '.').replace(/^\.|\.$/g, '');
+          staffEmailInput.placeholder = `${empName || 'staff'}@bcf-sl.org`;
+        }
+      }
+
+      const statusPill = document.getElementById('foms-status-pill');
+      statusPill.textContent = status;
+      if (isPaid) {
+        statusPill.className = 'badge-soft bg-emerald-100 text-emerald-800';
+      } else if (status.includes('Pending') || status === 'Finance Review') {
+        statusPill.className = 'badge-soft bg-amber-100 text-amber-900';
+      } else {
+        statusPill.className = 'badge-soft bg-blue-100 text-blue-900';
+      }
+
+      // EFT Box
+      const eftBox = document.getElementById('eft-ref-box');
+      const eftRefSpan = document.getElementById('foms-eft-ref');
+      if (isPaid && alw?.paymentRef) {
+        eftBox.classList.remove('hidden');
+        eftRefSpan.textContent = alw.paymentRef;
+      } else {
+        eftBox.classList.add('hidden');
+      }
+
+      // Email Dispatch Status Box
+      const emailBox = document.getElementById('email-dispatch-box');
+      const previewNotice = document.getElementById('disburse-email-preview-notice');
+      if (emailBox) {
+        if (isPaid) {
+          emailBox.classList.remove('hidden');
+          if (previewNotice) previewNotice.classList.add('hidden');
+          const recipientSpan = document.getElementById('foms-email-recipient');
+          const dateSpan = document.getElementById('foms-email-date');
+          const msgIdSpan = document.getElementById('foms-email-msgid');
+          const statusBadge = document.getElementById('foms-email-status-badge');
+
+          const effectiveEmail = alw?.disbursementEmailRecipient || alw?.employeeEmail || (staffEmailInput ? staffEmailInput.value : '') || emp?.email || 'staff@bcf-sl.org';
+          if (recipientSpan) recipientSpan.textContent = effectiveEmail;
+          if (dateSpan) {
+            dateSpan.textContent = alw?.disbursementEmailDispatchedAt ? BCF_LEAVE.formatDate(alw.disbursementEmailDispatchedAt) : (alw?.paymentDate ? BCF_LEAVE.formatDate(alw.paymentDate) : 'Remittance recorded');
+          }
+          if (msgIdSpan) msgIdSpan.textContent = alw?.disbursementEmailMessageId || 'ID: EFT-ADVICE-OK';
+          if (statusBadge) {
+            if (alw?.disbursementEmailDispatched === false && alw?.disbursementEmailError) {
+              statusBadge.textContent = 'Delivery Alert';
+              statusBadge.className = 'px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-amber-100 text-amber-800 border border-amber-300';
+            } else {
+              statusBadge.textContent = 'Advice Dispatched';
+              statusBadge.className = 'px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-blue-100 text-blue-800 border border-blue-300';
+            }
+          }
+        } else {
+          emailBox.classList.add('hidden');
+          if (previewNotice) previewNotice.classList.remove('hidden');
+        }
+      }
+
+      // Disburse Button visibility
+      const btnDisburse = document.getElementById('btn-disburse');
+      if (btnDisburse) {
+        if (isPaid) {
+          btnDisburse.classList.add('hidden');
+        } else {
+          btnDisburse.classList.remove('hidden');
+          btnDisburse.disabled = false;
+          btnDisburse.innerHTML = `
+            <span class="material-symbols-outlined text-[18px]">payments</span>
+            <span>Authorize Bank EFT Disbursement</span>
+          `;
+        }
+      }
+    }
+
+    // ─────────────────────────────────────────────────────────────
+    // DISBURSEMENT ACTION (Mark Paid, Record EFT, & Send Email)
+    // ─────────────────────────────────────────────────────────────
+    async function handleDisbursePayment() {
+      if (!currentDossier) {
+        BCF_LEAVE.showToast('Please select a valid allowance dossier to disburse payment.', 'warning');
+        return;
+      }
+
+      let alw = currentDossier.alw;
+      const app = currentDossier.app;
+      let emp = currentDossier.emp;
+
+      // Synthesize or ensure allowance record exists
+      if (!alw) {
+        const allowances = BCF_LEAVE.getAllowances();
+        if (app) {
+          alw = allowances.find(a => a.reqRef === app.id || a.employeeId === app.employeeId);
+        }
+        if (!alw) {
+          const monthlyBasic = emp ? emp.monthlyBasic : (app?.monthlyBasic || 15000);
+          const annualBasic = monthlyBasic * 12;
+          const allowanceAmount = annualBasic * 0.05;
+          const newAlwId = `BCF-LA-${new Date().getFullYear()}-${String(allowances.length + 1).padStart(4, '0')}`;
+          alw = {
+            id: newAlwId,
+            reqRef: app?.id || `BCF-LR-${new Date().getFullYear()}-0001`,
+            employeeId: (emp && emp.id) || (app && app.employeeId) || 'BCF-EMP-00025',
+            employeeName: (emp && emp.fullName) || (app && app.employeeName) || document.getElementById('foms-beneficiary-name')?.textContent || 'Staff Member',
+            department: (emp && emp.department) || (app && app.department) || 'Administration',
+            serviceCycle: `${new Date().getFullYear()}/${new Date().getFullYear() + 1}`,
+            monthlyBasic: monthlyBasic,
+            annualBasic: annualBasic,
+            rate: 0.05,
+            allowanceAmount: allowanceAmount,
+            claimDate: new Date().toISOString().split('T')[0],
+            status: 'Finance Review',
+            hrVerified: true,
+            payrollVerified: true,
+            financeApproved: true,
+            paymentVoucher: document.getElementById('foms-voucher-id')?.textContent || `PV-BCF-FOMS-${new Date().getFullYear()}-0429`,
+            paymentRef: null,
+            disbursementBank: emp?.bankName || document.getElementById('foms-bank-name')?.textContent || 'Sierra Leone Commercial Bank (SLCB)'
+          };
+          BCF_LEAVE.saveAllowance(alw);
+          if (app) {
+            app.allowanceId = alw.id;
+            BCF_LEAVE.saveApplication(app);
+          }
+          currentDossier.alw = alw;
+        }
+      }
+
+      // Resolve recipient email
+      const emailInput = document.getElementById('foms-staff-email');
+      let recipientEmail = emailInput ? emailInput.value.trim() : '';
+      if (!recipientEmail || !recipientEmail.includes('@')) {
+        recipientEmail = alw.employeeEmail || (app && app.employeeEmail) || (emp && emp.email) || '';
+      }
+      if (!recipientEmail || !recipientEmail.includes('@')) {
+        const staffName = (emp && emp.fullName) || alw.employeeName || 'staff';
+        const cleanSlug = staffName.toLowerCase().replace(/[^a-z0-9]/g, '.').replace(/\.+/g, '.').replace(/^\.|\.$/g, '');
+        recipientEmail = `${cleanSlug || 'staff'}@bcf-sl.org`;
+        if (emailInput) emailInput.value = recipientEmail;
+      }
+
+      const officerSelect = document.getElementById('finance-officer-select');
+      const officer = officerSelect ? officerSelect.value : 'Director of Finance & Accounts (FOMS Gateway)';
+      const eftRef = `SL-CB-EFT-${Math.floor(100000 + Math.random() * 900000)}`;
+
+      const btnDisburse = document.getElementById('btn-disburse');
+      if (btnDisburse) {
+        btnDisburse.disabled = true;
+        btnDisburse.innerHTML = `
+          <span class="animate-spin material-symbols-outlined text-[18px]">progress_activity</span>
+          <span>Authorizing EFT & Dispatching Email...</span>
+        `;
+      }
+
+      try {
+        const result = await BCF_LEAVE.disburseAllowancePayment(alw.id, officer, eftRef, {
+          recipientEmail,
+          officerName: officer
+        });
+
+        if (result && result.emailResult && result.emailResult.success) {
+          BCF_LEAVE.showToast(`EFT Remittance authorized (${eftRef}) & Disbursement Advice email sent to ${recipientEmail}!`, 'success');
+        } else if (result && result.emailResult && result.emailResult.error) {
+          BCF_LEAVE.showToast(`EFT authorized (${eftRef}), email note: ${result.emailResult.error}`, 'warning');
+        } else {
+          BCF_LEAVE.showToast(`EFT Remittance authorized (${eftRef}) for ${alw.id}!`, 'success');
+        }
+      } catch (err) {
+        console.error('Disbursement error:', err);
+        BCF_LEAVE.showToast(`Error processing disbursement: ${err.message}`, 'error');
+      }
+
+      // Reload
+      populateDossierSelector();
+      renderAllowanceRegister();
+      renderAuditLogs();
+      loadSelectedDossier(`ALLOWANCE:${alw.id}`);
+    }
+
+    // ─────────────────────────────────────────────────────────────
+    // RESEND DISBURSEMENT ADVICE EMAIL
+    // ─────────────────────────────────────────────────────────────
+    async function handleResendDisbursementEmail() {
+      if (!currentDossier || !currentDossier.alw) {
+        BCF_LEAVE.showToast('No active allowance record to resend advice.', 'warning');
+        return;
+      }
+      const alw = currentDossier.alw;
+      const emailInput = document.getElementById('foms-staff-email');
+      let recipientEmail = emailInput ? emailInput.value.trim() : '';
+      if (!recipientEmail || !recipientEmail.includes('@')) {
+        recipientEmail = alw.disbursementEmailRecipient || alw.employeeEmail || '';
+      }
+
+      const btn = document.getElementById('btn-resend-disb-email');
+      if (btn) {
+        btn.disabled = true;
+        btn.innerHTML = '<span class="animate-spin material-symbols-outlined text-[13px]">progress_activity</span> Resending...';
+      }
+
+      try {
+        const officerSelect = document.getElementById('finance-officer-select');
+        const officer = officerSelect ? officerSelect.value : 'Director of Finance & Accounts';
+        const res = await BCF_LEAVE.resendDisbursementNotification(alw.id, recipientEmail, { officerName: officer });
+        if (res && res.success) {
+          BCF_LEAVE.showToast(`Official disbursement advice re-sent to ${recipientEmail}!`, 'success');
+        } else {
+          BCF_LEAVE.showToast(`Resend note: ${res.error || 'Check mailbox configuration'}`, 'warning');
+        }
+      } catch (e) {
+        BCF_LEAVE.showToast(`Resend error: ${e.message}`, 'error');
+      } finally {
+        if (btn) {
+          btn.disabled = false;
+          btn.innerHTML = '<span class="material-symbols-outlined text-[13px]">forward_to_inbox</span><span>Resend Email</span>';
+        }
+        loadSelectedDossier(`ALLOWANCE:${alw.id}`);
+      }
+    }
+
+    // ─────────────────────────────────────────────────────────────
+    // RENDER ALLOWANCE REGISTER TABLE
+    // ─────────────────────────────────────────────────────────────
+    function renderAllowanceRegister() {
+      const tbody = document.getElementById('allowance-register-tbody');
+      if (!tbody) return;
+
+      const allowances = BCF_LEAVE.getAllowances();
+      if (allowances.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="9" class="p-4 text-center text-slate-400">No allowance claims recorded in ledger.</td></tr>';
+        return;
+      }
+
+      tbody.innerHTML = allowances.map(alw => {
+        const isPaid = alw.status === 'Paid';
+        return `
+          <tr class="hover:bg-slate-50 transition">
+            <td class="py-2.5 px-3 font-mono font-bold text-primary">${alw.paymentVoucher || alw.id}</td>
+            <td class="py-2.5 px-3 font-bold text-slate-800">${alw.employeeName}</td>
+            <td class="py-2.5 px-3 text-slate-600">${alw.department}</td>
+            <td class="py-2.5 px-3 font-mono">${BCF_LEAVE.formatCurrency(alw.monthlyBasic)}</td>
+            <td class="py-2.5 px-3 font-mono">${BCF_LEAVE.formatCurrency(alw.annualBasic)}</td>
+            <td class="py-2.5 px-3 font-mono font-bold text-slate-900">${BCF_LEAVE.formatCurrency(alw.allowanceAmount)}</td>
+            <td class="py-2.5 px-3 text-slate-600">${alw.disbursementBank}</td>
+            <td class="py-2.5 px-3 font-mono text-emerald-700 font-bold">${alw.paymentRef || '—'}</td>
+            <td class="py-2.5 px-3">
+              <span class="badge-soft ${isPaid ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-900'}">${alw.status}</span>
+            </td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    // ─────────────────────────────────────────────────────────────
+    // RENDER INSTITUTIONAL AUDIT LEDGER
+    // ─────────────────────────────────────────────────────────────
+    function renderAuditLogs() {
+      const tbody = document.getElementById('audit-log-tbody');
+      if (!tbody) return;
+
+      const logs = BCF_LEAVE.getAuditLogs();
+      if (logs.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="5" class="p-4 text-center text-slate-400">No audit log records found.</td></tr>';
+        return;
+      }
+
+      tbody.innerHTML = logs.slice(0, 15).map(log => `
+        <tr class="hover:bg-slate-50 transition">
+          <td class="py-2 px-3 text-slate-400 font-mono">${log.timestamp}</td>
+          <td class="py-2 px-3 font-bold text-slate-800">${log.actor}</td>
+          <td class="py-2 px-3 text-primary font-bold">${log.action}</td>
+          <td class="py-2 px-3 text-slate-600 font-sans text-xs">${log.details}</td>
+          <td class="py-2 px-3 font-mono text-slate-500">${log.employeeId}</td>
+        </tr>
+      `).join('');
+    }
+
+    // ─────────────────────────────────────────────────────────────
+    // VOUCHER MODAL & PRINTING
+    // ─────────────────────────────────────────────────────────────
+    function openVoucherModal() {
+      if (!currentDossier) return;
+      const { alw, app, emp } = currentDossier;
+
+      const empName = emp ? emp.fullName : (alw ? alw.employeeName : 'Staff Member');
+      const empId = emp ? emp.id : (alw ? alw.employeeId : 'BCF-EMP-00000');
+      const dept = emp ? emp.department : (alw ? alw.department : 'Programmes');
+      const monthly = emp ? emp.monthlyBasic : (alw ? alw.monthlyBasic : 40000);
+      const annual = monthly * 12;
+      const allowance = alw ? alw.allowanceAmount : (annual * 0.05);
+      const voucherNo = alw?.paymentVoucher || `PV-BCF-FOMS-${new Date().getFullYear()}-0429`;
+      const bankName = emp?.bankName || alw?.disbursementBank || 'Rokel Commercial Bank';
+
+      document.getElementById('modal-voucher-no').textContent = voucherNo;
+      document.getElementById('modal-v-name').textContent = empName;
+      document.getElementById('modal-v-id').textContent = `${empId} (${dept})`;
+      document.getElementById('modal-v-bank').textContent = bankName;
+      document.getElementById('modal-v-basis').textContent = `${BCF_LEAVE.formatCurrency(monthly)} x 12`;
+      document.getElementById('modal-v-annual').textContent = (annual).toLocaleString() + '.00';
+      document.getElementById('modal-v-gross').textContent = (allowance).toLocaleString() + '.00';
+      document.getElementById('modal-v-net').textContent = BCF_LEAVE.formatCurrency(allowance);
+
+      const m = document.getElementById('voucher-modal');
+      m.classList.remove('hidden');
+      m.style.display = 'flex';
+    }
+
+    function closeVoucherModal() {
+      const m = document.getElementById('voucher-modal');
+      if (m) {
+        m.classList.add('hidden');
+        m.style.display = 'none';
+      }
+    }
+
+    // ─────────────────────────────────────────────────────────────
+    // EXPORT CERTIFICATE (PRINTABLE WINDOW)
+    // ─────────────────────────────────────────────────────────────
+    function downloadOfficialApprovalSlip() {
+      if (!currentDossier) return;
+      const { alw, app, emp } = currentDossier;
+      const empName = emp ? emp.fullName : (alw ? alw.employeeName : 'Staff Member');
+      const empId = emp ? emp.id : 'BCF-EMP-00025';
+      const ref = app ? app.id : (alw ? alw.id : 'BCF-LEV-2026-0001');
+
+      const certWindow = window.open('', '_blank', 'width=800,height=700');
+      certWindow.document.write(`
+        <html>
+        <head>
+          <title>BCF-SL HR Approval Slip — ${ref}</title>
+          <style>
+            body { font-family: 'Inter', sans-serif; padding: 40px; color: #0f191d; line-height: 1.5; }
+            .header { border-bottom: 2px solid #004328; padding-bottom: 15px; margin-bottom: 25px; }
+            h1 { color: #004328; font-size: 20px; margin: 0; text-transform: uppercase; }
+            .badge { display: inline-block; padding: 4px 10px; background: #e6f4ea; color: #137333; font-weight: bold; border-radius: 4px; font-size: 12px; }
+            .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 25px; font-size: 13px; }
+            .box { padding: 15px; background: #f8fafd; border: 1px solid #e2e8f0; border-radius: 8px; }
+            .seal { margin-top: 40px; border-top: 1px solid #cbd5e1; padding-top: 20px; display: flex; justify-content: space-between; font-size: 11px; }
+          </style>
+        </head>
+        <body>
+          <div class="header">
+            <h1>Bandama Charity Foundation Sierra Leone</h1>
+            <p style="margin: 4px 0 0; font-size: 12px; color: #64748b;">Human Resources &amp; Personnel Administration Department • Official Endorsement</p>
+          </div>
+          <div style="margin-bottom: 20px;">
+            <span class="badge">STATUTORY HR AUTHORIZATION CERTIFICATE</span>
+            <p style="margin-top: 8px; font-size: 13px;">Reference: <strong>${ref}</strong> | Date: <strong>${new Date().toLocaleDateString()}</strong></p>
+          </div>
+          <div class="grid">
+            <div class="box">
+              <strong>Employee Dossier:</strong><br/>
+              Name: ${empName}<br/>
+              ID: ${empId}<br/>
+              Department: ${emp?.department || 'Programmes'}<br/>
+              Commencement Date: ${emp?.empDate || '15/10/2025'}
+            </div>
+            <div class="box">
+              <strong>Entitlement &amp; Allowance:</strong><br/>
+              Annual Entitlement: 31 Days<br/>
+              Allowance Rate: 5% of Annual Basic<br/>
+              Disbursement Sum: ${alw ? BCF_LEAVE.formatCurrency(alw.allowanceAmount) : 'NLe 24,000.00'}<br/>
+              Compliance Status: Fully Verified
+            </div>
+          </div>
+          <p style="font-size: 12px; color: #475569;">
+            This document certifies that the aforementioned employee has completed the required continuous service anniversary and has been officially authorized for statutory leave and allowance under the BCF-SL HR Policy Manual.
+          </p>
+          <div class="seal">
+            <div>
+              _______________________________<br/>
+              <strong>Director of Human Resources</strong><br/>
+              Bandama Charity Foundation
+            </div>
+            <div>
+              _______________________________<br/>
+              <strong>Chief Executive Officer</strong><br/>
+              Executive Authority Signoff
+            </div>
+          </div>
+        </body>
+        </html>
+      `);
+      certWindow.document.close();
+      certWindow.focus();
+    }
+
+    // ─────────────────────────────────────────────────────────────
+    // CSV EXPORT (Section 38)
+    // ─────────────────────────────────────────────────────────────
+    function exportAllowanceRegisterCSV() {
+      const allowances = BCF_LEAVE.getAllowances();
+      if (allowances.length === 0) {
+        BCF_LEAVE.showToast('No records available to export.', 'warning');
+        return;
+      }
+
+      const headers = ['Voucher Ref', 'Employee ID', 'Employee Name', 'Department', 'Monthly Basic (NLe)', 'Annual Basic (NLe)', 'Allowance (NLe)', 'Rate', 'Bank', 'EFT Ref', 'Status', 'Claim Date'];
+      const rows = allowances.map(a => [
+        `"${a.paymentVoucher || a.id}"`,
+        `"${a.employeeId}"`,
+        `"${a.employeeName}"`,
+        `"${a.department}"`,
+        a.monthlyBasic,
+        a.annualBasic,
+        a.allowanceAmount,
+        `"${(a.rate * 100).toFixed(0)}%"`,
+        `"${a.disbursementBank}"`,
+        `"${a.paymentRef || ''}"`,
+        `"${a.status}"`,
+        `"${a.claimDate}"`
+      ]);
+
+      const csvContent = 'data:text/csv;charset=utf-8,' + [headers.join(','), ...rows.map(r => r.join(','))].join('\n');
+      const encodedUri = encodeURI(csvContent);
+      const link = document.createElement('a');
+      link.setAttribute('href', encodedUri);
+      link.setAttribute('download', `BCF_SL_Leave_Allowance_Register_${new Date().toISOString().split('T')[0]}.csv`);
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      BCF_LEAVE.showToast('Allowance register exported to CSV successfully.', 'success');
+    }
+  </script>
+</body>
+</html>

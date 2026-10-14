@@ -1,0 +1,1124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>My Learning, Progress & Grades — BCF-SL Learning Portal</title>
+<meta name="description" content="Track course progress, module completion, assessment scores, certificates, and evaluations for Bandama Charity Foundation Sierra Leone staff."/>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin=""/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+  tailwind.config = {
+    theme: {
+      extend: {
+        fontFamily: {
+          sans: ['Inter', 'sans-serif'],
+          display: ['Plus Jakarta Sans', 'sans-serif']
+        },
+        colors: {
+          bcf: {
+            navy: '#00236f',
+            blue: '#0051d5',
+            cobalt: '#0b4fd6',
+            emerald: '#059669',
+            amber: '#d97706'
+          }
+        }
+      }
+    }
+  };
+</script>
+<script src="../learning_db.js?v=20261010_smtp_live_v3"></script>
+<style>
+  body {
+    background: radial-gradient(1200px 500px at 10% -10%, #dbe7ff 0, transparent 60%),
+                radial-gradient(900px 400px at 110% 0, #e0f2fe 0, transparent 55%),
+                #f5f7fb;
+  }
+  .hero {
+    background: linear-gradient(135deg, #00164e 0%, #00236f 45%, #0051d5 90%, #1d4ed8 100%);
+  }
+  .chip {
+    font-size: 11px;
+    font-weight: 700;
+    padding: 3px 10px;
+    border-radius: 9999px;
+  }
+  .tab-btn {
+    padding: 9px 16px;
+    border-radius: 12px;
+    font-size: 12.5px;
+    font-weight: 700;
+    color: #475569;
+    transition: all .2s;
+  }
+  .tab-btn.active {
+    background: #ffffff;
+    color: #00236f;
+    box-shadow: 0 4px 14px -4px rgba(0, 35, 111, 0.25);
+  }
+  .fade-in { animation: f .3s ease both; }
+  @keyframes f { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+  .step {
+    flex: 1;
+    height: 6px;
+    border-radius: 9px;
+    background: #e2e8f0;
+  }
+  .step.done {
+    background: linear-gradient(90deg, #2563eb, #4f46e5);
+  }
+  .step.now {
+    background: #93c5fd;
+  }
+  input, select, textarea { outline: none; }
+  ::-webkit-scrollbar { width: 6px; height: 6px; }
+  ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 6px; }
+  @media print {
+    header, nav, .no-print, button, #reminders { display: none !important; }
+    body { background: #fff !important; }
+    #tab-transcript { display: block !important; }
+  }
+</style>
+</head>
+<body class="font-sans text-slate-800 min-h-screen flex flex-col antialiased selection:bg-blue-600 selection:text-white">
+
+<!-- Top Navigation Bar -->
+<header class="sticky top-0 z-40 bg-white/90 backdrop-blur-xl border-b border-slate-200/80 shadow-xs">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between gap-3">
+    
+    <!-- Brand Info -->
+    <div class="flex items-center gap-3 min-w-0">
+      <div class="w-10 h-10 rounded-xl hero text-white flex items-center justify-center shadow-md shrink-0">
+        <span class="material-symbols-outlined text-[22px]">school</span>
+      </div>
+      <div class="min-w-0">
+        <div class="flex items-center gap-2">
+          <h1 class="font-display font-extrabold text-[15px] text-slate-900 leading-none truncate">BCF-SL Learning Portal</h1>
+          <span class="hidden sm:inline-block px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-blue-100 text-blue-800">Staff Development</span>
+        </div>
+        <p class="text-[11px] text-slate-500 mt-1 truncate" id="hdr-sub">My Learning, Progress & Grades</p>
+      </div>
+    </div>    <!-- Navigation Links -->
+    <nav class="hidden md:flex items-center gap-1 text-xs font-semibold">
+      <a target="_top" class="px-2.5 py-1.5 rounded-lg text-slate-600 hover:bg-slate-100 transition-colors" href="/learning/course-allocation" onclick="navTo('/learning/course-allocation'); return false;">Course Catalogue</a>
+      <a class="px-2.5 py-1.5 rounded-lg bg-blue-50 text-blue-700 font-bold shadow-2xs" href="/learning/learning-grades" onclick="return false;">My Learning & Grades</a>
+      <a target="_top" class="px-2.5 py-1.5 rounded-lg text-slate-600 hover:bg-slate-100 transition-colors" href="/learning/certificates" onclick="navTo('/learning/certificates'); return false;">Certificates & Transcripts</a>
+      <a target="_top" id="nav-acc-link" class="px-2.5 py-1.5 rounded-lg text-slate-600 hover:bg-slate-100 transition flex items-center gap-1" href="/learning/account-creation" onclick="navTo('/learning/account-creation'); return false;">
+        <span>Accounts</span> <span class="px-1.5 py-0.2 rounded text-[9px] bg-amber-100 text-amber-800 font-bold">Admin</span>
+      </a>
+      <a target="_top" id="nav-dash-link" class="px-2.5 py-1.5 rounded-lg text-slate-600 hover:bg-slate-100 transition flex items-center gap-1" href="/learning/learning-dashboard" onclick="navTo('/learning/learning-dashboard'); return false;">
+        <span>Dashboard</span> <span class="px-1.5 py-0.2 rounded text-[9px] bg-indigo-100 text-indigo-800 font-bold">Admin</span>
+      </a>
+    </nav>
+
+    <!-- User / Profile Control -->
+    <div class="flex items-center gap-2">
+      
+      <!-- Notifications -->
+      <button id="btn-notif" class="relative w-10 h-10 rounded-xl hover:bg-slate-100 flex items-center justify-center text-slate-600 transition" onclick="toggleNotif()" aria-label="Notifications">
+        <span class="material-symbols-outlined text-xl">notifications</span>
+        <span id="notif-dot" class="hidden absolute top-1.5 right-1.5 min-w-[16px] h-4 px-1 rounded-full bg-rose-500 text-white text-[9px] font-bold flex items-center justify-center"></span>
+      </button>
+
+      <!-- Staff Switcher Dropdown Trigger -->
+      <div class="relative">
+        <button onclick="toggleUserDropdown()" class="flex items-center gap-2 p-1.5 pr-2.5 rounded-xl hover:bg-slate-100 border border-transparent hover:border-slate-200 transition">
+          <div id="avatar" class="w-8 h-8 rounded-full bg-gradient-to-br from-blue-700 to-indigo-800 text-white text-xs font-bold flex items-center justify-center shadow-xs">--</div>
+          <div class="hidden sm:block text-left leading-tight">
+            <div id="emp-name" class="text-xs font-bold text-slate-900 truncate max-w-[130px]">—</div>
+            <div id="emp-pos" class="text-[10px] text-slate-500 truncate max-w-[130px]">—</div>
+          </div>
+          <span class="material-symbols-outlined text-slate-400 text-sm">expand_more</span>
+        </button>
+
+        <!-- Dropdown Menu -->
+        <div id="user-dropdown" class="hidden absolute right-0 top-12 w-64 bg-white rounded-2xl shadow-xl border border-slate-200 p-2 z-50 fade-in">
+          <div id="staff-switcher-hdr" class="px-3 py-2 border-b border-slate-100">
+            <div id="staff-switcher-title" class="text-[10px] uppercase font-bold text-slate-400">Switch Active Staff Profile</div>
+            <div id="staff-switcher-subtitle" class="text-xs text-slate-600 mt-0.5">Quickly test learning state as another employee:</div>
+          </div>
+          <div class="py-1 flex flex-col gap-0.5" id="staff-switcher-items"></div>
+          <div class="py-1 border-t border-slate-100">
+            <button onclick="openChangePasswordModal()" class="w-full text-left px-3 py-2 rounded-xl bg-blue-50/80 hover:bg-blue-100 text-blue-900 font-bold text-xs flex items-center gap-2 transition">
+              <span class="material-symbols-outlined text-base text-blue-700">key</span>
+              <span>Change / Edit Password</span>
+            </button>
+          </div>
+          <div class="pt-2 border-t border-slate-100 flex items-center justify-between px-2">
+            <a target="_top" href="/learning/login" onclick="navTo('/learning/login'); return false;" class="text-xs font-bold text-blue-700 hover:underline flex items-center gap-1">
+              <span class="material-symbols-outlined text-sm">login</span> Sign In Portal
+            </a>
+            <button onclick="logout()" class="text-xs font-bold text-rose-600 hover:underline flex items-center gap-1">
+              <span class="material-symbols-outlined text-sm">logout</span> Logout
+            </button>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Notification Drawer -->
+  <div id="notif-panel" class="hidden absolute right-4 top-16 w-80 max-h-96 overflow-auto bg-white rounded-2xl shadow-2xl border border-slate-200 p-3 z-50 fade-in"></div>
+</header>
+
+<main class="max-w-7xl mx-auto px-4 sm:px-6 py-6 flex flex-col gap-6 flex-1 w-full">
+
+  <!-- Hero Banner Strip -->
+  <section class="hero rounded-3xl text-white p-6 sm:p-7 shadow-xl relative overflow-hidden">
+    <div class="absolute -right-16 -top-16 w-80 h-80 rounded-full bg-sky-400/20 blur-3xl pointer-events-none"></div>
+    <div class="absolute -left-12 -bottom-20 w-80 h-80 rounded-full bg-indigo-500/20 blur-3xl pointer-events-none"></div>
+
+    <div class="relative z-10 flex flex-col lg:flex-row lg:items-center justify-between gap-6">
+      <div>
+        <div class="flex flex-wrap items-center gap-2 mb-2">
+          <span class="chip bg-white/15 border border-white/20 text-white flex items-center gap-1">
+            <span class="material-symbols-outlined text-sm text-emerald-300">verified</span>
+            <span id="hero-dept-tag">Staff Development</span>
+          </span>
+          <span id="hero-sem-chip" class="chip bg-blue-400/20 text-blue-200 border border-blue-300/30">Active Semester</span>
+        </div>
+        <h2 class="font-display font-extrabold text-2xl sm:text-3xl tracking-tight text-white">
+          Welcome back, <span id="hero-name">Staff</span>
+        </h2>
+        <p class="text-blue-100 text-xs sm:text-sm mt-1 max-w-xl">
+          Track your course modules, submit official partner credentials, log evaluations, and build your permanent BCF-SL academic record.
+        </p>
+      </div>
+
+      <div class="flex flex-wrap items-center gap-3">
+        <button onclick="navTo('/learning/course-allocation')" class="h-10 px-4 rounded-xl bg-white hover:bg-blue-50 text-blue-900 font-bold text-xs flex items-center gap-1.5 shadow-md transition">
+          <span class="material-symbols-outlined text-base text-blue-700">library_add</span> Browse Catalogue
+        </button>
+        <button onclick="navTo('/learning/certificates')" class="h-10 px-4 rounded-xl bg-white/10 hover:bg-white/20 border border-white/25 text-white font-bold text-xs flex items-center gap-1.5 transition">
+          <span class="material-symbols-outlined text-base">workspace_premium</span> View Certificates
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <!-- KPI Strip -->
+  <section class="grid grid-cols-2 md:grid-cols-5 gap-3" id="kpis"></section>
+
+  <!-- Progress & Pending Reminders -->
+  <section id="reminders" class="flex flex-col gap-2"></section>
+
+  <!-- Tab Selector Navigation -->
+  <div class="flex flex-wrap items-center justify-between gap-4 border-b border-slate-200 pb-3">
+    <div class="bg-slate-200/70 p-1 rounded-2xl flex flex-wrap gap-1">
+      <button class="tab-btn active" data-tab="courses" onclick="switchTab('courses')">My Active Courses</button>
+      <button class="tab-btn" data-tab="transcript" onclick="switchTab('transcript')">Official Academic Transcript</button>
+      <button class="tab-btn" data-tab="skills" onclick="switchTab('skills')">Skills Competency Profile</button>
+      <button class="tab-btn" data-tab="hours" onclick="switchTab('hours')">Learning Hours Ledger</button>
+    </div>
+
+    <div class="text-xs text-slate-500 font-medium hidden sm:flex items-center gap-1.5">
+      <span class="w-2 h-2 rounded-full bg-emerald-500"></span> Live Learning Database Synced
+    </div>
+  </div>
+
+  <!-- Content Panes -->
+  <section id="tab-courses" class="flex flex-col gap-4 fade-in"></section>
+  <section id="tab-transcript" class="hidden fade-in"></section>
+  <section id="tab-skills" class="hidden fade-in"></section>
+  <section id="tab-hours" class="hidden fade-in"></section>
+
+</main>
+
+<!-- Dialog (progress / certificate / evaluation) -->
+<div id="dlg" class="hidden fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm flex items-end sm:items-center justify-center p-3">
+  <div class="bg-white w-full max-w-lg rounded-3xl shadow-2xl p-6 fade-in max-h-[90vh] overflow-auto border border-slate-200" id="dlg-body"></div>
+</div>
+
+<!-- Modal for Staff Self-Service Password Change -->
+<div id="password-modal" class="hidden fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4">
+  <div class="bg-white rounded-3xl max-w-md w-full shadow-2xl border border-slate-200 overflow-hidden fade-in">
+    <div class="hero p-5 text-white flex items-center justify-between">
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-xl bg-white/15 flex items-center justify-center text-white ring-1 ring-white/20">
+          <span class="material-symbols-outlined text-xl">key</span>
+        </div>
+        <div>
+          <h3 class="font-display font-extrabold text-base">Change Account Password</h3>
+          <p class="text-xs text-blue-100">Update your BCF-SL Learning Portal credentials</p>
+        </div>
+      </div>
+      <button onclick="closeChangePasswordModal()" class="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 text-white flex items-center justify-center transition">
+        <span class="material-symbols-outlined text-base">close</span>
+      </button>
+    </div>
+
+    <form id="change-pass-form" onsubmit="handleStaffPasswordChange(event)" class="p-6 flex flex-col gap-4">
+      <div class="bg-slate-50 rounded-2xl p-3.5 border border-slate-200/80 text-xs">
+        <div class="flex items-center justify-between text-slate-500 mb-1">
+          <span>Active Staff Account:</span>
+          <span class="font-bold text-slate-800" id="pwd-staff-name">—</span>
+        </div>
+        <div class="flex items-center justify-between text-slate-500">
+          <span>Staff Login Username:</span>
+          <span class="font-mono font-bold text-blue-700 bg-blue-50 px-2 py-0.5 rounded border border-blue-100" id="pwd-staff-user">—</span>
+        </div>
+        <div class="flex items-center justify-between text-slate-500 mt-1">
+          <span>Work Email Address:</span>
+          <span class="font-semibold text-slate-700 truncate max-w-[200px]" id="pwd-staff-email">—</span>
+        </div>
+      </div>
+
+      <div class="flex flex-col gap-1.5">
+        <label class="text-xs font-bold text-slate-700" for="curr-pass">Current Password <span class="text-red-500">*</span></label>
+        <div class="relative">
+          <input type="password" id="curr-pass" required placeholder="Enter current password" class="w-full h-11 pl-3.5 pr-10 rounded-xl border border-slate-300 bg-slate-50 text-xs font-mono font-bold text-slate-900 focus:bg-white focus:border-blue-600 focus:outline-none"/>
+          <button type="button" onclick="togglePassField('curr-pass', 'eye-curr')" class="absolute right-3 top-3 text-slate-400 hover:text-slate-600">
+            <span class="material-symbols-outlined text-lg" id="eye-curr">visibility</span>
+          </button>
+        </div>
+      </div>
+
+      <div class="flex flex-col gap-1.5">
+        <label class="text-xs font-bold text-slate-700" for="new-pass">New Password <span class="text-red-500">*</span></label>
+        <div class="relative">
+          <input type="password" id="new-pass" required minlength="6" placeholder="At least 6 characters" class="w-full h-11 pl-3.5 pr-10 rounded-xl border border-slate-300 bg-slate-50 text-xs font-mono font-bold text-slate-900 focus:bg-white focus:border-blue-600 focus:outline-none"/>
+          <button type="button" onclick="togglePassField('new-pass', 'eye-new')" class="absolute right-3 top-3 text-slate-400 hover:text-slate-600">
+            <span class="material-symbols-outlined text-lg" id="eye-new">visibility</span>
+          </button>
+        </div>
+      </div>
+
+      <div class="flex flex-col gap-1.5">
+        <label class="text-xs font-bold text-slate-700" for="conf-pass">Confirm New Password <span class="text-red-500">*</span></label>
+        <div class="relative">
+          <input type="password" id="conf-pass" required minlength="6" placeholder="Re-enter new password" class="w-full h-11 pl-3.5 pr-10 rounded-xl border border-slate-300 bg-slate-50 text-xs font-mono font-bold text-slate-900 focus:bg-white focus:border-blue-600 focus:outline-none"/>
+          <button type="button" onclick="togglePassField('conf-pass', 'eye-conf')" class="absolute right-3 top-3 text-slate-400 hover:text-slate-600">
+            <span class="material-symbols-outlined text-lg" id="eye-conf">visibility</span>
+          </button>
+        </div>
+      </div>
+
+      <div class="text-[11px] text-slate-500 flex items-start gap-1.5 bg-blue-50/60 p-2.5 rounded-xl border border-blue-100">
+        <span class="material-symbols-outlined text-sm text-blue-600 shrink-0 mt-0.5">info</span>
+        <span>A security confirmation email will automatically be dispatched to your official BCF-SL work email upon password update.</span>
+      </div>
+
+      <div class="flex items-center gap-3 pt-2">
+        <button type="button" onclick="closeChangePasswordModal()" class="flex-1 h-11 rounded-xl border border-slate-300 bg-white hover:bg-slate-50 font-bold text-xs text-slate-700 transition">
+          Cancel
+        </button>
+        <button type="submit" id="btn-save-pwd" class="flex-1 h-11 rounded-xl bg-blue-700 hover:bg-blue-800 text-white font-bold text-xs flex items-center justify-center gap-1.5 shadow transition">
+          <span class="material-symbols-outlined text-base">check</span>
+          <span>Update Password</span>
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Floating Toast -->
+<div id="toast" class="fixed bottom-6 left-1/2 -translate-x-1/2 z-[60] hidden bg-slate-900 text-white text-sm font-semibold px-5 py-3 rounded-2xl shadow-2xl items-center gap-2"></div>
+
+<script>
+const STATUS_STYLE = {
+  'Requested': 'bg-amber-100 text-amber-800',
+  'Under Review': 'bg-orange-100 text-orange-800',
+  'Approved': 'bg-sky-100 text-sky-800',
+  'Enrolled': 'bg-blue-100 text-blue-800',
+  'Not Started': 'bg-slate-100 text-slate-700',
+  'In Progress': 'bg-indigo-100 text-indigo-800',
+  'Completed': 'bg-emerald-100 text-emerald-800',
+  'Certificate Submitted': 'bg-teal-100 text-teal-800',
+  'Certificate Verified': 'bg-emerald-600 text-white',
+  'Closed': 'bg-slate-700 text-white',
+  'Rejected': 'bg-rose-100 text-rose-700',
+  'Cancelled': 'bg-slate-100 text-slate-500'
+};
+
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const fmtDate = d => d ? new Date(d).toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'}) : '—';
+const initials = n => (n||'?').split(' ').map(x=>x[0]).join('').slice(0,2).toUpperCase();
+
+function toast(msg, ok=true){
+  const t = document.getElementById('toast');
+  t.innerHTML = `<span class="material-symbols-outlined text-[18px] ${ok?'text-emerald-400':'text-rose-400'}">${ok?'check_circle':'error'}</span>${esc(msg)}`;
+  t.classList.remove('hidden');
+  t.classList.add('flex');
+  clearTimeout(t._h);
+  t._h = setTimeout(() => { t.classList.add('hidden'); t.classList.remove('flex'); }, 4000);
+}
+
+// Navigation helper for iframe parent routing
+function navTo(url) {
+  try {
+    if (window.top && window.top !== window && window.top.location) {
+      window.top.location.href = url;
+      return;
+    }
+  } catch (e) {}
+  if (url.includes('course-allocation')) window.location.href = '../catalog_course_allocation/code.html';
+  else if (url.includes('learning-grades')) window.location.href = '../my_learning_grades/code.html';
+  else if (url.includes('certificates')) window.location.href = '../assessment_certificate/code.html';
+  else if (url.includes('account-creation')) window.location.href = '../admin_staff_provisioning/code.html?tab=accounts';
+  else if (url.includes('learning-dashboard')) window.location.href = '../admin_staff_provisioning/code.html?tab=analytics';
+  else if (url.includes('admin-provisioning')) window.location.href = '../admin_staff_provisioning/code.html';
+  else if (url.includes('login')) window.location.href = '../login/code.html';
+}
+
+function toggleUserDropdown() {
+  const el = document.getElementById('user-dropdown');
+  el.classList.toggle('hidden');
+}
+
+function toggleNotif() {
+  const p = document.getElementById('notif-panel');
+  const open = p.classList.toggle('hidden') === false;
+  if (!open) return;
+  const emp = getCurrentEmployee();
+  const notes = getNotifications(emp.employeeId).slice(0, 25);
+  const icon = {semester:'event_available',approved:'task_alt',enrolled:'how_to_reg',reminder:'schedule',completed:'celebration',certificate:'upload_file',threshold:'lock',closing:'hourglass_bottom',rejected:'cancel',review:'rate_review',verified:'verified'};
+  p.innerHTML = `<div class="flex items-center justify-between pb-2 border-b border-slate-100">
+    <b class="text-xs font-bold text-slate-800">Learning Notifications</b>
+    <span class="text-[10px] text-slate-400">${notes.length} total</span>
+  </div>` +
+  (notes.length ? notes.map(n => `
+    <div class="flex gap-2 p-2 rounded-xl ${n.read?'':'bg-blue-50/70'} border-b border-slate-50 last:border-b-0">
+      <span class="material-symbols-outlined text-[18px] text-blue-600 shrink-0">${icon[n.type]||'notifications'}</span>
+      <div>
+        <div class="text-[12px] text-slate-700 leading-snug">${esc(n.message)}</div>
+        <div class="text-[10px] text-slate-400 mt-0.5">${fmtDate(n.at)}</div>
+      </div>
+    </div>`).join('') : '<div class="text-xs text-slate-400 py-4 text-center">No new notifications.</div>');
+  markNotificationsRead(emp.employeeId);
+  document.getElementById('notif-dot').classList.add('hidden');
+}
+
+function logout() {
+  sessionStorage.removeItem('bcf_learning_session');
+  localStorage.removeItem('bcf_selected_profile');
+  sessionStorage.removeItem('bcf_staff_only_session');
+  navTo('/learning/login');
+}
+
+function selectStaff(empId) {
+  if (!isHRAdmin()) {
+    toast('Profile switching is restricted to HR Administrators.');
+    return;
+  }
+  setCurrentEmployee(empId);
+  document.getElementById('user-dropdown').classList.add('hidden');
+  const e = getCurrentEmployee();
+  toast(`Switched profile to ${e.fullName} (${e.department})`);
+  renderAll();
+}
+
+function renderStaffSwitcher() {
+  const current = getCurrentEmployee();
+  const list = document.getElementById('staff-switcher-items');
+  const title = document.getElementById('staff-switcher-title');
+  const subtitle = document.getElementById('staff-switcher-subtitle');
+  if (!list) return;
+
+  if (!isHRAdmin(current)) {
+    if (title) title.textContent = 'Active Staff Profile';
+    if (subtitle) subtitle.textContent = 'Your verified learning account:';
+    list.innerHTML = `
+      <div class="p-2.5 rounded-xl bg-blue-50/70 border border-blue-100 flex flex-col gap-1 text-left">
+        <div class="text-xs font-bold text-blue-950 truncate">${esc(current.fullName)}</div>
+        <div class="text-[11px] font-mono text-blue-700 font-semibold">${esc(current.employeeId)}</div>
+        <div class="text-[10.5px] text-slate-600 truncate">${esc(current.position || 'Staff')} · ${esc(current.department)}</div>
+        ${current.email ? `<div class="text-[10px] text-slate-500 truncate">${esc(current.email)}</div>` : ''}
+        <div class="mt-1 flex items-center gap-1 text-[10px] text-emerald-700 font-bold">
+          <span class="material-symbols-outlined text-[13px]">verified_user</span>
+          <span>Verified Staff Session</span>
+        </div>
+      </div>
+    `;
+    return;
+  }
+
+  if (title) title.textContent = 'Switch Active Staff Profile';
+  if (subtitle) subtitle.textContent = 'Quickly test learning state as another employee:';
+  const accounts = getLearningAccounts();
+  list.innerHTML = accounts.map(a => `
+    <button onclick="selectStaff('${a.employeeId}')" class="w-full px-3 py-2 text-left rounded-xl hover:bg-blue-50 transition flex items-center justify-between ${a.employeeId === current.employeeId ? 'bg-blue-50/80 font-bold text-blue-900' : 'text-slate-700'}">
+      <div class="min-w-0 pr-2">
+        <div class="text-xs truncate">${esc(a.employeeName)}</div>
+        <div class="text-[10px] text-slate-400 truncate">${esc(a.position)} · ${esc(a.department)}</div>
+      </div>
+      ${a.employeeId === current.employeeId ? '<span class="material-symbols-outlined text-sm text-blue-700">check</span>' : ''}
+    </button>
+  `).join('');
+}
+
+let emp, sem;
+
+function pipeline(status){
+  const flow = BCF_LEARNING.STATUS_FLOW;
+  const i = flow.indexOf(status);
+  if (i < 0) return '';
+  return `<div class="flex gap-1 mt-3" title="${esc(status)}">
+    ${flow.map((s, k) => `<div class="step ${k < i ? 'done' : k === i ? 'now' : ''}" title="${esc(s)}"></div>`).join('')}
+  </div>
+  <div class="flex justify-between text-[9.5px] text-slate-400 mt-1">
+    <span>Requested</span><span>Approved</span><span>In Progress</span><span>Certificate</span><span>Closed</span>
+  </div>`;
+}
+
+function renderHeader(){
+  emp = getCurrentEmployee();
+  sem = getActiveSemester();
+  const slots = getSlotSummary(emp.employeeId);
+  const hrs = getLearningHours(emp.employeeId);
+
+  // Top header text
+  document.getElementById('emp-name').textContent = emp.fullName;
+  document.getElementById('emp-pos').textContent = `${emp.position} · ${emp.department}`;
+  document.getElementById('avatar').textContent = initials(emp.fullName);
+  document.getElementById('hdr-sub').textContent = `${sem.name} · Supervisor: ${emp.supervisor}`;
+
+  const govLink = document.getElementById('nav-gov-link');
+  if (govLink) {
+    govLink.style.display = isHRAdmin(emp) ? '' : 'none';
+  }
+
+  // Hero strip
+  document.getElementById('hero-name').textContent = emp.fullName;
+  document.getElementById('hero-dept-tag').textContent = `${emp.position} · ${emp.department}`;
+  document.getElementById('hero-sem-chip').textContent = `${sem.name} (${slots.used}/${slots.max} Slots Used)`;
+
+  // Verified certs & scores
+  const allEnrollments = getEmployeeEnrollments(emp.employeeId);
+  const certs = getTranscript(emp.employeeId).filter(e => e.certificate && e.certificate.status === 'Verified').length;
+  const completedWithScores = allEnrollments.filter(e => typeof e.score === 'number');
+  const avgScore = completedWithScores.length
+    ? Math.round(completedWithScores.reduce((acc, curr) => acc + curr.score, 0) / completedWithScores.length)
+    : '—';
+
+  // KPI cards
+  const k = [
+    ['Current Semester', sem.name, 'event'],
+    ['Course Slots Quota', `${slots.used} / ${slots.max}`, 'donut_large'],
+    ['Average Assessment Score', avgScore !== '—' ? `${avgScore}%` : '—', 'grade'],
+    ['Semester Learning Hours', hrs.semester.toFixed(1) + ' hrs', 'schedule'],
+    ['Verified Certificates', certs, 'workspace_premium']
+  ];
+
+  document.getElementById('kpis').innerHTML = k.map(([l, v, i]) => `
+    <div class="bg-white rounded-2xl border border-slate-200 p-4 shadow-sm hover:shadow-md transition">
+      <div class="flex items-center justify-between text-slate-400">
+        <span class="text-[10px] font-bold uppercase tracking-wider">${l}</span>
+        <span class="material-symbols-outlined text-blue-600 text-[20px]">${i}</span>
+      </div>
+      <div class="font-display font-extrabold text-xl text-slate-900 mt-1">${esc(v)}</div>
+    </div>
+  `).join('');
+
+  // Notifications bell dot
+  const notes = getNotifications(emp.employeeId);
+  const unread = notes.filter(n => !n.read).length;
+  const dot = document.getElementById('notif-dot');
+  dot.textContent = unread;
+  dot.classList.toggle('hidden', !unread);
+
+  // Reminders
+  const days = getSettings().reminderDays;
+  const stale = getEmployeeEnrollments(emp.employeeId, sem.id).filter(e => ['Enrolled', 'Not Started', 'In Progress'].includes(e.status) && getIdleDays(e) >= days);
+  const needCert = getEmployeeEnrollments(emp.employeeId).filter(e => e.status === 'Completed');
+  const needEval = getEmployeeEnrollments(emp.employeeId).filter(e => e.progress === 100 && !e.evaluation);
+
+  document.getElementById('reminders').innerHTML =
+    stale.map(e => `
+      <div class="rounded-2xl bg-amber-50 border border-amber-200 p-3.5 text-xs text-amber-900 flex gap-3 items-center">
+        <span class="material-symbols-outlined text-amber-600 text-xl shrink-0">schedule</span>
+        <div class="flex-1">
+          <b>Learning Progress Reminder.</b> You have not recorded progress on <b>${esc(e.courseTitle)}</b> for ${getIdleDays(e)} days. Please log your weekly hours or update your modules.
+        </div>
+        <button onclick="openProgress('${e.id}')" class="h-8 px-3 rounded-xl bg-amber-600 text-white font-bold shrink-0">Update Now</button>
+      </div>`).join('') +
+    needCert.map(e => `
+      <div class="rounded-2xl bg-teal-50 border border-teal-200 p-3.5 text-xs text-teal-900 flex gap-3 items-center">
+        <span class="material-symbols-outlined text-teal-600 text-xl shrink-0">upload_file</span>
+        <div class="flex-1">
+          <b>Course Completed – Certificate Required.</b> Please submit your official partner certificate or verification credential for <b>${esc(e.courseTitle)}</b>.
+        </div>
+        <button onclick="openCert('${e.id}')" class="h-8 px-3 rounded-xl bg-teal-700 text-white font-bold shrink-0">Submit Certificate</button>
+      </div>`).join('') +
+    needEval.map(e => `
+      <div class="rounded-2xl bg-indigo-50 border border-indigo-200 p-3.5 text-xs text-indigo-900 flex gap-3 items-center">
+        <span class="material-symbols-outlined text-indigo-600 text-xl shrink-0">rate_review</span>
+        <div class="flex-1">
+          <b>Staff Course Evaluation Pending.</b> Help BCF-SL evaluate training quality by submitting feedback for <b>${esc(e.courseTitle)}</b>.
+        </div>
+        <button onclick="openEval('${e.id}')" class="h-8 px-3 rounded-xl bg-indigo-600 text-white font-bold shrink-0">Evaluate Course</button>
+      </div>`).join('');
+}
+
+function courseCard(e){
+  const actionable = ['Enrolled', 'Not Started', 'In Progress'].includes(e.status);
+  const c = getCourse(e.courseId) || {};
+  const hasScore = typeof e.score === 'number';
+  const passMark = c.passMark || 80;
+  const isPass = hasScore && e.score >= passMark;
+
+  return `<article class="bg-white rounded-3xl border border-slate-200 shadow-sm hover:shadow-md transition p-5 sm:p-6 fade-in">
+    <div class="flex flex-col lg:flex-row lg:items-start gap-5">
+      <img src="${c.image || 'https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=600&auto=format&fit=crop&q=80'}" alt="" class="w-full lg:w-48 h-32 rounded-2xl object-cover shadow-xs shrink-0"/>
+      
+      <div class="flex-1 min-w-0">
+        <div class="flex flex-wrap items-center gap-2">
+          <span class="chip ${STATUS_STYLE[e.status] || ''}">${esc(e.status)}</span>
+          <span class="chip bg-slate-100 text-slate-600">${e.isMandatory ? 'Mandatory · No Slot' : 'Slot ' + (e.slotNumber || '—')}</span>
+          <span class="chip bg-blue-50 text-blue-700 font-bold">${esc(e.vendor)}</span>
+          ${hasScore ? `<span class="chip ${isPass ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-800'} flex items-center gap-1 font-bold">
+            <span class="material-symbols-outlined text-[13px]">${isPass ? 'verified' : 'priority_high'}</span>
+            Grade: ${e.score}% ${isPass ? '(Pass Distinction)' : '(Pass)'}
+          </span>` : ''}
+        </div>
+
+        <h3 class="font-display font-extrabold text-lg text-slate-900 mt-2 leading-snug">${esc(e.courseTitle)}</h3>
+
+        <div class="mt-2.5 h-2.5 rounded-full bg-slate-100 overflow-hidden">
+          <div class="h-full rounded-full ${e.progress === 100 ? 'bg-emerald-500' : 'bg-gradient-to-r from-blue-600 to-indigo-600'}" style="width:${e.progress || 0}%"></div>
+        </div>
+
+        <div class="grid grid-cols-2 sm:grid-cols-5 gap-2 mt-3.5 text-[11.5px] bg-slate-50/80 p-3 rounded-2xl border border-slate-100">
+          <div><div class="text-slate-400 font-bold uppercase text-[9px]">Syllabus</div><b>${e.progress || 0}% Done</b></div>
+          <div><div class="text-slate-400 font-bold uppercase text-[9px]">Modules</div><b>${e.modulesCompleted || 0} / ${e.modulesTotal || 8}</b></div>
+          <div><div class="text-slate-400 font-bold uppercase text-[9px]">Hours Logged</div><b>${Number(e.hoursCompleted || 0).toFixed(1)} / ${e.hoursTotal || c.hours || '—'} h</b></div>
+          <div><div class="text-slate-400 font-bold uppercase text-[9px]">Last Active</div><b>${fmtDate(e.lastActivityDate)}</b></div>
+          <div><div class="text-slate-400 font-bold uppercase text-[9px]">Expected Finish</div><b>${fmtDate(e.expectedCompletionDate)}</b></div>
+        </div>
+
+        ${pipeline(e.status)}
+
+        ${e.status === 'Requested' ? `<p class="text-xs text-amber-700 mt-3 flex items-center gap-1.5"><span class="material-symbols-outlined text-sm">hourglass_top</span>Awaiting endorsement from your supervisor (${esc(emp.supervisor)}).</p>` : ''}
+        ${e.status === 'Under Review' ? `<p class="text-xs text-orange-700 mt-3 flex items-center gap-1.5"><span class="material-symbols-outlined text-sm">pending_actions</span>Endorsed by supervisor — currently under HR Governance review for licensing.</p>` : ''}
+        ${e.certificate ? `
+          <div class="mt-3 p-2.5 rounded-xl bg-teal-50/80 border border-teal-100 flex items-center justify-between text-xs">
+            <div class="text-teal-900">
+              <span class="font-bold">Credential:</span> ${esc(e.certificate.number || e.certificate.fileName || 'Attached')} · Status: 
+              <span class="${e.certificate.status === 'Verified' ? 'text-emerald-700' : e.certificate.status === 'Rejected' ? 'text-rose-700' : 'text-teal-700'} font-bold">${esc(e.certificate.status)}</span>
+            </div>
+            ${e.certificate.status === 'Verified' ? `<button onclick="navTo('/learning/certificates')" class="text-blue-700 hover:underline font-bold flex items-center gap-0.5">
+              <span class="material-symbols-outlined text-sm">visibility</span>View Certificate
+            </button>` : ''}
+          </div>` : ''}
+
+        ${e.evaluation ? `
+          <div class="mt-2 text-xs text-slate-500 flex items-center gap-1.5">
+            <span class="material-symbols-outlined text-amber-500 text-sm">star</span> Course Evaluation submitted (Usefulness: ${e.evaluation.useful}/5 · Recommend: ${esc(e.evaluation.recommend)})
+          </div>` : ''}
+      </div>
+
+      <div class="flex sm:flex-row lg:flex-col gap-2 shrink-0">
+        ${actionable ? `
+          <button onclick="openProgress('${e.id}')" class="h-9 px-3.5 rounded-xl bg-blue-700 hover:bg-blue-800 text-white text-xs font-bold flex items-center gap-1.5 transition">
+            <span class="material-symbols-outlined text-[16px]">trending_up</span>Update Progress
+          </button>
+          <a href="${c.link || '#'}" target="_blank" rel="noopener" class="h-9 px-3.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold flex items-center gap-1.5 transition">
+            <span class="material-symbols-outlined text-[16px]">open_in_new</span>Go to ${esc(e.vendor.split(' ')[0])}
+          </a>` : ''}
+
+        ${e.status === 'Completed' ? `
+          <button onclick="openCert('${e.id}')" class="h-9 px-3.5 rounded-xl bg-teal-600 hover:bg-teal-700 text-white text-xs font-bold flex items-center gap-1.5 transition">
+            <span class="material-symbols-outlined text-[16px]">upload_file</span>Submit Certificate
+          </button>` : ''}
+
+        ${e.progress === 100 && !e.evaluation ? `
+          <button onclick="openEval('${e.id}')" class="h-9 px-3.5 rounded-xl bg-amber-500 hover:bg-amber-600 text-white text-xs font-bold flex items-center gap-1.5 transition">
+            <span class="material-symbols-outlined text-[16px]">rate_review</span>Course Evaluation
+          </button>` : ''}
+
+        ${['Requested', 'Under Review'].includes(e.status) ? `
+          <button onclick="cancelReq('${e.id}')" class="h-9 px-3.5 rounded-xl bg-rose-50 hover:bg-rose-100 text-rose-700 text-xs font-bold transition">
+            Withdraw Request
+          </button>` : ''}
+      </div>
+    </div>
+  </article>`;
+}
+
+function renderCourses(){
+  const list = getEmployeeEnrollments(emp.employeeId, sem.id).filter(e => e.status !== 'Cancelled');
+  document.getElementById('tab-courses').innerHTML = list.length ? list.map(courseCard).join('') : `
+    <div class="bg-white rounded-3xl border border-dashed border-slate-300 p-12 text-center">
+      <div class="w-16 h-16 rounded-full bg-blue-50 text-blue-600 flex items-center justify-center mx-auto mb-3">
+        <span class="material-symbols-outlined text-3xl">library_add</span>
+      </div>
+      <h3 class="font-display font-extrabold text-base text-slate-800">No course enrollments for this semester yet</h3>
+      <p class="text-xs text-slate-500 max-w-md mx-auto mt-1">Browse the curated 2026 course catalogue to select up to 2 approved learning courses.</p>
+      <button onclick="navTo('/learning/course-allocation')" class="inline-flex mt-4 h-10 px-5 rounded-xl bg-blue-700 hover:bg-blue-800 text-white text-xs font-bold items-center gap-2 transition">
+        Browse Course Catalogue
+      </button>
+    </div>`;
+}
+
+function renderTranscript(){
+  const rows = getTranscript(emp.employeeId);
+  document.getElementById('tab-transcript').innerHTML = `
+    <div class="bg-white rounded-3xl border border-slate-200 shadow-sm overflow-hidden">
+      <div class="p-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-100">
+        <div>
+          <div class="flex items-center gap-2">
+            <h3 class="font-display font-extrabold text-lg text-slate-900">Official Employee Academic Transcript</h3>
+            <span class="chip bg-blue-50 text-blue-700">Permanent Record</span>
+          </div>
+          <p class="text-xs text-slate-500 mt-1">${esc(emp.fullName)} · Staff ID: <b>${esc(emp.employeeId)}</b> · ${esc(emp.department)}</p>
+        </div>
+        <div class="flex items-center gap-2">
+          <button onclick="window.print()" class="h-9 px-4 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold flex items-center gap-1.5 transition">
+            <span class="material-symbols-outlined text-[16px]">print</span>Print Transcript
+          </button>
+          <button onclick="navTo('/learning/certificates')" class="h-9 px-4 rounded-xl bg-blue-700 hover:bg-blue-800 text-white text-xs font-bold flex items-center gap-1.5 transition">
+            <span class="material-symbols-outlined text-[16px]">workspace_premium</span>Diplomas
+          </button>
+        </div>
+      </div>
+
+      <div class="overflow-x-auto">
+        <table class="w-full text-xs text-left">
+          <thead class="bg-slate-50 text-[10.5px] uppercase tracking-wider text-slate-500 font-bold border-b border-slate-200/70">
+            <tr>
+              <th class="px-5 py-3.5">Semester</th>
+              <th class="px-3 py-3.5">Course Title</th>
+              <th class="px-3 py-3.5">Vendor</th>
+              <th class="px-3 py-3.5">Category</th>
+              <th class="text-right px-3 py-3.5">Hours</th>
+              <th class="text-center px-3 py-3.5">Assessment Score</th>
+              <th class="text-center px-3 py-3.5">Status</th>
+              <th class="px-5 py-3.5">Official Credential</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-slate-100">
+            ${rows.map(r => {
+              const hasScore = typeof r.score === 'number';
+              const passMark = (getCourse(r.courseId) || {}).passMark || 80;
+              const isPass = hasScore && r.score >= passMark;
+              return `<tr class="hover:bg-slate-50/70 transition">
+                <td class="px-5 py-3.5 font-semibold text-slate-800">${esc(r.semesterName)}</td>
+                <td class="px-3 py-3.5 font-bold text-slate-900">${esc(r.courseTitle)}</td>
+                <td class="px-3 py-3.5 text-slate-600">${esc(r.vendor)}</td>
+                <td class="px-3 py-3.5">
+                  <span class="chip ${r.isMandatory ? 'bg-emerald-50 text-emerald-700' : 'bg-blue-50 text-blue-700'}">
+                    ${r.isMandatory ? 'Mandatory' : 'Staff Development'}
+                  </span>
+                </td>
+                <td class="px-3 py-3.5 text-right font-medium">${Number(r.hoursCompleted || 0).toFixed(1)} h</td>
+                <td class="px-3 py-3.5 text-center">
+                  ${hasScore ? `<span class="inline-flex items-center gap-1 font-bold ${isPass ? 'text-emerald-700' : 'text-amber-700'}">
+                    <b>${r.score}%</b> ${isPass ? '🏅' : ''}
+                  </span>` : '<span class="text-slate-400">—</span>'}
+                </td>
+                <td class="px-3 py-3.5 text-center">
+                  <span class="chip ${STATUS_STYLE[r.status] || 'bg-slate-100'}">${esc(r.status)}</span>
+                </td>
+                <td class="px-5 py-3.5">
+                  ${r.certificate?.status === 'Verified' ? `
+                    <div class="flex items-center gap-1.5 text-emerald-700 font-bold">
+                      <span class="material-symbols-outlined text-sm">verified</span>
+                      <span>Verified (${esc(r.certificate.number || 'BCF-CERT')})</span>
+                    </div>` : r.certificate ? `
+                    <span class="text-teal-700 font-semibold">Under Review</span>` : `
+                    <span class="text-slate-400">—</span>`}
+                </td>
+              </tr>`;
+            }).join('') || `<tr><td colspan="8" class="text-center text-slate-400 py-10 font-normal">No learning transcript records on file.</td></tr>`}
+          </tbody>
+        </table>
+      </div>
+    </div>`;
+}
+
+function renderSkills(){
+  const p = getSkillsProfile(emp.employeeId);
+  const names = Object.keys(p.current);
+  document.getElementById('tab-skills').innerHTML = `
+    <div class="bg-white rounded-3xl border border-slate-200 shadow-sm p-6 sm:p-7">
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-6">
+        <div>
+          <h3 class="font-display font-extrabold text-lg text-slate-900">Staff Competency & Skills Profile</h3>
+          <p class="text-xs text-slate-500 mt-0.5">Benchmark baseline vs current assessed mastery level after completed courses.</p>
+        </div>
+        <div class="flex items-center gap-4 text-xs font-semibold">
+          <span class="flex items-center gap-1.5"><i class="w-3.5 h-2.5 rounded bg-blue-700 inline-block"></i> Baseline Score</span>
+          <span class="flex items-center gap-1.5"><i class="w-3.5 h-2.5 rounded bg-emerald-400 inline-block"></i> Skill Gain</span>
+        </div>
+      </div>
+
+      <div class="grid md:grid-cols-2 gap-x-10 gap-y-6">
+        ${names.map(s => {
+          const b = p.baseline[s] ?? 0;
+          const c = p.current[s];
+          const gain = c - b;
+          return `<div>
+            <div class="flex justify-between items-center text-xs">
+              <span class="font-bold text-slate-800">${esc(s)}</span>
+              <span class="text-slate-500">
+                Baseline: ${b}% → Current: <b class="${c > b ? 'text-emerald-700' : 'text-slate-800'}">${c}%</b>
+                ${gain > 0 ? `<span class="ml-1 text-[10px] text-emerald-700 font-bold bg-emerald-50 px-1.5 py-0.5 rounded-full">+${gain}%</span>` : ''}
+              </span>
+            </div>
+            <div class="relative h-3 rounded-full bg-slate-100 mt-2 overflow-hidden shadow-inner">
+              <div class="absolute h-full bg-emerald-400/80 rounded-full" style="width:${c}%"></div>
+              <div class="absolute h-full bg-blue-700 rounded-full" style="width:${b}%"></div>
+            </div>
+          </div>`;
+        }).join('')}
+      </div>
+    </div>`;
+}
+
+function renderHours(){
+  const h = getLearningHours(emp.employeeId);
+  const sems = getSemesters();
+  const rows = getEmployeeEnrollments(emp.employeeId, sem.id).filter(e => !BCF_LEARNING.INACTIVE_STATUSES.includes(e.status));
+
+  document.getElementById('tab-hours').innerHTML = `
+    <div class="grid md:grid-cols-2 gap-6">
+      <div class="bg-white rounded-3xl border border-slate-200 shadow-sm p-6">
+        <div class="flex items-center justify-between mb-4">
+          <h3 class="font-display font-extrabold text-base text-slate-900">Current Semester Ledger</h3>
+          <span class="chip bg-blue-50 text-blue-700">${esc(sem.name)}</span>
+        </div>
+        <div class="divide-y divide-slate-100">
+          ${rows.map(r => `
+            <div class="flex justify-between items-center text-xs py-3">
+              <span class="font-medium text-slate-800">${esc(r.courseTitle)}</span>
+              <b class="text-slate-900">${Number(r.hoursCompleted || 0).toFixed(1)} hrs</b>
+            </div>`).join('') || '<div class="text-xs text-slate-400 py-4">No hours logged yet.</div>'}
+        </div>
+        <div class="flex justify-between text-sm pt-4 border-t border-slate-200 font-extrabold text-slate-900 mt-2">
+          <span>Semester Learning Total</span>
+          <span class="text-blue-700">${h.semester.toFixed(1)} hrs</span>
+        </div>
+      </div>
+
+      <div class="bg-white rounded-3xl border border-slate-200 shadow-sm p-6">
+        <div class="flex items-center justify-between mb-4">
+          <h3 class="font-display font-extrabold text-base text-slate-900">Annual Professional Development</h3>
+          <span class="chip bg-emerald-50 text-emerald-700">${sem.year} Annual Record</span>
+        </div>
+        <div class="divide-y divide-slate-100">
+          ${Object.entries(h.bySemester).sort().map(([k, v]) => `
+            <div class="flex justify-between items-center text-xs py-3">
+              <span class="font-medium text-slate-800">${esc((sems.find(s => s.id === k) || {}).name || k)}</span>
+              <b class="text-slate-900">${v.toFixed(1)} hrs</b>
+            </div>`).join('')}
+        </div>
+        <div class="flex justify-between text-sm pt-4 border-t border-slate-200 font-extrabold text-slate-900 mt-2">
+          <span>Annual Total (${sem.year})</span>
+          <span class="text-emerald-700">${h.annual.toFixed(1)} hrs</span>
+        </div>
+      </div>
+    </div>`;
+}
+
+function switchTab(tabId) {
+  document.querySelectorAll('.tab-btn').forEach(btn => {
+    btn.classList.toggle('active', btn.dataset.tab === tabId);
+  });
+  ['courses', 'transcript', 'skills', 'hours'].forEach(t => {
+    document.getElementById('tab-' + t).classList.toggle('hidden', t !== tabId);
+  });
+}
+
+// ── Dialogs ──
+function dlg(html){
+  document.getElementById('dlg-body').innerHTML = html;
+  document.getElementById('dlg').classList.remove('hidden');
+}
+function closeDlg(){
+  document.getElementById('dlg').classList.add('hidden');
+}
+const findE = id => getAllEnrollments().find(e => e.id === id);
+
+function openProgress(id){
+  const e = findE(id);
+  dlg(`
+    <div class="flex items-center justify-between pb-3 border-b border-slate-100 mb-4">
+      <div>
+        <h3 class="font-display font-extrabold text-lg text-slate-900">Update Learning Progress</h3>
+        <p class="text-xs text-slate-500">${esc(e.courseTitle)}</p>
+      </div>
+      <button onclick="closeDlg()" class="w-8 h-8 rounded-full hover:bg-slate-100 flex items-center justify-center text-slate-400">
+        <span class="material-symbols-outlined text-lg">close</span>
+      </button>
+    </div>
+
+    <div class="space-y-4 text-xs font-bold text-slate-700">
+      <div>
+        <div class="flex justify-between mb-1">
+          <span>Overall Percentage Completed:</span>
+          <span id="pv" class="text-blue-700 font-extrabold text-sm">${e.progress || 0}%</span>
+        </div>
+        <input id="p-pct" type="range" min="0" max="100" step="5" value="${e.progress || 0}" oninput="document.getElementById('pv').textContent=this.value+'%'" class="w-full accent-blue-700"/>
+      </div>
+
+      <div class="grid grid-cols-2 gap-3">
+        <label>
+          Modules Completed
+          <input id="p-mod" type="number" min="0" max="${e.modulesTotal || 8}" value="${e.modulesCompleted || 0}" class="mt-1 w-full h-10 rounded-xl border border-slate-300 px-3 font-normal text-xs"/>
+        </label>
+        <label>
+          Learning Hours Completed
+          <input id="p-hrs" type="number" min="0" step="0.5" value="${e.hoursCompleted || 0}" class="mt-1 w-full h-10 rounded-xl border border-slate-300 px-3 font-normal text-xs"/>
+        </label>
+      </div>
+    </div>
+
+    <div class="flex gap-2.5 mt-6">
+      <button onclick="closeDlg()" class="flex-1 h-10 rounded-xl bg-slate-100 hover:bg-slate-200 font-bold text-xs text-slate-700 transition">Cancel</button>
+      <button onclick="saveProgress('${id}')" class="flex-1 h-10 rounded-xl bg-blue-700 hover:bg-blue-800 text-white font-bold text-xs transition">Save Progress</button>
+    </div>`);
+}
+
+function saveProgress(id){
+  const pct = Number(document.getElementById('p-pct').value);
+  const r = updateEnrollmentProgress(id, pct, document.getElementById('p-hrs').value, document.getElementById('p-mod').value);
+  closeDlg();
+  if (r && r.progress === 100) {
+    dlg(`
+      <div class="text-center py-4">
+        <div class="w-16 h-16 rounded-full bg-emerald-50 text-emerald-600 flex items-center justify-center mx-auto mb-3">
+          <span class="material-symbols-outlined text-3xl">celebration</span>
+        </div>
+        <h3 class="font-display font-extrabold text-xl text-slate-900">Congratulations! Course Completed</h3>
+        <p class="text-xs text-slate-600 mt-2 max-w-sm mx-auto">
+          Your course status is now <b>Completed – Certificate Required</b>. Please submit your official partner certificate or complete the quick staff evaluation.
+        </p>
+        <div class="flex gap-2.5 mt-6">
+          <button onclick="closeDlg();openEval('${id}')" class="flex-1 h-10 rounded-xl bg-amber-500 hover:bg-amber-600 text-white font-bold text-xs transition">Evaluate Course</button>
+          <button onclick="closeDlg();openCert('${id}')" class="flex-1 h-10 rounded-xl bg-teal-600 hover:bg-teal-700 text-white font-bold text-xs transition">Submit Certificate</button>
+        </div>
+      </div>`);
+  } else {
+    toast('Course progress updated successfully.');
+  }
+  renderAll();
+}
+
+function openCert(id){
+  const e = findE(id);
+  dlg(`
+    <div class="flex items-center justify-between pb-3 border-b border-slate-100 mb-4">
+      <div>
+        <h3 class="font-display font-extrabold text-lg text-slate-900">Submit Partner Certificate</h3>
+        <p class="text-xs text-slate-500">${esc(e.courseTitle)} · ${esc(e.vendor)}</p>
+      </div>
+      <button onclick="closeDlg()" class="w-8 h-8 rounded-full hover:bg-slate-100 flex items-center justify-center text-slate-400">
+        <span class="material-symbols-outlined text-lg">close</span>
+      </button>
+    </div>
+
+    <div class="grid grid-cols-2 gap-3 text-xs font-bold text-slate-700">
+      <label class="col-span-2">
+        Certificate Title
+        <input id="c-title" value="${esc(e.courseTitle)}" class="mt-1 w-full h-10 rounded-xl border border-slate-300 px-3 font-normal text-xs"/>
+      </label>
+      <label>
+        Certificate ID / Credential Number
+        <input id="c-num" placeholder="e.g. BCF-2026-CRS..." class="mt-1 w-full h-10 rounded-xl border border-slate-300 px-3 font-normal text-xs"/>
+      </label>
+      <label>
+        Issue Date
+        <input id="c-issue" type="date" value="${new Date().toISOString().slice(0, 10)}" class="mt-1 w-full h-10 rounded-xl border border-slate-300 px-3 font-normal text-xs"/>
+      </label>
+      <label>
+        Expiry Date (optional)
+        <input id="c-exp" type="date" class="mt-1 w-full h-10 rounded-xl border border-slate-300 px-3 font-normal text-xs"/>
+      </label>
+      <label>
+        Certificate Document (PDF / Image)
+        <input id="c-file" type="file" accept=".pdf,.png,.jpg,.jpeg" class="mt-1 w-full text-[11px] font-normal file:mr-2 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:bg-blue-50 file:text-blue-700"/>
+      </label>
+      <label class="col-span-2">
+        Online Verification Link
+        <input id="c-link" type="url" placeholder="https://coursera.org/verify/..." class="mt-1 w-full h-10 rounded-xl border border-slate-300 px-3 font-normal text-xs"/>
+      </label>
+    </div>
+
+    <div id="c-err" class="hidden text-xs text-rose-700 bg-rose-50 rounded-xl p-2.5 mt-3"></div>
+
+    <div class="flex gap-2.5 mt-6">
+      <button onclick="closeDlg()" class="flex-1 h-10 rounded-xl bg-slate-100 hover:bg-slate-200 font-bold text-xs text-slate-700 transition">Cancel</button>
+      <button onclick="saveCert('${id}')" class="flex-1 h-10 rounded-xl bg-teal-600 hover:bg-teal-700 text-white font-bold text-xs transition">Submit for HR Verification</button>
+    </div>`);
+}
+
+function saveCert(id){
+  const f = document.getElementById('c-file').files[0];
+  const r = submitCertificate(id, {
+    title: document.getElementById('c-title').value,
+    number: document.getElementById('c-num').value.trim(),
+    issueDate: document.getElementById('c-issue').value,
+    expiryDate: document.getElementById('c-exp').value,
+    link: document.getElementById('c-link').value.trim(),
+    fileName: f ? f.name : ''
+  });
+  if (!r.success){
+    const el = document.getElementById('c-err');
+    el.textContent = r.message;
+    el.classList.remove('hidden');
+    return;
+  }
+  closeDlg();
+  toast('Certificate submitted — pending HR Learning Officer verification.');
+  renderAll();
+}
+
+function openEval(id){
+  const e = findE(id);
+  const scale = n => `
+    <select id="${n}" class="mt-1 w-full h-10 rounded-xl border border-slate-300 px-2.5 font-normal text-xs">
+      ${[5, 4, 3, 2, 1].map(v => `<option value="${v}">${v} – ${['', 'Not at all', 'Slightly', 'Moderately', 'Very', 'Extremely'][v]}</option>`).join('')}
+    </select>`;
+
+  dlg(`
+    <div class="flex items-center justify-between pb-3 border-b border-slate-100 mb-4">
+      <div>
+        <h3 class="font-display font-extrabold text-lg text-slate-900">Staff Learning Evaluation</h3>
+        <p class="text-xs text-slate-500">${esc(e.courseTitle)}</p>
+      </div>
+      <button onclick="closeDlg()" class="w-8 h-8 rounded-full hover:bg-slate-100 flex items-center justify-center text-slate-400">
+        <span class="material-symbols-outlined text-lg">close</span>
+      </button>
+    </div>
+
+    <div class="flex flex-col gap-3.5 text-xs font-bold text-slate-700">
+      <label>1. Was the course relevant to your position?${scale('ev1')}</label>
+      <label>2. Did the course improve your knowledge?${scale('ev2')}</label>
+      <label>3. What key skills did you gain?
+        <input id="ev3" placeholder="e.g. Budgeting, Risk Analysis..." class="mt-1 w-full h-10 rounded-xl border border-slate-300 px-3 font-normal text-xs"/>
+      </label>
+      <label>4. How will you apply the knowledge at BCF-SL?
+        <textarea id="ev4" rows="2" placeholder="Describe practical project application..." class="mt-1 w-full rounded-xl border border-slate-300 p-2.5 font-normal text-xs"></textarea>
+      </label>
+      <label>5. Overall course usefulness:${scale('ev5')}</label>
+      <label>6. Would you recommend this course to peers?
+        <select id="ev6" class="mt-1 w-full h-10 rounded-xl border border-slate-300 px-2.5 font-normal text-xs">
+          <option>Yes</option><option>Maybe</option><option>No</option>
+        </select>
+      </label>
+      <label>7. Additional training recommendations:
+        <input id="ev7" placeholder="e.g. Advanced follow-up course..." class="mt-1 w-full h-10 rounded-xl border border-slate-300 px-3 font-normal text-xs"/>
+      </label>
+    </div>
+
+    <div class="flex gap-2.5 mt-6">
+      <button onclick="closeDlg()" class="flex-1 h-10 rounded-xl bg-slate-100 hover:bg-slate-200 font-bold text-xs text-slate-700 transition">Later</button>
+      <button onclick="saveEval('${id}')" class="flex-1 h-10 rounded-xl bg-amber-500 hover:bg-amber-600 text-white font-bold text-xs transition">Submit Evaluation</button>
+    </div>`);
+}
+
+function saveEval(id){
+  const v = k => document.getElementById(k).value;
+  submitEvaluation(id, {
+    relevant: +v('ev1'),
+    improved: +v('ev2'),
+    skills: v('ev3'),
+    apply: v('ev4'),
+    useful: +v('ev5'),
+    recommend: v('ev6'),
+    additional: v('ev7')
+  });
+  closeDlg();
+  toast('Thank you — staff course evaluation recorded.');
+  renderAll();
+}
+
+function cancelReq(id){
+  if (confirm('Withdraw this course request? Your semester slot will be released.')) {
+    cancelRequest(id);
+    toast('Request withdrawn — semester slot released.');
+    renderAll();
+  }
+}
+
+// ── Staff Self-Service Password Management ──
+function openChangePasswordModal() {
+  const current = getCurrentEmployee();
+  const accounts = getLearningAccounts();
+  const acc = accounts.find(a => a.employeeId === current.employeeId) || current;
+  document.getElementById('pwd-staff-name').textContent = acc.employeeName || current.fullName;
+  document.getElementById('pwd-staff-user').textContent = acc.username || current.username;
+  document.getElementById('pwd-staff-email').textContent = acc.employeeEmail || current.email || 'staff@bcf-sl.org';
+  document.getElementById('change-pass-form').reset();
+  document.getElementById('user-dropdown').classList.add('hidden');
+  document.getElementById('password-modal').classList.remove('hidden');
+  document.getElementById('password-modal').classList.add('flex');
+}
+
+function closeChangePasswordModal() {
+  const m = document.getElementById('password-modal');
+  if (m) {
+    m.classList.add('hidden');
+    m.classList.remove('flex');
+  }
+}
+
+function togglePassField(fieldId, iconId) {
+  const inp = document.getElementById(fieldId);
+  const ico = document.getElementById(iconId);
+  if (!inp || !ico) return;
+  if (inp.type === 'password') {
+    inp.type = 'text';
+    ico.textContent = 'visibility_off';
+  } else {
+    inp.type = 'password';
+    ico.textContent = 'visibility';
+  }
+}
+
+function handleStaffPasswordChange(e) {
+  e.preventDefault();
+  const curr = document.getElementById('curr-pass').value;
+  const newP = document.getElementById('new-pass').value;
+  const confP = document.getElementById('conf-pass').value;
+
+  if (newP !== confP) {
+    toast('New passwords do not match. Please re-enter.', false);
+    return;
+  }
+
+  const current = getCurrentEmployee();
+  const res = updateStaffPassword(current.employeeId, curr, newP, current.fullName);
+
+  if (res.success) {
+    closeChangePasswordModal();
+    toast(`Password updated successfully! Official confirmation email dispatched to your work address.`);
+  } else {
+    toast(res.message || 'Failed to update password.', false);
+  }
+}
+
+document.getElementById('dlg').addEventListener('click', e => {
+  if (e.target.id === 'dlg') closeDlg();
+});
+
+document.addEventListener('click', e => {
+  const p = document.getElementById('notif-panel');
+  if (p && !p.classList.contains('hidden') && !p.contains(e.target) && !document.getElementById('btn-notif').contains(e.target)) {
+    p.classList.add('hidden');
+  }
+  const userDrop = document.getElementById('user-dropdown');
+  if (userDrop && !userDrop.contains(e.target) && !e.target.closest('button[onclick*="toggleUserDropdown"]')) {
+    userDrop.classList.add('hidden');
+  }
+});
+
+window.addEventListener('bcf_employee_changed', () => renderAll());
+
+function renderAll(){
+  renderHeader();
+  renderStaffSwitcher();
+  renderCourses();
+  renderTranscript();
+  renderSkills();
+  renderHours();
+}
+
+renderAll();
+</script>
+</body>
+</html>

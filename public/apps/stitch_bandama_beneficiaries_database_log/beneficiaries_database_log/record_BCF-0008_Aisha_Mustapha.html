@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>BCF-SL Official Record - BCF-0008 - Aisha Mustapha</title>
+  
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin=""/>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
+
+  <style>
+    body {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      background-color: #f1f5f9;
+      color: #0f172a;
+    }
+    @media print {
+      @page {
+        margin: 10mm;
+        size: A4 portrait;
+      }
+      body {
+        background-color: white !important;
+        padding: 0 !important;
+      }
+      .no-print {
+        display: none !important;
+      }
+      .print-card {
+        border: 1px solid #cbd5e1 !important;
+        box-shadow: none !important;
+        padding: 24px !important;
+        max-width: 100% !important;
+      }
+    }
+  </style>
+</head>
+<body class="min-h-screen py-8 px-4 flex flex-col items-center">
+
+  <!-- TOP FLOATING ACTIONS -->
+  <div class="no-print w-full max-w-2xl mb-4 flex items-center justify-between bg-white px-4 py-3 rounded-xl border border-slate-200 shadow-sm">
+    <div class="flex items-center gap-2">
+      <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
+      <span class="text-xs font-bold text-slate-700">Official Beneficiary Record &bull; BCF-0008</span>
+    </div>
+    <div class="flex items-center gap-2">
+      <button onclick="window.print()" class="px-3.5 py-1.5 rounded-lg bg-emerald-900 hover:bg-emerald-800 text-white text-xs font-bold flex items-center gap-1.5 shadow-sm transition active:scale-95">
+        <span class="material-symbols-outlined text-[16px]">print</span>
+        <span>Print Record / Save as PDF</span>
+      </button>
+      <button onclick="window.history.back()" class="px-3 py-1.5 rounded-lg border border-slate-300 hover:bg-slate-50 text-slate-700 text-xs font-semibold">
+        Back
+      </button>
+    </div>
+  </div>
+
+  <!-- OFFICIAL RECORD CARD -->
+  <div class="print-card w-full max-w-2xl bg-white border border-slate-200 rounded-2xl p-6 sm:p-8 shadow-md flex flex-col gap-5">
+    
+    <!-- Header -->
+    <div class="flex items-center justify-between border-b border-slate-200 pb-4">
+      <div class="flex items-center gap-3">
+        <img alt="BCF-SL Logo" class="h-11 w-auto object-contain rounded-md" src="/bcf_official_logo.png" onerror="this.onerror=null; this.src='bcf_official_logo.png';"/>
+        <div>
+          <span class="text-[10px] font-black text-emerald-900 uppercase tracking-wider block">
+            BANDAMA CHARITY FOUNDATION – SIERRA LEONE
+          </span>
+          <h1 class="text-base sm:text-lg font-black text-slate-900 tracking-tight">
+            Official Beneficiary Registration Record
+          </h1>
+        </div>
+      </div>
+      <div class="text-right text-[11px] font-mono text-slate-500">
+        <span class="block font-bold text-emerald-800">STATUS: ACTIVE</span>
+        <span>BCF-SL-REG-2026</span>
+      </div>
+    </div>
+
+    <!-- Beneficiary Identity Banner -->
+    <div class="flex flex-col sm:flex-row items-start justify-between gap-4 p-4 rounded-xl bg-purple-50/70 border border-purple-200">
+      <div class="flex items-start gap-4">
+        <!-- National ID / Photo Thumbnail -->
+        <div class="w-20 h-24 sm:w-24 sm:h-28 rounded-lg overflow-hidden border border-slate-300 shadow-sm shrink-0 bg-slate-100 flex items-center justify-center">
+          <img src="/bcf_official_logo.png" alt="Aisha Mustapha" class="w-full h-full object-contain p-1" onerror="this.src='bcf_official_logo.png'"/>
+        </div>
+        <div class="flex flex-col">
+          <div class="flex items-center gap-2">
+            <span class="px-2.5 py-0.5 rounded font-mono font-bold text-xs bg-purple-700 text-white">
+              BCF-0008
+            </span>
+            <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-800 border border-emerald-300">
+              Verified
+            </span>
+          </div>
+          <h2 class="text-lg font-black text-slate-900 mt-1">Aisha Mustapha</h2>
+          <p class="text-xs text-slate-600 font-medium mt-0.5">
+            23 years old &bull; Female &bull; Married &bull; 5 Children
+          </p>
+          <p class="text-[11px] font-mono text-slate-500 mt-1">
+            NIN: <strong>3455667775858</strong>
+          </p>
+        </div>
+      </div>
+
+      <div class="text-right flex flex-col items-end text-[11px] text-slate-500 self-end sm:self-start">
+        <span>Reg Date: <strong class="text-slate-800">2026-10-03</strong></span>
+        <span>Staff: <strong class="text-slate-800">Albert J. Bandama</strong></span>
+        <span class="text-emerald-700 font-bold mt-1 inline-flex items-center gap-1">
+          <span class="material-symbols-outlined text-[14px]">verified</span>
+          <span>Verified BCF Record</span>
+        </span>
+      </div>
+    </div>
+
+    <!-- Profile Details 6-Grid -->
+    <div class="grid grid-cols-2 sm:grid-cols-3 gap-3 text-xs">
+      <div class="p-3 rounded-lg bg-slate-50 border border-slate-200">
+        <span class="text-[10px] uppercase font-bold text-slate-400 block mb-0.5">District &amp; Town</span>
+        <span class="font-bold text-slate-800 text-sm">Kono, Koidu</span>
+      </div>
+
+      <div class="p-3 rounded-lg bg-slate-50 border border-slate-200">
+        <span class="text-[10px] uppercase font-bold text-slate-400 block mb-0.5">Residential Address</span>
+        <span class="font-bold text-slate-800 text-xs truncate block" title="2 Ross Road Cline Town Freetown">
+          2 Ross Road Cline Town Freetown
+        </span>
+      </div>
+
+      <div class="p-3 rounded-lg bg-slate-50 border border-slate-200">
+        <span class="text-[10px] uppercase font-bold text-slate-400 block mb-0.5">Contact Phone</span>
+        <span class="font-bold text-slate-800 text-sm font-mono">078974474</span>
+      </div>
+
+      <div class="p-3 rounded-lg bg-slate-50 border border-slate-200">
+        <span class="text-[10px] uppercase font-bold text-slate-400 block mb-0.5">Educational Status</span>
+        <span class="font-bold text-slate-800 text-xs">Vocational / TVET</span>
+      </div>
+
+      <div class="p-3 rounded-lg bg-slate-50 border border-slate-200">
+        <span class="text-[10px] uppercase font-bold text-slate-400 block mb-0.5">Institution</span>
+        <span class="font-bold text-slate-800 text-xs">Kakua</span>
+      </div>
+
+      <div class="p-3 rounded-lg bg-slate-50 border border-slate-200">
+        <span class="text-[10px] uppercase font-bold text-slate-400 block mb-0.5">Disability</span>
+        <span class="font-bold text-slate-800 text-xs">No</span>
+      </div>
+    </div>
+
+    <!-- Emergency Contact Section -->
+    <div class="p-3.5 rounded-xl bg-rose-50/70 border border-rose-200 text-xs">
+      <div class="text-[11px] font-black text-rose-900 uppercase tracking-wider mb-2 flex items-center gap-1.5">
+        <span class="material-symbols-outlined text-[16px] text-rose-700">emergency</span>
+        <span>Emergency Contact</span>
+      </div>
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-2.5 text-slate-700">
+        <div>
+          <span class="text-[10px] text-slate-500 uppercase block">Person</span>
+          <strong class="text-slate-900">Alie</strong>
+        </div>
+        <div>
+          <span class="text-[10px] text-slate-500 uppercase block">Phone</span>
+          <strong class="font-mono text-slate-900">78773472</strong>
+        </div>
+        <div>
+          <span class="text-[10px] text-slate-500 uppercase block">Address</span>
+          <strong class="text-slate-900">2 Ross Road Cline Town Freetown</strong>
+        </div>
+      </div>
+    </div>
+
+    <!-- Programme Allocations & Aid Disbursed -->
+    <div>
+      <div class="text-xs font-black text-slate-900 uppercase tracking-wider mb-2 flex items-center gap-1.5">
+        <span class="material-symbols-outlined text-[16px] text-emerald-800">inventory_2</span>
+        <span>Programme Allocations &amp; Aid Disbursed</span>
+      </div>
+
+      <div class="p-3.5 rounded-xl bg-slate-50 border border-slate-200 flex flex-col gap-1.5 text-xs">
+        <div class="flex items-center justify-between">
+          <span class="font-bold text-emerald-900">BCF-E02 &bull; Education</span>
+          <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-100 text-emerald-800 border border-emerald-300">
+            Satisfied
+          </span>
+        </div>
+        <div class="font-extrabold text-slate-900">School Provisiom</div>
+        <div class="text-slate-600 flex flex-wrap items-center gap-2">
+          <span>Item/Service: <strong class="text-slate-800">Land</strong></span>
+          <span>&bull;</span>
+          <span>Cost: <strong class="text-slate-900 font-semibold">15,000 NLe</strong></span>
+          <span>&bull;</span>
+          <span>Quantity: <strong class="text-slate-800">5</strong></span>
+          <span>&bull;</span>
+          <span>Date: <strong class="text-slate-800">2026-10-03</strong></span>
+        </div>
+        <div class="text-slate-500 italic text-[11px] pt-0.5 border-t border-slate-200/60 mt-1">
+          Notes: Initial intake allocation.
+        </div>
+      </div>
+    </div>
+
+    <!-- Footer Audit Signoff -->
+    <div class="mt-2 pt-4 border-t border-slate-200 flex flex-col sm:flex-row items-center justify-between text-[11px] text-slate-400 gap-2">
+      <div class="flex items-center gap-2">
+        <span class="material-symbols-outlined text-[16px] text-emerald-700">security</span>
+        <span>Bandama Charity Foundation (BCF-SL) &bull; Verified Field Master Record</span>
+      </div>
+      <div>
+        Generated on: <span class="font-mono text-slate-600">2026-10-03</span>
+      </div>
+    </div>
+
+  </div>
+
+</body>
+</html>

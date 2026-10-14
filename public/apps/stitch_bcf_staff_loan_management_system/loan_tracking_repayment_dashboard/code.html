@@ -1,0 +1,1524 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover"/>
+    <title>Loan Dashboard Management - BCF-SL</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: "#004328",
+                        "primary-dark": "#002b1a",
+                        secondary: "#1A56DB",
+                        tertiary: "#7B2FBE",
+                        surface: "#ffffff",
+                        "surface-container": "#f8f9fc",
+                        "on-surface": "#0d1c2e",
+                        "on-surface-variant": "#4b5563",
+                        outline: "#d1d5db",
+                        error: "#dc2626",
+                        success: "#16a34a"
+                    },
+                    fontFamily: {
+                        sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+                        mono: ['"JetBrains Mono"', 'monospace']
+                    }
+                }
+            }
+        };
+    </script>
+    <style>
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #f4f6fa; }
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-thumb { background-color: #cbd5e1; border-radius: 3px; }
+        .stat-card-glow { transition: all 0.2s ease-in-out; }
+        .stat-card-glow:hover { transform: translateY(-2px); box-shadow: 0 10px 25px -5px rgba(0,0,0,0.08); }
+        .dimension-active { background-color: #004328 !important; color: #ffffff !important; border-color: #004328 !important; }
+    </style>
+</head>
+<body class="text-on-surface flex flex-col min-h-screen">
+
+    <!-- Unified Top Navigation & 8 Tabs Bar -->
+    <div id="bcf-loans-nav-header"></div>
+
+    <main class="flex-grow p-4 sm:p-6 max-w-7xl mx-auto w-full flex flex-col gap-6">
+
+        <!-- EXECUTIVE HEADER & QUICK ACTIONS -->
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
+            <div>
+                <div class="flex items-center gap-2">
+                    <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-black uppercase tracking-wider bg-emerald-100 text-emerald-800 border border-emerald-300">
+                        <span class="w-2 h-2 rounded-full bg-emerald-600 animate-pulse"></span>
+                        Executive Financial Telemetry
+                    </span>
+                    <span class="text-xs font-bold text-slate-500 font-mono" id="portfolio-timestamp">Cycle: 2026-Q3/Q4</span>
+                </div>
+                <h1 class="text-xl sm:text-2xl lg:text-3xl font-black text-slate-900 tracking-tight mt-1.5">
+                    Loan Dashboard Management
+                </h1>
+                <p class="text-xs sm:text-sm text-slate-500 mt-1 max-w-3xl leading-relaxed">
+                    Portfolio analytics, statutory recovery telemetry, and demographic distribution across 
+                    <strong class="text-slate-700">Department, Classification, Job Level, Management Level, and Gender</strong>.
+                </p>
+            </div>
+
+            <div class="flex items-center gap-2.5 flex-wrap">
+                <button type="button" onclick="resetAndReloadPortfolio()" class="px-3.5 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold rounded-xl transition flex items-center gap-1.5 border border-slate-300 active:scale-95 cursor-pointer" title="Synchronize and reload active staff loan portfolio">
+                    <span class="material-symbols-outlined text-[17px]">sync</span>
+                    <span>Sync Ledger</span>
+                </button>
+
+                <button type="button" onclick="window.print()" class="px-3.5 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold rounded-xl transition flex items-center gap-1.5 border border-slate-300 active:scale-95 cursor-pointer" title="Print executive portfolio report">
+                    <span class="material-symbols-outlined text-[17px]">print</span>
+                    <span>Print Report</span>
+                </button>
+
+                <button type="button" onclick="BCF_LOANS.switchTab('loan-application')" class="px-4 py-2.5 bg-primary hover:bg-primary-dark text-white text-xs font-black rounded-xl transition shadow-md flex items-center gap-1.5 active:scale-95 cursor-pointer">
+                    <span class="material-symbols-outlined text-[18px]">add_circle</span>
+                    <span>New Application</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- 6 EXECUTIVE FINANCIAL PORTFOLIO KPI TILES -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4">
+            
+            <!-- 1. TOTAL AMOUNT OF LOAN -->
+            <div class="p-5 rounded-2xl bg-surface border-2 border-emerald-500/30 shadow-sm flex flex-col justify-between stat-card-glow relative overflow-hidden bg-gradient-to-br from-white via-white to-emerald-50/50">
+                <div class="flex items-center justify-between">
+                    <span class="text-[11px] font-black uppercase text-slate-500 tracking-wider">Total Amount of Loan</span>
+                    <div class="w-8 h-8 rounded-xl bg-emerald-100 text-primary flex items-center justify-center">
+                        <span class="material-symbols-outlined text-[19px]">account_balance_wallet</span>
+                    </div>
+                </div>
+                <div class="mt-3">
+                    <div id="kpi-total-loan-amt" class="text-xl sm:text-2xl font-black text-slate-900 font-mono tracking-tight">NLe 0.00</div>
+                    <div class="flex items-center gap-1.5 mt-1.5">
+                        <span class="inline-block px-2 py-0.5 rounded text-[10px] font-extrabold bg-emerald-100 text-emerald-800 border border-emerald-200">
+                            Recovered + Outstanding
+                        </span>
+                    </div>
+                    <p class="text-[11px] text-slate-500 mt-1" id="kpi-loan-sub">Sum of all approved loans</p>
+                </div>
+            </div>
+
+            <!-- 2. TOTAL RECOVERED TO DATE -->
+            <div class="p-5 rounded-2xl bg-surface border border-slate-200 shadow-sm flex flex-col justify-between stat-card-glow relative overflow-hidden bg-gradient-to-br from-white via-white to-teal-50/40">
+                <div class="flex items-center justify-between">
+                    <span class="text-[11px] font-black uppercase text-emerald-700 tracking-wider">Total Recovered</span>
+                    <div class="w-8 h-8 rounded-xl bg-teal-100 text-teal-700 flex items-center justify-center">
+                        <span class="material-symbols-outlined text-[19px]">savings</span>
+                    </div>
+                </div>
+                <div class="mt-3">
+                    <div id="kpi-total-recovered" class="text-xl sm:text-2xl font-black text-emerald-700 font-mono tracking-tight">NLe 0.00</div>
+                    <div class="w-full bg-slate-100 rounded-full h-1.5 mt-2 overflow-hidden">
+                        <div id="kpi-recovered-bar" class="bg-emerald-600 h-1.5 rounded-full transition-all duration-500" style="width: 0%"></div>
+                    </div>
+                    <div class="flex items-center justify-between text-[11px] mt-1.5 font-bold">
+                        <span class="text-emerald-700" id="kpi-recovered-pct">0% Recovered</span>
+                        <span class="text-slate-400 font-normal">Payroll Deductions</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 3. OUTSTANDING BALANCE -->
+            <div class="p-5 rounded-2xl bg-surface border border-slate-200 shadow-sm flex flex-col justify-between stat-card-glow relative overflow-hidden bg-gradient-to-br from-white via-white to-amber-50/40">
+                <div class="flex items-center justify-between">
+                    <span class="text-[11px] font-black uppercase text-amber-700 tracking-wider">Outstanding Balance</span>
+                    <div class="w-8 h-8 rounded-xl bg-amber-100 text-amber-700 flex items-center justify-center">
+                        <span class="material-symbols-outlined text-[19px]">pending_actions</span>
+                    </div>
+                </div>
+                <div class="mt-3">
+                    <div id="kpi-outstanding-bal" class="text-xl sm:text-2xl font-black text-amber-800 font-mono tracking-tight">NLe 0.00</div>
+                    <div class="w-full bg-slate-100 rounded-full h-1.5 mt-2 overflow-hidden">
+                        <div id="kpi-outstanding-bar" class="bg-amber-500 h-1.5 rounded-full transition-all duration-500" style="width: 0%"></div>
+                    </div>
+                    <div class="flex items-center justify-between text-[11px] mt-1.5 font-bold">
+                        <span class="text-amber-700" id="kpi-outstanding-pct">0% Balance</span>
+                        <span class="text-slate-400 font-normal">In Recovery</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 4. TOTAL ACTIVE LOANS & BENEFICIARIES -->
+            <div class="p-5 rounded-2xl bg-surface border border-slate-200 shadow-sm flex flex-col justify-between stat-card-glow relative overflow-hidden">
+                <div class="flex items-center justify-between">
+                    <span class="text-[11px] font-black uppercase text-blue-700 tracking-wider">Active Portfolio</span>
+                    <div class="w-8 h-8 rounded-xl bg-blue-100 text-blue-700 flex items-center justify-center">
+                        <span class="material-symbols-outlined text-[19px]">badge</span>
+                    </div>
+                </div>
+                <div class="mt-3">
+                    <div id="kpi-active-count" class="text-xl sm:text-2xl font-black text-blue-900 font-mono tracking-tight">0 Staff</div>
+                    <div class="flex items-center gap-1.5 mt-1.5">
+                        <span class="inline-block px-2 py-0.5 rounded text-[10px] font-extrabold bg-blue-100 text-blue-800 border border-blue-200" id="kpi-active-sub">
+                            0 Active Loans
+                        </span>
+                    </div>
+                    <p class="text-[11px] text-slate-500 mt-1">Beneficiary staff accounts</p>
+                </div>
+            </div>
+
+            <!-- 5. APPROVAL PIPELINE & IN-FLIGHT -->
+            <div class="p-5 rounded-2xl bg-surface border border-slate-200 shadow-sm flex flex-col justify-between stat-card-glow relative overflow-hidden">
+                <div class="flex items-center justify-between">
+                    <span class="text-[11px] font-black uppercase text-purple-700 tracking-wider">Workflow Pipeline</span>
+                    <div class="w-8 h-8 rounded-xl bg-purple-100 text-purple-700 flex items-center justify-center">
+                        <span class="material-symbols-outlined text-[19px]">published_with_changes</span>
+                    </div>
+                </div>
+                <div class="mt-3">
+                    <div id="kpi-pending-pipeline" class="text-xl sm:text-2xl font-black text-purple-900 font-mono tracking-tight">0 Pending</div>
+                    <p class="text-[11px] text-slate-500 mt-1 font-semibold" id="kpi-pipeline-sub">0 HR &bull; 0 Fin &bull; 0 CEO</p>
+                    <p class="text-[11px] text-slate-400 mt-0.5">In-flight applications</p>
+                </div>
+            </div>
+
+            <!-- 6. GENDER DIVERSITY RATIO -->
+            <div class="p-5 rounded-2xl bg-surface border border-slate-200 shadow-sm flex flex-col justify-between stat-card-glow relative overflow-hidden bg-gradient-to-br from-white via-white to-pink-50/30">
+                <div class="flex items-center justify-between">
+                    <span class="text-[11px] font-black uppercase text-pink-700 tracking-wider">Gender Diversity</span>
+                    <div class="w-8 h-8 rounded-xl bg-pink-100 text-pink-700 flex items-center justify-center">
+                        <span class="material-symbols-outlined text-[19px]">wc</span>
+                    </div>
+                </div>
+                <div class="mt-3">
+                    <div id="kpi-gender-ratio" class="text-xl sm:text-2xl font-black text-slate-900 font-mono tracking-tight">0% F / 0% M</div>
+                    <div class="w-full bg-slate-100 rounded-full h-1.5 mt-2 flex overflow-hidden">
+                        <div id="kpi-gender-female-bar" class="bg-pink-500 h-1.5 transition-all duration-500" style="width: 50%"></div>
+                        <div id="kpi-gender-male-bar" class="bg-blue-600 h-1.5 transition-all duration-500" style="width: 50%"></div>
+                    </div>
+                    <div class="flex items-center justify-between text-[11px] text-slate-600 mt-1.5 font-bold" id="kpi-gender-counts">
+                        <span class="text-pink-600">0 Female</span>
+                        <span class="text-blue-600">0 Male</span>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- RECONCILIATION AUDIT FORMULA BANNER -->
+        <div class="bg-slate-900 text-white rounded-2xl p-4 sm:p-5 shadow-md flex flex-col md:flex-row items-center justify-between gap-4 border border-slate-800">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-xl bg-emerald-500/20 text-emerald-400 flex items-center justify-center shrink-0 border border-emerald-500/30">
+                    <span class="material-symbols-outlined text-2xl">functions</span>
+                </div>
+                <div>
+                    <h3 class="font-extrabold text-sm sm:text-base text-white flex items-center gap-2">
+                        <span>Statutory Financial Policy Formula</span>
+                        <span class="text-[10px] px-2 py-0.5 bg-emerald-500/20 text-emerald-300 rounded-full font-mono font-bold uppercase">Audited</span>
+                    </h3>
+                    <p class="text-xs text-slate-300 mt-0.5">
+                        <span class="text-emerald-400 font-bold font-mono">Total Amount of Loan</span> = 
+                        <span class="text-teal-300 font-bold font-mono">Total Recovered To Date</span> + 
+                        <span class="text-amber-300 font-bold font-mono">Outstanding Balance</span>
+                        &bull; Amortized at fixed 10% monthly principal deductions over 10 months.
+                    </p>
+                </div>
+            </div>
+
+            <div class="flex items-center gap-2 bg-slate-800/80 px-4 py-2.5 rounded-xl border border-slate-700 shrink-0 text-xs font-mono">
+                <span class="text-slate-400">Reconciliation:</span>
+                <span id="banner-reconciliation-math" class="font-bold text-white">NLe 0.00 = NLe 0.00 + NLe 0.00</span>
+                <span class="material-symbols-outlined text-emerald-400 text-sm ml-1" title="Formula Balances Correctly">check_circle</span>
+            </div>
+        </div>
+
+        <!-- MULTI-DIMENSIONAL ANALYTICS BREAKDOWN SECTION -->
+        <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-5 sm:p-6 space-y-5">
+            <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4 border-b border-slate-200 pb-4">
+                <div>
+                    <div class="flex items-center gap-2">
+                        <span class="material-symbols-outlined text-primary text-xl">analytics</span>
+                        <h2 class="text-base sm:text-lg font-black text-slate-900 uppercase tracking-tight">
+                            Multi-Dimensional Loan Analytics Breakdown
+                        </h2>
+                    </div>
+                    <p class="text-xs text-slate-500 mt-0.5">
+                        Interactive breakdown of Total Loan Amount, Recovered To Date, and Outstanding Balance across 5 organizational dimensions.
+                    </p>
+                </div>
+
+                <!-- Dimension Switcher Tabs -->
+                <div class="flex items-center gap-1.5 p-1 bg-slate-100 rounded-xl overflow-x-auto max-w-full">
+                    <button type="button" onclick="switchAnalyticsTab('ALL')" id="dim-tab-ALL" class="px-3 py-1.5 rounded-lg text-xs font-bold transition whitespace-nowrap dimension-active">
+                        All Dimensions
+                    </button>
+                    <button type="button" onclick="switchAnalyticsTab('DEPT')" id="dim-tab-DEPT" class="px-3 py-1.5 rounded-lg text-xs font-bold text-slate-600 hover:text-slate-900 transition whitespace-nowrap">
+                        By Department
+                    </button>
+                    <button type="button" onclick="switchAnalyticsTab('CLASS')" id="dim-tab-CLASS" class="px-3 py-1.5 rounded-lg text-xs font-bold text-slate-600 hover:text-slate-900 transition whitespace-nowrap">
+                        By Classification
+                    </button>
+                    <button type="button" onclick="switchAnalyticsTab('JOB')" id="dim-tab-JOB" class="px-3 py-1.5 rounded-lg text-xs font-bold text-slate-600 hover:text-slate-900 transition whitespace-nowrap">
+                        By Job Level
+                    </button>
+                    <button type="button" onclick="switchAnalyticsTab('MGMT')" id="dim-tab-MGMT" class="px-3 py-1.5 rounded-lg text-xs font-bold text-slate-600 hover:text-slate-900 transition whitespace-nowrap">
+                        By Management Level
+                    </button>
+                    <button type="button" onclick="switchAnalyticsTab('GENDER')" id="dim-tab-GENDER" class="px-3 py-1.5 rounded-lg text-xs font-bold text-slate-600 hover:text-slate-900 transition whitespace-nowrap">
+                        By Gender
+                    </button>
+                </div>
+            </div>
+
+            <!-- ANALYTICS CARDS CONTAINER (Dynamic) -->
+            <div id="analytics-cards-container" class="space-y-6">
+                <!-- Dynamically populated by JS according to selected dimension -->
+            </div>
+        </div>
+
+        <!-- ACTIVE FILTER STATUS PILL -->
+        <div id="active-filter-banner" class="hidden bg-emerald-50 border border-emerald-300 rounded-xl p-3.5 flex items-center justify-between text-xs text-emerald-900 font-bold shadow-2xs">
+            <div class="flex items-center gap-2">
+                <span class="material-symbols-outlined text-emerald-700 text-lg">filter_alt</span>
+                <span id="active-filter-text">Active Filter Applied</span>
+            </div>
+            <button type="button" onclick="clearActiveDimensionFilter()" class="px-2.5 py-1 bg-white hover:bg-emerald-100 text-emerald-800 rounded-lg text-[11px] font-black border border-emerald-300 transition flex items-center gap-1 cursor-pointer">
+                <span class="material-symbols-outlined text-sm">close</span>
+                <span>Clear Filter</span>
+            </button>
+        </div>
+
+        <!-- PORTFOLIO LEDGER & APPLICATIONS PIPELINE -->
+        <div class="bg-surface rounded-2xl border border-slate-200 shadow-sm p-5 sm:p-6 space-y-4">
+            
+            <!-- VIEW TOGGLE & SEARCH TOOLBAR -->
+            <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+                
+                <!-- Table View Selector -->
+                <div class="flex items-center gap-2 bg-slate-100 p-1 rounded-xl">
+                    <button type="button" onclick="switchLedgerView('ACTIVE_LOANS')" id="tab-view-active-loans" class="px-4 py-2 rounded-lg text-xs font-black transition flex items-center gap-1.5 bg-white text-slate-900 shadow-xs">
+                        <span class="material-symbols-outlined text-sm text-primary">account_balance</span>
+                        <span>Active Staff Loans Portfolio (<span id="count-badge-active">0</span>)</span>
+                    </button>
+                    <button type="button" onclick="switchLedgerView('APPLICATIONS')" id="tab-view-applications" class="px-4 py-2 rounded-lg text-xs font-bold text-slate-600 hover:text-slate-900 transition flex items-center gap-1.5">
+                        <span class="material-symbols-outlined text-sm text-purple-600">assignment</span>
+                        <span>Loan Applications Register (<span id="count-badge-apps">0</span>)</span>
+                    </button>
+                </div>
+
+                <!-- Search and Filters -->
+                <div class="flex flex-col sm:flex-row items-center gap-2.5 flex-wrap">
+                    <div class="relative w-full sm:w-60">
+                        <span class="material-symbols-outlined absolute left-3 top-2.5 text-[18px] text-slate-400">search</span>
+                        <input type="text" id="ledger-search" oninput="applyTableFilters()" placeholder="Search staff, ID, or REF..." class="h-9 pl-9 pr-3 w-full bg-slate-50 border border-slate-300 rounded-xl text-xs font-semibold focus:border-primary focus:bg-white outline-none"/>
+                    </div>
+
+                    <select id="filter-department" onchange="applyTableFilters()" class="h-9 px-2.5 bg-slate-50 border border-slate-300 rounded-xl text-xs font-bold text-slate-700 focus:border-primary outline-none max-w-[160px]">
+                        <option value="ALL">All Departments</option>
+                        <option value="Executive Management">Executive Management</option>
+                        <option value="Finance Department">Finance Department</option>
+                        <option value="Health & Safety Department">Health &amp; Safety</option>
+                        <option value="Human Resources Management Department">Human Resources</option>
+                        <option value="Information Technology (IT) Department">IT Department</option>
+                        <option value="Internal Risk & Audits Department">Internal Audit</option>
+                        <option value="Legal & Communication Department">Legal &amp; Comm</option>
+                        <option value="Procurement Department">Procurement</option>
+                        <option value="Programs Department">Programs</option>
+                    </select>
+
+                    <select id="filter-gender" onchange="applyTableFilters()" class="h-9 px-2.5 bg-slate-50 border border-slate-300 rounded-xl text-xs font-bold text-slate-700 focus:border-primary outline-none">
+                        <option value="ALL">All Genders</option>
+                        <option value="Female">Female</option>
+                        <option value="Male">Male</option>
+                    </select>
+
+                    <select id="filter-classification" onchange="applyTableFilters()" class="h-9 px-2.5 bg-slate-50 border border-slate-300 rounded-xl text-xs font-bold text-slate-700 focus:border-primary outline-none">
+                        <option value="ALL">All Classifications</option>
+                        <option value="Permanent">Permanent</option>
+                        <option value="Fixed-Term Contract">Fixed-Term Contract</option>
+                    </select>
+
+                    <button type="button" onclick="resetAllTableFilters()" title="Reset Filters" class="h-9 px-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-xs font-bold transition flex items-center gap-1 cursor-pointer">
+                        <span class="material-symbols-outlined text-sm">restart_alt</span>
+                        <span>Reset</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- TABLE CONTAINER -->
+            <div class="overflow-x-auto border border-slate-200 rounded-xl">
+                <table class="w-full text-left border-collapse text-xs">
+                    <thead id="ledger-table-head">
+                        <!-- Populated dynamically according to view -->
+                    </thead>
+                    <tbody id="ledger-table-body" class="divide-y divide-slate-200 font-medium">
+                        <!-- Populated dynamically -->
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- TABLE FOOTER RECONCILIATION SUMMARY -->
+            <div id="table-summary-bar" class="p-3.5 bg-slate-50 border border-slate-200 rounded-xl flex flex-col sm:flex-row items-center justify-between gap-3 text-xs">
+                <div class="text-slate-600 font-semibold" id="table-record-count-text">
+                    Showing 0 of 0 records
+                </div>
+                <div class="flex items-center gap-4 text-xs font-mono font-bold">
+                    <div class="text-slate-800">Total Loans: <span id="table-sum-loan" class="text-primary font-black">NLe 0.00</span></div>
+                    <div class="text-slate-800">Recovered: <span id="table-sum-recovered" class="text-emerald-700 font-black">NLe 0.00</span></div>
+                    <div class="text-slate-800">Outstanding: <span id="table-sum-outstanding" class="text-amber-700 font-black">NLe 0.00</span></div>
+                </div>
+            </div>
+
+        </div>
+
+    </main>
+
+    <!-- MODAL: DETAILED REPAYMENT AMORTIZATION SCHEDULE -->
+    <div id="modal-amortization-detail" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center hidden p-4">
+        <div class="bg-white rounded-2xl max-w-2xl w-full shadow-2xl overflow-hidden flex flex-col">
+            <div class="px-6 py-4 bg-primary text-white flex items-center justify-between">
+                <div class="flex items-center gap-2">
+                    <span class="material-symbols-outlined text-2xl text-emerald-300">account_balance_wallet</span>
+                    <div>
+                        <h3 class="font-bold text-base sm:text-lg" id="modal-staff-name">Staff Loan Repayment Breakdown</h3>
+                        <p class="text-xs text-emerald-200" id="modal-loan-ref">BCF-LN-2026-XXXX &bull; 10% Statutory Payroll Recovery</p>
+                    </div>
+                </div>
+                <button type="button" onclick="closeModal('modal-amortization-detail')" class="text-white/80 hover:text-white p-1 rounded-lg hover:bg-white/10 transition cursor-pointer">
+                    <span class="material-symbols-outlined">close</span>
+                </button>
+            </div>
+
+            <div class="p-6 space-y-4 max-h-[75vh] overflow-y-auto">
+                <!-- Demographic & Profile Snapshot -->
+                <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 p-4 bg-slate-50 border border-slate-200 rounded-xl text-xs">
+                    <div>
+                        <span class="text-slate-400 block uppercase font-bold text-[10px]">Staff ID:</span>
+                        <strong class="text-slate-900 font-mono" id="modal-emp-id">--</strong>
+                    </div>
+                    <div>
+                        <span class="text-slate-400 block uppercase font-bold text-[10px]">Gender:</span>
+                        <strong class="text-slate-900" id="modal-emp-gender">--</strong>
+                    </div>
+                    <div>
+                        <span class="text-slate-400 block uppercase font-bold text-[10px]">Classification:</span>
+                        <strong class="text-slate-900" id="modal-emp-class">--</strong>
+                    </div>
+                    <div>
+                        <span class="text-slate-400 block uppercase font-bold text-[10px]">Department:</span>
+                        <strong class="text-slate-900" id="modal-emp-dept">--</strong>
+                    </div>
+                    <div>
+                        <span class="text-slate-400 block uppercase font-bold text-[10px]">Job Level:</span>
+                        <strong class="text-slate-900" id="modal-emp-joblevel">--</strong>
+                    </div>
+                    <div>
+                        <span class="text-slate-400 block uppercase font-bold text-[10px]">Management Level:</span>
+                        <strong class="text-slate-900" id="modal-emp-mgmtlevel">--</strong>
+                    </div>
+                    <div>
+                        <span class="text-slate-400 block uppercase font-bold text-[10px]">Monthly Salary:</span>
+                        <strong class="text-slate-900 font-mono" id="modal-emp-salary">--</strong>
+                    </div>
+                    <div>
+                        <span class="text-slate-400 block uppercase font-bold text-[10px]">Monthly Deduction:</span>
+                        <strong class="text-emerald-700 font-mono font-bold" id="modal-emp-deduction">--</strong>
+                    </div>
+                </div>
+
+                <!-- Financial Health Check: Formula Validation -->
+                <div class="grid grid-cols-3 gap-3">
+                    <div class="p-3.5 bg-slate-100 rounded-xl text-center">
+                        <span class="text-[10px] uppercase font-extrabold text-slate-500 block">Total Principal</span>
+                        <span id="modal-total-amt" class="text-base sm:text-lg font-black font-mono text-slate-900">NLe 0.00</span>
+                    </div>
+                    <div class="p-3.5 bg-emerald-50 border border-emerald-200 rounded-xl text-center">
+                        <span class="text-[10px] uppercase font-extrabold text-emerald-700 block">Recovered To Date</span>
+                        <span id="modal-recovered-amt" class="text-base sm:text-lg font-black font-mono text-emerald-800">NLe 0.00</span>
+                    </div>
+                    <div class="p-3.5 bg-amber-50 border border-amber-200 rounded-xl text-center">
+                        <span class="text-[10px] uppercase font-extrabold text-amber-700 block">Outstanding Balance</span>
+                        <span id="modal-outstanding-amt" class="text-base sm:text-lg font-black font-mono text-amber-800">NLe 0.00</span>
+                    </div>
+                </div>
+
+                <!-- 10-Month Amortization Schedule -->
+                <div class="border border-slate-200 rounded-xl overflow-hidden">
+                    <div class="px-4 py-2.5 bg-slate-100 font-extrabold text-xs text-slate-700 border-b border-slate-200">
+                        10-Month Statutory Payroll Deduction Schedule (10% of Principal)
+                    </div>
+                    <table class="w-full text-left text-xs">
+                        <thead class="bg-slate-50 font-bold text-slate-600 border-b border-slate-200">
+                            <tr>
+                                <th class="py-2 px-3">Cycle</th>
+                                <th class="py-2 px-3 text-right">Opening Balance</th>
+                                <th class="py-2 px-3 text-right">Deduction (10%)</th>
+                                <th class="py-2 px-3 text-right">Closing Balance</th>
+                                <th class="py-2 px-3 text-center">Status</th>
+                            </tr>
+                        </thead>
+                        <tbody id="modal-schedule-tbody" class="divide-y divide-slate-100 font-mono">
+                            <!-- Populated dynamically -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="px-6 py-4 bg-slate-50 border-t border-slate-200 flex items-center justify-between">
+                <span class="text-xs text-slate-500 font-medium">Policy: Deductions apply automatically via payroll integration.</span>
+                <button type="button" onclick="closeModal('modal-amortization-detail')" class="px-4 py-2 bg-slate-800 hover:bg-slate-900 text-white rounded-lg text-xs font-bold transition cursor-pointer">
+                    Close Breakdown
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Shared Library -->
+    <script src="../bcf_loans_shared.js"></script>
+
+    <script>
+        let allStaffLoans = [];
+        let allApplications = [];
+        let staffRegistry = [];
+        let currentLedgerView = 'ACTIVE_LOANS'; // 'ACTIVE_LOANS' or 'APPLICATIONS'
+        let currentAnalyticsTab = 'ALL'; // 'ALL', 'DEPT', 'CLASS', 'JOB', 'MGMT', 'GENDER'
+        let activeDimensionFilter = null; // { type: 'gender', value: 'Female', label: 'Gender: Female' }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const currentRole = (window.BCF_LOANS && typeof BCF_LOANS.getCurrentUserRole === 'function') 
+                ? BCF_LOANS.getCurrentUserRole() 
+                : (localStorage.getItem('bcf_loan_user_role') || localStorage.getItem('bcf_user_role') || 'STAFF');
+
+            const normRole = (window.BCF_LOANS && typeof BCF_LOANS.normalizeRoleKey === 'function')
+                ? (BCF_LOANS.normalizeRoleKey(currentRole) || currentRole)
+                : String(currentRole || 'STAFF').trim().toUpperCase();
+
+            // 1. Render Institutional Nav & Tabs
+            if (window.BCF_LOANS) {
+                BCF_LOANS.renderHeaderAndTabs('tracking-repayment');
+            }
+
+            // 2. CRITICAL RBAC ENFORCEMENT: Staff has ZERO access to Loan Dashboard Management
+            if (normRole === 'STAFF' || (window.BCF_LOANS && !BCF_LOANS.hasTabAccess('tracking-repayment', normRole))) {
+                enforceStaffAccessDenied();
+                return; // STOP execution completely!
+            }
+
+            // 3. Authorized Roles Only (HR, CEO, FINANCE, ADMIN)
+            loadDashboardData();
+        });
+
+        function enforceStaffAccessDenied() {
+            const main = document.querySelector('main');
+            if (main) {
+                main.innerHTML = `
+                    <div class="max-w-2xl mx-auto my-12 p-8 sm:p-10 bg-white border-2 border-red-500 rounded-3xl shadow-2xl text-center animate-in fade-in zoom-in-95">
+                        <div class="w-20 h-20 mx-auto rounded-full bg-red-100 text-red-600 flex items-center justify-center shadow-inner border border-red-200 mb-6">
+                            <span class="material-symbols-outlined text-5xl">gpp_bad</span>
+                        </div>
+                        <span class="inline-block px-4 py-1.5 rounded-full text-xs font-black uppercase tracking-wider bg-red-600 text-white shadow-2xs mb-3">
+                            Access Restricted &bull; 403 Forbidden
+                        </span>
+                        <h2 class="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight mb-2">
+                            Loan Dashboard Management
+                        </h2>
+                        <p class="text-base font-bold text-red-700 mb-6">
+                            Staff members do not have access to this monitoring dashboard.
+                        </p>
+                        
+                        <div class="p-5 bg-slate-50 border border-slate-200 rounded-2xl text-xs sm:text-sm text-slate-700 text-left space-y-3 mb-8">
+                            <div class="flex items-start gap-2.5">
+                                <span class="material-symbols-outlined text-red-600 text-lg shrink-0 mt-0.5">block</span>
+                                <div>
+                                    <strong class="text-slate-900">Staff Access Policy:</strong>
+                                    <span class="text-slate-600 block text-xs mt-0.5">Staff members are authorized exclusively to access and submit applications via the <strong>Staff Loan Application Form</strong>.</span>
+                                </div>
+                            </div>
+                            <div class="flex items-start gap-2.5 pt-2 border-t border-slate-200">
+                                <span class="material-symbols-outlined text-blue-600 text-lg shrink-0 mt-0.5">visibility</span>
+                                <div>
+                                    <strong class="text-slate-900">Dashboard View Access:</strong>
+                                    <span class="text-slate-600 block text-xs mt-0.5">Authorized for HR Director, Executive Director / CEO, Finance Director, and System Administrator.</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="flex flex-col sm:flex-row items-center justify-center gap-3">
+                            <button type="button" onclick="navigateToLoanApplication()" class="w-full sm:w-auto px-6 py-3.5 bg-emerald-700 hover:bg-emerald-800 text-white font-black text-xs sm:text-sm rounded-xl shadow-lg transition active:scale-95 flex items-center justify-center gap-2 cursor-pointer">
+                                <span class="material-symbols-outlined text-lg">edit_document</span>
+                                <span>Go to Staff Loan Application</span>
+                            </button>
+                            <button type="button" onclick="if(window.BCF_LOANS) BCF_LOANS.toggleRoleDropdown()" class="w-full sm:w-auto px-5 py-3.5 bg-slate-800 hover:bg-slate-900 text-white font-bold text-xs sm:text-sm rounded-xl shadow transition active:scale-95 flex items-center justify-center gap-2 cursor-pointer">
+                                <span class="material-symbols-outlined text-lg">manage_accounts</span>
+                                <span>Switch Role Privilege</span>
+                            </button>
+                        </div>
+                    </div>
+                `;
+                main.style.display = 'block';
+            }
+        }
+
+        function navigateToLoanApplication() {
+            if (window.BCF_LOANS && typeof BCF_LOANS.switchTab === 'function') {
+                BCF_LOANS.switchTab('loan-application');
+                return;
+            }
+            try {
+                if (window.top && window.top !== window && window.top.location) {
+                    window.top.location.href = '/loans/loan-application';
+                    return;
+                }
+            } catch (e) {}
+            window.location.href = '../staff_eligibility_loan_application/code.html';
+        }
+
+        // =========================================================================
+        // DATA LOADING & CROSS-REFERENCING ENGINE
+        // =========================================================================
+        function loadDashboardData() {
+            // 1. Staff Registry
+            if (window.BCF_LOANS && typeof BCF_LOANS.getStaffRegistry === 'function') {
+                staffRegistry = BCF_LOANS.getStaffRegistry();
+            } else {
+                try {
+                    staffRegistry = JSON.parse(localStorage.getItem('bcf_staff_registry') || '[]');
+                } catch(e) { staffRegistry = []; }
+            }
+
+            // 2. Active Staff Loans
+            if (window.BCF_LOANS && typeof BCF_LOANS.getStaffLoans === 'function') {
+                allStaffLoans = BCF_LOANS.getStaffLoans();
+            } else {
+                try {
+                    allStaffLoans = JSON.parse(localStorage.getItem('bcf_staff_loans') || '[]');
+                } catch(e) { allStaffLoans = []; }
+            }
+
+            // 3. Loan Applications (Pipeline)
+            if (window.BCF_LOANS && typeof BCF_LOANS.getLoanApplications === 'function') {
+                allApplications = BCF_LOANS.getLoanApplications();
+            } else {
+                try {
+                    allApplications = JSON.parse(localStorage.getItem('bcf_loan_applications') || '[]');
+                } catch(e) { allApplications = []; }
+            }
+
+            // 4. Normalize every loan record to ensure all 5 dimensions exist:
+            // Department, Classification, Job Level, Management Level, Gender
+            allStaffLoans = allStaffLoans.map(enrichLoanWithDemographics);
+            allApplications = allApplications.map(enrichApplicationWithDemographics);
+
+            // 5. Update KPI Cards & Formula
+            updateExecutiveKPIs();
+
+            // 6. Render Analytics Section
+            renderAnalyticsSection();
+
+            // 7. Render Ledger Table
+            applyTableFilters();
+        }
+
+        // Helper: Cross reference loan record with staff registry to pull demographics
+        function enrichLoanWithDemographics(loan) {
+            const empId = (loan.employeeId || loan.empId || '').trim();
+            const fullName = (loan.fullName || loan.employeeName || '').trim();
+
+            let matchedStaff = staffRegistry.find(s => {
+                const sId = (s.employeeId || '').trim();
+                const sName = (s.fullName || '').trim();
+                return (empId && sId && sId.toLowerCase() === empId.toLowerCase()) ||
+                       (fullName && sName && sName.toLowerCase() === fullName.toLowerCase());
+            });
+
+            // Department Normalizer
+            let dept = loan.department || (matchedStaff ? matchedStaff.department : 'Programs Department');
+            if (window.BCF_LOANS && typeof BCF_LOANS.normalizeDepartment === 'function') {
+                dept = BCF_LOANS.normalizeDepartment(dept);
+            }
+
+            // Gender
+            let gender = loan.gender || (matchedStaff ? matchedStaff.gender : null);
+            if (!gender) {
+                const fn = fullName.toLowerCase();
+                if (fn.includes('mariama') || fn.includes('aminata') || fn.includes('fatmata') || fn.includes('bundu') || fn.includes('hawa')) {
+                    gender = 'Female';
+                } else {
+                    gender = 'Male';
+                }
+            }
+
+            // Classification
+            let classification = loan.classification || (matchedStaff ? matchedStaff.classification : 'Permanent');
+
+            // Job Level
+            let jobLevel = loan.jobLevel || (matchedStaff ? matchedStaff.jobLevel : null);
+            if (!jobLevel) {
+                const pos = (loan.position || (matchedStaff ? matchedStaff.title : '')).toLowerCase();
+                if (pos.includes('ceo') || pos.includes('executive')) jobLevel = 'Executive';
+                else if (pos.includes('director')) jobLevel = 'Director';
+                else if (pos.includes('assistant manager')) jobLevel = 'Assistant Manager';
+                else if (pos.includes('manager')) jobLevel = 'Manager';
+                else jobLevel = 'Officer';
+            }
+
+            // Management Level
+            let mgmtLevel = loan.mgmtLevel || (matchedStaff ? matchedStaff.mgmtLevel : null);
+            if (!mgmtLevel) {
+                if (jobLevel === 'Executive' || jobLevel === 'Director') mgmtLevel = 'Top Management';
+                else if (jobLevel === 'Manager' || jobLevel === 'Assistant Manager') mgmtLevel = 'Middle Management';
+                else mgmtLevel = 'Employee';
+            }
+
+            // Financial Calculations
+            const approvedAmount = Number(loan.approvedAmount || loan.totalPrincipal || 0);
+            const monthlyDeduction = Number(loan.monthlyDeduction || (approvedAmount * 0.10));
+            const monthsTotal = Number(loan.monthsTotal || loan.totalMonths || 10);
+            const monthsPaid = Number(loan.monthsPaid || 0);
+
+            // User Formula: Total Amount of Loan = Total Recovered To Date + Outstanding Balance
+            let recoveredAmount = Number(loan.recoveredAmount !== undefined ? loan.recoveredAmount : (monthsPaid * monthlyDeduction));
+            let outstandingBalance = Number(loan.outstandingBalance !== undefined ? loan.outstandingBalance : (approvedAmount - recoveredAmount));
+
+            if (recoveredAmount > approvedAmount) recoveredAmount = approvedAmount;
+            if (outstandingBalance < 0) outstandingBalance = 0;
+
+            // Strict Formula Guarantee for every single loan
+            if (Math.abs(approvedAmount - (recoveredAmount + outstandingBalance)) > 0.01) {
+                outstandingBalance = Math.max(0, approvedAmount - recoveredAmount);
+            }
+
+            return {
+                ...loan,
+                empId: empId || (matchedStaff ? matchedStaff.employeeId : 'BCF-SL-1000'),
+                fullName: fullName || (matchedStaff ? matchedStaff.fullName : 'Staff Beneficiary'),
+                department: dept,
+                gender: gender,
+                classification: classification,
+                jobLevel: jobLevel,
+                mgmtLevel: mgmtLevel,
+                approvedAmount: approvedAmount,
+                monthlyDeduction: monthlyDeduction,
+                monthsTotal: monthsTotal,
+                monthsPaid: monthsPaid,
+                recoveredAmount: recoveredAmount,
+                outstandingBalance: outstandingBalance,
+                status: (outstandingBalance <= 0 || monthsPaid >= monthsTotal) ? 'COMPLETED' : 'ACTIVE'
+            };
+        }
+
+        function enrichApplicationWithDemographics(app) {
+            const staff = app.staff || {};
+            const empId = staff.employeeId || '';
+            const fullName = staff.fullName || '';
+
+            let matchedStaff = staffRegistry.find(s => {
+                const sId = (s.employeeId || '').trim();
+                const sName = (s.fullName || '').trim();
+                return (empId && sId && sId.toLowerCase() === empId.toLowerCase()) ||
+                       (fullName && sName && sName.toLowerCase() === fullName.toLowerCase());
+            });
+
+            let dept = staff.department || (matchedStaff ? matchedStaff.department : 'Programs Department');
+            if (window.BCF_LOANS && typeof BCF_LOANS.normalizeDepartment === 'function') {
+                dept = BCF_LOANS.normalizeDepartment(dept);
+            }
+
+            let gender = staff.gender || (matchedStaff ? matchedStaff.gender : null);
+            if (!gender) {
+                const fn = fullName.toLowerCase();
+                gender = (fn.includes('mariama') || fn.includes('aminata') || fn.includes('fatmata')) ? 'Female' : 'Male';
+            }
+
+            let classification = staff.classification || (matchedStaff ? matchedStaff.classification : 'Permanent');
+
+            let jobLevel = staff.jobLevel || (matchedStaff ? matchedStaff.jobLevel : null);
+            if (!jobLevel) {
+                const pos = (staff.title || '').toLowerCase();
+                if (pos.includes('ceo') || pos.includes('executive')) jobLevel = 'Executive';
+                else if (pos.includes('director')) jobLevel = 'Director';
+                else if (pos.includes('manager')) jobLevel = 'Manager';
+                else jobLevel = 'Officer';
+            }
+
+            let mgmtLevel = staff.mgmtLevel || (matchedStaff ? matchedStaff.mgmtLevel : null);
+            if (!mgmtLevel) {
+                if (jobLevel === 'Executive' || jobLevel === 'Director') mgmtLevel = 'Top Management';
+                else if (jobLevel === 'Manager') mgmtLevel = 'Middle Management';
+                else mgmtLevel = 'Employee';
+            }
+
+            return {
+                ...app,
+                staff: {
+                    ...staff,
+                    department: dept,
+                    gender: gender,
+                    classification: classification,
+                    jobLevel: jobLevel,
+                    mgmtLevel: mgmtLevel
+                }
+            };
+        }
+
+        // =========================================================================
+        // EXECUTIVE KPI CALCULATIONS & RECONCILIATION
+        // =========================================================================
+        function updateExecutiveKPIs() {
+            // Aggregate from active loans
+            let totalLoanAmount = 0;
+            let totalRecovered = 0;
+            let totalOutstanding = 0;
+
+            let femaleCount = 0;
+            let maleCount = 0;
+            let femaleLoanAmt = 0;
+            let maleLoanAmt = 0;
+
+            allStaffLoans.forEach(l => {
+                totalLoanAmount += (l.approvedAmount || 0);
+                totalRecovered += (l.recoveredAmount || 0);
+                totalOutstanding += (l.outstandingBalance || 0);
+
+                if (l.gender === 'Female') {
+                    femaleCount++;
+                    femaleLoanAmt += (l.approvedAmount || 0);
+                } else {
+                    maleCount++;
+                    maleLoanAmt += (l.approvedAmount || 0);
+                }
+            });
+
+            // Enforce Formula: Total Amount of Loan = Total Recovered To Date + Outstanding Balance
+            // Handle floating point precision cleanly
+            totalLoanAmount = Math.round(totalLoanAmount * 100) / 100;
+            totalRecovered = Math.round(totalRecovered * 100) / 100;
+            totalOutstanding = Math.round(totalOutstanding * 100) / 100;
+
+            const recoveredPct = totalLoanAmount > 0 ? ((totalRecovered / totalLoanAmount) * 100) : 0;
+            const outstandingPct = totalLoanAmount > 0 ? ((totalOutstanding / totalLoanAmount) * 100) : 0;
+
+            // Pipeline metrics
+            const pendingHR = allApplications.filter(a => a.status === 'PENDING_HR').length;
+            const pendingFin = allApplications.filter(a => a.status === 'HR_APPROVED').length;
+            const pendingCEO = allApplications.filter(a => a.status === 'FINANCE_APPROVED').length;
+            const authorized = allApplications.filter(a => a.status === 'CEO_AUTHORIZED' || a.status === 'VOUCHER_PREPARED').length;
+            const totalPending = pendingHR + pendingFin + pendingCEO + authorized;
+
+            // Format numbers
+            const fmt = (val) => 'NLe ' + Number(val || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+
+            // 1. KPI Cards
+            document.getElementById('kpi-total-loan-amt').textContent = fmt(totalLoanAmount);
+            document.getElementById('kpi-loan-sub').textContent = `${allStaffLoans.length} total staff advances`;
+
+            document.getElementById('kpi-total-recovered').textContent = fmt(totalRecovered);
+            document.getElementById('kpi-recovered-pct').textContent = `${recoveredPct.toFixed(1)}% Recovered`;
+            document.getElementById('kpi-recovered-bar').style.width = `${Math.min(100, recoveredPct)}%`;
+
+            document.getElementById('kpi-outstanding-bal').textContent = fmt(totalOutstanding);
+            document.getElementById('kpi-outstanding-pct').textContent = `${outstandingPct.toFixed(1)}% Balance`;
+            document.getElementById('kpi-outstanding-bar').style.width = `${Math.min(100, outstandingPct)}%`;
+
+            document.getElementById('kpi-active-count').textContent = `${allStaffLoans.length} Staff`;
+            document.getElementById('kpi-active-sub').textContent = `${allStaffLoans.filter(l => l.status === 'ACTIVE').length} Active Amortizations`;
+
+            document.getElementById('kpi-pending-pipeline').textContent = `${totalPending} Pending`;
+            document.getElementById('kpi-pipeline-sub').textContent = `${pendingHR} HR • ${pendingFin} Fin • ${pendingCEO} CEO`;
+
+            // Gender ratio
+            const totalStaffGender = femaleCount + maleCount;
+            const femalePct = totalStaffGender > 0 ? ((femaleCount / totalStaffGender) * 100).toFixed(0) : 0;
+            const malePct = totalStaffGender > 0 ? (100 - femalePct).toFixed(0) : 0;
+
+            document.getElementById('kpi-gender-ratio').textContent = `${femalePct}% F / ${malePct}% M`;
+            document.getElementById('kpi-gender-female-bar').style.width = `${femalePct}%`;
+            document.getElementById('kpi-gender-male-bar').style.width = `${malePct}%`;
+            document.getElementById('kpi-gender-counts').innerHTML = `
+                <span class="text-pink-600">${femaleCount} Female (${fmt(femaleLoanAmt)})</span>
+                <span class="text-blue-600">${maleCount} Male (${fmt(maleLoanAmt)})</span>
+            `;
+
+            // Reconciliation Banner
+            document.getElementById('banner-reconciliation-math').textContent = 
+                `${fmt(totalLoanAmount)} = ${fmt(totalRecovered)} + ${fmt(totalOutstanding)}`;
+
+            // Badges
+            document.getElementById('count-badge-active').textContent = allStaffLoans.length;
+            document.getElementById('count-badge-apps').textContent = allApplications.length;
+        }
+
+        // =========================================================================
+        // MULTI-DIMENSIONAL ANALYTICS BREAKDOWN MATRIX
+        // =========================================================================
+        function switchAnalyticsTab(tab) {
+            currentAnalyticsTab = tab;
+            ['ALL', 'DEPT', 'CLASS', 'JOB', 'MGMT', 'GENDER'].forEach(t => {
+                const el = document.getElementById(`dim-tab-${t}`);
+                if (el) {
+                    if (t === tab) {
+                        el.className = "px-3 py-1.5 rounded-lg text-xs font-black transition whitespace-nowrap dimension-active shadow-xs";
+                    } else {
+                        el.className = "px-3 py-1.5 rounded-lg text-xs font-bold text-slate-600 hover:text-slate-900 transition whitespace-nowrap";
+                    }
+                }
+            });
+            renderAnalyticsSection();
+        }
+
+        function calculateGroupMetrics(keyAccessor) {
+            const groups = {};
+
+            allStaffLoans.forEach(loan => {
+                const rawKey = keyAccessor(loan) || 'Unassigned';
+                const key = String(rawKey).trim();
+
+                if (!groups[key]) {
+                    groups[key] = {
+                        key: key,
+                        count: 0,
+                        totalLoanAmount: 0,
+                        totalRecovered: 0,
+                        totalOutstanding: 0,
+                        loans: []
+                    };
+                }
+
+                groups[key].count += 1;
+                groups[key].totalLoanAmount += loan.approvedAmount;
+                groups[key].totalRecovered += loan.recoveredAmount;
+                groups[key].totalOutstanding += loan.outstandingBalance;
+                groups[key].loans.push(loan);
+            });
+
+            return Object.values(groups).sort((a, b) => b.totalLoanAmount - a.totalLoanAmount);
+        }
+
+        function renderAnalyticsSection() {
+            const container = document.getElementById('analytics-cards-container');
+            if (!container) return;
+            container.innerHTML = '';
+
+            const fmt = (val) => 'NLe ' + Number(val || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+            const totalPortfolioAmt = allStaffLoans.reduce((sum, l) => sum + l.approvedAmount, 0) || 1;
+
+            // Dimensions to display
+            const showDept = (currentAnalyticsTab === 'ALL' || currentAnalyticsTab === 'DEPT');
+            const showClass = (currentAnalyticsTab === 'ALL' || currentAnalyticsTab === 'CLASS');
+            const showJob = (currentAnalyticsTab === 'ALL' || currentAnalyticsTab === 'JOB');
+            const showMgmt = (currentAnalyticsTab === 'ALL' || currentAnalyticsTab === 'MGMT');
+            const showGender = (currentAnalyticsTab === 'ALL' || currentAnalyticsTab === 'GENDER');
+
+            // 1. GENDER DIMENSION
+            if (showGender) {
+                const genderGroups = calculateGroupMetrics(l => l.gender || 'Unspecified');
+                container.appendChild(createDimensionCardSection(
+                    'Gender Breakdown',
+                    'wc',
+                    'Portfolio distribution, recovery rate, and total exposure between Female and Male staff',
+                    genderGroups,
+                    'gender',
+                    totalPortfolioAmt
+                ));
+            }
+
+            // 2. DEPARTMENT DIMENSION
+            if (showDept) {
+                const deptGroups = calculateGroupMetrics(l => l.department);
+                container.appendChild(createDimensionCardSection(
+                    'Department Breakdown',
+                    'corporate_fare',
+                    'Aggregate staff loan volume, recovery status, and outstanding principal by operational department',
+                    deptGroups,
+                    'department',
+                    totalPortfolioAmt
+                ));
+            }
+
+            // 3. CLASSIFICATION DIMENSION
+            if (showClass) {
+                const classGroups = calculateGroupMetrics(l => l.classification || 'Permanent');
+                container.appendChild(createDimensionCardSection(
+                    'Employment Classification Breakdown',
+                    'assignment_ind',
+                    'Permanent staff vs. Fixed-Term Contract personnel loan allocations and recovery progress',
+                    classGroups,
+                    'classification',
+                    totalPortfolioAmt
+                ));
+            }
+
+            // 4. JOB LEVEL DIMENSION
+            if (showJob) {
+                const jobGroups = calculateGroupMetrics(l => l.jobLevel || 'Officer');
+                container.appendChild(createDimensionCardSection(
+                    'Job Level Breakdown',
+                    'military_tech',
+                    'Distribution across Executive, Director, Manager, Assistant Manager, and Officer grades',
+                    jobGroups,
+                    'jobLevel',
+                    totalPortfolioAmt
+                ));
+            }
+
+            // 5. MANAGEMENT LEVEL DIMENSION
+            if (showMgmt) {
+                const mgmtGroups = calculateGroupMetrics(l => l.mgmtLevel || 'Employee');
+                container.appendChild(createDimensionCardSection(
+                    'Management Level Breakdown',
+                    'stairs',
+                    'Portfolio segregation across Top Management, Middle Management, and General Employees',
+                    mgmtGroups,
+                    'mgmtLevel',
+                    totalPortfolioAmt
+                ));
+            }
+        }
+
+        function createDimensionCardSection(title, icon, subtitle, groups, dimensionType, totalPortfolioAmt) {
+            const section = document.createElement('div');
+            section.className = "space-y-3";
+
+            const fmt = (val) => 'NLe ' + Number(val || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+
+            let cardsHtml = '';
+            groups.forEach(g => {
+                const recPct = g.totalLoanAmount > 0 ? ((g.totalRecovered / g.totalLoanAmount) * 100) : 0;
+                const outPct = g.totalLoanAmount > 0 ? ((g.totalOutstanding / g.totalLoanAmount) * 100) : 0;
+                const shareOfTotal = ((g.totalLoanAmount / totalPortfolioAmt) * 100).toFixed(1);
+
+                // Styling accent by dimension & value
+                let badgeClass = "bg-slate-100 text-slate-800 border-slate-300";
+                if (g.key === 'Female') badgeClass = "bg-pink-100 text-pink-800 border-pink-300";
+                else if (g.key === 'Male') badgeClass = "bg-blue-100 text-blue-800 border-blue-300";
+                else if (g.key.includes('Permanent')) badgeClass = "bg-emerald-100 text-emerald-800 border-emerald-300";
+                else if (g.key.includes('Fixed-Term')) badgeClass = "bg-purple-100 text-purple-800 border-purple-300";
+                else if (g.key.includes('Executive') || g.key.includes('Top Management')) badgeClass = "bg-indigo-100 text-indigo-800 border-indigo-300";
+
+                cardsHtml += `
+                    <div onclick="filterTableByDimension('${dimensionType}', '${escapeHtml(g.key)}')" class="p-4 rounded-xl border border-slate-200 bg-surface-container/60 hover:bg-white hover:border-primary/50 transition-all cursor-pointer group shadow-2xs flex flex-col justify-between">
+                        <div>
+                            <div class="flex items-center justify-between gap-2">
+                                <span class="px-2 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider border ${badgeClass}">
+                                    ${escapeHtml(g.key)}
+                                </span>
+                                <span class="text-[11px] font-mono font-bold text-slate-500">${g.count} Staff &bull; ${shareOfTotal}%</span>
+                            </div>
+
+                            <div class="mt-3">
+                                <span class="text-[10px] uppercase font-bold text-slate-400 block">Total Amount of Loan</span>
+                                <div class="text-base sm:text-lg font-black font-mono text-slate-900 group-hover:text-primary transition">
+                                    ${fmt(g.totalLoanAmount)}
+                                </div>
+                            </div>
+
+                            <!-- Dual segment recovery bar -->
+                            <div class="w-full bg-slate-200 rounded-full h-2 mt-2.5 flex overflow-hidden">
+                                <div class="bg-emerald-600 h-2 transition-all duration-500" style="width: ${recPct}%" title="Recovered: ${recPct.toFixed(1)}%"></div>
+                                <div class="bg-amber-500 h-2 transition-all duration-500" style="width: ${outPct}%" title="Outstanding: ${outPct.toFixed(1)}%"></div>
+                            </div>
+
+                            <div class="grid grid-cols-2 gap-2 mt-2.5 text-[11px]">
+                                <div>
+                                    <span class="text-[10px] text-slate-500 block">Total Recovered:</span>
+                                    <strong class="font-mono text-emerald-700">${fmt(g.totalRecovered)}</strong>
+                                    <span class="text-[9px] text-emerald-600 block">(${recPct.toFixed(0)}%)</span>
+                                </div>
+                                <div class="text-right">
+                                    <span class="text-[10px] text-slate-500 block">Outstanding:</span>
+                                    <strong class="font-mono text-amber-800">${fmt(g.totalOutstanding)}</strong>
+                                    <span class="text-[9px] text-amber-600 block">(${outPct.toFixed(0)}%)</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mt-3 pt-2.5 border-t border-slate-200 flex items-center justify-between text-[11px] text-primary font-bold">
+                            <span>Filter table &rarr;</span>
+                            <span class="material-symbols-outlined text-[15px] group-hover:translate-x-1 transition">arrow_forward</span>
+                        </div>
+                    </div>
+                `;
+            });
+
+            section.innerHTML = `
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center gap-2">
+                        <span class="material-symbols-outlined text-slate-700 text-lg">${icon}</span>
+                        <h3 class="text-xs sm:text-sm font-black text-slate-900 uppercase tracking-tight">${title}</h3>
+                        <span class="text-[10px] bg-slate-100 text-slate-600 px-2 py-0.5 rounded-full font-bold">${groups.length} categories</span>
+                    </div>
+                    <span class="text-[11px] text-slate-400 hidden sm:inline">${subtitle}</span>
+                </div>
+                <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
+                    ${cardsHtml}
+                </div>
+            `;
+
+            return section;
+        }
+
+        function escapeHtml(str) {
+            return String(str || '').replace(/[&<>"']/g, m => ({
+                '&': '&amp;',
+                '<': '&lt;',
+                '>': '&gt;',
+                '"': '&quot;',
+                "'": '&#039;'
+            })[m]);
+        }
+
+        // =========================================================================
+        // DIMENSION CLICK & FILTERING SYNERGY
+        // =========================================================================
+        function filterTableByDimension(type, value) {
+            activeDimensionFilter = { type, value };
+            
+            // Sync filter dropdowns if match
+            if (type === 'department') {
+                const el = document.getElementById('filter-department');
+                if (el) el.value = value;
+            } else if (type === 'gender') {
+                const el = document.getElementById('filter-gender');
+                if (el) el.value = value;
+            } else if (type === 'classification') {
+                const el = document.getElementById('filter-classification');
+                if (el) el.value = value;
+            }
+
+            // Show active filter pill
+            const banner = document.getElementById('active-filter-banner');
+            const bannerText = document.getElementById('active-filter-text');
+            if (banner && bannerText) {
+                banner.classList.remove('hidden');
+                bannerText.innerHTML = `Filtered by <strong class="uppercase">${type}</strong>: <span class="underline">${escapeHtml(value)}</span>`;
+            }
+
+            applyTableFilters();
+
+            // Scroll table into view smoothly
+            const tableCard = document.getElementById('tab-view-active-loans');
+            if (tableCard) {
+                tableCard.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            }
+        }
+
+        function clearActiveDimensionFilter() {
+            activeDimensionFilter = null;
+            const banner = document.getElementById('active-filter-banner');
+            if (banner) banner.classList.add('hidden');
+            resetAllTableFilters();
+        }
+
+        function resetAllTableFilters() {
+            activeDimensionFilter = null;
+            const banner = document.getElementById('active-filter-banner');
+            if (banner) banner.classList.add('hidden');
+
+            document.getElementById('ledger-search').value = '';
+            document.getElementById('filter-department').value = 'ALL';
+            document.getElementById('filter-gender').value = 'ALL';
+            document.getElementById('filter-classification').value = 'ALL';
+
+            applyTableFilters();
+        }
+
+        // =========================================================================
+        // DATA LEDGER RENDERING & VIEW SWITCHER
+        // =========================================================================
+        function switchLedgerView(view) {
+            currentLedgerView = view;
+            const btnActive = document.getElementById('tab-view-active-loans');
+            const btnApps = document.getElementById('tab-view-applications');
+
+            if (view === 'ACTIVE_LOANS') {
+                btnActive.className = "px-4 py-2 rounded-lg text-xs font-black transition flex items-center gap-1.5 bg-white text-slate-900 shadow-xs";
+                btnApps.className = "px-4 py-2 rounded-lg text-xs font-bold text-slate-600 hover:text-slate-900 transition flex items-center gap-1.5";
+            } else {
+                btnApps.className = "px-4 py-2 rounded-lg text-xs font-black transition flex items-center gap-1.5 bg-white text-slate-900 shadow-xs";
+                btnActive.className = "px-4 py-2 rounded-lg text-xs font-bold text-slate-600 hover:text-slate-900 transition flex items-center gap-1.5";
+            }
+
+            applyTableFilters();
+        }
+
+        function applyTableFilters() {
+            const search = (document.getElementById('ledger-search').value || '').toLowerCase().trim();
+            const filterDept = document.getElementById('filter-department').value;
+            const filterGender = document.getElementById('filter-gender').value;
+            const filterClass = document.getElementById('filter-classification').value;
+
+            if (currentLedgerView === 'ACTIVE_LOANS') {
+                const filtered = allStaffLoans.filter(loan => {
+                    // Search query
+                    if (search) {
+                        const sMatch = (loan.refNo || '').toLowerCase().includes(search) ||
+                            (loan.fullName || '').toLowerCase().includes(search) ||
+                            (loan.empId || '').toLowerCase().includes(search) ||
+                            (loan.department || '').toLowerCase().includes(search) ||
+                            (loan.jobLevel || '').toLowerCase().includes(search);
+                        if (!sMatch) return false;
+                    }
+
+                    // Dropdowns
+                    if (filterDept !== 'ALL' && loan.department !== filterDept) return false;
+                    if (filterGender !== 'ALL' && loan.gender !== filterGender) return false;
+                    if (filterClass !== 'ALL' && loan.classification !== filterClass) return false;
+
+                    // Active Dimension Filter
+                    if (activeDimensionFilter) {
+                        const { type, value } = activeDimensionFilter;
+                        if (type === 'department' && loan.department !== value) return false;
+                        if (type === 'gender' && loan.gender !== value) return false;
+                        if (type === 'classification' && loan.classification !== value) return false;
+                        if (type === 'jobLevel' && loan.jobLevel !== value) return false;
+                        if (type === 'mgmtLevel' && loan.mgmtLevel !== value) return false;
+                    }
+
+                    return true;
+                });
+
+                renderActiveLoansTable(filtered);
+            } else {
+                const filtered = allApplications.filter(app => {
+                    const staff = app.staff || {};
+                    if (search) {
+                        const sMatch = (app.refNo || '').toLowerCase().includes(search) ||
+                            (staff.fullName || '').toLowerCase().includes(search) ||
+                            (staff.employeeId || '').toLowerCase().includes(search) ||
+                            (staff.department || '').toLowerCase().includes(search);
+                        if (!sMatch) return false;
+                    }
+
+                    if (filterDept !== 'ALL' && staff.department !== filterDept) return false;
+                    if (filterGender !== 'ALL' && staff.gender !== filterGender) return false;
+                    if (filterClass !== 'ALL' && staff.classification !== filterClass) return false;
+
+                    if (activeDimensionFilter) {
+                        const { type, value } = activeDimensionFilter;
+                        if (type === 'department' && staff.department !== value) return false;
+                        if (type === 'gender' && staff.gender !== value) return false;
+                        if (type === 'classification' && staff.classification !== value) return false;
+                        if (type === 'jobLevel' && staff.jobLevel !== value) return false;
+                        if (type === 'mgmtLevel' && staff.mgmtLevel !== value) return false;
+                    }
+
+                    return true;
+                });
+
+                renderApplicationsTable(filtered);
+            }
+        }
+
+        function renderActiveLoansTable(list) {
+            const thead = document.getElementById('ledger-table-head');
+            const tbody = document.getElementById('ledger-table-body');
+            const fmt = (val) => 'NLe ' + Number(val || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+
+            thead.innerHTML = `
+                <tr class="bg-slate-50 border-b border-slate-200 font-extrabold text-slate-700 uppercase">
+                    <th class="py-3 px-4">Ref Number</th>
+                    <th class="py-3 px-4">Staff Member &amp; Demographics</th>
+                    <th class="py-3 px-4">Department &amp; Job Level</th>
+                    <th class="py-3 px-4 text-right">Total Loan Amount</th>
+                    <th class="py-3 px-4 text-right">Recovered To Date</th>
+                    <th class="py-3 px-4 text-right">Outstanding Balance</th>
+                    <th class="py-3 px-4 text-center">Progress (10 Mo)</th>
+                    <th class="py-3 px-4 text-center">Status</th>
+                    <th class="py-3 px-4 text-center">Actions</th>
+                </tr>
+            `;
+
+            tbody.innerHTML = '';
+
+            let sumLoan = 0;
+            let sumRecovered = 0;
+            let sumOutstanding = 0;
+
+            if (list.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="9" class="text-center py-10 text-slate-400">
+                            <span class="material-symbols-outlined text-4xl block text-slate-300 mb-1">search_off</span>
+                            No active staff loans match your search or dimension filter criteria.
+                        </td>
+                    </tr>
+                `;
+            } else {
+                list.forEach(loan => {
+                    sumLoan += loan.approvedAmount;
+                    sumRecovered += loan.recoveredAmount;
+                    sumOutstanding += loan.outstandingBalance;
+
+                    const tr = document.createElement('tr');
+                    tr.className = "hover:bg-slate-50/80 transition";
+
+                    const genderBadge = loan.gender === 'Female'
+                        ? `<span class="px-1.5 py-0.5 rounded text-[9px] font-black uppercase bg-pink-100 text-pink-700 border border-pink-200">Female</span>`
+                        : `<span class="px-1.5 py-0.5 rounded text-[9px] font-black uppercase bg-blue-100 text-blue-700 border border-blue-200">Male</span>`;
+
+                    const classBadge = loan.classification === 'Permanent'
+                        ? `<span class="text-[10px] text-slate-500 block">Permanent</span>`
+                        : `<span class="text-[10px] text-purple-700 font-semibold block">Fixed-Term</span>`;
+
+                    const progressPct = Math.min(100, Math.round(((loan.monthsPaid || 0) / (loan.monthsTotal || 10)) * 100));
+
+                    const statusBadge = loan.status === 'COMPLETED'
+                        ? `<span class="px-2.5 py-1 rounded-full text-[10px] font-extrabold bg-emerald-100 text-emerald-800 border border-emerald-300">Settled</span>`
+                        : `<span class="px-2.5 py-1 rounded-full text-[10px] font-extrabold bg-blue-100 text-blue-800 border border-blue-300">Active</span>`;
+
+                    tr.innerHTML = `
+                        <td class="py-3 px-4 font-mono font-bold text-slate-800">${escapeHtml(loan.refNo)}</td>
+                        <td class="py-3 px-4">
+                            <div class="flex items-center gap-1.5">
+                                <strong class="font-bold text-slate-900">${escapeHtml(loan.fullName)}</strong>
+                                ${genderBadge}
+                            </div>
+                            <div class="flex items-center gap-2 mt-0.5">
+                                <span class="text-[11px] font-mono text-slate-400">${escapeHtml(loan.empId)}</span>
+                                <span class="text-slate-300">&bull;</span>
+                                ${classBadge}
+                            </div>
+                        </td>
+                        <td class="py-3 px-4">
+                            <span class="font-semibold text-slate-800 block text-xs">${escapeHtml(loan.department)}</span>
+                            <span class="text-[11px] text-slate-500">${escapeHtml(loan.jobLevel)} &bull; ${escapeHtml(loan.mgmtLevel)}</span>
+                        </td>
+                        <td class="py-3 px-4 text-right font-mono font-bold text-slate-900">
+                            ${fmt(loan.approvedAmount)}
+                        </td>
+                        <td class="py-3 px-4 text-right font-mono font-bold text-emerald-700">
+                            ${fmt(loan.recoveredAmount)}
+                        </td>
+                        <td class="py-3 px-4 text-right font-mono font-bold text-amber-800">
+                            ${fmt(loan.outstandingBalance)}
+                        </td>
+                        <td class="py-3 px-4 text-center">
+                            <div class="flex items-center justify-center gap-1.5 font-mono text-[11px] font-bold text-slate-700">
+                                <span>${loan.monthsPaid || 0}/${loan.monthsTotal || 10}</span>
+                                <span class="text-slate-400">(${progressPct}%)</span>
+                            </div>
+                            <div class="w-16 bg-slate-200 rounded-full h-1.5 mx-auto mt-1 overflow-hidden">
+                                <div class="bg-emerald-600 h-1.5 rounded-full" style="width: ${progressPct}%"></div>
+                            </div>
+                        </td>
+                        <td class="py-3 px-4 text-center">${statusBadge}</td>
+                        <td class="py-3 px-4 text-center">
+                            <button type="button" onclick="openAmortizationModal('${loan.refNo}')" class="px-2.5 py-1 bg-primary/10 hover:bg-primary text-primary hover:text-white rounded-lg font-bold text-[11px] transition shadow-2xs cursor-pointer" title="View 10-month amortization schedule">
+                                View Schedule
+                            </button>
+                        </td>
+                    `;
+
+                    tbody.appendChild(tr);
+                });
+            }
+
+            // Summary Bar
+            document.getElementById('table-record-count-text').textContent = 
+                `Showing ${list.length} of ${allStaffLoans.length} active staff loan records`;
+            document.getElementById('table-sum-loan').textContent = fmt(sumLoan);
+            document.getElementById('table-sum-recovered').textContent = fmt(sumRecovered);
+            document.getElementById('table-sum-outstanding').textContent = fmt(sumOutstanding);
+        }
+
+        function renderApplicationsTable(list) {
+            const thead = document.getElementById('ledger-table-head');
+            const tbody = document.getElementById('ledger-table-body');
+            const fmt = (val) => 'NLe ' + Number(val || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+
+            thead.innerHTML = `
+                <tr class="bg-slate-50 border-b border-slate-200 font-extrabold text-slate-700 uppercase">
+                    <th class="py-3 px-4">Ref Number</th>
+                    <th class="py-3 px-4">Staff Member</th>
+                    <th class="py-3 px-4">Department &amp; Gender</th>
+                    <th class="py-3 px-4">Tier / Position</th>
+                    <th class="py-3 px-4 text-right">Requested</th>
+                    <th class="py-3 px-4 text-right">Approved Amount</th>
+                    <th class="py-3 px-4 text-center">Status</th>
+                    <th class="py-3 px-4 text-center">Workflow Action</th>
+                </tr>
+            `;
+
+            tbody.innerHTML = '';
+
+            let sumRequested = 0;
+            let sumApproved = 0;
+
+            if (list.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="8" class="text-center py-10 text-slate-400">
+                            <span class="material-symbols-outlined text-4xl block text-slate-300 mb-1">inbox</span>
+                            No loan applications match your filter criteria.
+                        </td>
+                    </tr>
+                `;
+            } else {
+                list.forEach(app => {
+                    const staff = app.staff || {};
+                    const req = app.request || {};
+                    const reqAmt = parseFloat(req.loanAmount || 0);
+
+                    const approvedAmtVal = app.ceoReview && app.ceoReview.approvedAmount
+                        ? parseFloat(app.ceoReview.approvedAmount)
+                        : (app.financeReview && app.financeReview.approvedAmount
+                            ? parseFloat(app.financeReview.approvedAmount)
+                            : 0);
+
+                    sumRequested += reqAmt;
+                    sumApproved += approvedAmtVal;
+
+                    const statusBadge = (function() {
+                        switch(app.status) {
+                            case 'PENDING_HR': return `<span class="px-2.5 py-1 rounded-full text-[10px] font-extrabold bg-amber-100 text-amber-800 border border-amber-300">Pending HR</span>`;
+                            case 'HR_APPROVED': return `<span class="px-2.5 py-1 rounded-full text-[10px] font-extrabold bg-blue-100 text-blue-800 border border-blue-300">At Finance</span>`;
+                            case 'FINANCE_APPROVED': return `<span class="px-2.5 py-1 rounded-full text-[10px] font-extrabold bg-purple-100 text-purple-800 border border-purple-300">At CEO</span>`;
+                            case 'CEO_AUTHORIZED': return `<span class="px-2.5 py-1 rounded-full text-[10px] font-extrabold bg-emerald-100 text-emerald-800 border border-emerald-300">CEO Authorized</span>`;
+                            case 'VOUCHER_PREPARED': return `<span class="px-2.5 py-1 rounded-full text-[10px] font-extrabold bg-indigo-100 text-indigo-800 border border-indigo-300">Voucher Prepared</span>`;
+                            case 'DISBURSED': return `<span class="px-2.5 py-1 rounded-full text-[10px] font-extrabold bg-teal-100 text-teal-800 border border-teal-300">Disbursed</span>`;
+                            case 'HR_REJECTED':
+                            case 'FINANCE_REJECTED':
+                            case 'CEO_REJECTED': return `<span class="px-2.5 py-1 rounded-full text-[10px] font-extrabold bg-red-100 text-red-800 border border-red-300">Not Approved</span>`;
+                            default: return `<span class="px-2.5 py-1 rounded-full text-[10px] font-bold bg-slate-100 text-slate-700">Active</span>`;
+                        }
+                    })();
+
+                    const targetTab = (function() {
+                        switch(app.status) {
+                            case 'PENDING_HR': return 'hr-approval';
+                            case 'HR_APPROVED': return 'finance-approval';
+                            case 'FINANCE_APPROVED': return 'ceo-authorisation';
+                            case 'CEO_AUTHORIZED': return 'hr-disbursement-voucher';
+                            case 'VOUCHER_PREPARED': return 'finance-disbursement-release';
+                            case 'DISBURSED': return 'payroll-integration';
+                            default: return 'hr-approval';
+                        }
+                    })();
+
+                    const genderBadge = staff.gender === 'Female'
+                        ? `<span class="px-1.5 py-0.5 rounded text-[9px] font-black uppercase bg-pink-100 text-pink-700">F</span>`
+                        : `<span class="px-1.5 py-0.5 rounded text-[9px] font-black uppercase bg-blue-100 text-blue-700">M</span>`;
+
+                    const tr = document.createElement('tr');
+                    tr.className = "hover:bg-slate-50/80 transition";
+                    tr.innerHTML = `
+                        <td class="py-3 px-4 font-mono font-bold text-slate-800">${escapeHtml(app.refNo)}</td>
+                        <td class="py-3 px-4">
+                            <div class="flex items-center gap-1.5">
+                                <strong class="font-bold text-slate-900">${escapeHtml(staff.fullName || 'Staff Applicant')}</strong>
+                                ${genderBadge}
+                            </div>
+                            <span class="block text-[11px] font-mono text-slate-400">${escapeHtml(staff.employeeId || '-')}</span>
+                        </td>
+                        <td class="py-3 px-4">
+                            <span class="text-slate-700 font-semibold block">${escapeHtml(staff.department || '-')}</span>
+                            <span class="text-[10px] text-slate-400">${escapeHtml(staff.classification || 'Permanent')}</span>
+                        </td>
+                        <td class="py-3 px-4 text-slate-700">
+                            <span>${escapeHtml(staff.multiplierCategory || 'Officer')}</span>
+                            <span class="text-[10px] text-slate-400 block">${escapeHtml(staff.title || 'Officer')}</span>
+                        </td>
+                        <td class="py-3 px-4 text-right font-mono font-bold text-primary">${fmt(reqAmt)}</td>
+                        <td class="py-3 px-4 text-right font-mono font-bold text-emerald-800">
+                            ${approvedAmtVal > 0 ? fmt(approvedAmtVal) : '<span class="text-slate-400 italic font-normal">Pending Review</span>'}
+                        </td>
+                        <td class="py-3 px-4 text-center">${statusBadge}</td>
+                        <td class="py-3 px-4 text-center">
+                            <button type="button" onclick="openLoanInWorkflow('${app.refNo}', '${targetTab}')" class="px-3 py-1 bg-primary/10 hover:bg-primary text-primary hover:text-white rounded-lg font-bold text-[11px] transition shadow-2xs cursor-pointer">
+                                Review &rarr;
+                            </button>
+                        </td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+            }
+
+            // Summary Bar for Applications
+            document.getElementById('table-record-count-text').textContent = 
+                `Showing ${list.length} of ${allApplications.length} application records`;
+            document.getElementById('table-sum-loan').textContent = fmt(sumRequested);
+            document.getElementById('table-sum-recovered').textContent = fmt(sumApproved);
+            document.getElementById('table-sum-outstanding').textContent = fmt(Math.max(0, sumRequested - sumApproved));
+        }
+
+        // =========================================================================
+        // AMORTIZATION SCHEDULE BREAKDOWN MODAL
+        // =========================================================================
+        function openAmortizationModal(refNo) {
+            const loan = allStaffLoans.find(l => l.refNo === refNo);
+            if (!loan) return;
+
+            const fmt = (val) => 'NLe ' + Number(val || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+
+            document.getElementById('modal-staff-name').textContent = `${loan.fullName} — Repayment Ledger`;
+            document.getElementById('modal-loan-ref').textContent = `${loan.refNo} &bull; Disbursed: ${loan.disbursedDate || '2026-08-15'}`;
+
+            document.getElementById('modal-emp-id').textContent = loan.empId;
+            document.getElementById('modal-emp-gender').textContent = loan.gender;
+            document.getElementById('modal-emp-class').textContent = loan.classification;
+            document.getElementById('modal-emp-dept').textContent = loan.department;
+            document.getElementById('modal-emp-joblevel').textContent = loan.jobLevel;
+            document.getElementById('modal-emp-mgmtlevel').textContent = loan.mgmtLevel;
+            document.getElementById('modal-emp-salary').textContent = fmt(loan.monthlyBasicSalary || 8500);
+            document.getElementById('modal-emp-deduction').textContent = `${fmt(loan.monthlyDeduction)} / Mo`;
+
+            document.getElementById('modal-total-amt').textContent = fmt(loan.approvedAmount);
+            document.getElementById('modal-recovered-amt').textContent = fmt(loan.recoveredAmount);
+            document.getElementById('modal-outstanding-amt').textContent = fmt(loan.outstandingBalance);
+
+            // Populate 10-month schedule
+            const tbody = document.getElementById('modal-schedule-tbody');
+            tbody.innerHTML = '';
+
+            let runningBal = loan.approvedAmount;
+            const monthlyDed = loan.monthlyDeduction;
+
+            for (let m = 1; m <= (loan.monthsTotal || 10); m++) {
+                const opening = runningBal;
+                const ded = Math.min(runningBal, monthlyDed);
+                const closing = Math.max(0, runningBal - ded);
+                runningBal = closing;
+
+                const isPaid = m <= (loan.monthsPaid || 0);
+
+                const tr = document.createElement('tr');
+                tr.className = isPaid ? "bg-emerald-50/50" : "";
+                tr.innerHTML = `
+                    <td class="py-2 px-3 font-bold text-slate-800">Month ${m}</td>
+                    <td class="py-2 px-3 text-right text-slate-600">${fmt(opening)}</td>
+                    <td class="py-2 px-3 text-right font-bold ${isPaid ? 'text-emerald-700' : 'text-slate-700'}">${fmt(ded)}</td>
+                    <td class="py-2 px-3 text-right text-slate-900 font-bold">${fmt(closing)}</td>
+                    <td class="py-2 px-3 text-center">
+                        ${isPaid 
+                            ? `<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-100 text-emerald-800 border border-emerald-300">Deducted</span>`
+                            : `<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-slate-100 text-slate-500">Scheduled</span>`
+                        }
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            }
+
+            document.getElementById('modal-amortization-detail').classList.remove('hidden');
+        }
+
+        function closeModal(id) {
+            const el = document.getElementById(id);
+            if (el) el.classList.add('hidden');
+        }
+
+        function openLoanInWorkflow(refNo, tabId) {
+            if (window.BCF_LOANS && typeof BCF_LOANS.setActiveLoanApplication === 'function') {
+                BCF_LOANS.setActiveLoanApplication(refNo);
+                BCF_LOANS.switchTab(tabId);
+            }
+        }
+
+        function resetAndReloadPortfolio() {
+            localStorage.removeItem('bcf_staff_loans');
+            loadDashboardData();
+            if (window.BCF_LOANS && typeof BCF_LOANS.showToast === 'function') {
+                BCF_LOANS.showToast('Synchronized and refreshed staff loan portfolio analytics.', 'success');
+            }
+        }
+    </script>
+</body>
+</html>

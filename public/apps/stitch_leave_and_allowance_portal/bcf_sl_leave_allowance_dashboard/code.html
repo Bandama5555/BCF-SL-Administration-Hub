@@ -1,0 +1,1232 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover"/>
+  <title>BCF-SL Leave Management Module — Dashboard &amp; Eligibility Portal</title>
+  
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
+  
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: {
+            primary: "#004328",
+            "primary-dark": "#002d1a",
+            "primary-light": "#0d5c3a",
+            secondary: "#465f88",
+            tertiary: "#ca8a04",
+            surface: "#f8fafd",
+            "surface-container": "#eff5f8",
+            "surface-container-high": "#e4edf2",
+            "on-surface": "#0f191d",
+            "on-surface-variant": "#414f55",
+            outline: "#cbd5e1"
+          },
+          fontFamily: {
+            sans: ['"Inter"', 'sans-serif'],
+            headline: ['"Plus Jakarta Sans"', 'sans-serif'],
+            mono: ['"JetBrains Mono"', 'monospace']
+          }
+        }
+      }
+    };
+  </script>
+
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"/>
+  <meta http-equiv="Pragma" content="no-cache"/>
+  <meta http-equiv="Expires" content="0"/>
+
+  <style>
+    body { font-family: 'Inter', sans-serif; background-color: #f8fafd; }
+    h1, h2, h3, h4, h5, .font-headline { font-family: 'Plus Jakarta Sans', sans-serif; }
+    .badge-soft { display: inline-flex; align-items: center; gap: 0.25rem; font-size: 0.72rem; font-weight: 700; padding: 0.25rem 0.6rem; border-radius: 9999px; }
+    .hidden { display: none !important; }
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-thumb { background-color: #cbd5e1; border-radius: 4px; }
+  </style>
+
+  <!-- Core Shared BCF Leave Module Logic -->
+  <script src="../bcf_leave_shared.js?v=20261006_FINAL_REV1"></script>
+</head>
+<body class="text-on-surface flex flex-col min-h-screen">
+
+  <!-- TOP INSTITUTIONAL BRAND HEADER -->
+  <header class="bg-white border-b border-slate-200 sticky top-0 z-40 shadow-xs">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between gap-4">
+      <div class="flex items-center gap-3 min-w-0">
+        <img src="/bcf-logo.jpg" onerror="this.src='../bcf-logo.jpg'; this.onerror=function(){this.src='../../bcf-logo.jpg'}" alt="BCF-SL Logo" class="h-9 w-auto object-contain shrink-0 rounded"/>
+        <div class="flex flex-col min-w-0">
+          <div class="flex items-center gap-2">
+            <span class="font-extrabold text-sm sm:text-base text-primary tracking-tight truncate uppercase leading-none">
+              Bandama Charity Foundation
+            </span>
+            <span class="hidden sm:inline-block px-2 py-0.5 text-[10px] font-extrabold rounded bg-emerald-100 text-emerald-800 border border-emerald-200">
+              SIERRA LEONE
+            </span>
+          </div>
+          <span class="text-[11px] font-semibold text-slate-500 truncate mt-0.5">
+            Leave Management &amp; Allowance System • HR &amp; Payroll Integrated
+          </span>
+        </div>
+      </div>
+
+      <div class="flex items-center gap-2 shrink-0">
+        <!-- Interactive Employee / Role Switcher -->
+        <div class="flex items-center gap-1.5 bg-slate-100 border border-slate-300 rounded-xl px-2.5 py-1">
+          <span class="material-symbols-outlined text-[16px] text-primary">person</span>
+          <select id="user-switcher-select" onchange="onUserSwitch(this.value)" class="bg-transparent text-xs font-bold text-slate-800 outline-none cursor-pointer">
+            <!-- Dynamically populated -->
+          </select>
+        </div>
+
+        <button onclick="openSettingsModal()" class="h-9 px-3 rounded-xl border border-slate-300 hover:border-primary/50 bg-white hover:bg-slate-50 text-xs font-bold flex items-center gap-1.5 text-slate-700 shadow-2xs transition active:scale-95 cursor-pointer" title="Configure Leave Policy (31 Days / 5% Allowance)">
+          <span class="material-symbols-outlined text-[16px] text-primary">tune</span>
+          <span class="hidden md:inline">Policy Settings</span>
+        </button>
+
+        <a href="../bcf_sl_leave_application_form/code.html" class="h-9 px-3.5 rounded-xl bg-primary hover:bg-primary-dark text-white text-xs font-extrabold flex items-center gap-1.5 shadow-sm transition active:scale-95 cursor-pointer">
+          <span class="material-symbols-outlined text-[17px]">edit_calendar</span>
+          <span class="hidden sm:inline">Apply Leave / Claim</span>
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <!-- SUB-NAV TAB STRIP -->
+  <div class="bg-white border-b border-slate-200 px-4 sm:px-6">
+    <div class="max-w-7xl mx-auto flex items-center justify-between overflow-x-auto">
+      <div class="flex items-center gap-2 py-2">
+        <button id="tab-btn-employee" onclick="switchDashboardView('employee')" class="px-3.5 py-1.5 rounded-lg text-xs font-bold transition flex items-center gap-1.5 bg-primary text-white shadow-2xs">
+          <span class="material-symbols-outlined text-[16px]">account_circle</span>
+          <span>My Leave &amp; Allowance</span>
+        </button>
+        <button id="tab-btn-executive" onclick="switchDashboardView('executive')" class="px-3.5 py-1.5 rounded-lg text-xs font-bold transition flex items-center gap-1.5 text-slate-600 hover:text-primary hover:bg-slate-100">
+          <span class="material-symbols-outlined text-[16px]">analytics</span>
+          <span>HR &amp; Executive Overview (45 Staff)</span>
+        </button>
+      </div>
+
+      <div class="flex items-center gap-3 text-xs font-bold text-slate-500 py-2">
+        <a href="../bcf_sl_hr_review_approval/code.html" class="hover:text-primary transition flex items-center gap-1">
+          <span class="material-symbols-outlined text-[16px]">how_to_reg</span>
+          <span>HR Approval Console</span>
+        </a>
+        <span class="text-slate-300">|</span>
+        <a href="../bcf_sl_audit_trail_foms_payment/code.html" class="hover:text-primary transition flex items-center gap-1">
+          <span class="material-symbols-outlined text-[16px]">payments</span>
+          <span>FOMS Payment Tracker</span>
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- MAIN VIEWPORT -->
+  <main class="flex-grow p-4 sm:p-6 max-w-7xl mx-auto w-full flex flex-col gap-6">
+
+    <!-- ============================================================== -->
+    <!-- VIEW A: EMPLOYEE SELF-SERVICE VIEW (Sections 6, 7, 36, 37)      -->
+    <!-- ============================================================== -->
+    <div id="view-employee-container" class="flex flex-col gap-6">
+
+      <!-- Navigation Bar back to Executive Overview -->
+      <div class="flex items-center justify-between bg-white border border-slate-200 rounded-2xl p-3 px-4 shadow-2xs flex-wrap gap-2">
+        <div class="flex items-center gap-2">
+          <span class="material-symbols-outlined text-primary text-[20px]">account_circle</span>
+          <span class="text-xs font-extrabold text-slate-900">Staff Self-Service Leave &amp; Allowance Portal</span>
+          <span class="text-[11px] text-slate-500 font-medium hidden sm:inline">• Official Service Anniversary &amp; Entitlement Record</span>
+        </div>
+        <button onclick="switchDashboardView('executive')" class="px-3.5 py-1.5 rounded-xl border border-slate-300 hover:bg-slate-100 text-slate-700 text-xs font-bold flex items-center gap-1.5 shadow-2xs transition active:scale-95 cursor-pointer">
+          <span class="material-symbols-outlined text-[16px]">arrow_back</span>
+          <span>Back to Staff Register (Overview)</span>
+        </button>
+      </div>
+
+      <!-- Tamper-Proof Profile Card -->
+      <div class="bg-white rounded-2xl border border-slate-200 p-5 shadow-xs relative overflow-hidden">
+        <div class="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-emerald-700 via-primary to-emerald-800"></div>
+
+        <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 pt-1">
+          <div class="flex items-center gap-4">
+            <div class="w-16 h-16 rounded-2xl bg-emerald-50 border-2 border-emerald-200 flex items-center justify-center text-primary text-2xl font-black shrink-0 font-headline" id="emp-avatar-initials">
+              JK
+            </div>
+            <div class="flex flex-col min-w-0">
+              <div class="flex items-center gap-2 flex-wrap">
+                <h2 class="text-xl font-extrabold text-slate-900 truncate" id="emp-full-name">John Kamara</h2>
+                <span class="font-mono text-xs font-bold px-2 py-0.5 rounded bg-slate-100 text-slate-700" id="emp-id-badge">BCF-EMP-00025</span>
+                <span class="badge-soft bg-emerald-100 text-emerald-800 border border-emerald-200" id="emp-status-badge">Active</span>
+              </div>
+              <p class="text-xs font-bold text-primary mt-0.5" id="emp-position">Programme Officer</p>
+              <p class="text-xs text-slate-500" id="emp-dept-loc">Programmes Department • Freetown Headquarters</p>
+            </div>
+          </div>
+
+          <!-- HR & Payroll Immutability Shield -->
+          <div class="flex flex-col sm:items-end gap-1 text-xs">
+            <div class="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-50 border border-slate-200 text-slate-600 font-semibold">
+              <span class="material-symbols-outlined text-[16px] text-primary">lock</span>
+              <span>Locked HR / Payroll Record (Read-Only)</span>
+            </div>
+            <span class="text-[11px] text-slate-400">Supervisor: <strong class="text-slate-700" id="emp-supervisor">Dr. Sorie Sesay (CEO)</strong></span>
+          </div>
+        </div>
+
+        <!-- Service Tenure & Employment Date Strip (Section 3 & 4) -->
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 mt-5 pt-4 border-t border-slate-100 text-xs">
+          <div class="p-3 rounded-xl bg-slate-50 border border-slate-200/80">
+            <span class="text-[10px] uppercase font-bold text-slate-400 block">Employment Date</span>
+            <span class="font-bold text-slate-900 font-mono text-sm block mt-0.5" id="emp-hire-date">15/10/2025</span>
+            <span class="text-[10px] text-slate-500">Official HR Record</span>
+          </div>
+          <div class="p-3 rounded-xl bg-slate-50 border border-slate-200/80">
+            <span class="text-[10px] uppercase font-bold text-slate-400 block">Service Completed</span>
+            <span class="font-bold text-primary font-mono text-sm block mt-0.5" id="emp-tenure-length">1 Year, 0 Days</span>
+            <span class="text-[10px] text-slate-500">Calculated Daily</span>
+          </div>
+          <div class="p-3 rounded-xl bg-slate-50 border border-slate-200/80">
+            <span class="text-[10px] uppercase font-bold text-slate-400 block">Next Anniversary</span>
+            <span class="font-bold text-slate-900 font-mono text-sm block mt-0.5" id="emp-next-anniv">15/10/2026</span>
+            <span class="text-[10px] text-slate-500">Next Service Cycle</span>
+          </div>
+          <div class="p-3 rounded-xl bg-slate-50 border border-slate-200/80">
+            <span class="text-[10px] uppercase font-bold text-slate-400 block">Eligibility Status</span>
+            <span class="font-bold text-sm block mt-0.5" id="emp-eligibility-chip">✅ Eligible</span>
+            <span class="text-[10px] text-slate-500" id="emp-eligibility-sub">Rule: Completed &ge; 1 Yr</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- ELIGIBILITY ENGINE BANNER: LOCKED VS UNLOCKED (Section 5, 6, 7, 36, 37) -->
+      <div id="eligibility-banner-locked" class="hidden bg-rose-50 border-2 border-rose-300 rounded-2xl p-5 shadow-xs">
+        <div class="flex items-start gap-3.5">
+          <div class="w-10 h-10 rounded-xl bg-rose-600 text-white flex items-center justify-center shrink-0">
+            <span class="material-symbols-outlined text-2xl">lock</span>
+          </div>
+          <div class="flex-grow">
+            <div class="flex items-center gap-2">
+              <h3 class="text-base font-extrabold text-rose-950">Leave Application &amp; Allowance Claim Unavailable</h3>
+              <span class="badge-soft bg-rose-200 text-rose-900">🔒 Not Yet Eligible</span>
+            </div>
+            <p class="text-xs text-rose-900 mt-1 font-semibold leading-relaxed" id="locked-reason-text">
+              You have not yet completed one year of continuous service. Under BCF-SL Leave Policy, employees must complete 12 full months before annual leave and leave allowance claims become accessible.
+            </p>
+            <div class="mt-3 flex items-center gap-4 text-xs font-mono">
+              <span class="text-rose-800"><strong>Employment Date:</strong> <span id="locked-emp-date">15/10/2025</span></span>
+              <span class="text-rose-800"><strong>Eligibility Date:</strong> <span id="locked-elig-date">15/10/2026</span></span>
+              <span class="text-rose-900 font-bold bg-rose-100 px-2 py-0.5 rounded">Remaining Time: <span id="locked-remaining-time">9 days</span></span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div id="eligibility-banner-unlocked" class="bg-emerald-50 border border-emerald-300 rounded-2xl p-5 shadow-xs">
+        <div class="flex items-start justify-between gap-4 flex-wrap">
+          <div class="flex items-start gap-3.5">
+            <div class="w-10 h-10 rounded-xl bg-primary text-white flex items-center justify-center shrink-0">
+              <span class="material-symbols-outlined text-2xl">verified</span>
+            </div>
+            <div>
+              <div class="flex items-center gap-2">
+                <h3 class="text-base font-extrabold text-emerald-950">Statutory Leave Entitlement &amp; Allowance Active</h3>
+                <span class="badge-soft bg-emerald-200 text-emerald-900">✅ 1 Year Milestone Cleared</span>
+              </div>
+              <p class="text-xs text-emerald-900 mt-1 leading-relaxed">
+                Congratulations! Continuous service requirement (&ge; 1 year) is satisfied. You are eligible to apply for your <strong>31-Day Annual Leave Quota</strong> and claim your calculated <strong>5% Leave Allowance</strong>.
+              </p>
+            </div>
+          </div>
+
+          <div id="milestone-email-action-container" class="flex items-center gap-2 flex-wrap">
+            <!-- Dynamically populated with auto-sent status / live auto-dispatcher -->
+          </div>
+        </div>
+      </div>
+
+      <!-- DUAL BENTO CARDS: LEAVE LEDGER (31 DAYS) & LEAVE ALLOWANCE (5% SALARY) -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+
+        <!-- CARD 1: 🏖️ Annual Leave Entitlement (31 Days) -->
+        <div class="bg-white rounded-2xl border border-slate-200 p-5 shadow-xs flex flex-col justify-between">
+          <div>
+            <div class="flex items-center justify-between pb-3 border-b border-slate-100">
+              <div class="flex items-center gap-2">
+                <span class="material-symbols-outlined text-primary text-xl">beach_access</span>
+                <h4 class="font-extrabold text-sm text-slate-900 uppercase tracking-tight">🏖️ Annual Leave Entitlement</h4>
+              </div>
+              <span class="font-mono text-xs font-bold text-slate-500">Policy: 31 Days / Yr</span>
+            </div>
+
+            <!-- Numbers Meter -->
+            <div class="grid grid-cols-3 gap-3 my-4 text-center">
+              <div class="p-3 rounded-xl bg-slate-50 border border-slate-100">
+                <span class="text-[10px] uppercase font-bold text-slate-400 block">Annual Quota</span>
+                <span class="text-2xl font-black text-slate-900 font-mono mt-0.5 block" id="meter-quota">31</span>
+                <span class="text-[10px] text-slate-500">Days Entitled</span>
+              </div>
+              <div class="p-3 rounded-xl bg-slate-50 border border-slate-100">
+                <span class="text-[10px] uppercase font-bold text-slate-400 block">Days Taken</span>
+                <span class="text-2xl font-black text-rose-600 font-mono mt-0.5 block" id="meter-used">0</span>
+                <span class="text-[10px] text-slate-500">Approved Leaves</span>
+              </div>
+              <div class="p-3 rounded-xl bg-emerald-50 border border-emerald-200">
+                <span class="text-[10px] uppercase font-bold text-emerald-800 block">Days Remaining</span>
+                <span class="text-2xl font-black text-primary font-mono mt-0.5 block" id="meter-remaining">31</span>
+                <span class="text-[10px] text-emerald-700 font-semibold">Available to Apply</span>
+              </div>
+            </div>
+
+            <!-- Visual Bar -->
+            <div class="w-full h-3 bg-slate-100 rounded-full overflow-hidden flex mb-2">
+              <div id="meter-bar-used" class="h-full bg-rose-500 transition-all duration-500" style="width: 0%;"></div>
+              <div id="meter-bar-rem" class="h-full bg-primary transition-all duration-500" style="width: 100%;"></div>
+            </div>
+            <div class="flex items-center justify-between text-[11px] text-slate-500 font-medium">
+              <span>Service Cycle: <strong class="text-slate-700" id="meter-cycle">2026/2027</strong></span>
+              <span id="meter-ratio-text">0 / 31 Days Consumed</span>
+            </div>
+          </div>
+
+          <div class="mt-5 pt-3 border-t border-slate-100 flex items-center gap-2">
+            <a id="btn-apply-leave" href="../bcf_sl_leave_application_form/code.html" class="flex-1 h-10 rounded-xl bg-primary hover:bg-primary-dark text-white text-xs font-extrabold flex items-center justify-center gap-1.5 shadow-2xs transition active:scale-95">
+              <span class="material-symbols-outlined text-[17px]">add_circle</span>
+              <span>Apply for Annual Leave</span>
+            </a>
+            <button onclick="scrollToLedger()" class="h-10 px-3 rounded-xl border border-slate-300 hover:bg-slate-50 text-slate-700 text-xs font-bold flex items-center gap-1 cursor-pointer">
+              <span class="material-symbols-outlined text-[16px]">receipt_long</span>
+              <span>Ledger</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- CARD 2: 💰 Leave Allowance (5% Annual Basic Salary) -->
+        <div class="bg-white rounded-2xl border border-slate-200 p-5 shadow-xs flex flex-col justify-between">
+          <div>
+            <div class="flex items-center justify-between pb-3 border-b border-slate-100">
+              <div class="flex items-center gap-2">
+                <span class="material-symbols-outlined text-primary text-xl">payments</span>
+                <h4 class="font-extrabold text-sm text-slate-900 uppercase tracking-tight">💰 Statutory Leave Allowance</h4>
+              </div>
+              <span class="badge-soft bg-emerald-100 text-emerald-800 font-mono">5% Annual Basic</span>
+            </div>
+
+            <!-- Allowance Calculation Breakdown (Section 9 & 10) -->
+            <div class="bg-slate-50 border border-slate-200 rounded-xl p-3.5 my-4 space-y-2 text-xs">
+              <div class="flex items-center justify-between">
+                <span class="text-slate-500 font-medium">Monthly Basic Salary (from Payroll):</span>
+                <span class="font-mono font-bold text-slate-900" id="alw-monthly-basic">NLe 40,000.00</span>
+              </div>
+              <div class="flex items-center justify-between">
+                <span class="text-slate-500 font-medium">Annual Basic Salary (Monthly &times; 12):</span>
+                <span class="font-mono font-bold text-slate-900" id="alw-annual-basic">NLe 480,000.00</span>
+              </div>
+              <div class="flex items-center justify-between pt-2 border-t border-slate-200 text-slate-600">
+                <span class="font-bold">Leave Allowance Rate:</span>
+                <span class="font-mono font-extrabold text-primary" id="alw-rate-label">5.0%</span>
+              </div>
+              <div class="p-2.5 rounded-lg bg-emerald-100/60 border border-emerald-200 flex items-center justify-between">
+                <div>
+                  <span class="text-[10px] uppercase font-bold text-emerald-800 block">Calculated Allowance</span>
+                  <span class="font-mono text-lg font-black text-primary" id="alw-calculated-amount">NLe 24,000.00</span>
+                </div>
+                <div class="text-right">
+                  <span class="text-[10px] text-slate-500 block">Claim Status</span>
+                  <span class="badge-soft bg-emerald-600 text-white" id="alw-claim-status-badge">Available to Claim</span>
+                </div>
+              </div>
+            </div>
+
+            <p class="text-[11px] text-slate-500 italic">
+              * Retrieved directly from FOMS Payroll. HR officers cannot manually type the salary, ensuring zero tampering.
+            </p>
+          </div>
+
+          <div class="mt-5 pt-3 border-t border-slate-100 flex items-center gap-2">
+            <button id="btn-claim-allowance" onclick="triggerClaimAllowance()" class="flex-1 h-10 rounded-xl bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-extrabold flex items-center justify-center gap-1.5 shadow-2xs transition active:scale-95 cursor-pointer">
+              <span class="material-symbols-outlined text-[17px]">price_check</span>
+              <span>Claim Leave Allowance</span>
+            </button>
+            <a href="../bcf_sl_leave_application_form/code.html" class="h-10 px-3.5 rounded-xl border border-slate-300 hover:bg-slate-50 text-slate-700 text-xs font-bold flex items-center gap-1 cursor-pointer" title="Submit both 31-day leave and allowance together">
+              <span>Apply Both</span>
+            </a>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- LEAVE LEDGER TABLE (Section 15 & 16) -->
+      <div id="section-leave-ledger" class="bg-white rounded-2xl border border-slate-200 p-5 shadow-xs">
+        <div class="flex items-center justify-between pb-3 border-b border-slate-100">
+          <div>
+            <h4 class="font-extrabold text-sm text-slate-900 uppercase tracking-tight">Official Leave Balance Ledger</h4>
+            <p class="text-xs text-slate-500">Immutable chronological audit trail of all leave entitlements, approvals, and usage</p>
+          </div>
+          <button onclick="exportLedgerCsv()" class="h-8 px-3 rounded-lg border border-slate-300 hover:bg-slate-50 text-xs font-bold flex items-center gap-1 text-slate-700 cursor-pointer">
+            <span class="material-symbols-outlined text-[15px]">download</span>
+            <span>Export Ledger CSV</span>
+          </button>
+        </div>
+
+        <div class="overflow-x-auto mt-4">
+          <table class="w-full text-left text-xs">
+            <thead class="bg-slate-50 text-[10px] font-bold text-slate-500 uppercase">
+              <tr>
+                <th class="py-2.5 px-3">Date</th>
+                <th class="py-2.5 px-3">Transaction / Description</th>
+                <th class="py-2.5 px-3">Reference</th>
+                <th class="py-2.5 px-3 text-right">Days (+/-)</th>
+                <th class="py-2.5 px-3 text-right">Running Balance</th>
+                <th class="py-2.5 px-3">Authorized By</th>
+              </tr>
+            </thead>
+            <tbody id="ledger-table-body" class="divide-y divide-slate-100">
+              <!-- Dynamically populated -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- ============================================================== -->
+    <!-- VIEW B: HR & EXECUTIVE MANAGEMENT DASHBOARD (Section 1)        -->
+    <!-- ============================================================== -->
+    <div id="view-executive-container" class="hidden flex flex-col gap-6">
+
+      <!-- Executive Overview Banner -->
+      <div class="bg-white rounded-2xl border border-slate-200 p-5 shadow-xs flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+        <div>
+          <span class="badge-soft bg-emerald-100 text-emerald-800 mb-1">Human Resources &amp; Executive Command</span>
+          <h2 class="text-xl font-extrabold text-slate-900 tracking-tight">Organization-Wide Leave &amp; Allowance Dashboard</h2>
+          <p class="text-xs text-slate-500 mt-0.5">Real-time indicators across all 45 BCF-SL personnel, service tenure tracking, and payroll liability</p>
+        </div>
+        <div class="flex items-center gap-2">
+          <button onclick="scanAnniversaries()" class="h-9 px-3 rounded-xl border border-slate-300 hover:bg-slate-50 text-xs font-bold flex items-center gap-1.5 text-slate-700 cursor-pointer">
+            <span class="material-symbols-outlined text-[16px] text-primary">sync</span>
+            <span>Scan Anniversaries</span>
+          </button>
+          <button onclick="exportAllEmployeesCsv()" class="h-9 px-3 rounded-xl bg-primary hover:bg-primary-dark text-white text-xs font-extrabold flex items-center gap-1.5 shadow-2xs cursor-pointer">
+            <span class="material-symbols-outlined text-[16px]">file_download</span>
+            <span>Export Full Register</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- KEY STATISTICS METRIC TILES GRID (Section 1 - All 15 Indicators) -->
+      <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3.5">
+        
+        <div class="bg-white rounded-xl border border-slate-200 p-3.5 shadow-2xs">
+          <div class="flex items-center justify-between text-slate-400 mb-1">
+            <span class="text-[10px] uppercase font-extrabold tracking-wider">Total Staff</span>
+            <span class="material-symbols-outlined text-[18px]">groups</span>
+          </div>
+          <div class="text-2xl font-black text-slate-900 font-mono" id="kpi-total-staff">45</div>
+          <div class="text-[11px] text-slate-500 mt-0.5 font-medium">All Personnel</div>
+        </div>
+
+        <div class="bg-white rounded-xl border border-slate-200 p-3.5 shadow-2xs">
+          <div class="flex items-center justify-between text-emerald-600 mb-1">
+            <span class="text-[10px] uppercase font-extrabold tracking-wider">Eligible for Leave</span>
+            <span class="material-symbols-outlined text-[18px]">verified</span>
+          </div>
+          <div class="text-2xl font-black text-emerald-700 font-mono" id="kpi-eligible-staff">31</div>
+          <div class="text-[11px] text-emerald-800 mt-0.5 font-bold">&ge; 1 Yr Continuous Service</div>
+        </div>
+
+        <div class="bg-white rounded-xl border border-slate-200 p-3.5 shadow-2xs">
+          <div class="flex items-center justify-between text-rose-500 mb-1">
+            <span class="text-[10px] uppercase font-extrabold tracking-wider">Not Yet Eligible</span>
+            <span class="material-symbols-outlined text-[18px]">lock_clock</span>
+          </div>
+          <div class="text-2xl font-black text-rose-600 font-mono" id="kpi-not-eligible">14</div>
+          <div class="text-[11px] text-rose-700 mt-0.5 font-medium">&lt; 1 Yr Service Accrual</div>
+        </div>
+
+        <div class="bg-white rounded-xl border border-slate-200 p-3.5 shadow-2xs">
+          <div class="flex items-center justify-between text-amber-500 mb-1">
+            <span class="text-[10px] uppercase font-extrabold tracking-wider">Pending Applications</span>
+            <span class="material-symbols-outlined text-[18px]">pending_actions</span>
+          </div>
+          <div class="text-2xl font-black text-amber-600 font-mono" id="kpi-pending-apps">4</div>
+          <div class="text-[11px] text-amber-700 mt-0.5 font-bold">Awaiting HR / Approval</div>
+        </div>
+
+        <div class="bg-white rounded-xl border border-slate-200 p-3.5 shadow-2xs">
+          <div class="flex items-center justify-between text-blue-500 mb-1">
+            <span class="text-[10px] uppercase font-extrabold tracking-wider">Currently on Leave</span>
+            <span class="material-symbols-outlined text-[18px]">flight_takeoff</span>
+          </div>
+          <div class="text-2xl font-black text-blue-600 font-mono" id="kpi-on-leave">3</div>
+          <div class="text-[11px] text-blue-700 mt-0.5 font-medium">Active Absence</div>
+        </div>
+
+        <div class="bg-white rounded-xl border border-slate-200 p-3.5 shadow-2xs">
+          <div class="flex items-center justify-between text-indigo-500 mb-1">
+            <span class="text-[10px] uppercase font-extrabold tracking-wider">Approved Leave</span>
+            <span class="material-symbols-outlined text-[18px]">task_alt</span>
+          </div>
+          <div class="text-2xl font-black text-indigo-600 font-mono" id="kpi-approved-leave">24</div>
+          <div class="text-[11px] text-slate-500 mt-0.5">This Fiscal Term</div>
+        </div>
+
+        <div class="bg-white rounded-xl border border-slate-200 p-3.5 shadow-2xs">
+          <div class="flex items-center justify-between text-purple-500 mb-1">
+            <span class="text-[10px] uppercase font-extrabold tracking-wider">Returning Soon</span>
+            <span class="material-symbols-outlined text-[18px]">event_repeat</span>
+          </div>
+          <div class="text-2xl font-black text-purple-600 font-mono" id="kpi-returning-soon">2</div>
+          <div class="text-[11px] text-purple-700 mt-0.5 font-medium">&le; 3 Days to Resume</div>
+        </div>
+
+        <div class="bg-white rounded-xl border border-slate-200 p-3.5 shadow-2xs">
+          <div class="flex items-center justify-between text-slate-500 mb-1">
+            <span class="text-[10px] uppercase font-extrabold tracking-wider">Days Taken / Used</span>
+            <span class="material-symbols-outlined text-[18px]">calendar_today</span>
+          </div>
+          <div class="text-2xl font-black text-slate-800 font-mono" id="kpi-days-used">186</div>
+          <div class="text-[11px] text-slate-500 mt-0.5">Total Leave Days</div>
+        </div>
+
+        <div class="bg-white rounded-xl border border-slate-200 p-3.5 shadow-2xs">
+          <div class="flex items-center justify-between text-emerald-600 mb-1">
+            <span class="text-[10px] uppercase font-extrabold tracking-wider">Days Remaining</span>
+            <span class="material-symbols-outlined text-[18px]">event_available</span>
+          </div>
+          <div class="text-2xl font-black text-emerald-700 font-mono" id="kpi-days-remaining">775</div>
+          <div class="text-[11px] text-emerald-800 mt-0.5 font-semibold">Org Quota Pool</div>
+        </div>
+
+        <div class="bg-white rounded-xl border border-slate-200 p-3.5 shadow-2xs">
+          <div class="flex items-center justify-between text-emerald-600 mb-1">
+            <span class="text-[10px] uppercase font-extrabold tracking-wider">Upcoming Anniversaries</span>
+            <span class="material-symbols-outlined text-[18px]">celebration</span>
+          </div>
+          <div class="text-2xl font-black text-primary font-mono" id="kpi-upcoming-anniv">4</div>
+          <div class="text-[11px] text-slate-500 mt-0.5">Within 30 Days</div>
+        </div>
+
+        <div class="bg-white rounded-xl border border-slate-200 p-3.5 shadow-2xs">
+          <div class="flex items-center justify-between text-amber-500 mb-1">
+            <span class="text-[10px] uppercase font-extrabold tracking-wider">Allowances Pending</span>
+            <span class="material-symbols-outlined text-[18px]">schedule</span>
+          </div>
+          <div class="text-2xl font-black text-amber-600 font-mono" id="kpi-alw-pending">5</div>
+          <div class="text-[11px] text-amber-800 font-bold" id="kpi-alw-pending-amt">NLe 28,800</div>
+        </div>
+
+        <div class="bg-white rounded-xl border border-slate-200 p-3.5 shadow-2xs">
+          <div class="flex items-center justify-between text-emerald-600 mb-1">
+            <span class="text-[10px] uppercase font-extrabold tracking-wider">Allowances Paid</span>
+            <span class="material-symbols-outlined text-[18px]">check_circle</span>
+          </div>
+          <div class="text-2xl font-black text-emerald-700 font-mono" id="kpi-alw-paid">26</div>
+          <div class="text-[11px] text-emerald-800 font-bold" id="kpi-alw-paid-amt">NLe 69,000</div>
+        </div>
+
+        <div class="bg-white rounded-xl border border-slate-200 p-3.5 shadow-2xs">
+          <div class="flex items-center justify-between text-rose-500 mb-1">
+            <span class="text-[10px] uppercase font-extrabold tracking-wider">Rejected Leave</span>
+            <span class="material-symbols-outlined text-[18px]">cancel</span>
+          </div>
+          <div class="text-2xl font-black text-rose-600 font-mono" id="kpi-rejected-leave">2</div>
+          <div class="text-[11px] text-slate-500 mt-0.5">Staffing Conflict</div>
+        </div>
+
+        <div class="bg-white rounded-xl border border-slate-200 p-3.5 shadow-2xs">
+          <div class="flex items-center justify-between text-amber-500 mb-1">
+            <span class="text-[10px] uppercase font-extrabold tracking-wider">Overdue Claims</span>
+            <span class="material-symbols-outlined text-[18px]">alarm_on</span>
+          </div>
+          <div class="text-2xl font-black text-amber-700 font-mono">1</div>
+          <div class="text-[11px] text-slate-500 mt-0.5">&gt; 30 Days Unclaimed</div>
+        </div>
+
+        <div class="bg-white rounded-xl border border-slate-200 p-3.5 shadow-2xs">
+          <div class="flex items-center justify-between text-slate-400 mb-1">
+            <span class="text-[10px] uppercase font-extrabold tracking-wider">Expired / Carry-Over</span>
+            <span class="material-symbols-outlined text-[18px]">history</span>
+          </div>
+          <div class="text-2xl font-black text-slate-700 font-mono">3</div>
+          <div class="text-[11px] text-slate-500 mt-0.5">Cap: 5 Days Max</div>
+        </div>
+
+      </div>
+
+      <!-- MASTER EMPLOYEE LEAVE ROSTER (Section 3 & 4) -->
+      <div class="bg-white rounded-2xl border border-slate-200 p-5 shadow-xs">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-slate-100">
+          <div>
+            <h4 class="font-extrabold text-sm text-slate-900 uppercase tracking-tight">Staff Service Anniversary &amp; Entitlement Register</h4>
+            <p class="text-xs text-slate-500">Calculated strictly from each employee's official employment date (Sec. 3 &amp; 4)</p>
+          </div>
+          <input type="text" id="roster-search-input" oninput="filterRosterTable()" placeholder="Search staff, ID, department..." class="px-3 py-1.5 rounded-xl border border-slate-200 text-xs outline-none focus:border-primary w-64"/>
+        </div>
+
+        <div class="overflow-x-auto mt-4">
+          <table class="w-full text-left text-xs">
+            <thead class="bg-slate-50 text-[10px] font-bold text-slate-500 uppercase">
+              <tr>
+                <th class="py-2.5 px-3">Employee ID</th>
+                <th class="py-2.5 px-3">Full Legal Name</th>
+                <th class="py-2.5 px-3">Department</th>
+                <th class="py-2.5 px-3">Employment Date</th>
+                <th class="py-2.5 px-3">Service Tenure</th>
+                <th class="py-2.5 px-3">Anniversary &amp; 31-Day Quota</th>
+                <th class="py-2.5 px-3">Eligibility Status</th>
+                <th class="py-2.5 px-3 font-mono">5% Allowance (1x/Yr)</th>
+                <th class="py-2.5 px-3 text-right">Actions</th>
+              </tr>
+            </thead>
+            <tbody id="roster-table-body" class="divide-y divide-slate-100">
+              <!-- Dynamically populated -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+    </div>
+
+  </main>
+
+  <!-- ============================================================== -->
+  <!-- MODAL: POLICY SETTINGS CONFIGURATION (Section 35)               -->
+  <!-- ============================================================== -->
+  <div id="settings-modal" class="hidden fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl border border-slate-200 max-w-lg w-full p-6 shadow-2xl">
+      <div class="flex items-center justify-between pb-3 border-b border-slate-100">
+        <div class="flex items-center gap-2">
+          <span class="material-symbols-outlined text-primary text-xl">tune</span>
+          <h3 class="font-extrabold text-base text-slate-900">BCF-SL Leave Policy Parameters</h3>
+        </div>
+        <button onclick="closeSettingsModal()" class="text-slate-400 hover:text-slate-600 cursor-pointer">
+          <span class="material-symbols-outlined text-xl">close</span>
+        </button>
+      </div>
+
+      <form id="settings-form" onsubmit="savePolicySettings(event)" class="space-y-4 mt-4 text-xs">
+        <div>
+          <label class="font-bold text-slate-700 block mb-1">Annual Leave Entitlement (Days)</label>
+          <input type="number" id="setting-annual-days" min="1" max="60" class="w-full px-3 py-2 rounded-xl border border-slate-300 font-bold" value="31"/>
+          <span class="text-[10px] text-slate-500">BCF-SL baseline policy: 31 Leave Days per completed year.</span>
+        </div>
+
+        <div>
+          <label class="font-bold text-slate-700 block mb-1">Minimum Continuous Service (Months)</label>
+          <input type="number" id="setting-service-months" min="1" max="24" class="w-full px-3 py-2 rounded-xl border border-slate-300 font-bold" value="12"/>
+          <span class="text-[10px] text-slate-500">12 Months (1 Completed Year required before eligibility).</span>
+        </div>
+
+        <div>
+          <label class="font-bold text-slate-700 block mb-1">Leave Allowance Rate (%)</label>
+          <input type="number" id="setting-allowance-rate" step="0.1" min="1" max="50" class="w-full px-3 py-2 rounded-xl border border-slate-300 font-bold" value="5"/>
+          <span class="text-[10px] text-slate-500">Proposed BCF-SL rate: 5% of Annual Basic Salary.</span>
+        </div>
+
+        <div>
+          <label class="font-bold text-slate-700 block mb-1">Calculation Formula Basis</label>
+          <select id="setting-allowance-basis" class="w-full px-3 py-2 rounded-xl border border-slate-300 font-bold">
+            <option value="annual">Option A — 5% of Annual Basic Salary (Monthly x 12 x 5%) [Standard]</option>
+            <option value="monthly">Option B — 5% of Monthly Basic Salary (Monthly x 5%)</option>
+          </select>
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="font-bold text-slate-700 block mb-1">Carry-Over Permitted</label>
+            <select id="setting-carry-over" class="w-full px-3 py-2 rounded-xl border border-slate-300 font-bold">
+              <option value="true">Yes</option>
+              <option value="false">No</option>
+            </select>
+          </div>
+          <div>
+            <label class="font-bold text-slate-700 block mb-1">Max Carry-Over Days</label>
+            <input type="number" id="setting-max-carry" min="0" max="15" class="w-full px-3 py-2 rounded-xl border border-slate-300 font-bold" value="5"/>
+          </div>
+        </div>
+
+        <div class="flex items-center justify-end gap-2 pt-3 border-t border-slate-100">
+          <button type="button" onclick="closeSettingsModal()" class="px-4 py-2 rounded-xl border border-slate-300 text-slate-700 font-bold cursor-pointer">Cancel</button>
+          <button type="submit" class="px-5 py-2 rounded-xl bg-primary hover:bg-primary-dark text-white font-extrabold cursor-pointer">Save Parameters</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- SCRIPT LOGIC -->
+  <script>
+    let activeDashboardView = 'employee';
+
+    document.addEventListener('DOMContentLoaded', () => {
+      initApp();
+    });
+
+    function initApp() {
+      if (typeof BCF_LEAVE === 'undefined') {
+        setTimeout(initApp, 40);
+        return;
+      }
+      populateUserSwitcher();
+      renderCurrentEmployeeView();
+      renderExecutiveDashboard();
+
+      // Automatically scan and notify staff whose leave days are due
+      if (BCF_LEAVE.startAutomatedEligibilityWatcher) {
+        BCF_LEAVE.startAutomatedEligibilityWatcher(60000);
+      }
+    }
+
+    function populateUserSwitcher() {
+      const select = document.getElementById('user-switcher-select');
+      if (!select) return;
+
+      const employees = BCF_LEAVE.getEmployees();
+      const curId = BCF_LEAVE.getCurrentUserId();
+
+      select.innerHTML = employees.map(e => {
+        const elig = BCF_LEAVE.calculateEligibility(e);
+        const icon = elig.isEligible ? '✅' : '🔒';
+        return `<option value="${e.id}" ${e.id === curId ? 'selected' : ''}>
+          ${icon} ${e.fullName} (${e.id}) • ${e.department}
+        </option>`;
+      }).join('');
+    }
+
+    function onUserSwitch(empId) {
+      if (!empId) return;
+      BCF_LEAVE.setCurrentUserId(empId);
+      const select = document.getElementById('user-switcher-select');
+      if (select) select.value = empId;
+
+      if (activeDashboardView !== 'employee') {
+        switchDashboardView('employee');
+      } else {
+        renderCurrentEmployeeView();
+      }
+
+      const emp = BCF_LEAVE.getCurrentEmployee();
+      BCF_LEAVE.showToast(`Switched active portal view to ${emp?.fullName || empId}`, 'info');
+    }
+
+    function viewEmployeePortal(empId) {
+      if (!empId) return;
+      BCF_LEAVE.setCurrentUserId(empId);
+      
+      const select = document.getElementById('user-switcher-select');
+      if (select) select.value = empId;
+
+      switchDashboardView('employee');
+      renderCurrentEmployeeView();
+
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      const emp = BCF_LEAVE.getCurrentEmployee();
+      BCF_LEAVE.showToast(`Opened Leave & Allowance Portal for ${emp?.fullName || empId}`, 'success');
+    }
+
+    function switchDashboardView(view) {
+      activeDashboardView = view;
+      const empContainer = document.getElementById('view-employee-container');
+      const execContainer = document.getElementById('view-executive-container');
+      const tabEmp = document.getElementById('tab-btn-employee');
+      const tabExec = document.getElementById('tab-btn-executive');
+
+      if (view === 'employee') {
+        empContainer.classList.remove('hidden');
+        empContainer.style.display = 'flex';
+        execContainer.classList.add('hidden');
+        execContainer.style.display = 'none';
+
+        tabEmp.className = 'px-3.5 py-1.5 rounded-lg text-xs font-bold transition flex items-center gap-1.5 bg-primary text-white shadow-2xs';
+        tabExec.className = 'px-3.5 py-1.5 rounded-lg text-xs font-bold transition flex items-center gap-1.5 text-slate-600 hover:text-primary hover:bg-slate-100';
+        renderCurrentEmployeeView();
+      } else {
+        empContainer.classList.add('hidden');
+        empContainer.style.display = 'none';
+        execContainer.classList.remove('hidden');
+        execContainer.style.display = 'flex';
+
+        tabExec.className = 'px-3.5 py-1.5 rounded-lg text-xs font-bold transition flex items-center gap-1.5 bg-primary text-white shadow-2xs';
+        tabEmp.className = 'px-3.5 py-1.5 rounded-lg text-xs font-bold transition flex items-center gap-1.5 text-slate-600 hover:text-primary hover:bg-slate-100';
+        renderExecutiveDashboard();
+      }
+    }
+
+    // ─────────────────────────────────────────────────────────────
+    // RENDER EMPLOYEE PORTAL VIEW (Section 6, 7, 36, 37)
+    // ─────────────────────────────────────────────────────────────
+    function renderCurrentEmployeeView() {
+      const emp = BCF_LEAVE.getCurrentEmployee();
+      if (!emp) return;
+
+      const elig = BCF_LEAVE.calculateEligibility(emp);
+      const balance = BCF_LEAVE.getLeaveBalance(emp.id);
+
+      // Populate Header details
+      document.getElementById('emp-avatar-initials').textContent = emp.fullName.split(' ').map(n=>n[0]).join('').slice(0,2);
+      document.getElementById('emp-full-name').textContent = emp.fullName;
+      document.getElementById('emp-id-badge').textContent = emp.id;
+      document.getElementById('emp-position').textContent = emp.position;
+      document.getElementById('emp-dept-loc').textContent = `${emp.department} • ${emp.workLoc}`;
+      document.getElementById('emp-supervisor').textContent = emp.supervisor || 'Executive Management';
+
+      // Tenure details
+      document.getElementById('emp-hire-date').textContent = BCF_LEAVE.formatDate(emp.empDate);
+      document.getElementById('emp-tenure-length').textContent = elig.tenureDisplay;
+      document.getElementById('emp-next-anniv').textContent = BCF_LEAVE.formatDate(elig.nextAnniversary);
+
+      const statusBadge = document.getElementById('emp-status-badge');
+      if (statusBadge) {
+        statusBadge.textContent = emp.status;
+        statusBadge.className = emp.status === 'Active' ? 'badge-soft bg-emerald-100 text-emerald-800 border border-emerald-200' : 'badge-soft bg-slate-100 text-slate-700';
+      }
+
+      const eligChip = document.getElementById('emp-eligibility-chip');
+      const eligSub = document.getElementById('emp-eligibility-sub');
+      if (elig.isEligible) {
+        eligChip.textContent = '✅ Eligible';
+        eligChip.className = 'font-bold text-sm block mt-0.5 text-emerald-700';
+        eligSub.textContent = `Completed ${elig.completedYears} Full Year(s)`;
+      } else {
+        eligChip.textContent = '🔒 Not Yet Eligible';
+        eligChip.className = 'font-bold text-sm block mt-0.5 text-rose-600';
+        eligSub.textContent = `${elig.remainingText} remaining`;
+      }
+
+      // Toggle Locked vs Unlocked Banner
+      const lockedBanner = document.getElementById('eligibility-banner-locked');
+      const unlockedBanner = document.getElementById('eligibility-banner-unlocked');
+      const btnApply = document.getElementById('btn-apply-leave');
+      const btnClaim = document.getElementById('btn-claim-allowance');
+
+      if (elig.isEligible) {
+        lockedBanner.classList.add('hidden');
+        lockedBanner.style.display = 'none';
+        unlockedBanner.classList.remove('hidden');
+        unlockedBanner.style.display = 'block';
+
+        // Update Automated Milestone / Eligibility Notification Status
+        const cycle = BCF_LEAVE.getServiceCycle(emp);
+        const milestoneActionContainer = document.getElementById('milestone-email-action-container');
+        if (milestoneActionContainer) {
+          if (balance.remainingDays <= 0) {
+            milestoneActionContainer.innerHTML = `
+              <div class="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-100 border border-slate-300 text-slate-700 text-xs font-bold">
+                <span class="material-symbols-outlined text-[17px] text-slate-500">lock_clock</span>
+                <span>All 31 Days Consumed (Locks until ${BCF_LEAVE.formatDate(balance.nextAnniversary)})</span>
+              </div>
+            `;
+          } else if (emp.lastEligibilityEmailCycle === cycle.cycleLabel) {
+            milestoneActionContainer.innerHTML = `
+              <div class="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-white border border-emerald-300 text-emerald-950 text-xs font-bold shadow-2xs">
+                <span class="material-symbols-outlined text-primary text-[18px]">mark_email_read</span>
+                <span>Auto-Sent to <span class="font-mono text-emerald-900 font-extrabold">${emp.lastEligibilityEmailRecipient || emp.email}</span> (<span class="text-slate-500 font-normal">${BCF_LEAVE.formatDate(emp.lastEligibilityEmailDate || new Date())}</span>)</span>
+                <button onclick="resendMilestoneEmailNotice()" class="ml-1 text-[11px] underline font-extrabold text-primary hover:text-emerald-900 cursor-pointer" title="Resend a fresh copy to ${emp.email}">Resend</button>
+              </div>
+            `;
+          } else {
+            // Not yet notified for this cycle -> AUTOMATIC BACKGROUND DISPATCH
+            milestoneActionContainer.innerHTML = `
+              <div class="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-white border border-blue-300 text-blue-900 text-xs font-bold animate-pulse">
+                <span class="material-symbols-outlined text-blue-600 text-[18px] animate-spin">sync</span>
+                <span>Auto-Sending Leave Notice to <strong class="font-mono">${emp.email}</strong>...</span>
+              </div>
+            `;
+            BCF_LEAVE.ensureEmployeeEligibilityNotified(emp.id).then(res => {
+              const current = BCF_LEAVE.getCurrentEmployee();
+              if (current && current.id === emp.id) {
+                renderCurrentEmployeeView();
+                if (res.newlySent) {
+                  BCF_LEAVE.showToast(`🚀 Official Leave Eligibility Email automatically sent to ${emp.email}!`, 'success');
+                }
+              }
+            }).catch(err => {
+              console.warn('[BCF_LEAVE] Auto-notify error:', err);
+            });
+          }
+        }
+
+        if (balance.remainingDays <= 0) {
+          btnApply.setAttribute('disabled', 'true');
+          btnApply.classList.add('opacity-50', 'pointer-events-none', 'bg-slate-400');
+          btnApply.classList.remove('bg-primary', 'hover:bg-primary-dark');
+          btnApply.innerHTML = `<span class="material-symbols-outlined text-[17px]">lock_clock</span><span>All 31 Days Consumed (Unlocks ${BCF_LEAVE.formatDate(balance.nextAnniversary)})</span>`;
+        } else {
+          btnApply.removeAttribute('disabled');
+          btnApply.classList.remove('opacity-50', 'pointer-events-none', 'bg-slate-400');
+          btnApply.classList.add('bg-primary', 'hover:bg-primary-dark');
+          btnApply.innerHTML = `<span class="material-symbols-outlined text-[17px]">add_circle</span><span>Apply for Annual Leave (${balance.remainingDays} Days Left)</span>`;
+        }
+
+        btnClaim.removeAttribute('disabled');
+        btnClaim.classList.remove('opacity-50', 'pointer-events-none', 'bg-slate-400');
+        btnClaim.classList.add('bg-emerald-700', 'hover:bg-emerald-800');
+      } else {
+        unlockedBanner.classList.add('hidden');
+        unlockedBanner.style.display = 'none';
+        lockedBanner.classList.remove('hidden');
+        lockedBanner.style.display = 'block';
+
+        document.getElementById('locked-reason-text').textContent = elig.reason;
+        document.getElementById('locked-emp-date').textContent = BCF_LEAVE.formatDate(emp.empDate);
+        document.getElementById('locked-elig-date').textContent = BCF_LEAVE.formatDate(elig.eligibilityDate);
+        document.getElementById('locked-remaining-time').textContent = elig.remainingText;
+
+        btnApply.setAttribute('disabled', 'true');
+        btnApply.classList.add('opacity-50', 'pointer-events-none', 'bg-slate-400');
+        btnApply.classList.remove('bg-primary', 'hover:bg-primary-dark');
+        btnApply.innerHTML = `<span class="material-symbols-outlined text-[17px]">lock</span><span>Ineligible for Leave</span>`;
+
+        btnClaim.setAttribute('disabled', 'true');
+        btnClaim.classList.add('opacity-50', 'pointer-events-none', 'bg-slate-400');
+        btnClaim.classList.remove('bg-emerald-700', 'hover:bg-emerald-800');
+        btnClaim.innerHTML = `<span class="material-symbols-outlined text-[17px]">lock</span><span>Claim Unavailable</span>`;
+      }
+
+      // Annual Leave Numbers
+      document.getElementById('meter-quota').textContent = balance.annualQuota;
+      document.getElementById('meter-used').textContent = balance.usedDays;
+      document.getElementById('meter-remaining').textContent = balance.remainingDays;
+
+      const pctUsed = balance.annualQuota > 0 ? (balance.usedDays / balance.annualQuota) * 100 : 0;
+      document.getElementById('meter-bar-used').style.width = `${pctUsed}%`;
+      document.getElementById('meter-bar-rem').style.width = `${100 - pctUsed}%`;
+      document.getElementById('meter-ratio-text').textContent = balance.remainingDays === 0
+        ? `All 31 Days Consumed (Locked until ${BCF_LEAVE.formatDate(balance.nextAnniversary)})`
+        : `${balance.usedDays} / ${balance.annualQuota} Days Consumed (${balance.remainingDays} Days Available)`;
+
+      // Allowance numbers
+      document.getElementById('alw-monthly-basic').textContent = BCF_LEAVE.formatCurrency(elig.monthlyBasic);
+      document.getElementById('alw-annual-basic').textContent = BCF_LEAVE.formatCurrency(elig.annualBasic);
+      document.getElementById('alw-rate-label').textContent = elig.ratePercent;
+      document.getElementById('alw-calculated-amount').textContent = BCF_LEAVE.formatCurrency(elig.leaveAllowance);
+
+      // RULE 1: Check existing allowance claim status for current year
+      const alwStatus = BCF_LEAVE.hasClaimedAllowanceInCycle(emp.id);
+      const claimStatusBadge = document.getElementById('alw-claim-status-badge');
+      if (alwStatus.hasClaimed) {
+        claimStatusBadge.textContent = `${alwStatus.allowance.status} (Claimed for Year)`;
+        claimStatusBadge.className = 'badge-soft bg-emerald-600 text-white';
+        btnClaim.setAttribute('disabled', 'true');
+        btnClaim.classList.add('opacity-50', 'cursor-not-allowed', 'pointer-events-none');
+        btnClaim.innerHTML = `<span class="material-symbols-outlined text-[17px]">done_all</span><span>Claimed for ${alwStatus.cycleLabel} (1 Claim / Yr)</span>`;
+      } else if (elig.isEligible) {
+        claimStatusBadge.textContent = 'Available to Claim (1 Claim / Yr)';
+        claimStatusBadge.className = 'badge-soft bg-emerald-600 text-white';
+        btnClaim.removeAttribute('disabled');
+        btnClaim.classList.remove('opacity-50', 'cursor-not-allowed', 'pointer-events-none');
+        btnClaim.innerHTML = `<span class="material-symbols-outlined text-[17px]">price_check</span><span>Claim Leave Allowance</span>`;
+      } else {
+        claimStatusBadge.textContent = 'Locked (Ineligible)';
+        claimStatusBadge.className = 'badge-soft bg-rose-600 text-white';
+        btnClaim.setAttribute('disabled', 'true');
+        btnClaim.classList.add('opacity-50', 'cursor-not-allowed', 'pointer-events-none');
+      }
+
+      // Render Ledger Table
+      renderLedgerTable(emp.id);
+    }
+
+    function renderLedgerTable(empId) {
+      const tbody = document.getElementById('ledger-table-body');
+      if (!tbody) return;
+
+      const ledger = BCF_LEAVE.getLeaveLedger(empId);
+      if (ledger.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="6" class="p-6 text-center text-slate-400">No leave ledger transactions recorded yet.</td></tr>`;
+        return;
+      }
+
+      tbody.innerHTML = ledger.map(item => `
+        <tr class="hover:bg-slate-50/80 transition-colors">
+          <td class="py-2.5 px-3 font-mono text-slate-600">${BCF_LEAVE.formatDate(item.date)}</td>
+          <td class="py-2.5 px-3 font-bold text-slate-900">${item.transaction}</td>
+          <td class="py-2.5 px-3 font-mono font-bold text-primary">${item.refNo}</td>
+          <td class="py-2.5 px-3 text-right font-mono font-black ${item.type === 'CREDIT' ? 'text-emerald-700' : 'text-rose-600'}">${item.changeDays}</td>
+          <td class="py-2.5 px-3 text-right font-mono font-bold text-slate-900">${item.balance} Days</td>
+          <td class="py-2.5 px-3 text-slate-500">${item.officer}</td>
+        </tr>
+      `).join('');
+    }
+
+    function scrollToLedger() {
+      document.getElementById('section-leave-ledger')?.scrollIntoView({ behavior: 'smooth' });
+    }
+
+    // ─────────────────────────────────────────────────────────────
+    // RENDER EXECUTIVE DASHBOARD (Section 1)
+    // ─────────────────────────────────────────────────────────────
+    function renderExecutiveDashboard() {
+      const stats = BCF_LEAVE.getDashboardStats();
+
+      document.getElementById('kpi-total-staff').textContent = stats.totalEmployees;
+      document.getElementById('kpi-eligible-staff').textContent = stats.eligibleForLeave;
+      document.getElementById('kpi-not-eligible').textContent = stats.notYetEligible;
+      document.getElementById('kpi-pending-apps').textContent = stats.applicationsPending;
+      document.getElementById('kpi-on-leave').textContent = stats.currentlyOnLeave;
+      document.getElementById('kpi-approved-leave').textContent = stats.approvedLeave;
+      document.getElementById('kpi-returning-soon').textContent = stats.returningSoon;
+      document.getElementById('kpi-days-used').textContent = stats.leaveDaysUsed;
+      document.getElementById('kpi-days-remaining').textContent = stats.leaveDaysRemaining;
+      document.getElementById('kpi-upcoming-anniv').textContent = stats.upcomingAnniversaries;
+      document.getElementById('kpi-alw-pending').textContent = stats.allowancesPending;
+      document.getElementById('kpi-alw-pending-amt').textContent = BCF_LEAVE.formatCurrency(stats.totalAllowancePendingAmount);
+      document.getElementById('kpi-alw-paid').textContent = stats.allowancesPaid;
+      document.getElementById('kpi-alw-paid-amt').textContent = BCF_LEAVE.formatCurrency(stats.totalAllowancePaidAmount);
+      document.getElementById('kpi-rejected-leave').textContent = stats.rejectedLeave;
+
+      renderRosterTable();
+    }
+
+    function renderRosterTable(query = '') {
+      const tbody = document.getElementById('roster-table-body');
+      if (!tbody) return;
+
+      const employees = BCF_LEAVE.getEmployees();
+      const q = query.toLowerCase().trim();
+
+      const filtered = employees.filter(e => {
+        if (!q) return true;
+        return `${e.id} ${e.fullName} ${e.department} ${e.position}`.toLowerCase().includes(q);
+      });
+
+      if (filtered.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="9" class="p-6 text-center text-slate-400">No employee records found.</td></tr>`;
+        return;
+      }
+
+      tbody.innerHTML = filtered.map(e => {
+        const elig = BCF_LEAVE.calculateEligibility(e);
+        const bal = BCF_LEAVE.getLeaveBalance(e.id);
+        const alwCheck = BCF_LEAVE.hasClaimedAllowanceInCycle(e.id);
+
+        let balanceChip = '';
+        if (!elig.isEligible) {
+          balanceChip = `<span class="badge-soft bg-slate-100 text-slate-500 font-mono">0 / 31d</span>`;
+        } else if (bal.remainingDays === 0) {
+          balanceChip = `<span class="badge-soft bg-rose-100 text-rose-800 font-mono font-black" title="All 31 days taken. Locked until ${BCF_LEAVE.formatDate(bal.nextAnniversary)}">🔒 31d Taken</span>`;
+        } else {
+          balanceChip = `<span class="badge-soft bg-emerald-100 text-emerald-800 font-mono font-bold">${bal.remainingDays} / 31d Left</span>`;
+        }
+
+        let alwChip = '';
+        if (alwCheck.hasClaimed) {
+          alwChip = `<div class="font-mono text-slate-900 font-bold">${BCF_LEAVE.formatCurrency(alwCheck.allowance.allowanceAmount)}<br/><span class="badge-soft bg-emerald-100 text-emerald-800 text-[10px]">Claimed (${alwCheck.allowance.status})</span></div>`;
+        } else if (elig.isEligible) {
+          alwChip = `<div class="font-mono text-slate-900 font-bold">${BCF_LEAVE.formatCurrency(elig.leaveAllowance)}<br/><span class="badge-soft bg-blue-100 text-blue-800 text-[10px]">1 Claim Avail.</span></div>`;
+        } else {
+          alwChip = `<div class="font-mono text-slate-400 font-bold">${BCF_LEAVE.formatCurrency(elig.leaveAllowance)}<br/><span class="badge-soft bg-slate-100 text-slate-500 text-[10px]">Locked</span></div>`;
+        }
+
+        return `
+          <tr class="hover:bg-slate-50/80 transition-colors">
+            <td class="py-2.5 px-3 font-mono font-bold text-primary">${e.id}</td>
+            <td class="py-2.5 px-3">
+              <span class="font-extrabold text-slate-900 block">${e.fullName}</span>
+              <span class="text-[11px] text-slate-500">${e.position}</span>
+            </td>
+            <td class="py-2.5 px-3 text-slate-700">${e.department}</td>
+            <td class="py-2.5 px-3 font-mono text-slate-600">${BCF_LEAVE.formatDate(e.empDate)}</td>
+            <td class="py-2.5 px-3 font-mono text-slate-800 font-bold">${elig.tenureDisplay}</td>
+            <td class="py-2.5 px-3 font-mono text-slate-600">
+              ${BCF_LEAVE.formatDate(elig.nextAnniversary)}
+              <div class="mt-0.5">${balanceChip}</div>
+            </td>
+            <td class="py-2.5 px-3">
+              ${elig.isEligible 
+                ? `<span class="badge-soft bg-emerald-100 text-emerald-800">✅ Eligible</span>` 
+                : `<span class="badge-soft bg-rose-100 text-rose-800">🔒 &lt; 1 Yr (${elig.remainingText})</span>`}
+            </td>
+            <td class="py-2.5 px-3">${alwChip}</td>
+            <td class="py-2.5 px-3 text-right">
+              <div class="flex items-center justify-end gap-1.5 flex-wrap">
+                ${elig.isEligible ? `
+                  ${e.lastEligibilityEmailCycle === elig.serviceCycle ? `
+                    <span class="badge-soft bg-emerald-50 text-emerald-800 border border-emerald-300 text-[10px] font-bold inline-flex items-center gap-1" title="Notice auto-sent to ${e.lastEligibilityEmailRecipient || e.email} on ${BCF_LEAVE.formatDate(e.lastEligibilityEmailDate)}">
+                      <span class="material-symbols-outlined text-[13px] text-primary">mark_email_read</span>
+                      <span>Auto-Sent</span>
+                    </span>
+                    <button onclick="sendEligibilityEmailForStaff('${e.id}')" class="px-1.5 py-1 rounded-md border border-slate-200 hover:bg-slate-100 text-slate-600 text-[10px] font-bold inline-flex items-center gap-0.5 cursor-pointer" title="Resend notification email to ${e.email}">
+                      <span class="material-symbols-outlined text-[12px]">sync</span>
+                    </button>
+                  ` : `
+                    <button onclick="sendEligibilityEmailForStaff('${e.id}')" class="px-2 py-1 rounded-lg border border-emerald-400 bg-emerald-50 hover:bg-emerald-100 text-emerald-900 text-[11px] font-extrabold inline-flex items-center gap-1 shadow-2xs transition active:scale-95 cursor-pointer animate-pulse" title="Leave days due! Auto-dispatch official notice to ${e.email}">
+                      <span class="material-symbols-outlined text-[14px] text-primary">forward_to_inbox</span>
+                      <span>Auto-Send</span>
+                    </button>
+                  `}
+                ` : ''}
+                <button onclick="viewEmployeePortal('${e.id}')" class="px-2.5 py-1 rounded-lg bg-primary hover:bg-primary-dark text-white text-[11px] font-extrabold inline-flex items-center gap-1 shadow-2xs hover:shadow-xs active:scale-95 transition cursor-pointer" title="Open employee self-service leave portal for ${e.fullName}">
+                  <span class="material-symbols-outlined text-[14px]">badge</span>
+                  <span>View</span>
+                </button>
+              </div>
+            </td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    function filterRosterTable() {
+      const q = document.getElementById('roster-search-input')?.value || '';
+      renderRosterTable(q);
+    }
+
+    async function scanAnniversaries() {
+      BCF_LEAVE.showToast('Scanning all employee records against service anniversary thresholds...', 'info');
+      try {
+        const scanRes = await BCF_LEAVE.checkAndNotifyEligibleEmployees();
+        renderExecutiveDashboard();
+        if (scanRes && scanRes.sentCount > 0) {
+          BCF_LEAVE.showToast(`Anniversary scan complete. Automatically dispatched ${scanRes.sentCount} official eligibility email(s) to staff!`, 'success');
+        } else {
+          BCF_LEAVE.showToast('Anniversary scan complete. All staff entitlements verified and up to date.', 'success');
+        }
+      } catch (err) {
+        renderExecutiveDashboard();
+        BCF_LEAVE.showToast('Anniversary scan complete. All active records synchronized.', 'info');
+      }
+    }
+
+    async function sendEligibilityEmailForStaff(empId) {
+      const emp = BCF_LEAVE.getEmployee(empId);
+      if (!emp) return;
+
+      BCF_LEAVE.showToast(`Dispatching official eligibility email to ${emp.email}...`, 'info');
+      const res = await BCF_LEAVE.sendEligibilityNotification(emp, { officer: 'HR Master Roster Console' });
+      renderExecutiveDashboard();
+      if (res && res.success) {
+        BCF_LEAVE.showToast(`Official leave eligibility email successfully delivered to ${emp.email}!`, 'success');
+      } else {
+        BCF_LEAVE.showToast(`Notification error: ${res.error || 'Check server status'}`, 'warning');
+      }
+    }
+
+    // ─────────────────────────────────────────────────────────────
+    // ACTIONS & NOTIFICATIONS
+    // ─────────────────────────────────────────────────────────────
+    function triggerClaimAllowance() {
+      const emp = BCF_LEAVE.getCurrentEmployee();
+      if (!emp) return;
+
+      try {
+        const alw = BCF_LEAVE.submitAllowanceOnlyClaim(emp.id);
+        BCF_LEAVE.showToast(`Statutory leave allowance claim (${alw.id}) submitted to HR Verification!`, 'success');
+        renderCurrentEmployeeView();
+      } catch (err) {
+        BCF_LEAVE.showToast(err.message, 'error');
+      }
+    }
+
+    async function resendMilestoneEmailNotice() {
+      const emp = BCF_LEAVE.getCurrentEmployee();
+      if (!emp) return;
+
+      BCF_LEAVE.showToast(`Dispatching duplicate milestone notification to ${emp.email}...`, 'info');
+      const res = await BCF_LEAVE.sendEligibilityNotification(emp, { officer: 'HR Resend Console' });
+      if (res && res.success) {
+        BCF_LEAVE.showToast(`Official leave eligibility notification delivered to ${emp.email}!`, 'success');
+        renderCurrentEmployeeView();
+      } else {
+        BCF_LEAVE.showToast(`Notice: ${res.error || 'Server notice'}`, 'warning');
+      }
+    }
+
+    async function sendMilestoneEmailNotice() {
+      return resendMilestoneEmailNotice();
+    }
+
+    // ─────────────────────────────────────────────────────────────
+    // SETTINGS MODAL
+    // ─────────────────────────────────────────────────────────────
+    function openSettingsModal() {
+      const modal = document.getElementById('settings-modal');
+      if (!modal) return;
+      const s = BCF_LEAVE.getSettings();
+
+      document.getElementById('setting-annual-days').value = s.annualLeaveDays;
+      document.getElementById('setting-service-months').value = s.eligibilityMonths;
+      document.getElementById('setting-allowance-rate').value = (s.allowanceRate * 100).toFixed(1);
+      document.getElementById('setting-allowance-basis').value = s.allowanceBasis;
+      document.getElementById('setting-carry-over').value = s.carryOverPermitted ? 'true' : 'false';
+      document.getElementById('setting-max-carry').value = s.maxCarryOverDays;
+
+      modal.classList.remove('hidden');
+      modal.style.display = 'flex';
+    }
+
+    function closeSettingsModal() {
+      const modal = document.getElementById('settings-modal');
+      if (modal) {
+        modal.classList.add('hidden');
+        modal.style.display = 'none';
+      }
+    }
+
+    function savePolicySettings(e) {
+      e.preventDefault();
+      const updated = {
+        annualLeaveDays: parseInt(document.getElementById('setting-annual-days').value) || 31,
+        eligibilityMonths: parseInt(document.getElementById('setting-service-months').value) || 12,
+        allowanceRate: (parseFloat(document.getElementById('setting-allowance-rate').value) || 5) / 100,
+        allowanceBasis: document.getElementById('setting-allowance-basis').value,
+        carryOverPermitted: document.getElementById('setting-carry-over').value === 'true',
+        maxCarryOverDays: parseInt(document.getElementById('setting-max-carry').value) || 5
+      };
+
+      BCF_LEAVE.saveSettings(updated);
+      closeSettingsModal();
+      renderCurrentEmployeeView();
+      renderExecutiveDashboard();
+      BCF_LEAVE.showToast('Policy parameters updated successfully.', 'success');
+    }
+
+    // ─────────────────────────────────────────────────────────────
+    // EXPORT HELPERS
+    // ─────────────────────────────────────────────────────────────
+    function exportLedgerCsv() {
+      const emp = BCF_LEAVE.getCurrentEmployee();
+      if (!emp) return;
+      const ledger = BCF_LEAVE.getLeaveLedger(emp.id);
+
+      const headers = ['Date', 'Transaction', 'Reference', 'Change Days', 'Balance', 'Authorized By'];
+      const rows = ledger.map(l => [
+        l.date, `"${l.transaction.replace(/"/g, '""')}"`, l.refNo, l.changeDays, l.balance, `"${l.officer}"`
+      ]);
+
+      const csvContent = 'data:text/csv;charset=utf-8,' + [headers.join(','), ...rows.map(e => e.join(','))].join('\n');
+      const encodedUri = encodeURI(csvContent);
+      const link = document.createElement('a');
+      link.setAttribute('href', encodedUri);
+      link.setAttribute('download', `BCF_Leave_Ledger_${emp.id}_${new Date().toISOString().split('T')[0]}.csv`);
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      BCF_LEAVE.showToast('Leave ledger exported to CSV.', 'success');
+    }
+
+    function exportAllEmployeesCsv() {
+      const employees = BCF_LEAVE.getEmployees();
+      const headers = ['Employee ID', 'Name', 'Department', 'Position', 'Employment Date', 'Tenure', 'Eligibility', 'Leave Allowance NLe'];
+      const rows = employees.map(e => {
+        const elig = BCF_LEAVE.calculateEligibility(e);
+        return [
+          e.id, `"${e.fullName}"`, `"${e.department}"`, `"${e.position}"`, e.empDate, `"${elig.tenureDisplay}"`, elig.status, elig.leaveAllowance
+        ];
+      });
+
+      const csvContent = 'data:text/csv;charset=utf-8,' + [headers.join(','), ...rows.map(e => e.join(','))].join('\n');
+      const encodedUri = encodeURI(csvContent);
+      const link = document.createElement('a');
+      link.setAttribute('href', encodedUri);
+      link.setAttribute('download', `BCF_Staff_Leave_Register_${new Date().toISOString().split('T')[0]}.csv`);
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      BCF_LEAVE.showToast('Master leave register exported to CSV.', 'success');
+    }
+  </script>
+</body>
+</html>

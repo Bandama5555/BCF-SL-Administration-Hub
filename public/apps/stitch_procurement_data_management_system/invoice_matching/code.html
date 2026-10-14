@@ -1,0 +1,543 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover"/>
+  <title>Invoice &amp; 3-Way Match — BCF-SL Integrated Procurement</title>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: {
+            primary: "#0037b0",
+            "primary-dark": "#00247d",
+            secondary: "#565e74",
+            tertiary: "#006948",
+            "tertiary-dark": "#004f35",
+            surface: "#f8f9ff",
+            "surface-container": "#eff4ff",
+            "on-surface": "#0b1c30",
+            "on-surface-variant": "#434655",
+            outline: "#747686",
+            error: "#ba1a1a"
+          },
+          fontFamily: {
+            sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+            body: ['"Inter"', 'sans-serif'],
+            mono: ['"JetBrains Mono"', 'monospace']
+          }
+        }
+      }
+    };
+  </script>
+  <style>
+    body { font-family: 'Inter', sans-serif; background-color: #f8f9ff; }
+    h1, h2, h3, h4, .font-headline { font-family: 'Plus Jakarta Sans', sans-serif; }
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-thumb { background-color: #cbd5e1; border-radius: 4px; }
+  </style>
+</head>
+<body class="text-on-surface flex flex-col min-h-screen">
+
+  <!-- UNIFIED PROCUREMENT TOP NAVIGATION & WORKFLOW TABS -->
+  <div id="bcf-procurement-nav-header"></div>
+
+  <!-- MAIN VIEWPORT -->
+  <main class="flex-grow p-4 sm:p-6 max-w-7xl mx-auto w-full flex flex-col gap-6">
+
+    <!-- HERO & SUMMARY METRICS -->
+    <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+      <div>
+        <div class="flex items-center gap-2 mb-1">
+          <span class="inline-flex items-center justify-center w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+          <span class="text-xs font-extrabold uppercase tracking-wider text-emerald-800 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200">
+            Financial Settlement &amp; Audit Integrity
+          </span>
+          <span class="text-xs text-slate-500">• PO + GRN + Invoice Verification</span>
+        </div>
+        <h1 class="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight font-headline">
+          Invoice &amp; 3-Way Match Verification
+        </h1>
+        <p class="text-xs sm:text-sm text-slate-600 mt-1 max-w-2xl">
+          Automated three-way verification comparing the Purchase Order, physical Goods Received Note, and vendor invoice prior to releasing payment from Financial Operations.
+        </p>
+      </div>
+
+      <div class="flex items-center gap-2.5 flex-wrap shrink-0">
+        <button onclick="openInvoiceModal()" class="px-4 py-2 rounded-xl bg-primary hover:bg-primary-dark text-white text-xs font-extrabold flex items-center gap-1.5 transition shadow-md cursor-pointer active:scale-95">
+          <span class="material-symbols-outlined text-[18px]">receipt_long</span>
+          <span>Record Vendor Invoice</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- 3-WAY MATCH ARCHITECTURE DIAGRAM BANNER -->
+    <div class="bg-gradient-to-r from-blue-900 via-indigo-900 to-slate-900 rounded-2xl p-4 sm:p-5 text-white shadow-md border border-blue-800/40">
+      <div class="flex items-center justify-between mb-3 border-b border-white/10 pb-2">
+        <span class="text-xs font-extrabold uppercase tracking-wider text-blue-300 flex items-center gap-1.5">
+          <span class="material-symbols-outlined text-[18px]">rule</span>
+          <span>BCF-SL 3-Way Matching Engine</span>
+        </span>
+        <span class="text-[11px] font-mono text-slate-300">Tolerance Threshold: NLe 0.00</span>
+      </div>
+
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+        <!-- 1. PO -->
+        <div class="p-3 rounded-xl bg-white/10 border border-white/10 flex items-center gap-3">
+          <div class="w-10 h-10 rounded-lg bg-blue-500/20 text-blue-300 flex items-center justify-center shrink-0">
+            <span class="material-symbols-outlined text-2xl">shopping_bag</span>
+          </div>
+          <div>
+            <span class="text-[10px] uppercase font-bold text-blue-300 block">Step 1: Authorized PO</span>
+            <span class="text-xs font-bold text-white">Agreed Items &amp; Price</span>
+          </div>
+        </div>
+
+        <!-- 2. GRN -->
+        <div class="p-3 rounded-xl bg-white/10 border border-white/10 flex items-center gap-3">
+          <div class="w-10 h-10 rounded-lg bg-emerald-500/20 text-emerald-300 flex items-center justify-center shrink-0">
+            <span class="material-symbols-outlined text-2xl">inventory_2</span>
+          </div>
+          <div>
+            <span class="text-[10px] uppercase font-bold text-emerald-300 block">Step 2: Verified GRN</span>
+            <span class="text-xs font-bold text-white">Physical Delivered Qty</span>
+          </div>
+        </div>
+
+        <!-- 3. INVOICE -->
+        <div class="p-3 rounded-xl bg-white/10 border border-white/10 flex items-center gap-3">
+          <div class="w-10 h-10 rounded-lg bg-purple-500/20 text-purple-300 flex items-center justify-center shrink-0">
+            <span class="material-symbols-outlined text-2xl">receipt</span>
+          </div>
+          <div>
+            <span class="text-[10px] uppercase font-bold text-purple-300 block">Step 3: Supplier Invoice</span>
+            <span class="text-xs font-bold text-white">Billed Amount &amp; Taxes</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- STATS CARDS -->
+    <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+      <div class="p-4 sm:p-5 rounded-2xl bg-white border border-slate-200 shadow-xs flex flex-col justify-between">
+        <div class="flex items-center justify-between text-slate-500 mb-2">
+          <span class="text-xs font-extrabold uppercase tracking-wider">Total Invoices</span>
+          <div class="w-8 h-8 rounded-lg bg-blue-50 text-primary flex items-center justify-center">
+            <span class="material-symbols-outlined text-[20px]">receipt</span>
+          </div>
+        </div>
+        <div>
+          <span id="metric-total-invs" class="text-2xl sm:text-3xl font-black text-slate-900 font-mono">0</span>
+          <div class="flex items-center gap-1 mt-1 text-[11px] text-slate-500 font-semibold">
+            <span>Invoiced claims submitted</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="p-4 sm:p-5 rounded-2xl bg-white border border-slate-200 shadow-xs flex flex-col justify-between">
+        <div class="flex items-center justify-between text-slate-500 mb-2">
+          <span class="text-xs font-extrabold uppercase tracking-wider">100% Matched</span>
+          <div class="w-8 h-8 rounded-lg bg-emerald-50 text-emerald-700 flex items-center justify-center">
+            <span class="material-symbols-outlined text-[20px]">check_circle</span>
+          </div>
+        </div>
+        <div>
+          <span id="metric-matched-invs" class="text-2xl sm:text-3xl font-black text-emerald-700 font-mono">0</span>
+          <div class="flex items-center gap-1 mt-1 text-[11px] text-emerald-700 font-bold">
+            <span>Zero variance confirmed</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="p-4 sm:p-5 rounded-2xl bg-white border border-slate-200 shadow-xs flex flex-col justify-between">
+        <div class="flex items-center justify-between text-slate-500 mb-2">
+          <span class="text-xs font-extrabold uppercase tracking-wider">Approved for Payment</span>
+          <div class="w-8 h-8 rounded-lg bg-purple-50 text-purple-700 flex items-center justify-center">
+            <span class="material-symbols-outlined text-[20px]">payments</span>
+          </div>
+        </div>
+        <div>
+          <span id="metric-payable-amt" class="text-xl sm:text-2xl font-black text-slate-900 font-mono">NLe 0.00</span>
+          <div class="flex items-center gap-1 mt-1 text-[11px] text-purple-700 font-bold">
+            <span>Financial Operations Ready</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="p-4 sm:p-5 rounded-2xl bg-white border border-slate-200 shadow-xs flex flex-col justify-between">
+        <div class="flex items-center justify-between text-slate-500 mb-2">
+          <span class="text-xs font-extrabold uppercase tracking-wider">NRA Withholding Tax</span>
+          <div class="w-8 h-8 rounded-lg bg-amber-50 text-amber-700 flex items-center justify-center">
+            <span class="material-symbols-outlined text-[20px]">account_balance</span>
+          </div>
+        </div>
+        <div>
+          <span id="metric-tax-withheld" class="text-xl sm:text-2xl font-black text-amber-700 font-mono">NLe 0.00</span>
+          <div class="flex items-center gap-1 mt-1 text-[11px] text-slate-500">
+            <span>5% statutory tax deduction</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- INVOICE LIST -->
+    <div id="invoices-container" class="space-y-4">
+      <!-- Dynamic Invoices -->
+    </div>
+
+    <!-- EMPTY STATE -->
+    <div id="invoices-empty-state" class="hidden text-center py-16 bg-white rounded-2xl border border-slate-200">
+      <div class="w-16 h-16 rounded-full bg-slate-100 text-slate-400 mx-auto flex items-center justify-center mb-3">
+        <span class="material-symbols-outlined text-3xl">receipt_long</span>
+      </div>
+      <h3 class="text-base font-bold text-slate-800">No vendor invoices registered</h3>
+      <p class="text-xs text-slate-500 mt-1 max-w-sm mx-auto">When suppliers submit billing for delivered goods, record the invoice to perform the automated 3-Way Match.</p>
+      <button onclick="openInvoiceModal()" class="mt-4 px-4 py-2 rounded-xl bg-primary hover:bg-primary-dark text-white text-xs font-bold">
+        Record Invoice
+      </button>
+    </div>
+
+  </main>
+
+  <!-- RECORD INVOICE & RUN 3-WAY MATCH MODAL -->
+  <div id="inv-modal" class="fixed inset-0 z-50 bg-black/50 backdrop-blur-xs hidden flex items-center justify-center p-3 sm:p-4 overflow-y-auto">
+    <div class="bg-white rounded-2xl max-w-3xl w-full p-5 sm:p-6 shadow-2xl border border-slate-200 flex flex-col my-auto max-h-[92vh]">
+      <div class="flex items-center justify-between border-b border-slate-100 pb-3 mb-4">
+        <div class="flex items-center gap-2.5">
+          <div class="w-9 h-9 rounded-xl bg-primary/10 text-primary flex items-center justify-center">
+            <span class="material-symbols-outlined text-[20px]">receipt_long</span>
+          </div>
+          <div>
+            <h3 class="text-base font-extrabold text-slate-900 font-headline">Record Invoice &amp; Run 3-Way Match</h3>
+            <p class="text-xs text-slate-500">Automated reconciliation against PO &amp; Goods Received Note</p>
+          </div>
+        </div>
+        <button onclick="closeInvoiceModal()" class="w-8 h-8 rounded-lg text-slate-400 hover:text-slate-600 hover:bg-slate-100 flex items-center justify-center">
+          <span class="material-symbols-outlined text-[20px]">close</span>
+        </button>
+      </div>
+
+      <form id="inv-form" onsubmit="handleInvoiceSubmit(event)" class="flex-1 overflow-y-auto pr-1 space-y-4 text-xs">
+        <!-- PO Selector -->
+        <div class="p-3 bg-blue-50/70 rounded-xl border border-blue-200/60">
+          <label class="block font-bold text-blue-900 mb-1">Select Purchase Order *</label>
+          <select id="inv-source-po" required onchange="onSourcePoChange()" class="w-full px-3 py-2 rounded-xl border border-blue-300 bg-white text-xs font-semibold">
+            <option value="">Select Purchase Order...</option>
+            <!-- Populated via script -->
+          </select>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+          <div>
+            <label class="block font-bold text-slate-700 mb-1">Supplier Invoice Number *</label>
+            <input id="inv-number" type="text" required placeholder="e.g. INV-SLA-9021" class="w-full px-3 py-2 rounded-xl border border-slate-200 bg-slate-50 font-mono text-xs"/>
+          </div>
+          <div>
+            <label class="block font-bold text-slate-700 mb-1">Invoice Date *</label>
+            <input id="inv-date" type="date" required class="w-full px-3 py-2 rounded-xl border border-slate-200 bg-slate-50 text-xs font-mono"/>
+          </div>
+          <div>
+            <label class="block font-bold text-slate-700 mb-1">Payment Due Date *</label>
+            <input id="inv-due-date" type="date" required class="w-full px-3 py-2 rounded-xl border border-slate-200 bg-slate-50 text-xs font-mono"/>
+          </div>
+        </div>
+
+        <div>
+          <label class="block font-bold text-slate-700 mb-1">Billed Invoice Gross Amount (NLe) *</label>
+          <input id="inv-amount" type="number" step="any" required oninput="calculateTaxAndMatch()" placeholder="e.g. 175000" class="w-full px-3 py-2 rounded-xl border border-slate-200 bg-slate-50 font-mono font-black text-sm text-primary"/>
+        </div>
+
+        <!-- Statutory Deductions (NRA Withholding Tax) -->
+        <div class="p-3 bg-amber-50/70 rounded-xl border border-amber-200/70 grid grid-cols-2 gap-3">
+          <div>
+            <span class="text-[10px] uppercase font-bold text-amber-900 block">NRA Withholding Tax (5%)</span>
+            <span id="disp-calc-tax" class="font-mono font-bold text-amber-800 text-xs">NLe 0.00</span>
+          </div>
+          <div class="text-right">
+            <span class="text-[10px] uppercase font-bold text-amber-900 block">Net Payable to Supplier</span>
+            <span id="disp-calc-net" class="font-mono font-black text-slate-900 text-sm">NLe 0.00</span>
+          </div>
+        </div>
+
+        <!-- 3-Way Match Verification Banner -->
+        <div id="match-feedback-banner" class="p-3.5 rounded-xl border text-xs">
+          <!-- Populated by calculateTaxAndMatch() -->
+        </div>
+
+        <!-- Submit buttons -->
+        <div class="flex items-center justify-end gap-2 pt-3 border-t border-slate-100">
+          <button type="button" onclick="closeInvoiceModal()" class="px-4 py-2 rounded-xl border border-slate-200 hover:bg-slate-100 text-xs font-bold text-slate-600">
+            Cancel
+          </button>
+          <button type="submit" class="px-5 py-2 rounded-xl bg-primary hover:bg-primary-dark text-white text-xs font-extrabold shadow-md active:scale-95">
+            Certify 3-Way Match &amp; Approve for Payment
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Shared Library -->
+  <script src="../bcf_procurement_shared.js"></script>
+
+  <!-- Controller Logic -->
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      // Shared top navigation
+      BCF_PROCUREMENT.renderHeaderAndTabs('invoice-matching');
+
+      loadInvoices();
+
+      // Check if GRN was passed
+      const passedGrn = localStorage.getItem('bcf_selected_grn_id');
+      if (passedGrn) {
+        localStorage.removeItem('bcf_selected_grn_id');
+        const grn = BCF_PROCUREMENT.getGrn(passedGrn);
+        if (grn) openInvoiceModal(grn.poId);
+      }
+    });
+
+    function loadInvoices() {
+      renderInvoices();
+      updateMetrics();
+    }
+
+    function updateMetrics() {
+      const invs = BCF_PROCUREMENT.getInvoices();
+      const matched = invs.filter(i => i.threeWayMatch && i.threeWayMatch.status === 'Matched').length;
+      const payableTotal = invs.reduce((sum, i) => sum + (i.netPayable || i.totalAmount || 0), 0);
+      const taxTotal = invs.reduce((sum, i) => sum + (i.taxWithholding || 0), 0);
+
+      document.getElementById('metric-total-invs').textContent = invs.length;
+      document.getElementById('metric-matched-invs').textContent = matched;
+      document.getElementById('metric-payable-amt').textContent = BCF_PROCUREMENT.formatCurrency(payableTotal);
+      document.getElementById('metric-tax-withheld').textContent = BCF_PROCUREMENT.formatCurrency(taxTotal);
+    }
+
+    function renderInvoices() {
+      const container = document.getElementById('invoices-container');
+      const emptyState = document.getElementById('invoices-empty-state');
+      if (!container) return;
+
+      const invs = BCF_PROCUREMENT.getInvoices();
+
+      if (invs.length === 0) {
+        container.innerHTML = '';
+        emptyState?.classList.remove('hidden');
+        return;
+      }
+
+      emptyState?.classList.add('hidden');
+
+      container.innerHTML = invs.map(inv => {
+        const isMatched = inv.threeWayMatch && inv.threeWayMatch.status === 'Matched';
+
+        return `
+          <div class="bg-white rounded-2xl border border-slate-200 shadow-xs p-4 sm:p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div class="flex items-start gap-3.5 flex-1 min-w-0">
+              <div class="w-11 h-11 rounded-xl bg-purple-50 text-purple-700 flex items-center justify-center shrink-0 mt-0.5">
+                <span class="material-symbols-outlined text-[22px]">receipt_long</span>
+              </div>
+              <div class="flex-1 min-w-0">
+                <div class="flex items-center gap-2 flex-wrap mb-1">
+                  <span class="font-mono text-xs font-black text-purple-900 bg-purple-50 px-2 py-0.5 rounded border border-purple-200">
+                    ${inv.invoiceNumber}
+                  </span>
+                  <span class="font-mono text-xs font-bold text-slate-700 bg-slate-100 px-2 py-0.5 rounded border border-slate-200">
+                    PO: ${inv.poId}
+                  </span>
+                  <span class="font-mono text-xs font-bold text-slate-700 bg-slate-100 px-2 py-0.5 rounded border border-slate-200">
+                    TXN: ${inv.txnId}
+                  </span>
+                  <span class="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold ${isMatched ? 'bg-emerald-100 text-emerald-800 border border-emerald-300' : 'bg-amber-100 text-amber-800 border border-amber-300'}">
+                    ${isMatched ? '3-Way Matched ✓' : 'Variance Pending'}
+                  </span>
+                </div>
+
+                <h3 class="text-sm sm:text-base font-extrabold text-slate-900 leading-snug font-headline">
+                  Supplier: ${inv.supplierName}
+                </h3>
+
+                <div class="flex items-center gap-3 text-xs text-slate-500 mt-1 flex-wrap">
+                  <span>Gross: <strong class="text-slate-800 font-mono">${BCF_PROCUREMENT.formatCurrency(inv.totalAmount)}</strong></span>
+                  <span>NRA 5% Tax: <strong class="text-amber-800 font-mono">${BCF_PROCUREMENT.formatCurrency(inv.taxWithholding)}</strong></span>
+                  <span>Net Payable: <strong class="text-emerald-800 font-mono font-bold">${BCF_PROCUREMENT.formatCurrency(inv.netPayable)}</strong></span>
+                  <span>Due: <strong class="text-slate-700 font-mono">${BCF_PROCUREMENT.formatDate(inv.dueDate)}</strong></span>
+                </div>
+              </div>
+            </div>
+
+            <div class="flex sm:flex-col items-center sm:items-end justify-between sm:justify-center border-t sm:border-t-0 pt-3 sm:pt-0 border-slate-100 shrink-0 gap-2">
+              <div class="text-left sm:text-right">
+                <span class="text-[10px] font-bold uppercase text-slate-400 block">Settlement Status</span>
+                <span class="font-mono text-xs font-bold text-emerald-700">${inv.paymentStatus || 'Approved for Payment'}</span>
+              </div>
+
+              <button onclick="viewTxnLifecycle('${inv.txnId}')" class="px-3.5 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-800 text-xs font-bold transition flex items-center gap-1 cursor-pointer">
+                <span class="material-symbols-outlined text-[16px]">timeline</span>
+                <span>Audit Trail</span>
+              </button>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function openInvoiceModal(preSelectedPoId = null) {
+      const modal = document.getElementById('inv-modal');
+      const form = document.getElementById('inv-form');
+      form.reset();
+
+      // Populate POs
+      const poSelect = document.getElementById('inv-source-po');
+      const pos = BCF_PROCUREMENT.getPurchaseOrders();
+
+      poSelect.innerHTML = '<option value="">Select Purchase Order...</option>' + pos.map(p => `
+        <option value="${p.id}" ${preSelectedPoId === p.id ? 'selected' : ''}>
+          ${p.poNumber || p.id} — ${p.supplierName} (${BCF_PROCUREMENT.formatCurrency(p.totalAmount)})
+        </option>
+      `).join('');
+
+      const today = new Date().toISOString().split('T')[0];
+      const in30Days = new Date(Date.now() + 30 * 86400000).toISOString().split('T')[0];
+      document.getElementById('inv-date').value = today;
+      document.getElementById('inv-due-date').value = in30Days;
+
+      if (preSelectedPoId) {
+        onSourcePoChange();
+      }
+
+      calculateTaxAndMatch();
+      modal.classList.remove('hidden');
+    }
+
+    function closeInvoiceModal() {
+      document.getElementById('inv-modal').classList.add('hidden');
+    }
+
+    function onSourcePoChange() {
+      const poId = document.getElementById('inv-source-po').value;
+      if (!poId) return;
+
+      const po = BCF_PROCUREMENT.getPurchaseOrder(poId);
+      if (po) {
+        document.getElementById('inv-amount').value = po.totalAmount || 0;
+        calculateTaxAndMatch();
+      }
+    }
+
+    function calculateTaxAndMatch() {
+      const gross = parseFloat(document.getElementById('inv-amount').value) || 0;
+      const tax = gross * 0.05; // 5% withholding tax per NRA
+      const net = gross - tax;
+
+      document.getElementById('disp-calc-tax').textContent = BCF_PROCUREMENT.formatCurrency(tax);
+      document.getElementById('disp-calc-net').textContent = BCF_PROCUREMENT.formatCurrency(net);
+
+      // Run 3-Way Match Check
+      const poId = document.getElementById('inv-source-po').value;
+      const banner = document.getElementById('match-feedback-banner');
+      if (!banner) return;
+
+      if (!poId || gross <= 0) {
+        banner.className = 'p-3 rounded-xl border border-slate-200 bg-slate-50 text-slate-500';
+        banner.innerHTML = 'Select a Purchase Order and specify invoice amount to run 3-Way Matching.';
+        return;
+      }
+
+      const po = BCF_PROCUREMENT.getPurchaseOrder(poId);
+      const grn = BCF_PROCUREMENT.getGrns().find(g => g.poId === poId);
+
+      const variance = Math.abs((po ? po.totalAmount : 0) - gross);
+      const isPriceMatch = variance <= 1.0;
+      const hasGrn = !!grn;
+
+      if (isPriceMatch && hasGrn) {
+        banner.className = 'p-3 rounded-xl border border-emerald-300 bg-emerald-50 text-emerald-900 flex items-start gap-2';
+        banner.innerHTML = `
+          <span class="material-symbols-outlined text-[20px] text-emerald-700 shrink-0 mt-0.5">check_circle</span>
+          <div>
+            <span class="font-extrabold uppercase text-[10px] tracking-wider text-emerald-800 block">3-WAY MATCH: 100% PERFECT MATCH</span>
+            <p class="mt-0.5">PO amount (NLe ${BCF_PROCUREMENT.formatNumber(po.totalAmount)}) perfectly matches Invoice with verified receipt at ${grn.warehouseName}.</p>
+          </div>
+        `;
+      } else if (!hasGrn) {
+        banner.className = 'p-3 rounded-xl border border-amber-300 bg-amber-50 text-amber-900 flex items-start gap-2';
+        banner.innerHTML = `
+          <span class="material-symbols-outlined text-[20px] text-amber-700 shrink-0 mt-0.5">warning</span>
+          <div>
+            <span class="font-extrabold uppercase text-[10px] tracking-wider text-amber-800 block">3-WAY MATCH: GRN PENDING</span>
+            <p class="mt-0.5">Goods Received Note has not yet been certified for PO ${po?.poNumber}. Invoice can be staged but payment will hold until physical receipt.</p>
+          </div>
+        `;
+      } else {
+        banner.className = 'p-3 rounded-xl border border-red-300 bg-red-50 text-red-900 flex items-start gap-2';
+        banner.innerHTML = `
+          <span class="material-symbols-outlined text-[20px] text-red-700 shrink-0 mt-0.5">error</span>
+          <div>
+            <span class="font-extrabold uppercase text-[10px] tracking-wider text-red-800 block">3-WAY MATCH: PRICE VARIANCE DETECTED</span>
+            <p class="mt-0.5">Variance of NLe ${BCF_PROCUREMENT.formatNumber(variance)} exceeds the zero-tolerance policy. Authorized PO was NLe ${BCF_PROCUREMENT.formatNumber(po.totalAmount)}.</p>
+          </div>
+        `;
+      }
+    }
+
+    function handleInvoiceSubmit(e) {
+      e.preventDefault();
+
+      const poId = document.getElementById('inv-source-po').value;
+      const po = BCF_PROCUREMENT.getPurchaseOrder(poId);
+      if (!po) {
+        alert('Please select a valid Purchase Order.');
+        return;
+      }
+
+      const gross = parseFloat(document.getElementById('inv-amount').value) || 0;
+      const tax = gross * 0.05;
+      const net = gross - tax;
+
+      const grn = BCF_PROCUREMENT.getGrns().find(g => g.poId === poId);
+
+      const inv = {
+        txnId: po.txnId,
+        poId: po.id,
+        grnId: grn ? grn.id : null,
+        invoiceNumber: document.getElementById('inv-number').value.trim(),
+        supplierId: po.supplierId,
+        supplierName: po.supplierName,
+        invoiceDate: document.getElementById('inv-date').value,
+        dueDate: document.getElementById('inv-due-date').value,
+        subtotal: gross,
+        taxWithholding: tax,
+        netPayable: net,
+        totalAmount: gross,
+        threeWayMatch: {
+          poMatched: Math.abs(po.totalAmount - gross) <= 1.0,
+          grnMatched: !!grn,
+          amountVariance: Math.abs(po.totalAmount - gross),
+          quantityVariance: 0,
+          status: (Math.abs(po.totalAmount - gross) <= 1.0 && !!grn) ? 'Matched' : 'Pending',
+          matchedDate: new Date().toISOString().split('T')[0],
+          verifiedBy: 'Automated 3-Way Match Verification Engine'
+        },
+        paymentStatus: 'Approved for Payment',
+        status: 'Verified'
+      };
+
+      const saved = BCF_PROCUREMENT.saveInvoice(inv);
+      closeInvoiceModal();
+      loadInvoices();
+      BCF_PROCUREMENT.showToast(`Invoice ${saved.invoiceNumber} recorded and verified under Master TXN ${saved.txnId}!`, 'success');
+    }
+
+    function viewTxnLifecycle(txnId) {
+      localStorage.setItem('bcf_selected_txn_id', txnId);
+      BCF_PROCUREMENT.switchTab('transaction-audit-trail');
+    }
+  </script>
+</body>
+</html>

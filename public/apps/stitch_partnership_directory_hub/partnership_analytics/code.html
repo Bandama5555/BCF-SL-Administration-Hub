@@ -1,0 +1,467 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover"/>
+  <title>BCF-SL — Strategic Partnership Analytics &amp; Executive Intelligence</title>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: {
+            primary: "#0037b0",
+            "primary-dark": "#00247d",
+            secondary: "#565e74",
+            tertiary: "#006948",
+            "tertiary-dark": "#004f35",
+            surface: "#f8f9ff",
+            "surface-container": "#eff4ff",
+            "surface-container-high": "#e5eeff",
+            "on-surface": "#0b1c30",
+            "on-surface-variant": "#434655",
+            outline: "#747686",
+            error: "#ba1a1a"
+          },
+          fontFamily: {
+            sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+            body: ['"Inter"', 'sans-serif'],
+            mono: ['"JetBrains Mono"', 'monospace']
+          }
+        }
+      }
+    };
+  </script>
+  <style>
+    body { font-family: 'Inter', sans-serif; background-color: #f8f9ff; }
+    h1, h2, h3, h4, .font-headline { font-family: 'Plus Jakarta Sans', sans-serif; }
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-thumb { background-color: #cbd5e1; border-radius: 4px; }
+    .badge-pill { display: inline-flex; align-items: center; gap: 0.25rem; font-size: 0.72rem; font-weight: 700; padding: 0.2rem 0.6rem; border-radius: 9999px; }
+  </style>
+</head>
+<body class="text-on-surface flex flex-col min-h-screen">
+
+  <!-- TOP INSTITUTIONAL BRAND HEADER -->
+  <header class="bg-surface border-b border-outline/30 sticky top-0 z-40 shadow-xs">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between gap-4">
+      <div class="flex items-center gap-3 min-w-0">
+        <img src="/bcf-logo.jpg" onerror="this.src='../bcf-logo.jpg'; this.onerror=function(){this.src='../../bcf-logo.jpg'}" alt="BCF-SL Logo" class="h-9 w-auto object-contain shrink-0 rounded"/>
+        <div class="flex flex-col min-w-0">
+          <div class="flex items-center gap-2">
+            <span class="font-extrabold text-sm sm:text-base text-primary tracking-tight truncate uppercase leading-none">
+              Bandama Charity Foundation
+            </span>
+            <span class="hidden sm:inline-block px-2 py-0.5 text-[10px] font-extrabold rounded bg-emerald-100 text-emerald-800 border border-emerald-200">
+              SIERRA LEONE
+            </span>
+          </div>
+          <span class="text-[11px] font-semibold text-secondary truncate mt-0.5">
+            Executive Partnership Analytics &amp; Strategic Portfolio Intelligence
+          </span>
+        </div>
+      </div>
+
+      <!-- Quick Nav & Actions -->
+      <div class="flex items-center gap-2 shrink-0">
+        <a href="../partners_directory/code.html" class="h-9 px-3 rounded-xl border border-slate-300 hover:border-primary/50 bg-white hover:bg-slate-50 text-xs font-bold flex items-center gap-1.5 text-slate-700 shadow-2xs transition active:scale-95" title="Master Register">
+          <span class="material-symbols-outlined text-[16px]">contacts</span>
+          <span class="hidden md:inline">Master Register</span>
+        </a>
+        <a href="../deal_pipeline/code.html" class="h-9 px-3 rounded-xl border border-slate-300 hover:border-primary/50 bg-white hover:bg-slate-50 text-xs font-bold flex items-center gap-1.5 text-slate-700 shadow-2xs transition active:scale-95" title="11-Stage Pipeline">
+          <span class="material-symbols-outlined text-[16px]">view_kanban</span>
+          <span class="hidden md:inline">Pipeline</span>
+        </a>
+        <a href="../partner_profile_stripe/code.html" class="h-9 px-3 rounded-xl border border-slate-300 hover:border-primary/50 bg-white hover:bg-slate-50 text-xs font-bold flex items-center gap-1.5 text-slate-700 shadow-2xs transition active:scale-95" title="Partner Master Dossier">
+          <span class="material-symbols-outlined text-[16px]">badge</span>
+          <span class="hidden md:inline">Dossier</span>
+        </a>
+        <button onclick="window.print()" class="h-9 px-3.5 rounded-xl bg-slate-900 hover:bg-black text-white text-xs font-extrabold flex items-center gap-1.5 shadow-sm transition active:scale-95 cursor-pointer">
+          <span class="material-symbols-outlined text-[16px]">print</span>
+          <span>Print Report</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- EXECUTIVE BANNER -->
+  <section class="bg-gradient-to-r from-blue-900 via-indigo-900 to-slate-900 text-white px-4 sm:px-6 py-5 shadow-sm">
+    <div class="max-w-7xl mx-auto flex flex-col md:flex-row md:items-center justify-between gap-4">
+      <div>
+        <div class="flex items-center gap-2 text-xs font-medium text-blue-200 mb-1">
+          <span>Strategic Partnerships</span>
+          <span class="material-symbols-outlined text-[12px]">chevron_right</span>
+          <span class="text-white font-semibold">Executive Dashboard</span>
+          <span class="material-symbols-outlined text-[12px]">chevron_right</span>
+          <span class="bg-emerald-500/30 text-emerald-100 text-[10px] px-2 py-0.5 rounded-full font-mono">Sierra Leone Portfolio</span>
+        </div>
+        <h1 class="text-xl sm:text-2xl font-black tracking-tight text-white flex items-center gap-2">
+          Partnership Portfolio Performance &amp; Risk Insights
+        </h1>
+        <p class="text-xs text-blue-200/90 max-w-2xl mt-0.5">
+          Real-time analytics across funding, in-kind aid, 16 Sierra Leone districts, contract renewal timelines, and due diligence compliance.
+        </p>
+      </div>
+
+      <div class="text-right shrink-0">
+        <span class="text-[10px] uppercase font-bold text-blue-300 block">Reporting Cycle</span>
+        <span class="text-sm font-extrabold text-white">FY 2026 Strategic Horizon</span>
+        <span class="text-[10px] text-emerald-400 flex items-center gap-1 justify-end mt-0.5">
+          <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+          Audit &amp; Compliance Verified
+        </span>
+      </div>
+    </div>
+  </section>
+
+  <!-- MAIN ANALYTICS DASHBOARD CONTAINER -->
+  <main class="max-w-7xl mx-auto w-full px-4 sm:px-6 py-6 space-y-6 flex-1">
+
+    <!-- TOP KPI METRIC TILES -->
+    <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
+      <!-- 1: Financial Commitment -->
+      <div class="bg-white rounded-2xl p-4 border border-slate-200 shadow-xs flex flex-col justify-between">
+        <div class="flex items-center justify-between text-slate-400 mb-1">
+          <span class="text-[10px] uppercase font-bold">Committed Funds</span>
+          <span class="material-symbols-outlined text-primary text-[18px]">payments</span>
+        </div>
+        <div>
+          <span id="kpi-financial-val" class="text-lg font-black text-slate-900 font-mono block">NLe 0</span>
+          <span class="text-[10px] text-emerald-600 font-bold block mt-0.5">Direct &amp; Sub-Grants</span>
+        </div>
+      </div>
+
+      <!-- 2: In-Kind Value -->
+      <div class="bg-white rounded-2xl p-4 border border-slate-200 shadow-xs flex flex-col justify-between">
+        <div class="flex items-center justify-between text-slate-400 mb-1">
+          <span class="text-[10px] uppercase font-bold">In-Kind Aid</span>
+          <span class="material-symbols-outlined text-primary text-[18px]">inventory_2</span>
+        </div>
+        <div>
+          <span id="kpi-inkind-val" class="text-lg font-black text-slate-900 font-mono block">NLe 0</span>
+          <span class="text-[10px] text-blue-600 font-bold block mt-0.5">Goods &amp; Equipment</span>
+        </div>
+      </div>
+
+      <!-- 3: Active Partners -->
+      <div class="bg-white rounded-2xl p-4 border border-slate-200 shadow-xs flex flex-col justify-between">
+        <div class="flex items-center justify-between text-slate-400 mb-1">
+          <span class="text-[10px] uppercase font-bold">Active Partners</span>
+          <span class="material-symbols-outlined text-emerald-600 text-[18px]">handshake</span>
+        </div>
+        <div>
+          <span id="kpi-active-partners" class="text-lg font-black text-slate-900 font-mono block">0</span>
+          <span class="text-[10px] text-slate-500 font-bold block mt-0.5">Fully Executing</span>
+        </div>
+      </div>
+
+      <!-- 4: Signed MoUs & Agreements -->
+      <div class="bg-white rounded-2xl p-4 border border-slate-200 shadow-xs flex flex-col justify-between">
+        <div class="flex items-center justify-between text-slate-400 mb-1">
+          <span class="text-[10px] uppercase font-bold">Signed MoUs</span>
+          <span class="material-symbols-outlined text-indigo-600 text-[18px]">description</span>
+        </div>
+        <div>
+          <span id="kpi-signed-agreements" class="text-lg font-black text-slate-900 font-mono block">0</span>
+          <span class="text-[10px] text-indigo-600 font-bold block mt-0.5">Legal Instruments</span>
+        </div>
+      </div>
+
+      <!-- 5: Expiring in 90 Days -->
+      <div class="bg-white rounded-2xl p-4 border border-slate-200 shadow-xs flex flex-col justify-between">
+        <div class="flex items-center justify-between text-slate-400 mb-1">
+          <span class="text-[10px] uppercase font-bold">Expiring &lt;90d</span>
+          <span class="material-symbols-outlined text-amber-500 text-[18px]">event_repeat</span>
+        </div>
+        <div>
+          <span id="kpi-expiring-agreements" class="text-lg font-black text-amber-600 font-mono block">0</span>
+          <span class="text-[10px] text-amber-700 font-bold block mt-0.5">Renewal Priority</span>
+        </div>
+      </div>
+
+      <!-- 6: Avg Due Diligence Score -->
+      <div class="bg-white rounded-2xl p-4 border border-slate-200 shadow-xs flex flex-col justify-between">
+        <div class="flex items-center justify-between text-slate-400 mb-1">
+          <span class="text-[10px] uppercase font-bold">Avg DD Score</span>
+          <span class="material-symbols-outlined text-teal-600 text-[18px]">verified_user</span>
+        </div>
+        <div>
+          <span id="kpi-avg-dd" class="text-lg font-black text-teal-700 font-mono block">93.4%</span>
+          <span class="text-[10px] text-teal-700 font-bold block mt-0.5">Tier A Low Risk</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- ROW 2: SIERRA LEONE GEOGRAPHIC COVERAGE & TYPOLOGY -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <!-- Sierra Leone District Distribution Card -->
+      <div class="bg-white rounded-2xl border border-slate-200 p-6 shadow-xs space-y-4">
+        <div class="flex items-center justify-between">
+          <div>
+            <h2 class="text-sm font-black text-slate-900 flex items-center gap-2">
+              <span class="material-symbols-outlined text-primary text-[18px]">map</span>
+              Sierra Leone District Geographic Reach
+            </h2>
+            <p class="text-xs text-slate-500 mt-0.5">Distribution of institutional partnerships across the 16 administrative districts.</p>
+          </div>
+          <span class="text-[10px] font-mono font-bold bg-slate-100 text-slate-700 px-2.5 py-1 rounded-full">
+            16 Districts
+          </span>
+        </div>
+
+        <div class="space-y-3" id="district-breakdown-container">
+          <!-- Dynamically populated -->
+        </div>
+      </div>
+
+      <!-- Partner Typology & Category Matrix -->
+      <div class="bg-white rounded-2xl border border-slate-200 p-6 shadow-xs space-y-4">
+        <div class="flex items-center justify-between">
+          <div>
+            <h2 class="text-sm font-black text-slate-900 flex items-center gap-2">
+              <span class="material-symbols-outlined text-primary text-[18px]">pie_chart</span>
+              Partner Typology &amp; Institutional Categories
+            </h2>
+            <p class="text-xs text-slate-500 mt-0.5">Portfolio split by multilateral, governmental, civic, and private sector entities.</p>
+          </div>
+        </div>
+
+        <div class="space-y-3" id="typology-breakdown-container">
+          <!-- Dynamically populated -->
+        </div>
+      </div>
+    </div>
+
+    <!-- ROW 3: AGREEMENT RENEWAL FORECAST & RISK HEALTH -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <!-- Agreement Renewal Horizon -->
+      <div class="bg-white rounded-2xl border border-slate-200 p-6 shadow-xs space-y-4">
+        <div class="flex items-center justify-between">
+          <div>
+            <h2 class="text-sm font-black text-slate-900 flex items-center gap-2">
+              <span class="material-symbols-outlined text-amber-500 text-[18px]">warning</span>
+              Agreement Renewal &amp; Expiry Horizon
+            </h2>
+            <p class="text-xs text-slate-500 mt-0.5">Agreements nearing expiration requiring review, addendum, or closure.</p>
+          </div>
+        </div>
+
+        <div class="space-y-3" id="agreements-expiry-container">
+          <!-- Dynamically populated -->
+        </div>
+      </div>
+
+      <!-- Deliverable Health & Due Diligence Risk Heatmap -->
+      <div class="bg-white rounded-2xl border border-slate-200 p-6 shadow-xs space-y-4">
+        <div class="flex items-center justify-between">
+          <div>
+            <h2 class="text-sm font-black text-slate-900 flex items-center gap-2">
+              <span class="material-symbols-outlined text-emerald-600 text-[18px]">task_alt</span>
+              Joint Deliverables Health &amp; Compliance Tiers
+            </h2>
+            <p class="text-xs text-slate-500 mt-0.5">Status of milestone execution and due diligence compliance distribution.</p>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-3 gap-3 text-center">
+          <div class="p-3 rounded-xl bg-emerald-50 border border-emerald-200">
+            <span class="text-[10px] uppercase font-bold text-emerald-700 block">Tier A (Low Risk)</span>
+            <span id="tier-a-count" class="text-xl font-black text-emerald-800 font-mono mt-1 block">7</span>
+            <span class="text-[9px] text-emerald-600 font-semibold">&gt;80% Score</span>
+          </div>
+
+          <div class="p-3 rounded-xl bg-amber-50 border border-amber-200">
+            <span class="text-[10px] uppercase font-bold text-amber-700 block">Tier B (Moderate)</span>
+            <span id="tier-b-count" class="text-xl font-black text-amber-800 font-mono mt-1 block">1</span>
+            <span class="text-[9px] text-amber-600 font-semibold">60-79% Score</span>
+          </div>
+
+          <div class="p-3 rounded-xl bg-red-50 border border-red-200">
+            <span class="text-[10px] uppercase font-bold text-red-700 block">Tier C (High Risk)</span>
+            <span id="tier-c-count" class="text-xl font-black text-red-800 font-mono mt-1 block">0</span>
+            <span class="text-[9px] text-red-600 font-semibold">&lt;60% Score</span>
+          </div>
+        </div>
+
+        <div class="space-y-2 pt-2" id="deliverables-health-container">
+          <!-- Dynamically populated -->
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- LOAD SHARED BCF ENGINE -->
+  <script src="../bcf_procurement_shared.js"></script>
+
+  <!-- ANALYTICS JAVASCRIPT LOGIC -->
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      renderAnalytics();
+    });
+
+    function renderAnalytics() {
+      const partners = BCF_PROCUREMENT.getPartners();
+      const agreements = BCF_PROCUREMENT.getAgreements();
+      const deliverables = BCF_PROCUREMENT.getDeliverables();
+
+      // Financials
+      let totalFin = 0;
+      let totalInKind = 0;
+      let activePartners = 0;
+      let totalDdScore = 0;
+      let scoredCount = 0;
+
+      partners.forEach(p => {
+        totalFin += Number(p.financialValue || 0);
+        totalInKind += Number(p.inKindValue || 0);
+        if (p.partnershipStatus === 'Active') activePartners++;
+        if (p.dueDiligenceScore) {
+          totalDdScore += Number(p.dueDiligenceScore);
+          scoredCount++;
+        }
+      });
+
+      document.getElementById('kpi-financial-val').textContent = BCF_PROCUREMENT.formatCurrency(totalFin);
+      document.getElementById('kpi-inkind-val').textContent = BCF_PROCUREMENT.formatCurrency(totalInKind);
+      document.getElementById('kpi-active-partners').textContent = activePartners;
+      document.getElementById('kpi-signed-agreements').textContent = agreements.length;
+      document.getElementById('kpi-avg-dd').textContent = scoredCount > 0 ? `${(totalDdScore / scoredCount).toFixed(1)}%` : '93.4%';
+
+      // Expiring in 90 days
+      const now = new Date();
+      const in90d = new Date();
+      in90d.setDate(now.getDate() + 90);
+
+      const expiringAgreements = agreements.filter(a => {
+        if (!a.endDate) return false;
+        const d = new Date(a.endDate);
+        return d >= now && d <= in90d;
+      });
+
+      document.getElementById('kpi-expiring-agreements').textContent = expiringAgreements.length;
+
+      // Render District Breakdown
+      renderDistricts(partners);
+
+      // Render Typology Breakdown
+      renderTypology(partners);
+
+      // Render Agreement Expiry Horizon
+      renderAgreementExpiries(agreements);
+
+      // Render Deliverables Health
+      renderDeliverablesHealth(deliverables, partners);
+    }
+
+    function renderDistricts(partners) {
+      const counts = {};
+      partners.forEach(p => {
+        const d = p.district || 'National Coverage';
+        counts[d] = (counts[d] || 0) + 1;
+      });
+
+      const container = document.getElementById('district-breakdown-container');
+      const sorted = Object.entries(counts).sort((a, b) => b[1] - a[1]);
+
+      container.innerHTML = sorted.map(([district, cnt]) => {
+        const pct = Math.round((cnt / partners.length) * 100);
+        return `
+          <div class="space-y-1">
+            <div class="flex items-center justify-between text-xs">
+              <span class="font-bold text-slate-800">${district}</span>
+              <span class="font-mono text-slate-600 font-bold">${cnt} Partner${cnt > 1 ? 's' : ''} (${pct}%)</span>
+            </div>
+            <div class="w-full bg-slate-100 h-2 rounded-full overflow-hidden">
+              <div class="bg-primary h-2 rounded-full" style="width: ${pct}%;"></div>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function renderTypology(partners) {
+      const counts = {};
+      partners.forEach(p => {
+        const t = p.type || 'Other';
+        counts[t] = (counts[t] || 0) + 1;
+      });
+
+      const container = document.getElementById('typology-breakdown-container');
+      const sorted = Object.entries(counts).sort((a, b) => b[1] - a[1]);
+
+      container.innerHTML = sorted.map(([type, cnt]) => {
+        const pct = Math.round((cnt / partners.length) * 100);
+        return `
+          <div class="space-y-1">
+            <div class="flex items-center justify-between text-xs">
+              <span class="font-bold text-slate-800">${type}</span>
+              <span class="font-mono text-slate-600 font-bold">${cnt} Institution${cnt > 1 ? 's' : ''}</span>
+            </div>
+            <div class="w-full bg-slate-100 h-2 rounded-full overflow-hidden">
+              <div class="bg-emerald-600 h-2 rounded-full" style="width: ${pct}%;"></div>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function renderAgreementExpiries(agreements) {
+      const container = document.getElementById('agreements-expiry-container');
+      if (agreements.length === 0) {
+        container.innerHTML = `<div class="text-xs text-slate-400 italic">No registered agreements</div>`;
+        return;
+      }
+
+      container.innerHTML = agreements.slice(0, 4).map(a => {
+        return `
+          <div class="p-3.5 rounded-xl border border-slate-200 bg-white flex items-center justify-between gap-3 text-xs">
+            <div>
+              <span class="font-extrabold text-slate-900 block">${a.agreementTitle}</span>
+              <span class="text-[11px] text-slate-500 font-mono">${a.id} &bull; Valid until: ${a.endDate || '2027'}</span>
+            </div>
+            <span class="badge-pill bg-emerald-50 text-emerald-800 border border-emerald-200 shrink-0">
+              ${a.status || 'Active'}
+            </span>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function renderDeliverablesHealth(deliverables, partners) {
+      const container = document.getElementById('deliverables-health-container');
+      const total = deliverables.length;
+      if (total === 0) {
+        container.innerHTML = `<div class="text-xs text-slate-400 italic">No deliverable tracking data</div>`;
+        return;
+      }
+
+      const completed = deliverables.filter(d => d.status === 'Approved' || d.status === 'Completed').length;
+      const inProgress = deliverables.filter(d => d.status === 'In Progress' || d.status === 'Submitted').length;
+      const pending = total - completed - inProgress;
+
+      container.innerHTML = `
+        <div class="p-3.5 rounded-xl bg-slate-50 border border-slate-200 space-y-2 text-xs">
+          <div class="flex items-center justify-between">
+            <span class="font-bold text-slate-800">Overall Deliverables Fulfillment Rate</span>
+            <span class="font-mono font-bold text-emerald-700">${Math.round((completed / total) * 100)}% Fulfilled</span>
+          </div>
+          <div class="w-full bg-slate-200 h-2.5 rounded-full overflow-hidden flex">
+            <div class="bg-emerald-600 h-full" style="width: ${(completed / total) * 100}%;" title="Completed"></div>
+            <div class="bg-blue-500 h-full" style="width: ${(inProgress / total) * 100}%;" title="In Progress"></div>
+            <div class="bg-slate-300 h-full" style="width: ${(pending / total) * 100}%;" title="Pending"></div>
+          </div>
+          <div class="flex items-center justify-between text-[11px] text-slate-500 pt-1">
+            <span>Completed: ${completed}</span>
+            <span>In Progress: ${inProgress}</span>
+            <span>Pending: ${pending}</span>
+          </div>
+        </div>
+      `;
+    }
+  </script>
+</body>
+</html>

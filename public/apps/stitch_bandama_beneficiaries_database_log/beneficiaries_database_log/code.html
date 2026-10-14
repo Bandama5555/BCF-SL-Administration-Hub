@@ -1,0 +1,3324 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" name="viewport"/>
+  <title>BCF-SL Beneficiaries Database &amp; Programme Allocation Tracker</title>
+  
+  <!-- Fonts & Icons -->
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin=""/>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
+
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              50: "#f0fdf4",
+              100: "#dcfce7",
+              500: "#22c55e",
+              700: "#15803d",
+              800: "#166534",
+              900: "#004c22", // BCF-SL Forest Green
+              950: "#003314",
+            },
+            purpleKey: {
+              50: "#faf5ff",
+              100: "#f3e8ff",
+              200: "#e9d5ff",
+              600: "#9333ea",
+              700: "#7e22ce",
+              800: "#6b21a8",
+            },
+            blueKey: {
+              50: "#eff6ff",
+              100: "#dbeafe",
+              200: "#bfdbfe",
+              600: "#2563eb",
+              700: "#1d4ed8",
+            },
+            surface: "#f8fafc",
+            "on-surface": "#0f172a"
+          },
+          fontFamily: {
+            sans: ["'Plus Jakarta Sans'", "sans-serif"],
+            mono: ["ui-monospace", "SFMono-Regular", "Menlo", "Monaco", "Consolas", "monospace"],
+          }
+        }
+      }
+    };
+  </script>
+
+  <style>
+    @layer base {
+      html, body {
+        width: 100%;
+        margin: 0;
+        padding: 0;
+        background-color: #f8fafc;
+        color: #0f172a;
+        font-family: 'Plus Jakarta Sans', sans-serif;
+      }
+      .pb-safe { padding-bottom: env(safe-area-inset-bottom, 16px); }
+      .pt-safe { padding-top: env(safe-area-inset-top, 16px); }
+    }
+
+    /* Custom Scrollbars */
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #f1f5f9;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #cbd5e1;
+      border-radius: 4px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #94a3b8;
+    }
+
+    /* Print Formatting */
+    @media print {
+      body { background: white !important; color: black !important; }
+      header, nav, main, section, #topActions, .no-print { display: none !important; }
+      #dossierModal {
+        position: static !important;
+        display: block !important;
+        background: white !important;
+        padding: 0 !important;
+        margin: 0 !important;
+        width: 100% !important;
+      }
+      .print-page {
+        box-shadow: none !important;
+        border: 1px solid #cbd5e1 !important;
+        margin: 0 !important;
+        width: 100% !important;
+        max-width: 100% !important;
+      }
+    }
+
+    .badge-purple-req {
+      background-color: #f3e8ff;
+      color: #7e22ce;
+      border: 1px solid #d8b4fe;
+    }
+    .badge-blue-opt {
+      background-color: #eff6ff;
+      color: #1d4ed8;
+      border: 1px solid #bfdbfe;
+    }
+    .badge-example-row {
+      background-color: #e0f2fe;
+      color: #0369a1;
+      border: 1px solid #7dd3fc;
+      font-style: italic;
+    }
+  </style>
+</head>
+
+<body class="bg-surface text-on-surface min-h-screen flex flex-col antialiased">
+
+  <!-- TOP HEADER -->
+  <header class="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-slate-200 shadow-2xs">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 py-2.5 flex items-center justify-between gap-4">
+      
+      <!-- Brand & Organization Info -->
+      <div class="flex items-center gap-3 min-w-0">
+        <img alt="Bandama Charity Foundation Logo" 
+             class="h-10 sm:h-11 w-auto object-contain shrink-0 rounded-md shadow-2xs" 
+             src="/bcf_official_logo.png" 
+             onerror="this.onerror=null; this.src='bcf_official_logo.png';"/>
+        <div class="flex flex-col min-w-0">
+          <div class="flex items-center gap-2">
+            <span class="text-[11px] font-black text-brand-900 tracking-wider uppercase truncate">
+              Bandama Charity Foundation – Sierra Leone (BCF-SL)
+            </span>
+            <span class="hidden md:inline-flex px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-900 text-[10px] font-bold border border-emerald-300">
+              Field Database
+            </span>
+          </div>
+          <h1 class="text-sm sm:text-base font-extrabold text-slate-900 tracking-tight truncate">
+            Beneficiaries Database &amp; Programme Allocation Tracker
+          </h1>
+        </div>
+      </div>
+
+      <!-- Quick Action CTAs -->
+      <div class="flex items-center gap-2 shrink-0" id="topActions">
+        <button type="button" onclick="openEnrollModal()" class="h-9 px-3.5 rounded-lg bg-brand-900 hover:bg-brand-800 text-white text-xs font-bold inline-flex items-center gap-1.5 transition shadow-sm active:scale-95">
+          <span class="material-symbols-outlined text-[17px]">person_add</span>
+          <span class="hidden sm:inline">Enroll Beneficiary</span>
+        </button>
+        <button type="button" onclick="openAllocationModal()" class="h-9 px-3 rounded-lg bg-emerald-50 hover:bg-emerald-100 border border-emerald-300 text-brand-900 text-xs font-bold inline-flex items-center gap-1.5 transition shadow-2xs">
+          <span class="material-symbols-outlined text-[17px] text-brand-900">add_box</span>
+          <span class="hidden sm:inline">Log Allocation</span>
+        </button>
+        <button type="button" onclick="exportDataCSV()" class="h-9 px-2.5 sm:px-3 rounded-lg border border-slate-300 bg-white hover:bg-slate-50 text-slate-700 text-xs font-bold inline-flex items-center gap-1 transition shadow-2xs" title="Export to CSV">
+          <span class="material-symbols-outlined text-[17px] text-slate-600">file_download</span>
+          <span class="hidden md:inline">Export CSV</span>
+        </button>
+        <button type="button" onclick="resetToSampleData()" class="h-9 px-2 rounded-lg border border-slate-200 text-slate-500 hover:text-rose-600 hover:bg-rose-50 text-xs font-semibold inline-flex items-center" title="Reset to standard BCF-SL template">
+          <span class="material-symbols-outlined text-[17px]">restart_alt</span>
+        </button>
+      </div>
+
+    </div>
+
+    <!-- WORKBOOK SHEETS TAB BAR -->
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 border-t border-slate-100 flex items-center justify-between overflow-x-auto no-scrollbar gap-2 py-1.5 bg-slate-50/70">
+      <div class="flex items-center gap-1.5 shrink-0">
+        <button type="button" id="tabBtnSummary" onclick="switchSheet('summary')" 
+                class="px-3.5 py-1.5 rounded-md text-xs font-bold transition flex items-center gap-1.5 bg-brand-900 text-white shadow-xs">
+          <span class="material-symbols-outlined text-[16px]">table_chart</span>
+          <span>Beneficiaries Summary Log</span>
+          <span id="badgeCountTotal" class="ml-1 px-1.5 py-0.2 bg-white/20 rounded-full text-[10px]">6</span>
+        </button>
+        
+        <button type="button" id="tabBtnAllocations" onclick="switchSheet('allocations')" 
+                class="px-3.5 py-1.5 rounded-md text-xs font-bold transition flex items-center gap-1.5 text-slate-600 hover:text-slate-900 hover:bg-white">
+          <span class="material-symbols-outlined text-[16px]">assignment_turned_in</span>
+          <span>Program Allocations</span>
+          <span id="badgeCountAllocations" class="ml-1 px-1.5 py-0.2 bg-slate-200 text-slate-700 rounded-full text-[10px]">6</span>
+        </button>
+
+        <button type="button" id="tabBtnRegistration" onclick="switchSheet('registration')" 
+                class="px-3.5 py-1.5 rounded-md text-xs font-bold transition flex items-center gap-1.5 text-slate-600 hover:text-slate-900 hover:bg-white">
+          <span class="material-symbols-outlined text-[16px]">edit_document</span>
+          <span>Registration Form</span>
+        </button>
+
+        <button type="button" id="tabBtnLists" onclick="switchSheet('lists')" 
+                class="px-3.5 py-1.5 rounded-md text-xs font-bold transition flex items-center gap-1.5 text-slate-600 hover:text-slate-900 hover:bg-white">
+          <span class="material-symbols-outlined text-[16px]">list_alt</span>
+          <span>Lists &amp; Codebook</span>
+        </button>
+      </div>
+
+      <!-- Compliance indicator -->
+      <div class="hidden lg:flex items-center gap-1.5 text-[11px] text-slate-500 font-medium shrink-0">
+        <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+        <span>Data Protection &amp; Safeguarding Compliant</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- WORKBOOK INSTRUCTION & COLOUR KEY BANNER -->
+  <section class="bg-gradient-to-r from-emerald-50/80 via-white to-purple-50/70 border-b border-slate-200/80 px-4 sm:px-6 py-2.5">
+    <div class="max-w-7xl mx-auto flex flex-col md:flex-row md:items-center justify-between gap-3 text-xs">
+      
+      <!-- Colour Key Legend -->
+      <div class="flex flex-wrap items-center gap-2">
+        <span class="font-extrabold text-slate-800 uppercase tracking-wider text-[11px]">Colour Key:</span>
+        <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-bold badge-purple-req">
+          <span class="w-1.5 h-1.5 rounded-full bg-purpleKey-700"></span>
+          Purple = Required field (*)
+        </span>
+        <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-bold badge-blue-opt">
+          <span class="w-1.5 h-1.5 rounded-full bg-blueKey-600"></span>
+          Blue = Optional field
+        </span>
+        <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-bold badge-example-row">
+          <span class="w-1.5 h-1.5 rounded-full bg-sky-500"></span>
+          Blue / Italic = Worked EXAMPLE row (not a real person)
+        </span>
+      </div>
+
+      <!-- Photo File Reference Instruction Note -->
+      <div class="flex items-center gap-2 text-slate-600 bg-white/80 px-2.5 py-1 rounded-md border border-slate-200/70 shadow-2xs">
+        <span class="material-symbols-outlined text-[16px] text-brand-900 shrink-0">photo_library</span>
+        <span class="text-[11px] leading-tight">
+          <strong>Manual Photo Storage:</strong> Save photo named exactly with Beneficiary ID (e.g. <code class="font-mono text-brand-900 bg-emerald-50 px-1 py-0.5 rounded">BCF-0001.jpg</code>) in shared folder.
+        </span>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- MAIN BODY CONTAINER -->
+  <main class="max-w-7xl w-full mx-auto px-4 sm:px-6 py-5 flex-1 flex flex-col gap-5">
+
+    <!-- AUDIT YEAR & PERFORMANCE EVALUATION SYNC STRIP -->
+    <div class="bg-gradient-to-r from-emerald-50 via-white to-purple-50 p-3 sm:p-3.5 rounded-xl border border-emerald-200 shadow-2xs flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+      <div class="flex items-center gap-2.5">
+        <span class="material-symbols-outlined text-brand-900 text-[22px]">calendar_month</span>
+        <div>
+          <span class="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Annual Audit &amp; Performance Evaluation Link</span>
+          <div class="text-xs sm:text-sm font-extrabold text-slate-900 flex items-center gap-2">
+            <span>Evaluation Year:</span>
+            <span id="activeAuditYearBadge" class="text-brand-900 font-mono font-bold bg-emerald-100/90 px-2 py-0.5 rounded border border-emerald-300">FY 2024 (Annual Audit &amp; Impact)</span>
+          </div>
+        </div>
+      </div>
+      <div class="flex items-center gap-2">
+        <label for="auditYearSelect" class="text-xs font-bold text-slate-700">Audit Year:</label>
+        <select id="auditYearSelect" onchange="handleAuditYearChange(this.value)" class="bg-white border border-slate-300 rounded-lg px-2.5 py-1 text-xs font-bold text-slate-800 focus:ring-2 focus:ring-brand-900">
+          <option value="2024">FY 2024 (8 Beneficiaries)</option>
+          <option value="2025">FY 2025 (8 Beneficiaries)</option>
+          <option value="2023">FY 2023 (8 Beneficiaries)</option>
+        </select>
+        <span class="text-[11px] text-emerald-800 font-semibold font-mono hidden md:inline">&bull; Auto-synced with Performance Evaluation</span>
+      </div>
+    </div>
+
+    <!-- KPI STRIP -->
+    <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4">
+      <div class="bg-white rounded-xl p-3.5 border border-emerald-300 shadow-2xs bg-gradient-to-br from-white to-emerald-50/40 flex flex-col justify-between">
+        <div class="flex items-center justify-between text-slate-500 mb-1">
+          <span class="text-xs font-bold uppercase tracking-wider text-emerald-950">Total Beneficiaries</span>
+          <span class="material-symbols-outlined text-[18px] text-brand-900">groups</span>
+        </div>
+        <div>
+          <div class="flex items-baseline gap-2">
+            <span id="kpiTotalBeneficiaries" class="text-2xl font-black text-slate-900 font-mono">8</span>
+            <span id="kpiTotalBeneficiariesSub" class="text-[10px] font-bold text-emerald-800 bg-emerald-100 px-1.5 py-0.5 rounded">FY 2024 Verified</span>
+          </div>
+          <div id="kpiTotalBeneficiariesRoster" class="text-[10px] text-slate-500 mt-1 font-mono">8 Beneficiaries Enrolled &bull; Equal to Performance Evaluation</div>
+        </div>
+      </div>
+
+      <div class="bg-white rounded-xl p-3.5 border border-slate-200 shadow-2xs flex flex-col justify-between">
+        <div class="flex items-center justify-between text-slate-500 mb-1">
+          <span class="text-xs font-bold uppercase tracking-wider">Allocations Dispatched</span>
+          <span class="material-symbols-outlined text-[18px] text-blue-600">inventory_2</span>
+        </div>
+        <div class="flex items-baseline gap-2">
+          <span id="kpiTotalAllocations" class="text-2xl font-black text-slate-900">6</span>
+          <span class="text-[11px] font-semibold text-blue-700 bg-blue-50 px-1.5 py-0.5 rounded">Disbursed</span>
+        </div>
+      </div>
+
+      <div class="bg-white rounded-xl p-3.5 border border-slate-200 shadow-2xs flex flex-col justify-between">
+        <div class="flex items-center justify-between text-slate-500 mb-1">
+          <span class="text-xs font-bold uppercase tracking-wider">Satisfaction Rate</span>
+          <span class="material-symbols-outlined text-[18px] text-emerald-600">sentiment_very_satisfied</span>
+        </div>
+        <div class="flex items-baseline gap-2">
+          <span id="kpiSatisfactionRate" class="text-2xl font-black text-emerald-700">83.3%</span>
+          <span class="text-[11px] font-semibold text-slate-500">Satisfied</span>
+        </div>
+      </div>
+
+      <div class="bg-white rounded-xl p-3.5 border border-slate-200 shadow-2xs flex flex-col justify-between">
+        <div class="flex items-center justify-between text-slate-500 mb-1">
+          <span class="text-xs font-bold uppercase tracking-wider">Districts Active</span>
+          <span class="material-symbols-outlined text-[18px] text-purple-600">map</span>
+        </div>
+        <div class="flex items-baseline gap-2">
+          <span id="kpiDistrictsCount" class="text-2xl font-black text-purple-700">5 / 16</span>
+          <span class="text-[11px] font-semibold text-purple-700 bg-purple-50 px-1.5 py-0.5 rounded">SL Coverage</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- ========================================== -->
+    <!-- SHEET 1: BENEFICIARY SUMMARY LOG           -->
+    <!-- ========================================== -->
+    <section id="sheetSummary" class="flex flex-col gap-4">
+      
+      <!-- YEARLY ARCHIVE FOLDERS BAR -->
+      <div class="bg-white rounded-xl p-3 border border-slate-200 shadow-2xs flex flex-col md:flex-row md:items-center justify-between gap-3">
+        <div class="flex items-center gap-2 flex-wrap">
+          <span class="material-symbols-outlined text-amber-600 text-[20px]">folder_special</span>
+          <span class="text-xs font-bold text-slate-800">Yearly Archive Folders:</span>
+          <div class="flex flex-wrap items-center gap-1.5" id="yearlyFolderPills">
+            <button type="button" onclick="selectYearFolder('ALL')" id="folderPillALL" class="px-2.5 py-1.5 rounded-lg text-xs font-bold transition flex items-center gap-1.5 bg-brand-900 text-white shadow-2xs">
+              <span class="material-symbols-outlined text-[15px]">folder_open</span>
+              <span>All Years</span>
+              <span id="folderCountALL" class="ml-1 px-1.5 py-0.2 bg-white/20 rounded-full text-[10px]">8</span>
+            </button>
+            <button type="button" onclick="selectYearFolder('2026')" id="folderPill2026" class="px-2.5 py-1.5 rounded-lg text-xs font-bold transition flex items-center gap-1.5 bg-slate-100 text-slate-700 hover:bg-slate-200 border border-slate-200/80">
+              <span class="material-symbols-outlined text-[15px]">folder</span>
+              <span>FY 2026 Folder</span>
+              <span id="folderCount2026" class="ml-1 px-1.5 py-0.2 bg-slate-200 text-slate-700 rounded-full text-[10px]">0</span>
+            </button>
+            <button type="button" onclick="selectYearFolder('2025')" id="folderPill2025" class="px-2.5 py-1.5 rounded-lg text-xs font-bold transition flex items-center gap-1.5 bg-slate-100 text-slate-700 hover:bg-slate-200 border border-slate-200/80">
+              <span class="material-symbols-outlined text-[15px]">folder</span>
+              <span>FY 2025 Folder</span>
+              <span id="folderCount2025" class="ml-1 px-1.5 py-0.2 bg-slate-200 text-slate-700 rounded-full text-[10px]">0</span>
+            </button>
+            <button type="button" onclick="selectYearFolder('2024')" id="folderPill2024" class="px-2.5 py-1.5 rounded-lg text-xs font-bold transition flex items-center gap-1.5 bg-slate-100 text-slate-700 hover:bg-slate-200 border border-slate-200/80">
+              <span class="material-symbols-outlined text-[15px]">folder</span>
+              <span>FY 2024 Folder</span>
+              <span id="folderCount2024" class="ml-1 px-1.5 py-0.2 bg-slate-200 text-slate-700 rounded-full text-[10px]">0</span>
+            </button>
+            <button type="button" onclick="selectYearFolder('2023')" id="folderPill2023" class="px-2.5 py-1.5 rounded-lg text-xs font-bold transition flex items-center gap-1.5 bg-slate-100 text-slate-700 hover:bg-slate-200 border border-slate-200/80">
+              <span class="material-symbols-outlined text-[15px]">folder</span>
+              <span>FY 2023 Folder</span>
+              <span id="folderCount2023" class="ml-1 px-1.5 py-0.2 bg-slate-200 text-slate-700 rounded-full text-[10px]">0</span>
+            </button>
+          </div>
+        </div>
+        <div id="activeYearFolderStatus" class="text-[11px] font-semibold text-emerald-800 bg-emerald-50 px-2.5 py-1 rounded-md border border-emerald-200 font-mono shrink-0">
+          Viewing: All Yearly Archive Folders
+        </div>
+      </div>
+
+      <!-- Filter Toolbar -->
+      <div class="bg-white rounded-xl p-3 border border-slate-200 shadow-2xs flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3">
+        <!-- Search bar -->
+        <div class="relative flex-1">
+          <span class="material-symbols-outlined absolute left-3 top-2.5 text-[18px] text-slate-400">search</span>
+          <input type="text" id="summarySearchInput" oninput="renderSummaryTable()"
+                 placeholder="Search beneficiary name, ID, NIN, district, item, or programme..." 
+                 class="w-full pl-9 pr-4 py-2 text-xs rounded-lg border border-slate-200 focus:outline-none focus:ring-2 focus:ring-brand-900/20 focus:border-brand-900 bg-slate-50/50"/>
+        </div>
+
+        <!-- Filter Dropdowns -->
+        <div class="flex flex-wrap items-center gap-2">
+          <!-- Yearly Folder Dropdown -->
+          <select id="filterYear" onchange="handleYearFilterDropdownChange(this.value)" class="px-2.5 py-2 text-xs rounded-lg border border-slate-200 bg-emerald-50 font-bold text-brand-900 focus:outline-none focus:border-brand-900">
+            <option value="ALL">📁 All Yearly Folders</option>
+            <option value="2026">📁 Folder FY 2026</option>
+            <option value="2025">📁 Folder FY 2025</option>
+            <option value="2024">📁 Folder FY 2024</option>
+            <option value="2023">📁 Folder FY 2023</option>
+          </select>
+
+          <!-- District Filter -->
+          <select id="filterDistrict" onchange="renderSummaryTable()" class="px-2.5 py-2 text-xs rounded-lg border border-slate-200 bg-white font-medium text-slate-700 focus:outline-none focus:border-brand-900">
+            <option value="ALL">All Districts (16)</option>
+            <!-- Generated dynamically -->
+          </select>
+
+          <!-- Category Filter -->
+          <select id="filterCategory" onchange="renderSummaryTable()" class="px-2.5 py-2 text-xs rounded-lg border border-slate-200 bg-white font-medium text-slate-700 focus:outline-none focus:border-brand-900">
+            <option value="ALL">All Program Categories</option>
+            <option value="Health">Health</option>
+            <option value="Education">Education</option>
+            <option value="Agriculture">Agriculture</option>
+            <option value="Climate Change">Climate Change</option>
+            <option value="Social Justice">Social Justice</option>
+            <option value="Innovation">Innovation</option>
+            <option value="Addiction Rehabilitation">Addiction Rehabilitation</option>
+            <option value="Empowerment">Empowerment</option>
+          </select>
+
+          <!-- Status Filter -->
+          <select id="filterStatus" onchange="renderSummaryTable()" class="px-2.5 py-2 text-xs rounded-lg border border-slate-200 bg-white font-medium text-slate-700 focus:outline-none focus:border-brand-900">
+            <option value="ALL">All Statuses</option>
+            <option value="Satisfied">Satisfied</option>
+            <option value="Average">Average</option>
+            <option value="Not Satisfied">Not Satisfied</option>
+          </select>
+
+          <button type="button" onclick="clearFilters()" class="px-2.5 py-2 text-xs text-slate-500 hover:text-slate-800 hover:bg-slate-100 rounded-lg transition" title="Clear Filters">
+            <span class="material-symbols-outlined text-[16px]">filter_alt_off</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Master Beneficiary Summary Table -->
+      <div class="bg-white rounded-xl border border-slate-200 shadow-2xs overflow-hidden flex flex-col">
+        <div class="overflow-x-auto">
+          <table class="w-full text-left text-xs border-collapse">
+            <thead>
+              <tr class="bg-slate-100/80 text-slate-700 border-b border-slate-200 font-bold tracking-wider uppercase text-[10px]">
+                <th class="py-3 px-3 w-12 text-center">No.</th>
+                <th class="py-3 px-3">Beneficiary ID</th>
+                <th class="py-3 px-3">Beneficiary Name &amp; Photo</th>
+                <th class="py-3 px-3">District</th>
+                <th class="py-3 px-3">Program Code</th>
+                <th class="py-3 px-3">Program Category</th>
+                <th class="py-3 px-3 min-w-[180px]">Program Title</th>
+                <th class="py-3 px-3 text-center">Alloc. Qty</th>
+                <th class="py-3 px-3 min-w-[160px]">Item/Service Name</th>
+                <th class="py-3 px-3 text-right whitespace-nowrap">Cost (NLe)</th>
+                <th class="py-3 px-3 text-center">Item Qty</th>
+                <th class="py-3 px-3 text-center">Status</th>
+                <th class="py-3 px-3">Date</th>
+                <th class="py-3 px-3 min-w-[140px]">Additional Info</th>
+                <th class="py-3 px-3 text-center">Actions</th>
+              </tr>
+            </thead>
+            <tbody id="summaryTableBody" class="divide-y divide-slate-100 text-slate-800">
+              <!-- Dynamically populated -->
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Table Footer / Count summary -->
+        <div class="px-4 py-3 bg-slate-50 border-t border-slate-200 flex items-center justify-between text-xs text-slate-500">
+          <div id="tableRecordSummary">Showing 6 beneficiaries</div>
+          <div class="flex items-center gap-2">
+            <span class="text-[11px] text-slate-400">Click "View Records" to view &amp; print registration record</span>
+          </div>
+        </div>
+      </div>
+
+    </section>
+
+    <!-- ========================================== -->
+    <!-- SHEET 2: PROGRAM ALLOCATIONS TRACKER       -->
+    <!-- ========================================== -->
+    <section id="sheetAllocations" class="hidden flex flex-col gap-4">
+      
+      <!-- Banner & Description -->
+      <div class="bg-white rounded-xl p-4 border border-slate-200 shadow-2xs flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+        <div>
+          <h2 class="text-sm font-extrabold text-slate-900">Program Allocations Tracker (Sheet 2)</h2>
+          <p class="text-xs text-slate-500 mt-0.5">
+            Log each programme or distribution event this beneficiary receives. A beneficiary can appear multiple times here (once per programme or distribution event).
+          </p>
+        </div>
+        <button type="button" onclick="openAllocationModal()" class="h-9 px-3.5 rounded-lg bg-brand-900 hover:bg-brand-800 text-white text-xs font-bold inline-flex items-center gap-1.5 transition shadow-sm active:scale-95 shrink-0">
+          <span class="material-symbols-outlined text-[17px]">add_circle</span>
+          <span>Log New Allocation Event</span>
+        </button>
+      </div>
+
+      <!-- Allocations Table -->
+      <div class="bg-white rounded-xl border border-slate-200 shadow-2xs overflow-hidden flex flex-col">
+        <div class="overflow-x-auto">
+          <table class="w-full text-left text-xs border-collapse">
+            <thead>
+              <tr class="bg-slate-100/80 text-slate-700 border-b border-slate-200 font-bold tracking-wider uppercase text-[10px]">
+                <th class="py-3 px-3 w-12 text-center">#</th>
+                <th class="py-3 px-3">Beneficiary Ref</th>
+                <th class="py-3 px-3">Program Code</th>
+                <th class="py-3 px-3">Program Category</th>
+                <th class="py-3 px-3 min-w-[200px]">Program Title</th>
+                <th class="py-3 px-3 min-w-[180px]">Item/Service Name</th>
+                <th class="py-3 px-3 text-right whitespace-nowrap">Cost (NLe)</th>
+                <th class="py-3 px-3 text-center">Quantity</th>
+                <th class="py-3 px-3 text-center">Satisfaction</th>
+                <th class="py-3 px-3">Date</th>
+                <th class="py-3 px-3 min-w-[160px]">Remarks / Info</th>
+                <th class="py-3 px-3 text-center">Action</th>
+              </tr>
+            </thead>
+            <tbody id="allocationsTableBody" class="divide-y divide-slate-100 text-slate-800">
+              <!-- Dynamically populated -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+    </section>
+
+    <!-- ========================================== -->
+    <!-- SHEET 3: BENEFICIARY REGISTRATION FORM     -->
+    <!-- ========================================== -->
+    <section id="sheetRegistration" class="hidden flex flex-col gap-4">
+      
+      <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 max-w-4xl mx-auto w-full">
+        
+        <!-- Registration Form Header -->
+        <div class="border-b border-slate-200 pb-5 mb-5">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div class="flex items-center gap-3">
+              <img alt="BCF-SL Logo" class="h-12 w-auto object-contain rounded-md" src="/bcf_official_logo.png" onerror="this.onerror=null; this.src='bcf_official_logo.png';"/>
+              <div>
+                <span class="text-[11px] font-black text-brand-900 uppercase tracking-wider">Bandama Charity Foundation – Sierra Leone (BCF-SL)</span>
+                <h2 class="text-base sm:text-lg font-black text-slate-900">BENEFICIARY REGISTRATION FORM</h2>
+                <p class="text-xs text-slate-500 font-medium">Complete one form per beneficiary. Attach a passport-size photograph (PNG/JPG) in the box provided.</p>
+              </div>
+            </div>
+            <div class="flex items-center gap-2">
+              <button type="button" onclick="printRegistrationForm()" class="h-9 px-3 rounded-lg border border-slate-300 hover:bg-slate-100 text-slate-700 text-xs font-bold inline-flex items-center gap-1.5 transition">
+                <span class="material-symbols-outlined text-[16px]">print</span>
+                <span>Print Form</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Top Meta Row -->
+          <div class="grid grid-cols-1 sm:grid-cols-4 gap-3 mt-4 pt-4 border-t border-slate-100 text-xs">
+            <div class="p-2.5 rounded-lg bg-purpleKey-50 border border-purpleKey-200">
+              <label class="block font-bold text-purpleKey-800 text-[10px] uppercase tracking-wider mb-1">
+                Beneficiary ID * <span class="text-purple-600">(Purple Required)</span>
+              </label>
+              <input type="text" id="regBeneficiaryId" class="w-full bg-white px-2.5 py-1.5 rounded border border-purpleKey-300 font-mono font-bold text-slate-900 focus:outline-none focus:ring-1 focus:ring-purple-600" value="BCF-0006"/>
+            </div>
+
+            <div class="p-2.5 rounded-lg bg-purpleKey-50 border border-purpleKey-200">
+              <label class="block font-bold text-purpleKey-800 text-[10px] uppercase tracking-wider mb-1">
+                Date of Registration *
+              </label>
+              <input type="date" id="regDate" class="w-full bg-white px-2.5 py-1.5 rounded border border-purpleKey-300 font-medium text-slate-900 focus:outline-none"/>
+            </div>
+
+            <div class="p-2.5 rounded-lg bg-purpleKey-50 border border-purpleKey-200">
+              <label class="block font-bold text-purpleKey-800 text-[10px] uppercase tracking-wider mb-1">
+                Registered By (BCF-SL Staff) *
+              </label>
+              <input type="text" id="regStaff" class="w-full bg-white px-2.5 py-1.5 rounded border border-purpleKey-300 font-medium text-slate-900 focus:outline-none" value="Albert J. Bandama"/>
+            </div>
+
+            <div class="p-2.5 rounded-lg bg-slate-50 border border-slate-200">
+              <label class="block font-bold text-slate-600 text-[10px] uppercase tracking-wider mb-1">
+                Signature / Audit Trail
+              </label>
+              <div class="text-[11px] font-mono text-emerald-700 bg-emerald-50 px-2 py-1.5 rounded border border-emerald-200 flex items-center gap-1">
+                <span class="material-symbols-outlined text-[14px]">verified</span>
+                <span>Verified Field Record</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Form Body Form -->
+        <form id="beneficiaryForm" onsubmit="handleFormSubmit(event)" class="flex flex-col gap-6">
+
+          <!-- Section: Beneficiary Profile -->
+          <div>
+            <div class="flex items-center justify-between border-b border-slate-100 pb-2 mb-4">
+              <h3 class="text-sm font-extrabold text-slate-900 flex items-center gap-2">
+                <span class="w-2 h-2 rounded-full bg-brand-900"></span>
+                <span>Beneficiary Profile</span>
+              </h3>
+              <span class="text-[11px] text-purpleKey-700 font-bold bg-purpleKey-50 px-2 py-0.5 rounded-full border border-purpleKey-200">
+                * Required Purple Fields
+              </span>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+              
+              <!-- Full Name -->
+              <div class="md:col-span-2">
+                <label class="block text-xs font-bold text-purpleKey-800 mb-1">
+                  Name *
+                </label>
+                <input type="text" id="regName" required placeholder="Full legal name of beneficiary" 
+                       class="w-full px-3 py-2 text-xs rounded-lg border border-purpleKey-300 bg-white focus:outline-none focus:ring-2 focus:ring-purple-600/30"/>
+              </div>
+
+              <!-- Photo Box / File Reference & Camera Options -->
+              <div class="md:row-span-3 bg-slate-50 border border-dashed border-slate-300 rounded-xl p-3 flex flex-col items-center justify-center text-center">
+                <div id="photoPreviewBox" class="w-24 h-24 rounded-lg bg-slate-200 border border-slate-300 overflow-hidden flex items-center justify-center mb-1.5 shadow-inner relative">
+                  <span class="material-symbols-outlined text-[36px] text-slate-400">person</span>
+                </div>
+                <label class="block text-[11px] font-bold text-purpleKey-800 mb-1">
+                  Image * (Passport Photo)
+                </label>
+                
+                <!-- Choose either Camera or Choose File -->
+                <div class="grid grid-cols-2 gap-1.5 w-full my-1">
+                  <button type="button" onclick="triggerPhotoFileSelect()" class="py-1.5 px-2 bg-emerald-800 hover:bg-emerald-900 text-white rounded-lg text-[10px] font-bold flex items-center justify-center gap-1 shadow-xs transition active:scale-95" title="Upload an image from your computer">
+                    <span class="material-symbols-outlined text-[14px]">file_upload</span>
+                    <span>Choose file</span>
+                  </button>
+                  <button type="button" onclick="openCameraModal()" class="py-1.5 px-2 bg-purple-700 hover:bg-purple-800 text-white rounded-lg text-[10px] font-bold flex items-center justify-center gap-1 shadow-xs transition active:scale-95" title="Take a live passport photo using your camera">
+                    <span class="material-symbols-outlined text-[14px]">photo_camera</span>
+                    <span>Camera</span>
+                  </button>
+                </div>
+
+                <input type="file" id="regPhotoFile" accept="image/*" onchange="previewPhotoUpload(event)" class="hidden"/>
+                <input type="text" id="regPhotoRef" placeholder="Photo Ref (e.g. BCF-0006.jpg)" class="mt-1.5 w-full text-[11px] font-mono px-2 py-1 rounded border border-slate-200 bg-white"/>
+                <button type="button" id="btnRemovePhoto" onclick="clearPhotoPreview()" class="hidden mt-1 text-[10px] text-rose-600 hover:text-rose-800 font-semibold inline-flex items-center gap-0.5 transition">
+                  <span class="material-symbols-outlined text-[13px]">delete</span>
+                  <span>Remove Photo</span>
+                </button>
+              </div>
+
+              <!-- Age, Gender & Marital Status in 3-column subgrid across 2 cols -->
+              <div class="md:col-span-2 grid grid-cols-1 sm:grid-cols-3 gap-3">
+                <!-- Age -->
+                <div>
+                  <label class="block text-xs font-bold text-purpleKey-800 mb-1">
+                    Age *
+                  </label>
+                  <input type="number" id="regAge" min="1" max="120" required placeholder="e.g. 28" 
+                         class="w-full px-3 py-2 text-xs rounded-lg border border-purpleKey-300 bg-white focus:outline-none focus:ring-2 focus:ring-purple-600/30"/>
+                </div>
+
+                <!-- Gender Dropdown -->
+                <div>
+                  <label class="block text-xs font-bold text-purpleKey-800 mb-1">
+                    Gender *
+                  </label>
+                  <select id="regGender" required class="w-full px-3 py-2 text-xs rounded-lg border border-purpleKey-300 bg-white focus:outline-none focus:ring-2 focus:ring-purple-600/30">
+                    <option value="">Select Gender</option>
+                    <option value="Male">Male</option>
+                    <option value="Female">Female</option>
+                    <option value="Prefer Not Say">Prefer Not Say</option>
+                  </select>
+                </div>
+
+                <!-- Marital Status -->
+                <div>
+                  <label class="block text-xs font-bold text-purpleKey-800 mb-1">
+                    Marital Status *
+                  </label>
+                  <select id="regMaritalStatus" required class="w-full px-3 py-2 text-xs rounded-lg border border-purpleKey-300 bg-white focus:outline-none focus:ring-2 focus:ring-purple-600/30">
+                    <option value="">Select Status</option>
+                    <option value="Single">Single</option>
+                    <option value="Married">Married</option>
+                  </select>
+                </div>
+              </div>
+
+              <!-- NIN / ID Card No. / Passport ID -->
+              <div>
+                <label class="block text-xs font-bold text-purpleKey-800 mb-1">
+                  NIN / ID Card No. / Passport ID *
+                </label>
+                <input type="text" id="regNIN" required placeholder="e.g. SL-123456-A" 
+                       class="w-full px-3 py-2 text-xs rounded-lg border border-purpleKey-300 bg-white focus:outline-none focus:ring-2 focus:ring-purple-600/30 font-mono"/>
+              </div>
+
+              <!-- No. of Children -->
+              <div>
+                <label class="block text-xs font-bold text-purpleKey-800 mb-1">
+                  No. of Children *
+                </label>
+                <input type="number" id="regChildren" min="0" max="30" required placeholder="e.g. 3" 
+                       class="w-full px-3 py-2 text-xs rounded-lg border border-purpleKey-300 bg-white focus:outline-none focus:ring-2 focus:ring-purple-600/30"/>
+              </div>
+
+              <!-- Institution (Optional) -->
+              <div>
+                <label class="block text-xs font-bold text-blueKey-700 mb-1">
+                  Institution <span class="text-blue-500 font-normal">(Optional Blue)</span>
+                </label>
+                <input type="text" id="regInstitution" placeholder="e.g. Kakua Community Clinic, Bo High School" 
+                       class="w-full px-3 py-2 text-xs rounded-lg border border-blueKey-200 bg-blue-50/20 focus:outline-none focus:ring-2 focus:ring-blue-600/30"/>
+              </div>
+
+              <!-- Educational Status (Dropdown) -->
+              <div>
+                <label class="block text-xs font-bold text-blueKey-700 mb-1">
+                  Educational Status <span class="text-blue-500 font-normal">(Optional)</span>
+                </label>
+                <select id="regEduStatus" class="w-full px-3 py-2 text-xs rounded-lg border border-blueKey-200 bg-blue-50/20 focus:outline-none focus:ring-2 focus:ring-blue-600/30">
+                  <option value="Not in School">Not in School</option>
+                  <option value="Pre-Primary">Pre-Primary</option>
+                  <option value="Primary">Primary</option>
+                  <option value="Junior Secondary (JSS)">Junior Secondary (JSS)</option>
+                  <option value="Senior Secondary (SSS)">Senior Secondary (SSS)</option>
+                  <option value="Tertiary / University">Tertiary / University</option>
+                  <option value="Vocational / TVET">Vocational / TVET</option>
+                  <option value="Illiterate / No Formal Education">Illiterate / No Formal Education</option>
+                  <option value="Other">Other</option>
+                </select>
+              </div>
+
+              <!-- Disability & If Yes, Specify -->
+              <div>
+                <label class="block text-xs font-bold text-slate-700 mb-1">
+                  Disability (Yes / No)
+                </label>
+                <div class="grid grid-cols-2 gap-2">
+                  <select id="regDisability" onchange="toggleDisabilityDetail()" class="w-full px-3 py-2 text-xs rounded-lg border border-slate-300 bg-white focus:outline-none">
+                    <option value="No">No</option>
+                    <option value="Yes">Yes</option>
+                  </select>
+                  <input type="text" id="regDisabilityDetail" placeholder="If Yes, Specify" disabled 
+                         class="w-full px-3 py-2 text-xs rounded-lg border border-slate-200 bg-slate-100 disabled:opacity-60 focus:outline-none"/>
+                </div>
+              </div>
+
+              <!-- Phone Number -->
+              <div>
+                <label class="block text-xs font-bold text-slate-700 mb-1">
+                  Phone Number
+                </label>
+                <input type="text" id="regPhone" placeholder="e.g. +232 76 123456" 
+                       class="w-full px-3 py-2 text-xs rounded-lg border border-slate-300 bg-white focus:outline-none"/>
+              </div>
+
+              <!-- District * (16 Districts) -->
+              <div>
+                <label class="block text-xs font-bold text-purpleKey-800 mb-1">
+                  District * <span class="text-purple-600">(1 of Sierra Leone's 16)</span>
+                </label>
+                <select id="regDistrict" required class="w-full px-3 py-2 text-xs rounded-lg border border-purpleKey-300 bg-white focus:outline-none focus:ring-2 focus:ring-purple-600/30">
+                  <option value="">Select District</option>
+                  <!-- 16 Districts populated -->
+                </select>
+              </div>
+
+              <!-- Town * -->
+              <div>
+                <label class="block text-xs font-bold text-purpleKey-800 mb-1">
+                  Town *
+                </label>
+                <input type="text" id="regTown" required placeholder="e.g. Bo City, Kenema, Makeni" 
+                       class="w-full px-3 py-2 text-xs rounded-lg border border-purpleKey-300 bg-white focus:outline-none focus:ring-2 focus:ring-purple-600/30"/>
+              </div>
+
+              <!-- Address * -->
+              <div class="md:col-span-3">
+                <label class="block text-xs font-bold text-purpleKey-800 mb-1">
+                  Address *
+                </label>
+                <input type="text" id="regAddress" required placeholder="e.g. 14 Hospital Road, Kakua Chiefdom" 
+                       class="w-full px-3 py-2 text-xs rounded-lg border border-purpleKey-300 bg-white focus:outline-none focus:ring-2 focus:ring-purple-600/30"/>
+              </div>
+
+            </div>
+          </div>
+
+          <!-- Section: Emergency Contact -->
+          <div class="border-t border-slate-100 pt-5">
+            <h3 class="text-sm font-extrabold text-slate-900 flex items-center gap-2 mb-3">
+              <span class="w-2 h-2 rounded-full bg-rose-600"></span>
+              <span>Emergency Contact</span>
+            </h3>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div>
+                <label class="block text-xs font-bold text-slate-700 mb-1">Emergency Person</label>
+                <input type="text" id="regEmergPerson" placeholder="Full name of next of kin / guardian" 
+                       class="w-full px-3 py-2 text-xs rounded-lg border border-slate-300 bg-white focus:outline-none"/>
+              </div>
+
+              <div>
+                <label class="block text-xs font-bold text-slate-700 mb-1">Emergency Person Contact</label>
+                <input type="text" id="regEmergContact" placeholder="Phone number / Mobile" 
+                       class="w-full px-3 py-2 text-xs rounded-lg border border-slate-300 bg-white focus:outline-none"/>
+              </div>
+
+              <div>
+                <label class="block text-xs font-bold text-slate-700 mb-1">Emergency Person Address</label>
+                <input type="text" id="regEmergAddress" placeholder="Physical location / Chiefdom" 
+                       class="w-full px-3 py-2 text-xs rounded-lg border border-slate-300 bg-white focus:outline-none"/>
+              </div>
+            </div>
+          </div>
+
+          <!-- Section: Program Allocations & Aid Distributed Items (Optional Intake) -->
+          <div class="border-t border-slate-100 pt-5 bg-emerald-50/60 p-4 rounded-xl border border-emerald-200">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-3">
+              <div>
+                <h3 class="text-sm font-extrabold text-brand-900 flex items-center gap-2">
+                  <span class="material-symbols-outlined text-[18px]">redeem</span>
+                  <span>Initial Program Allocation &amp; Aid Items (Optional)</span>
+                </h3>
+                <p class="text-xs text-slate-600 mt-0.5">Attach program distributions or aid items directly to this beneficiary. Add multiple rows if many items are distributed.</p>
+              </div>
+              <button type="button" onclick="addRegistrationItemRow()" class="h-8 px-3 rounded-lg bg-emerald-800 hover:bg-emerald-700 text-white text-xs font-bold inline-flex items-center gap-1.5 shadow-2xs transition active:scale-95 shrink-0" title="Add another item row">
+                <span class="material-symbols-outlined text-[16px]">add_circle</span>
+                <span>Add Item</span>
+              </button>
+            </div>
+
+            <!-- Dynamic Items Container -->
+            <div id="regItemsContainer" class="flex flex-col gap-3">
+              <!-- Item rows dynamically injected here -->
+            </div>
+
+            <!-- Bottom Add Item Button -->
+            <button type="button" onclick="addRegistrationItemRow()" class="mt-3 w-full py-2.5 border-2 border-dashed border-emerald-300 hover:border-emerald-600 hover:bg-emerald-100/60 rounded-xl text-emerald-900 text-xs font-bold flex items-center justify-center gap-1.5 transition active:scale-[0.99]">
+              <span class="material-symbols-outlined text-[18px]">add_circle</span>
+              <span>+ Add Another Item / Allocation</span>
+            </button>
+          </div>
+
+          <!-- Buttons -->
+          <div class="flex items-center justify-end gap-3 pt-4 border-t border-slate-200">
+            <button type="button" onclick="resetForm()" class="px-4 py-2 rounded-lg border border-slate-300 text-slate-700 hover:bg-slate-100 text-xs font-bold transition">
+              Reset Form
+            </button>
+            <button type="submit" class="px-5 py-2.5 rounded-lg bg-brand-900 hover:bg-brand-800 text-white text-xs font-bold transition shadow-sm active:scale-95 flex items-center gap-1.5">
+              <span class="material-symbols-outlined text-[17px]">save</span>
+              <span>Save Beneficiary to Database</span>
+            </button>
+          </div>
+
+        </form>
+      </div>
+
+    </section>
+
+    <!-- ========================================== -->
+    <!-- SHEET 4: LISTS & CODEBOOK REFERENCE        -->
+    <!-- ========================================== -->
+    <section id="sheetLists" class="hidden flex flex-col gap-5">
+      
+      <!-- Info notice -->
+      <div class="bg-amber-50 border border-amber-200 rounded-xl p-3.5 flex items-center gap-3 text-amber-900 text-xs">
+        <span class="material-symbols-outlined text-amber-700 text-[22px]">lock</span>
+        <div>
+          <strong class="font-extrabold">Lists Sheet (Source lists used for system dropdowns):</strong>
+          <span>These reference tables establish BCF-SL's standard dropdown taxonomies for districts, educational status, marital status, and statutory programme allocations. Do not delete.</span>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+        
+        <!-- Table 1: Standard Program Codes & Categories -->
+        <div class="bg-white rounded-xl border border-slate-200 shadow-2xs p-4 flex flex-col">
+          <div class="flex items-center justify-between border-b border-slate-100 pb-2 mb-3">
+            <h3 class="text-xs font-extrabold text-slate-900 uppercase tracking-wider flex items-center gap-1.5">
+              <span class="material-symbols-outlined text-brand-900 text-[18px]">category</span>
+              <span>BCF-SL Program Codes &amp; Categories</span>
+            </h3>
+            <span class="text-[10px] font-bold text-brand-900 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">8 Statutory</span>
+          </div>
+
+          <table class="w-full text-left text-xs">
+            <thead>
+              <tr class="text-[10px] text-slate-500 uppercase border-b border-slate-200 font-bold">
+                <th class="py-2 px-2">Code</th>
+                <th class="py-2 px-2">Category</th>
+                <th class="py-2 px-2">Primary Aid Focus</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-slate-100">
+              <tr>
+                <td class="py-2 px-2 font-mono font-bold text-brand-900">BCF-H01</td>
+                <td class="py-2 px-2 font-semibold text-slate-800">Health</td>
+                <td class="py-2 px-2 text-slate-500">Maternal health, clinics, medical outreach</td>
+              </tr>
+              <tr>
+                <td class="py-2 px-2 font-mono font-bold text-brand-900">BCF-E02</td>
+                <td class="py-2 px-2 font-semibold text-slate-800">Education</td>
+                <td class="py-2 px-2 text-slate-500">School uniforms, books, learning stipends</td>
+              </tr>
+              <tr>
+                <td class="py-2 px-2 font-mono font-bold text-brand-900">BCF-A03</td>
+                <td class="py-2 px-2 font-semibold text-slate-800">Agriculture</td>
+                <td class="py-2 px-2 text-slate-500">Seeds, fertilizer, farmer cooperatives</td>
+              </tr>
+              <tr>
+                <td class="py-2 px-2 font-mono font-bold text-brand-900">BCF-CC04</td>
+                <td class="py-2 px-2 font-semibold text-slate-800">Climate Change</td>
+                <td class="py-2 px-2 text-slate-500">Clean water boreholes, solar lights, flood relief</td>
+              </tr>
+              <tr>
+                <td class="py-2 px-2 font-mono font-bold text-brand-900">BCF-SJ05</td>
+                <td class="py-2 px-2 font-semibold text-slate-800">Social Justice</td>
+                <td class="py-2 px-2 text-slate-500">Legal aid, human rights, civic empowerment</td>
+              </tr>
+              <tr>
+                <td class="py-2 px-2 font-mono font-bold text-brand-900">BCF-I06</td>
+                <td class="py-2 px-2 font-semibold text-slate-800">Innovation</td>
+                <td class="py-2 px-2 text-slate-500">Digital hubs, STEM literacy, youth tech labs</td>
+              </tr>
+              <tr>
+                <td class="py-2 px-2 font-mono font-bold text-brand-900">BCF-AR07</td>
+                <td class="py-2 px-2 font-semibold text-slate-800">Addiction Rehabilitation</td>
+                <td class="py-2 px-2 text-slate-500">Substance recovery, counseling, safe transit</td>
+              </tr>
+              <tr>
+                <td class="py-2 px-2 font-mono font-bold text-brand-900">BCF-EP08</td>
+                <td class="py-2 px-2 font-semibold text-slate-800">Empowerment</td>
+                <td class="py-2 px-2 text-slate-500">Women enterprise capital, tailoring grants</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Table 2: Sierra Leone 16 Districts -->
+        <div class="bg-white rounded-xl border border-slate-200 shadow-2xs p-4 flex flex-col">
+          <div class="flex items-center justify-between border-b border-slate-100 pb-2 mb-3">
+            <h3 class="text-xs font-extrabold text-slate-900 uppercase tracking-wider flex items-center gap-1.5">
+              <span class="material-symbols-outlined text-purple-700 text-[18px]">location_on</span>
+              <span>Sierra Leone 16 Districts</span>
+            </h3>
+            <span class="text-[10px] font-bold text-purple-800 bg-purpleKey-50 px-2 py-0.5 rounded border border-purpleKey-200">Required Dropdown</span>
+          </div>
+
+          <div class="grid grid-cols-2 gap-2 text-xs">
+            <div class="flex items-center gap-1.5 p-1.5 bg-slate-50 rounded">
+              <span class="w-1.5 h-1.5 rounded-full bg-slate-400"></span>
+              <span class="font-medium">1. Bo</span>
+            </div>
+            <div class="flex items-center gap-1.5 p-1.5 bg-slate-50 rounded">
+              <span class="w-1.5 h-1.5 rounded-full bg-slate-400"></span>
+              <span class="font-medium">2. Bombali</span>
+            </div>
+            <div class="flex items-center gap-1.5 p-1.5 bg-slate-50 rounded">
+              <span class="w-1.5 h-1.5 rounded-full bg-slate-400"></span>
+              <span class="font-medium">3. Bonthe</span>
+            </div>
+            <div class="flex items-center gap-1.5 p-1.5 bg-slate-50 rounded">
+              <span class="w-1.5 h-1.5 rounded-full bg-slate-400"></span>
+              <span class="font-medium">4. Falaba</span>
+            </div>
+            <div class="flex items-center gap-1.5 p-1.5 bg-slate-50 rounded">
+              <span class="w-1.5 h-1.5 rounded-full bg-slate-400"></span>
+              <span class="font-medium">5. Kailahun</span>
+            </div>
+            <div class="flex items-center gap-1.5 p-1.5 bg-slate-50 rounded">
+              <span class="w-1.5 h-1.5 rounded-full bg-slate-400"></span>
+              <span class="font-medium">6. Kambia</span>
+            </div>
+            <div class="flex items-center gap-1.5 p-1.5 bg-slate-50 rounded">
+              <span class="w-1.5 h-1.5 rounded-full bg-slate-400"></span>
+              <span class="font-medium">7. Karene</span>
+            </div>
+            <div class="flex items-center gap-1.5 p-1.5 bg-slate-50 rounded">
+              <span class="w-1.5 h-1.5 rounded-full bg-slate-400"></span>
+              <span class="font-medium">8. Kenema</span>
+            </div>
+            <div class="flex items-center gap-1.5 p-1.5 bg-slate-50 rounded">
+              <span class="w-1.5 h-1.5 rounded-full bg-slate-400"></span>
+              <span class="font-medium">9. Koinadugu</span>
+            </div>
+            <div class="flex items-center gap-1.5 p-1.5 bg-slate-50 rounded">
+              <span class="w-1.5 h-1.5 rounded-full bg-slate-400"></span>
+              <span class="font-medium">10. Kono</span>
+            </div>
+            <div class="flex items-center gap-1.5 p-1.5 bg-slate-50 rounded">
+              <span class="w-1.5 h-1.5 rounded-full bg-slate-400"></span>
+              <span class="font-medium">11. Moyamba</span>
+            </div>
+            <div class="flex items-center gap-1.5 p-1.5 bg-slate-50 rounded">
+              <span class="w-1.5 h-1.5 rounded-full bg-slate-400"></span>
+              <span class="font-medium">12. Port Loko</span>
+            </div>
+            <div class="flex items-center gap-1.5 p-1.5 bg-slate-50 rounded">
+              <span class="w-1.5 h-1.5 rounded-full bg-slate-400"></span>
+              <span class="font-medium">13. Pujehun</span>
+            </div>
+            <div class="flex items-center gap-1.5 p-1.5 bg-slate-50 rounded">
+              <span class="w-1.5 h-1.5 rounded-full bg-slate-400"></span>
+              <span class="font-medium">14. Tonkolili</span>
+            </div>
+            <div class="flex items-center gap-1.5 p-1.5 bg-slate-50 rounded">
+              <span class="w-1.5 h-1.5 rounded-full bg-slate-400"></span>
+              <span class="font-medium">15. Western Area Rural</span>
+            </div>
+            <div class="flex items-center gap-1.5 p-1.5 bg-slate-50 rounded">
+              <span class="w-1.5 h-1.5 rounded-full bg-slate-400"></span>
+              <span class="font-medium">16. Western Area Urban</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Table 3: Educational Status List -->
+        <div class="bg-white rounded-xl border border-slate-200 shadow-2xs p-4 flex flex-col">
+          <div class="flex items-center justify-between border-b border-slate-100 pb-2 mb-3">
+            <h3 class="text-xs font-extrabold text-slate-900 uppercase tracking-wider flex items-center gap-1.5">
+              <span class="material-symbols-outlined text-blue-700 text-[18px]">school</span>
+              <span>Educational Status Taxonomy</span>
+            </h3>
+            <span class="text-[10px] font-bold text-blue-800 bg-blueKey-50 px-2 py-0.5 rounded border border-blueKey-200">Optional Dropdown</span>
+          </div>
+
+          <ul class="divide-y divide-slate-100 text-xs text-slate-700">
+            <li class="py-1.5 flex items-center justify-between"><span>Not in School</span><span class="text-slate-400 text-[11px]">Level 0</span></li>
+            <li class="py-1.5 flex items-center justify-between"><span>Pre-Primary</span><span class="text-slate-400 text-[11px]">Nursery / Early</span></li>
+            <li class="py-1.5 flex items-center justify-between"><span>Primary</span><span class="text-slate-400 text-[11px]">Class 1 - 6</span></li>
+            <li class="py-1.5 flex items-center justify-between"><span>Junior Secondary (JSS)</span><span class="text-slate-400 text-[11px]">JSS 1 - 3</span></li>
+            <li class="py-1.5 flex items-center justify-between"><span>Senior Secondary (SSS)</span><span class="text-slate-400 text-[11px]">SSS 1 - 3</span></li>
+            <li class="py-1.5 flex items-center justify-between"><span>Tertiary / University</span><span class="text-slate-400 text-[11px]">Higher Education</span></li>
+            <li class="py-1.5 flex items-center justify-between"><span>Vocational / TVET</span><span class="text-slate-400 text-[11px]">Technical Skills</span></li>
+            <li class="py-1.5 flex items-center justify-between"><span>Illiterate / No Formal Education</span><span class="text-slate-400 text-[11px]">Adult Literacy</span></li>
+            <li class="py-1.5 flex items-center justify-between"><span>Other</span><span class="text-slate-400 text-[11px]">Informal / Faith</span></li>
+          </ul>
+        </div>
+
+        <!-- Table 4: Marital Status & Allocation Ratings -->
+        <div class="bg-white rounded-xl border border-slate-200 shadow-2xs p-4 flex flex-col gap-4">
+          <div>
+            <div class="flex items-center justify-between border-b border-slate-100 pb-2 mb-2">
+              <h3 class="text-xs font-extrabold text-slate-900 uppercase tracking-wider">Marital Status Options</h3>
+              <span class="text-[10px] font-bold text-purpleKey-800 bg-purpleKey-50 px-2 py-0.5 rounded border border-purpleKey-200">Required</span>
+            </div>
+            <div class="flex items-center gap-3 text-xs">
+              <span class="px-3 py-1.5 rounded-lg bg-slate-100 font-semibold">1. Single</span>
+              <span class="px-3 py-1.5 rounded-lg bg-slate-100 font-semibold">2. Married</span>
+            </div>
+          </div>
+
+          <div>
+            <div class="flex items-center justify-between border-b border-slate-100 pb-2 mb-2">
+              <h3 class="text-xs font-extrabold text-slate-900 uppercase tracking-wider">Allocation Status Ratings</h3>
+              <span class="text-[10px] font-bold text-emerald-800 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">Quality of Aid</span>
+            </div>
+            <div class="flex flex-col gap-2 text-xs">
+              <div class="flex items-center gap-2 p-2 rounded-lg bg-emerald-50 border border-emerald-200">
+                <span class="px-2 py-0.5 rounded bg-emerald-600 text-white font-bold text-[10px]">Satisfied</span>
+                <span class="text-slate-600">Goods/aid delivered in full order; recipient acknowledged complete satisfaction.</span>
+              </div>
+              <div class="flex items-center gap-2 p-2 rounded-lg bg-amber-50 border border-amber-200">
+                <span class="px-2 py-0.5 rounded bg-amber-600 text-white font-bold text-[10px]">Average</span>
+                <span class="text-slate-600">Partial distribution or minor quality remarks noted during field verification.</span>
+              </div>
+              <div class="flex items-center gap-2 p-2 rounded-lg bg-rose-50 border border-rose-200">
+                <span class="px-2 py-0.5 rounded bg-rose-600 text-white font-bold text-[10px]">Not Satisfied</span>
+                <span class="text-slate-600">Item defect, delay, or requirement unfulfilled; requires M&amp;E remediation.</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+    </section>
+
+  </main>
+
+  <!-- ========================================== -->
+  <!-- MODAL: VIEW BENEFICIARY RECORD / CARD      -->
+  <!-- ========================================== -->
+  <div id="dossierModal" class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4 hidden">
+    <div class="bg-white rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto shadow-2xl border border-slate-200 flex flex-col print-page">
+      
+      <!-- Modal Header -->
+      <div class="p-4 border-b border-slate-200 flex items-center justify-between bg-slate-50 rounded-t-2xl">
+        <div class="flex items-center gap-2.5">
+          <img alt="BCF Logo" class="h-8 w-auto object-contain rounded" src="/bcf_official_logo.png" onerror="this.onerror=null; this.src='bcf_official_logo.png';"/>
+          <div>
+            <span class="text-[10px] font-black text-brand-900 uppercase tracking-wider">Bandama Charity Foundation – Sierra Leone</span>
+            <h3 class="text-sm font-black text-slate-900">Official Beneficiary Registration Record</h3>
+          </div>
+        </div>
+        <div class="flex items-center gap-2 no-print">
+          <button type="button" onclick="printCurrentRecord()" class="h-8 px-3 rounded-lg bg-brand-900 hover:bg-brand-800 text-white text-xs font-bold inline-flex items-center gap-1.5 shadow-sm transition active:scale-95" title="Print this record or Save as PDF">
+            <span class="material-symbols-outlined text-[15px]">print</span>
+            <span>Print / Save as PDF</span>
+          </button>
+          <button type="button" onclick="downloadCurrentRecordHTML()" class="h-8 px-2.5 rounded-lg border border-slate-300 bg-white hover:bg-slate-50 text-xs font-bold inline-flex items-center gap-1 text-slate-700 shadow-2xs transition" title="Save offline copy to computer">
+            <span class="material-symbols-outlined text-[15px]">download</span>
+            <span>Save HTML</span>
+          </button>
+          <button type="button" onclick="closeDossierModal()" class="w-8 h-8 rounded-lg hover:bg-slate-200 flex items-center justify-center text-slate-500">
+            <span class="material-symbols-outlined text-[18px]">close</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Dossier Content Container -->
+      <div id="dossierModalBody" class="p-5 flex flex-col gap-4 text-xs">
+        <!-- Injected via JS -->
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ========================================== -->
+  <!-- MODAL: LOG NEW ALLOCATION                  -->
+  <!-- ========================================== -->
+  <div id="allocationModal" class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4 hidden">
+    <div class="bg-white rounded-2xl max-w-lg w-full shadow-2xl border border-slate-200 flex flex-col">
+      <div class="p-4 border-b border-slate-200 flex items-center justify-between bg-slate-50 rounded-t-2xl">
+        <div class="flex items-center gap-2">
+          <span class="material-symbols-outlined text-brand-900 text-[20px]">assignment_turned_in</span>
+          <h3 class="text-sm font-extrabold text-slate-900">Log Program Allocation</h3>
+        </div>
+        <button type="button" onclick="closeAllocationModal()" class="w-8 h-8 rounded-lg hover:bg-slate-200 flex items-center justify-center text-slate-500">
+          <span class="material-symbols-outlined text-[18px]">close</span>
+        </button>
+      </div>
+
+      <form id="newAllocationForm" onsubmit="handleAllocationSubmit(event)" class="p-5 flex flex-col gap-3.5 text-xs">
+        <div>
+          <label class="block font-bold text-slate-700 mb-1">Select Beneficiary *</label>
+          <select id="allocBeneficiarySelect" required class="w-full px-3 py-2 text-xs rounded-lg border border-slate-300 bg-white focus:outline-none focus:border-brand-900">
+            <!-- Dynamically populated -->
+          </select>
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block font-bold text-slate-700 mb-1">Program Code *</label>
+            <select id="allocProgCode" required onchange="autoFillProgramFromCode(this.value, 'allocProgCat', 'allocProgTitle')" class="w-full px-3 py-2 text-xs rounded-lg border border-slate-300 bg-white focus:outline-none focus:border-brand-900">
+              <option value="">Select Code</option>
+              <option value="BCF-H01">BCF-H01 (Health)</option>
+              <option value="BCF-E02">BCF-E02 (Education)</option>
+              <option value="BCF-A03">BCF-A03 (Agriculture)</option>
+              <option value="BCF-CC04">BCF-CC04 (Climate Change)</option>
+              <option value="BCF-SJ05">BCF-SJ05 (Social Justice)</option>
+              <option value="BCF-I06">BCF-I06 (Innovation)</option>
+              <option value="BCF-AR07">BCF-AR07 (Addiction Rehab)</option>
+              <option value="BCF-EP08">BCF-EP08 (Empowerment)</option>
+            </select>
+          </div>
+          <div>
+            <label class="block font-bold text-slate-700 mb-1">Program Category</label>
+            <input type="text" id="allocProgCat" readonly class="w-full px-3 py-2 text-xs rounded-lg border border-slate-200 bg-slate-50 font-medium"/>
+          </div>
+        </div>
+
+        <div>
+          <label class="block font-bold text-slate-700 mb-1">Program Title *</label>
+          <input type="text" id="allocProgTitle" required placeholder="e.g. School Materials Provision for Vulnerable Children" class="w-full px-3 py-2 text-xs rounded-lg border border-slate-300 bg-white focus:outline-none focus:border-brand-900"/>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-12 gap-3">
+          <div class="sm:col-span-12">
+            <label class="block font-bold text-slate-700 mb-1">Item/Service Name *</label>
+            <input type="text" id="allocItemName" required placeholder="e.g. Exercise books, rice seeds, medical service, land" class="w-full px-3 py-2 text-xs rounded-lg border border-slate-300 bg-white focus:outline-none focus:border-brand-900"/>
+          </div>
+          <div class="sm:col-span-4">
+            <label class="block font-bold text-slate-700 mb-1">Cost of the Item/Service (NLe)</label>
+            <input type="number" min="0" step="any" id="allocItemCost" placeholder="e.g. 500" class="w-full px-3 py-2 text-xs rounded-lg border border-slate-300 bg-white font-mono focus:outline-none focus:border-brand-900"/>
+          </div>
+          <div class="sm:col-span-4">
+            <label class="block font-bold text-slate-700 mb-1">Quantity *</label>
+            <input type="number" id="allocQty" min="1" value="1" required class="w-full px-3 py-2 text-xs rounded-lg border border-slate-300 bg-white font-mono focus:outline-none focus:border-brand-900"/>
+          </div>
+          <div class="sm:col-span-4">
+            <label class="block font-bold text-slate-700 mb-1">Status Rating *</label>
+            <select id="allocStatus" required class="w-full px-3 py-2 text-xs rounded-lg border border-slate-300 bg-white focus:outline-none focus:border-brand-900">
+              <option value="Satisfied">Satisfied</option>
+              <option value="Average">Average</option>
+              <option value="Not Satisfied">Not Satisfied</option>
+            </select>
+          </div>
+        </div>
+
+        <div>
+          <label class="block font-bold text-slate-700 mb-1">Date of Allocation *</label>
+          <input type="date" id="allocDate" required class="w-full px-3 py-2 text-xs rounded-lg border border-slate-300 bg-white focus:outline-none focus:border-brand-900"/>
+        </div>
+
+        <div>
+          <label class="block font-bold text-slate-700 mb-1">Additional Information</label>
+          <textarea id="allocNotes" rows="2" placeholder="Audit remarks, field observation..." class="w-full px-3 py-2 text-xs rounded-lg border border-slate-300 bg-white focus:outline-none focus:border-brand-900"></textarea>
+        </div>
+
+        <div class="flex items-center justify-end gap-2 pt-3 border-t border-slate-200">
+          <button type="button" onclick="closeAllocationModal()" class="px-3 py-2 rounded-lg border border-slate-300 text-slate-700 text-xs font-bold hover:bg-slate-100">Cancel</button>
+          <button type="submit" class="px-4 py-2 rounded-lg bg-brand-900 text-white text-xs font-bold hover:bg-brand-800 shadow-sm active:scale-95">Save Allocation</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ========================================== -->
+  <!-- MODAL: CAMERA PASSPORT PHOTO CAPTURE       -->
+  <!-- ========================================== -->
+  <div id="cameraModal" class="fixed inset-0 z-50 bg-slate-900/80 backdrop-blur-xs flex items-center justify-center p-4 hidden">
+    <div class="bg-white rounded-2xl max-w-sm w-full shadow-2xl border border-slate-200 overflow-hidden flex flex-col">
+      <div class="p-3.5 border-b border-slate-200 flex items-center justify-between bg-slate-900 text-white rounded-t-2xl">
+        <div class="flex items-center gap-2">
+          <span class="material-symbols-outlined text-purple-400 text-[20px]">photo_camera</span>
+          <h3 class="text-xs font-extrabold tracking-wide uppercase">Capture Passport Photo</h3>
+        </div>
+        <button type="button" onclick="closeCameraModal()" class="w-7 h-7 rounded-lg hover:bg-white/10 flex items-center justify-center text-slate-300 hover:text-white transition">
+          <span class="material-symbols-outlined text-[18px]">close</span>
+        </button>
+      </div>
+
+      <div class="p-4 flex flex-col items-center">
+        <!-- Live Video Viewport with guideline -->
+        <div class="relative w-64 h-64 bg-slate-950 rounded-xl overflow-hidden shadow-inner flex items-center justify-center border border-slate-800">
+          <video id="cameraVideo" autoplay playsinline muted class="w-full h-full object-cover"></video>
+          <canvas id="cameraCanvas" class="hidden"></canvas>
+          <img id="cameraSnapshotPreview" class="hidden w-full h-full object-cover" alt="Captured Passport Photo"/>
+
+          <!-- Oval framing guideline -->
+          <div id="cameraGuideline" class="pointer-events-none absolute inset-0 flex flex-col items-center justify-center">
+            <div class="w-36 h-48 border-2 border-dashed border-emerald-400/90 rounded-[50%] shadow-[0_0_15px_rgba(16,185,129,0.3)]"></div>
+            <span class="mt-1 text-[9px] font-bold text-white/90 bg-black/60 px-2 py-0.5 rounded-full backdrop-blur-xs tracking-wider uppercase">Align Face Inside Oval</span>
+          </div>
+
+          <!-- Live camera active badge -->
+          <div id="cameraLiveBadge" class="absolute top-2 left-2 flex items-center gap-1 bg-red-600/90 text-white px-2 py-0.5 rounded-full text-[9px] font-bold tracking-wider">
+            <span class="w-1.5 h-1.5 rounded-full bg-white animate-pulse"></span>
+            <span>LIVE</span>
+          </div>
+        </div>
+
+        <!-- Camera Status / Error Banner -->
+        <div id="cameraStatusMsg" class="hidden mt-2.5 text-[11px] text-rose-700 bg-rose-50 border border-rose-200 px-3 py-1.5 rounded-lg text-center w-full"></div>
+
+        <!-- Camera Device Selector Dropdown -->
+        <div class="mt-2.5 w-full flex flex-col items-center">
+          <div class="flex items-center gap-1.5 w-full max-w-xs">
+            <span class="material-symbols-outlined text-slate-400 text-[16px] shrink-0">videocam</span>
+            <select id="cameraDeviceSelect" onchange="switchCameraToDeviceId(this.value)" class="flex-1 bg-slate-100 border border-slate-300 rounded-lg px-2 py-1 text-[11px] text-slate-800 font-medium truncate focus:outline-none focus:ring-1 focus:ring-purple-600 cursor-pointer">
+              <option value="">Detecting cameras...</option>
+            </select>
+          </div>
+          <div id="cameraSingleNotice" class="hidden mt-1 text-[10px] text-amber-700 font-semibold text-center flex items-center justify-center gap-1">
+            <span class="material-symbols-outlined text-[13px] text-amber-600">info</span>
+            <span>Only 1 camera found on this computer</span>
+          </div>
+        </div>
+
+        <!-- Controls: Capture or Retake/Accept -->
+        <div class="mt-3.5 w-full">
+          <!-- Initial Stream Controls -->
+          <div id="cameraControlsInitial" class="flex items-center gap-2 w-full">
+            <button type="button" onclick="switchCameraFacing()" id="btnFlipCam" class="py-2.5 px-3 rounded-xl border border-slate-300 bg-white hover:bg-slate-100 text-slate-800 text-xs font-bold inline-flex items-center justify-center gap-1.5 shadow-2xs transition active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed" title="Switch one camera at a time (Front / Back)">
+              <span class="material-symbols-outlined text-[17px] text-slate-700">flip_camera_ios</span>
+              <span id="flipCamLabel">Flip</span>
+            </button>
+            <button type="button" onclick="takeSnapshot()" class="flex-1 py-2.5 px-4 rounded-xl bg-purple-700 hover:bg-purple-800 text-white text-xs font-bold inline-flex items-center justify-center gap-1.5 shadow-md active:scale-95 transition">
+              <span class="material-symbols-outlined text-[18px]">photo_camera</span>
+              <span>Capture Photo</span>
+            </button>
+          </div>
+
+          <!-- After Snapshot Controls -->
+          <div id="cameraControlsCaptured" class="hidden flex items-center gap-2 w-full">
+            <button type="button" onclick="retakePhoto()" class="flex-1 py-2 px-3 rounded-lg border border-slate-300 bg-white hover:bg-slate-50 text-slate-700 text-xs font-bold inline-flex items-center justify-center gap-1 shadow-2xs transition">
+              <span class="material-symbols-outlined text-[16px]">restart_alt</span>
+              <span>Retake</span>
+            </button>
+            <button type="button" onclick="acceptCapturedPhoto()" class="flex-1 py-2 px-3 rounded-lg bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-bold inline-flex items-center justify-center gap-1 shadow transition active:scale-95">
+              <span class="material-symbols-outlined text-[16px]">check_circle</span>
+              <span>Use Photo</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TOAST NOTIFICATION CONTAINER -->
+  <div id="toastNotification" class="fixed bottom-5 right-5 z-50 bg-slate-900 text-white px-4 py-2.5 rounded-xl shadow-xl text-xs font-semibold flex items-center gap-2 transform translate-y-20 opacity-0 transition-all duration-300 pointer-events-none">
+    <span class="material-symbols-outlined text-[18px] text-emerald-400" id="toastIcon">check_circle</span>
+    <span id="toastMsg">Operation successful</span>
+  </div>
+
+  <!-- JAVASCRIPT BUSINESS LOGIC & DATA ENGINE -->
+  <script>
+    // Sierra Leone 16 Districts Standard List
+    const SL_DISTRICTS = [
+      "Bo", "Bombali", "Bonthe", "Falaba", "Kailahun", "Kambia",
+      "Karene", "Kenema", "Koinadugu", "Kono", "Moyamba", "Port Loko",
+      "Pujehun", "Tonkolili", "Western Area Rural", "Western Area Urban"
+    ];
+
+    // Standard BCF-SL 8 Programs Taxonomy
+    const BCF_PROGRAMS = {
+      "BCF-H01": { code: "BCF-H01", category: "Health", defaultTitle: "Maternal & Infant Healthcare Outreach" },
+      "BCF-E02": { code: "BCF-E02", category: "Education", defaultTitle: "School Materials Provision for Vulnerable Children" },
+      "BCF-A03": { code: "BCF-A03", category: "Agriculture", defaultTitle: "Smallholder Farmer Seed Grant & Food Security" },
+      "BCF-CC04": { code: "BCF-CC04", category: "Climate Change", defaultTitle: "Flood Resilience & Solar Water Supply" },
+      "BCF-SJ05": { code: "BCF-SJ05", category: "Social Justice", defaultTitle: "Legal Aid & Child Rights Protection" },
+      "BCF-I06": { code: "BCF-I06", category: "Innovation", defaultTitle: "Youth Digital Literacy & Community Tech Hub" },
+      "BCF-AR07": { code: "BCF-AR07", category: "Addiction Rehabilitation", defaultTitle: "Substance Recovery Counseling & Reintegration" },
+      "BCF-EP08": { code: "BCF-EP08", category: "Empowerment", defaultTitle: "Youth & Women Enterprise Capital" }
+    };
+
+    // Standard Sample Initial Dataset (Includes the exact worked example row EX requested by user)
+    const INITIAL_BENEFICIARIES = [
+      {
+        no: "EX",
+        isExample: true,
+        id: "BCF-0000",
+        name: "Example Beneficiary (not a real person)",
+        age: 32,
+        gender: "Male",
+        maritalStatus: "Married",
+        nin: "NIN-SL-000000-X",
+        children: 3,
+        institution: "N/A (Worked Example)",
+        educationalStatus: "Senior Secondary (SSS)",
+        disability: "No",
+        disabilityDetail: "",
+        phone: "+232 76 000000",
+        address: "14 Hospital Road",
+        town: "Bo City",
+        district: "Bo",
+        photoRef: "BCF-0000.jpg",
+        photoDataUrl: "",
+        registeredBy: "Albert J. Bandama",
+        regDate: "2026-02-10",
+        emergPerson: "John Doe",
+        emergContact: "+232 76 000001",
+        emergAddress: "14 Hospital Road, Bo City",
+        allocations: [
+          {
+            allocId: "ALC-EX-01",
+            programCode: "BCF-E02",
+            programCategory: "Education",
+            programTitle: "School Materials Provision for Vulnerable Children – Bo City",
+            allocQty: 1,
+            itemName: "Exercise books, pens, school bag",
+            itemCost: 450,
+            itemQty: 3,
+            status: "Satisfied",
+            date: "2026-02-10",
+            notes: "Worked example only."
+          }
+        ]
+      },
+      {
+        no: "1",
+        isExample: false,
+        id: "BCF-0001",
+        name: "Aminata Sesay",
+        age: 28,
+        gender: "Female",
+        maritalStatus: "Married",
+        nin: "SL-892301-B",
+        children: 4,
+        institution: "Kakua Community Health Center",
+        educationalStatus: "Junior Secondary (JSS)",
+        disability: "No",
+        disabilityDetail: "",
+        phone: "+232 78 452190",
+        address: "5 Koribondo Highway",
+        town: "Kakua Chiefdom",
+        district: "Bo",
+        photoRef: "BCF-0001.jpg",
+        photoDataUrl: "",
+        registeredBy: "Albert J. Bandama",
+        regDate: "2026-02-14",
+        emergPerson: "Mohamed Sesay",
+        emergContact: "+232 78 452191",
+        emergAddress: "5 Koribondo Highway, Bo",
+        allocations: [
+          {
+            allocId: "ALC-0001-01",
+            programCode: "BCF-H01",
+            programCategory: "Health",
+            programTitle: "Maternal & Infant Healthcare Outreach",
+            allocQty: 1,
+            itemName: "Prenatal Vitamins & Sanitation Kit",
+            itemCost: 800,
+            itemQty: 2,
+            status: "Satisfied",
+            date: "2026-02-14",
+            notes: "Enrolled through antenatal clinic."
+          }
+        ]
+      },
+      {
+        no: "2",
+        isExample: false,
+        id: "BCF-0002",
+        name: "Mohamed Alpha Kamara",
+        age: 45,
+        gender: "Male",
+        maritalStatus: "Married",
+        nin: "SL-441209-K",
+        children: 6,
+        institution: "Lunsar Farmers Cooperative",
+        educationalStatus: "Vocational / TVET",
+        disability: "No",
+        disabilityDetail: "",
+        phone: "+232 77 889900",
+        address: "22 Old Railway Line",
+        town: "Lunsar",
+        district: "Port Loko",
+        photoRef: "BCF-0002.jpg",
+        photoDataUrl: "",
+        registeredBy: "Foday Conteh",
+        regDate: "2026-02-18",
+        emergPerson: "Fatmata Kamara",
+        emergContact: "+232 77 889901",
+        emergAddress: "22 Old Railway Line, Lunsar",
+        allocations: [
+          {
+            allocId: "ALC-0002-01",
+            programCode: "BCF-A03",
+            programCategory: "Agriculture",
+            programTitle: "Smallholder Farmer Seed Grant & Food Security",
+            allocQty: 1,
+            itemName: "Certified Rice Paddy Seeds (50kg) & Fertilizer",
+            itemCost: 2500,
+            itemQty: 3,
+            status: "Satisfied",
+            date: "2026-02-18",
+            notes: "Planted for current rainy season cycle."
+          }
+        ]
+      },
+      {
+        no: "3",
+        isExample: false,
+        id: "BCF-0003",
+        name: "Fatu Bintu Koroma",
+        age: 22,
+        gender: "Female",
+        maritalStatus: "Single",
+        nin: "SL-783210-W",
+        children: 1,
+        institution: "Kroo Bay Women's Union",
+        educationalStatus: "Primary",
+        disability: "Yes",
+        disabilityDetail: "Physical mobility limitation",
+        phone: "+232 30 112233",
+        address: "8 Wharf Lane",
+        town: "Kroo Bay",
+        district: "Western Area Urban",
+        photoRef: "BCF-0003.jpg",
+        photoDataUrl: "",
+        registeredBy: "Mariama Bangura",
+        regDate: "2026-02-22",
+        emergPerson: "Ibrahim Koroma",
+        emergContact: "+232 30 112234",
+        emergAddress: "8 Wharf Lane, Kroo Bay",
+        allocations: [
+          {
+            allocId: "ALC-0003-01",
+            programCode: "BCF-EP08",
+            programCategory: "Empowerment",
+            programTitle: "Youth & Women Enterprise Capital",
+            allocQty: 1,
+            itemName: "Manual Sewing Machine & Fabric Roll",
+            itemCost: 3500,
+            itemQty: 1,
+            status: "Average",
+            date: "2026-02-22",
+            notes: "Recipient requested additional sewing thread."
+          }
+        ]
+      },
+      {
+        no: "4",
+        isExample: false,
+        id: "BCF-0004",
+        name: "Sahr Emmanuel Conteh",
+        age: 58,
+        gender: "Male",
+        maritalStatus: "Married",
+        nin: "SL-109283-E",
+        children: 2,
+        institution: "Kenema Rural Elders Circle",
+        educationalStatus: "Illiterate / No Formal Education",
+        disability: "Yes",
+        disabilityDetail: "Visual impairment",
+        phone: "+232 76 990011",
+        address: "12 Hangha Road",
+        town: "Nongowa Chiefdom",
+        district: "Kenema",
+        photoRef: "BCF-0004.jpg",
+        photoDataUrl: "",
+        registeredBy: "Albert J. Bandama",
+        regDate: "2026-03-01",
+        emergPerson: "Kadiatu Conteh",
+        emergContact: "+232 76 990012",
+        emergAddress: "12 Hangha Road, Kenema",
+        allocations: [
+          {
+            allocId: "ALC-0004-01",
+            programCode: "BCF-CC04",
+            programCategory: "Climate Change",
+            programTitle: "Flood Resilience & Solar Water Supply",
+            allocQty: 1,
+            itemName: "Clean Water Filter Unit & Solar Lantern",
+            itemCost: 1800,
+            itemQty: 2,
+            status: "Satisfied",
+            date: "2026-03-01",
+            notes: "Installed at residence with family training."
+          }
+        ]
+      },
+      {
+        no: "5",
+        isExample: false,
+        id: "BCF-0005",
+        name: "Isatu Mariama Bangura",
+        age: 19,
+        gender: "Female",
+        maritalStatus: "Single",
+        nin: "SL-654321-M",
+        children: 0,
+        institution: "Makeni Youth Center",
+        educationalStatus: "Senior Secondary (SSS)",
+        disability: "No",
+        disabilityDetail: "",
+        phone: "+232 79 334455",
+        address: "3 Rogbaneh Road",
+        town: "Makeni",
+        district: "Bombali",
+        photoRef: "BCF-0005.jpg",
+        photoDataUrl: "",
+        registeredBy: "Foday Conteh",
+        regDate: "2026-03-05",
+        emergPerson: "Pa Alimamy Bangura",
+        emergContact: "+232 79 334456",
+        emergAddress: "3 Rogbaneh Road, Makeni",
+        allocations: [
+          {
+            allocId: "ALC-0005-01",
+            programCode: "BCF-AR07",
+            programCategory: "Addiction Rehabilitation",
+            programTitle: "Substance Recovery Counseling & Reintegration",
+            allocQty: 1,
+            itemName: "Psychosocial Support Kit & Food Vouchers",
+            itemCost: 1200,
+            itemQty: 4,
+            status: "Satisfied",
+            date: "2026-03-05",
+            notes: "Attending bi-weekly counselor workshops."
+          }
+        ]
+      },
+      {
+        no: "6",
+        isExample: false,
+        id: "BCF-0006",
+        name: "Emmanuel Sahr Tamba",
+        age: 31,
+        gender: "Male",
+        maritalStatus: "Married",
+        nin: "SL-991122-T",
+        children: 3,
+        institution: "Koidu Youth Artisanal Mining Collective",
+        educationalStatus: "Junior Secondary (JSS)",
+        disability: "No",
+        disabilityDetail: "",
+        phone: "+232 88 554433",
+        address: "14 Kainkordu Road",
+        town: "Koidu",
+        district: "Kono",
+        photoRef: "BCF-0006.jpg",
+        photoDataUrl: "",
+        registeredBy: "Albert J. Bandama",
+        regDate: "2026-03-12",
+        emergPerson: "Sia Tamba",
+        emergContact: "+232 88 554434",
+        emergAddress: "14 Kainkordu Road, Koidu",
+        allocations: [
+          {
+            allocId: "ALC-0006-01",
+            programCode: "BCF-E02",
+            programCategory: "Education",
+            programTitle: "Vocational Skills & Micro-Grant Support",
+            allocQty: 1,
+            itemName: "Mechanic Tool Kit & Safety Boots",
+            itemCost: 2800,
+            itemQty: 1,
+            status: "Satisfied",
+            date: "2026-03-12",
+            notes: "Completed apprenticeship module."
+          }
+        ]
+      },
+      {
+        no: "7",
+        isExample: false,
+        id: "BCF-0008",
+        name: "Aisha Mustapha",
+        age: 23,
+        gender: "Female",
+        maritalStatus: "Married",
+        nin: "3455667775858",
+        children: 5,
+        institution: "Kakua",
+        educationalStatus: "Vocational / TVET",
+        disability: "No",
+        disabilityDetail: "",
+        phone: "078974474",
+        address: "2 Ross Road Cline Town Freetown",
+        town: "Koidu",
+        district: "Kono",
+        photoRef: "BCF-0008.jpg",
+        photoDataUrl: "",
+        registeredBy: "Albert J. Bandama",
+        regDate: "2026-10-03",
+        emergPerson: "Alie",
+        emergContact: "78773472",
+        emergAddress: "2 Ross Road Cline Town Freetown",
+        allocations: [
+          {
+            allocId: "ALC-0008-01",
+            programCode: "BCF-E02",
+            programCategory: "Education",
+            programTitle: "School Provisiom",
+            allocQty: 1,
+            itemName: "Land",
+            itemCost: 15000,
+            itemQty: 5,
+            status: "Satisfied",
+            date: "2026-10-03",
+            notes: "Initial intake allocation."
+          }
+        ]
+      }
+    ];
+
+    // Local Storage Key
+    const STORAGE_KEY = "bcf_sl_beneficiaries_database_v2";
+
+    // Application State
+    let beneficiaries = [];
+
+    // Load data
+    function loadData() {
+      try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if (raw) {
+          beneficiaries = JSON.parse(raw);
+          // Ensure BCF-0006 & BCF-0008 are present
+          let bcf6 = beneficiaries.find(b => b.id === "BCF-0006");
+          if (!bcf6) {
+            bcf6 = INITIAL_BENEFICIARIES.find(b => b.id === "BCF-0006");
+            if (bcf6) beneficiaries.push(bcf6);
+          }
+          let aisha = beneficiaries.find(b => b.id === "BCF-0008");
+          if (!aisha) {
+            aisha = INITIAL_BENEFICIARIES.find(b => b.id === "BCF-0008");
+            if (aisha) beneficiaries.push(aisha);
+          } else if (aisha.allocations && aisha.allocations.length > 0 && !aisha.allocations[0].itemCost) {
+            aisha.allocations[0].itemCost = 15000;
+          }
+          beneficiaries.forEach(b => {
+            if (!b.gender) {
+              if (b.id === "BCF-0001" || b.id === "BCF-0003" || b.id === "BCF-0005" || b.id === "BCF-0008") {
+                b.gender = "Female";
+              } else {
+                b.gender = "Male";
+              }
+            }
+          });
+          saveData();
+        } else {
+          beneficiaries = JSON.parse(JSON.stringify(INITIAL_BENEFICIARIES));
+          saveData();
+        }
+      } catch (e) {
+        console.error("Storage error:", e);
+        beneficiaries = JSON.parse(JSON.stringify(INITIAL_BENEFICIARIES));
+      }
+    }
+
+    function saveData() {
+      try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(beneficiaries));
+      } catch (e) {
+        console.error("Failed to save to local storage:", e);
+      }
+    }
+
+    function resetToSampleData() {
+      if (confirm("Reset Beneficiaries Database to standard BCF-SL template? This will restore the worked example row EX and initial sample logs.")) {
+        beneficiaries = JSON.parse(JSON.stringify(INITIAL_BENEFICIARIES));
+        saveData();
+        renderAll();
+        showToast("Restored BCF-SL standard template!");
+      }
+    }
+
+    // Sheet / Tab Switching
+    function switchSheet(sheetName) {
+      const sheets = ["summary", "allocations", "registration", "lists"];
+      sheets.forEach(s => {
+        const el = document.getElementById("sheet" + s.charAt(0).toUpperCase() + s.slice(1));
+        const btn = document.getElementById("tabBtn" + s.charAt(0).toUpperCase() + s.slice(1));
+        if (el) el.classList.add("hidden");
+        if (btn) {
+          btn.className = "px-3.5 py-1.5 rounded-md text-xs font-bold transition flex items-center gap-1.5 text-slate-600 hover:text-slate-900 hover:bg-white";
+        }
+      });
+
+      const activeEl = document.getElementById("sheet" + sheetName.charAt(0).toUpperCase() + sheetName.slice(1));
+      const activeBtn = document.getElementById("tabBtn" + sheetName.charAt(0).toUpperCase() + sheetName.slice(1));
+      if (activeEl) activeEl.classList.remove("hidden");
+      if (activeBtn) {
+        activeBtn.className = "px-3.5 py-1.5 rounded-md text-xs font-bold transition flex items-center gap-1.5 bg-brand-900 text-white shadow-xs";
+      }
+
+      if (sheetName === "summary") renderSummaryTable();
+      if (sheetName === "allocations") renderAllocationsTable();
+    }
+    window.switchSheet = switchSheet;
+
+    // Listen for tab switch and action messages from parent window
+    window.addEventListener("message", function(e) {
+      if (!e.data || typeof e.data !== "object") return;
+      if (e.data.type === "BCF_SWITCH_SHEET" && e.data.sheet) {
+        switchSheet(e.data.sheet);
+      } else if (e.data.type === "BCF_ACTION" && e.data.action) {
+        if (typeof window[e.data.action] === "function") {
+          window[e.data.action]();
+        }
+      }
+    });
+
+    // Populate Districts in select boxes
+    function initDistrictDropdowns() {
+      const filterSelect = document.getElementById("filterDistrict");
+      const regSelect = document.getElementById("regDistrict");
+      
+      SL_DISTRICTS.forEach(d => {
+        if (filterSelect) {
+          const opt = document.createElement("option");
+          opt.value = d;
+          opt.textContent = d;
+          filterSelect.appendChild(opt);
+        }
+        if (regSelect) {
+          const opt = document.createElement("option");
+          opt.value = d;
+          opt.textContent = d;
+          regSelect.appendChild(opt);
+        }
+      });
+    }
+
+    // Helper: Next Beneficiary ID
+    function getNextBeneficiaryId() {
+      let maxNum = 0;
+      beneficiaries.forEach(b => {
+        if (b.id && b.id.startsWith("BCF-")) {
+          const num = parseInt(b.id.replace("BCF-", ""), 10);
+          if (!isNaN(num) && num > maxNum) maxNum = num;
+        }
+      });
+      const nextNum = maxNum + 1;
+      return "BCF-" + String(nextNum).padStart(4, "0");
+    }
+
+    let selectedYearFolder = "ALL";
+
+    function selectYearFolder(year) {
+      selectedYearFolder = year;
+      const filterYearEl = document.getElementById("filterYear");
+      if (filterYearEl) filterYearEl.value = year;
+
+      const years = ["ALL", "2026", "2025", "2024", "2023"];
+      years.forEach(y => {
+        const pill = document.getElementById("folderPill" + y);
+        if (pill) {
+          if (y === year) {
+            pill.className = "px-2.5 py-1.5 rounded-lg text-xs font-bold transition flex items-center gap-1.5 bg-brand-900 text-white shadow-2xs";
+            const icon = pill.querySelector(".material-symbols-outlined");
+            if (icon) icon.textContent = "folder_open";
+          } else {
+            pill.className = "px-2.5 py-1.5 rounded-lg text-xs font-bold transition flex items-center gap-1.5 bg-slate-100 text-slate-700 hover:bg-slate-200 border border-slate-200/80";
+            const icon = pill.querySelector(".material-symbols-outlined");
+            if (icon) icon.textContent = "folder";
+          }
+        }
+      });
+
+      const statusEl = document.getElementById("activeYearFolderStatus");
+      if (statusEl) {
+        statusEl.textContent = year === "ALL" ? "Viewing: All Yearly Archive Folders" : `Viewing: Yearly Folder FY ${year}`;
+      }
+
+      renderSummaryTable();
+      renderAllocationsTable();
+    }
+
+    function handleYearFilterDropdownChange(val) {
+      selectYearFolder(val);
+    }
+
+    function updateYearFolderCounts() {
+      const counts = { ALL: beneficiaries.length, "2026": 0, "2025": 0, "2024": 0, "2023": 0 };
+      beneficiaries.forEach(b => {
+        const allocDate = (b.allocations && b.allocations.length > 0) ? b.allocations[0].date : "";
+        const yr = (b.regDate || allocDate || "").substring(0, 4);
+        if (counts[yr] !== undefined) counts[yr]++;
+      });
+
+      Object.keys(counts).forEach(y => {
+        const badge = document.getElementById("folderCount" + y);
+        if (badge) badge.textContent = counts[y];
+      });
+    }
+
+    function clearFilters() {
+      const sInput = document.getElementById("summarySearchInput");
+      const fDist = document.getElementById("filterDistrict");
+      const fCat = document.getElementById("filterCategory");
+      const fStat = document.getElementById("filterStatus");
+
+      if (sInput) sInput.value = "";
+      if (fDist) fDist.value = "ALL";
+      if (fCat) fCat.value = "ALL";
+      if (fStat) fStat.value = "ALL";
+
+      selectYearFolder("ALL");
+    }
+
+    // Render Summary Log Table
+    function renderSummaryTable() {
+      const tbody = document.getElementById("summaryTableBody");
+      if (!tbody) return;
+
+      const searchTerm = (document.getElementById("summarySearchInput")?.value || "").toLowerCase().trim();
+      const filterYear = document.getElementById("filterYear")?.value || selectedYearFolder || "ALL";
+      const filterDistrict = document.getElementById("filterDistrict")?.value || "ALL";
+      const filterCategory = document.getElementById("filterCategory")?.value || "ALL";
+      const filterStatus = document.getElementById("filterStatus")?.value || "ALL";
+
+      tbody.innerHTML = "";
+
+      let count = 0;
+
+      beneficiaries.forEach((b, idx) => {
+        // Each beneficiary may have one or more allocations. We display the first allocation on the summary row,
+        // or one row per allocation if available.
+        const alloc = (b.allocations && b.allocations.length > 0) ? b.allocations[0] : {
+          programCode: "—",
+          programCategory: "—",
+          programTitle: "—",
+          allocQty: 1,
+          itemName: "—",
+          itemQty: 0,
+          status: "Not Satisfied",
+          date: b.regDate || "—",
+          notes: "No allocation logged yet"
+        };
+
+        // Filtering
+        if (filterYear !== "ALL") {
+          const regYr = (b.regDate || alloc.date || "").substring(0, 4);
+          if (regYr && regYr !== filterYear) return;
+        }
+        if (filterDistrict !== "ALL" && b.district !== filterDistrict) return;
+        if (filterCategory !== "ALL" && alloc.programCategory !== filterCategory) return;
+        if (filterStatus !== "ALL" && alloc.status !== filterStatus) return;
+
+        if (searchTerm) {
+          const match = 
+            (b.name || "").toLowerCase().includes(searchTerm) ||
+            (b.id || "").toLowerCase().includes(searchTerm) ||
+            (b.nin || "").toLowerCase().includes(searchTerm) ||
+            (b.district || "").toLowerCase().includes(searchTerm) ||
+            (b.town || "").toLowerCase().includes(searchTerm) ||
+            (alloc.programTitle || "").toLowerCase().includes(searchTerm) ||
+            (alloc.itemName || "").toLowerCase().includes(searchTerm) ||
+            (alloc.programCode || "").toLowerCase().includes(searchTerm);
+          if (!match) return;
+        }
+
+        count++;
+
+        const tr = document.createElement("tr");
+        if (b.isExample) {
+          tr.className = "bg-sky-50/70 hover:bg-sky-100/60 font-medium italic transition";
+        } else {
+          tr.className = "hover:bg-slate-50 transition";
+        }
+
+        // Status badge
+        let statusBadge = "";
+        if (alloc.status === "Satisfied") {
+          statusBadge = '<span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-800 border border-emerald-300">Satisfied</span>';
+        } else if (alloc.status === "Average") {
+          statusBadge = '<span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-100 text-amber-800 border border-amber-300">Average</span>';
+        } else {
+          statusBadge = '<span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold bg-rose-100 text-rose-800 border border-rose-300">Not Satisfied</span>';
+        }
+
+        // Example badge
+        const noDisplay = b.isExample ? '<span class="badge-example-row px-1.5 py-0.5 rounded text-[10px] font-bold">EX</span>' : (b.no || idx);
+
+        // Photo thumbnail
+        let photoHtml = "";
+        if (b.photoDataUrl) {
+          photoHtml = `<img src="${b.photoDataUrl}" class="w-8 h-8 rounded-full object-cover border border-slate-300 shadow-2xs shrink-0"/>`;
+        } else {
+          photoHtml = `<div class="w-8 h-8 rounded-full bg-brand-900/10 text-brand-900 font-bold flex items-center justify-center text-[11px] shrink-0 border border-brand-900/20">${(b.name || "B").substring(0, 2).toUpperCase()}</div>`;
+        }
+
+        tr.innerHTML = `
+          <td class="py-3 px-3 text-center font-bold text-slate-500">${noDisplay}</td>
+          <td class="py-3 px-3 font-mono font-bold text-purpleKey-700 whitespace-nowrap">${b.id}</td>
+          <td class="py-3 px-3">
+            <div class="flex items-center gap-2.5">
+              ${photoHtml}
+              <div class="flex flex-col min-w-0">
+                <span class="font-bold text-slate-900 truncate">${b.name}</span>
+                <span class="text-[10px] text-slate-500 font-mono">NIN: ${b.nin || 'N/A'}${b.gender ? ' &bull; ' + b.gender : ''} &bull; ${b.photoRef || b.id + '.jpg'}</span>
+              </div>
+            </div>
+          </td>
+          <td class="py-3 px-3 font-medium text-slate-700 whitespace-nowrap">${b.district}</td>
+          <td class="py-3 px-3 font-mono font-bold text-brand-900 whitespace-nowrap">${alloc.programCode}</td>
+          <td class="py-3 px-3 font-semibold text-slate-800 whitespace-nowrap">${alloc.programCategory}</td>
+          <td class="py-3 px-3 text-slate-600 max-w-xs truncate" title="${alloc.programTitle}">${alloc.programTitle}</td>
+          <td class="py-3 px-3 text-center font-bold text-slate-700">${alloc.allocQty || 1}</td>
+          <td class="py-3 px-3 text-slate-700 font-medium">${alloc.itemName}</td>
+          <td class="py-3 px-3 text-right font-mono font-semibold text-slate-800 whitespace-nowrap">${alloc.itemCost ? Number(alloc.itemCost).toLocaleString() + ' NLe' : '—'}</td>
+          <td class="py-3 px-3 text-center font-bold text-brand-900">${alloc.itemQty || 1}</td>
+          <td class="py-3 px-3 text-center whitespace-nowrap">${statusBadge}</td>
+          <td class="py-3 px-3 text-slate-500 whitespace-nowrap">${alloc.date || b.regDate}</td>
+          <td class="py-3 px-3 text-slate-500 truncate max-w-xs" title="${alloc.notes || b.address}">${alloc.notes || '—'}</td>
+          <td class="py-3 px-3 text-center whitespace-nowrap">
+            <div class="inline-flex items-center gap-1">
+              <button type="button" onclick="viewRecord('${b.id}')" class="px-2.5 py-1 bg-brand-50 hover:bg-brand-100 text-brand-900 rounded font-semibold text-[11px] border border-emerald-300 transition shadow-2xs inline-flex items-center gap-1" title="View Records">
+                <span class="material-symbols-outlined text-[13px]">visibility</span>
+                <span>View Records</span>
+              </button>
+              <button type="button" onclick="openAllocationModalFor('${b.id}')" class="p-1 hover:bg-slate-100 text-slate-600 rounded" title="Add Allocation">
+                <span class="material-symbols-outlined text-[16px]">add_box</span>
+              </button>
+              ${!b.isExample ? `
+                <button type="button" onclick="deleteBeneficiary('${b.id}')" class="p-1 hover:bg-rose-50 text-slate-400 hover:text-rose-600 rounded" title="Delete Row">
+                  <span class="material-symbols-outlined text-[16px]">delete</span>
+                </button>
+              ` : `
+                <span class="text-[10px] text-slate-400 italic px-1">Template</span>
+              `}
+            </div>
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+
+      if (count === 0) {
+        tbody.innerHTML = `
+          <tr>
+            <td colspan="14" class="py-8 text-center text-slate-400">
+              <span class="material-symbols-outlined text-[32px] mb-1">manage_search</span>
+              <p>No beneficiaries found matching current search or filters.</p>
+            </td>
+          </tr>
+        `;
+      }
+
+      // Update counters
+      const summaryEl = document.getElementById("tableRecordSummary");
+      const enrolledCount = beneficiaries.filter(b => !b.isExample).length;
+      if (summaryEl) summaryEl.textContent = `Showing ${count} of ${enrolledCount} enrolled beneficiaries in registry`;
+    }
+
+    // Render Allocations Sheet Table
+    function renderAllocationsTable() {
+      const tbody = document.getElementById("allocationsTableBody");
+      if (!tbody) return;
+
+      const filterYear = document.getElementById("filterYear")?.value || selectedYearFolder || "ALL";
+
+      tbody.innerHTML = "";
+      let totalAllocs = 0;
+
+      beneficiaries.forEach(b => {
+        if (!b.allocations || b.allocations.length === 0) return;
+
+        b.allocations.forEach((alc, aIdx) => {
+          if (filterYear !== "ALL") {
+            const yr = (alc.date || b.regDate || "").substring(0, 4);
+            if (yr && yr !== filterYear) return;
+          }
+
+          totalAllocs++;
+          const tr = document.createElement("tr");
+          tr.className = b.isExample ? "bg-sky-50/60 font-medium italic hover:bg-sky-100/50" : "hover:bg-slate-50";
+
+          let statusBadge = "";
+          if (alc.status === "Satisfied") {
+            statusBadge = '<span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-800 border border-emerald-300">Satisfied</span>';
+          } else if (alc.status === "Average") {
+            statusBadge = '<span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-100 text-amber-800 border border-amber-300">Average</span>';
+          } else {
+            statusBadge = '<span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold bg-rose-100 text-rose-800 border border-rose-300">Not Satisfied</span>';
+          }
+
+          tr.innerHTML = `
+            <td class="py-3 px-3 text-center text-slate-500 font-bold">${totalAllocs}</td>
+            <td class="py-3 px-3 whitespace-nowrap">
+              <div class="flex items-center gap-1.5">
+                <span class="font-mono font-bold text-purpleKey-700">${b.id}</span>
+                <span class="text-slate-400">&bull;</span>
+                <span class="font-bold text-slate-800">${b.name}</span>
+              </div>
+            </td>
+            <td class="py-3 px-3 font-mono font-bold text-brand-900">${alc.programCode}</td>
+            <td class="py-3 px-3 font-semibold text-slate-700">${alc.programCategory}</td>
+            <td class="py-3 px-3 text-slate-800">${alc.programTitle}</td>
+            <td class="py-3 px-3 text-slate-700 font-medium">${alc.itemName}</td>
+            <td class="py-3 px-3 text-right font-mono font-semibold text-slate-800 whitespace-nowrap">${alc.itemCost ? Number(alc.itemCost).toLocaleString() + ' NLe' : '—'}</td>
+            <td class="py-3 px-3 text-center font-bold text-slate-900">${alc.itemQty || 1}</td>
+            <td class="py-3 px-3 text-center whitespace-nowrap">${statusBadge}</td>
+            <td class="py-3 px-3 text-slate-500 whitespace-nowrap">${alc.date}</td>
+            <td class="py-3 px-3 text-slate-500">${alc.notes || '—'}</td>
+            <td class="py-3 px-3 text-center whitespace-nowrap">
+              <button type="button" onclick="deleteAllocation('${b.id}', '${alc.allocId}')" class="p-1 text-slate-400 hover:text-rose-600 rounded" title="Delete Allocation">
+                <span class="material-symbols-outlined text-[16px]">delete</span>
+              </button>
+            </td>
+          `;
+          tbody.appendChild(tr);
+        });
+      });
+    }
+
+    // Update KPI Header Metrics
+    function updateKPIs() {
+      const total = beneficiaries.length;
+      let totalAllocs = 0;
+      let satisfiedCount = 0;
+      const districtSet = new Set();
+
+      beneficiaries.forEach(b => {
+        if (b.district) districtSet.add(b.district);
+        if (b.allocations) {
+          b.allocations.forEach(a => {
+            totalAllocs++;
+            if (a.status === "Satisfied") satisfiedCount++;
+          });
+        }
+      });
+
+      const satRate = totalAllocs > 0 ? ((satisfiedCount / totalAllocs) * 100).toFixed(1) + "%" : "100%";
+
+      // Retrieve Annual Audit & Performance Evaluation active year and data
+      let activeYear = "2024";
+      try {
+        const savedYear = localStorage.getItem("bcf_performance_active_year");
+        if (savedYear) activeYear = savedYear;
+      } catch (e) {}
+
+      // Total beneficiaries automatically equals live total in Beneficiaries Database (8)
+      const yearBeneficiaries = String(total);
+      let yearDistricts = "14 Districts SL";
+      let auditStatus = "Verified Q3";
+
+      try {
+        const rawYears = localStorage.getItem("bcf_performance_eval_years");
+        if (rawYears) {
+          const parsedYears = JSON.parse(rawYears);
+          if (parsedYears[activeYear]) {
+            yearDistricts = parsedYears[activeYear].districtsText || "14 Districts SL";
+            auditStatus = parsedYears[activeYear].status || "Verified";
+          }
+        }
+      } catch (e) {}
+
+      // Update Total Beneficiaries to automatically equal Performance Evaluation & Annual Audit by year (8)
+      document.getElementById("kpiTotalBeneficiaries").textContent = yearBeneficiaries;
+      const subEl = document.getElementById("kpiTotalBeneficiariesSub");
+      if (subEl) subEl.textContent = `FY ${activeYear} (${auditStatus})`;
+      const rosterEl = document.getElementById("kpiTotalBeneficiariesRoster");
+      if (rosterEl) rosterEl.innerHTML = `${total} Enrolled Beneficiaries &bull; Equal to Performance Evaluation`;
+
+      // Update selector dropdown options dynamically
+      const yearSelect = document.getElementById("auditYearSelect");
+      if (yearSelect) {
+        if (yearSelect.value !== activeYear) yearSelect.value = activeYear;
+        Array.from(yearSelect.options).forEach(opt => {
+          opt.textContent = `FY ${opt.value} (${total} Beneficiaries)`;
+        });
+      }
+      const yearBadge = document.getElementById("activeAuditYearBadge");
+      if (yearBadge) {
+        yearBadge.textContent = `FY ${activeYear} (${yearBeneficiaries} Beneficiaries)`;
+      }
+
+      document.getElementById("kpiTotalAllocations").textContent = totalAllocs;
+      document.getElementById("kpiSatisfactionRate").textContent = satRate;
+      document.getElementById("kpiDistrictsCount").textContent = `${districtSet.size} / 16 (${yearDistricts})`;
+
+      const badgeCountTotal = document.getElementById("badgeCountTotal");
+      if (badgeCountTotal) badgeCountTotal.textContent = total;
+
+      const badgeCountAlloc = document.getElementById("badgeCountAllocations");
+      if (badgeCountAlloc) badgeCountAlloc.textContent = totalAllocs;
+
+      updateYearFolderCounts();
+
+      try {
+        const bc = new BroadcastChannel("bcf_beneficiaries_channel");
+        bc.postMessage({ type: "BENEFICIARIES_UPDATED", count: total, yearBeneficiaries, activeYear });
+        setTimeout(() => bc.close(), 200);
+      } catch (e) {}
+    }
+
+    // Switch Audit Year from Beneficiaries Database and sync with Performance Evaluation
+    function handleAuditYearChange(selectedYear) {
+      try {
+        localStorage.setItem("bcf_performance_active_year", selectedYear);
+        const bc = new BroadcastChannel("bcf_performance_channel");
+        bc.postMessage({ type: "YEAR_CHANGED", year: selectedYear });
+        setTimeout(() => bc.close(), 200);
+      } catch (e) {}
+      updateKPIs();
+    }
+
+    // Auto-fill Program details from code
+    function autoFillProgramFromCode(code, catFieldId, titleFieldId) {
+      const p = BCF_PROGRAMS[code];
+      if (p) {
+        const catEl = document.getElementById(catFieldId);
+        const titleEl = document.getElementById(titleFieldId);
+        if (catEl) catEl.value = p.category;
+        if (titleEl && !titleEl.value) titleEl.value = p.defaultTitle;
+      }
+    }
+
+    // Photo file preview handler
+    function previewPhotoUpload(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        const box = document.getElementById("photoPreviewBox");
+        if (box) {
+          box.innerHTML = `<img src="${e.target.result}" class="w-full h-full object-cover"/>`;
+        }
+        box.dataset.dataUrl = e.target.result;
+      };
+      reader.readAsDataURL(file);
+
+      // Auto update photo ref
+      const idVal = document.getElementById("regBeneficiaryId")?.value || "BCF-XXXX";
+      const ext = file.name.split('.').pop() || "jpg";
+      const refInput = document.getElementById("regPhotoRef");
+      if (refInput) refInput.value = `${idVal}.${ext}`;
+    }
+
+    // Toggle Disability Detail field
+    function toggleDisabilityDetail() {
+      const isYes = document.getElementById("regDisability")?.value === "Yes";
+      const detailInput = document.getElementById("regDisabilityDetail");
+      if (detailInput) {
+        detailInput.disabled = !isYes;
+        if (isYes) {
+          detailInput.classList.remove("bg-slate-100");
+          detailInput.classList.add("bg-white");
+          detailInput.focus();
+        } else {
+          detailInput.classList.add("bg-slate-100");
+          detailInput.classList.remove("bg-white");
+          detailInput.value = "";
+        }
+      }
+    }
+
+    // Form submission handler
+    function handleFormSubmit(event) {
+      event.preventDefault();
+
+      const bId = document.getElementById("regBeneficiaryId")?.value.trim();
+      const name = document.getElementById("regName")?.value.trim();
+      const age = parseInt(document.getElementById("regAge")?.value, 10);
+      const gender = document.getElementById("regGender")?.value;
+      const marital = document.getElementById("regMaritalStatus")?.value;
+      const nin = document.getElementById("regNIN")?.value.trim();
+      const children = parseInt(document.getElementById("regChildren")?.value, 10);
+      const district = document.getElementById("regDistrict")?.value;
+      const town = document.getElementById("regTown")?.value.trim();
+      const address = document.getElementById("regAddress")?.value.trim();
+
+      if (!bId || !name || isNaN(age) || !gender || !marital || !nin || isNaN(children) || !district || !town || !address) {
+        alert("Please complete all Required Purple Fields marked with an asterisk (*).");
+        return;
+      }
+
+      // Check if duplicate ID exists (if editing or adding)
+      const existingIdx = beneficiaries.findIndex(b => b.id === bId);
+
+      const photoDataUrl = document.getElementById("photoPreviewBox")?.dataset.dataUrl || "";
+      const photoRef = document.getElementById("regPhotoRef")?.value.trim() || `${bId}.jpg`;
+
+      const newRecord = {
+        no: existingIdx >= 0 ? beneficiaries[existingIdx].no : String(beneficiaries.length),
+        isExample: false,
+        id: bId,
+        name: name,
+        age: age,
+        gender: gender,
+        maritalStatus: marital,
+        nin: nin,
+        children: children,
+        institution: document.getElementById("regInstitution")?.value.trim() || "N/A",
+        educationalStatus: document.getElementById("regEduStatus")?.value || "Not in School",
+        disability: document.getElementById("regDisability")?.value || "No",
+        disabilityDetail: document.getElementById("regDisabilityDetail")?.value.trim() || "",
+        phone: document.getElementById("regPhone")?.value.trim() || "",
+        address: address,
+        town: town,
+        district: district,
+        photoRef: photoRef,
+        photoDataUrl: photoDataUrl,
+        registeredBy: document.getElementById("regStaff")?.value.trim() || "BCF-SL Staff",
+        regDate: document.getElementById("regDate")?.value || new Date().toISOString().split('T')[0],
+        emergPerson: document.getElementById("regEmergPerson")?.value.trim() || "",
+        emergContact: document.getElementById("regEmergContact")?.value.trim() || "",
+        emergAddress: document.getElementById("regEmergAddress")?.value.trim() || "",
+        allocations: existingIdx >= 0 ? beneficiaries[existingIdx].allocations : []
+      };
+
+      // Multi-item allocation collection
+      const itemCards = document.querySelectorAll("#regItemsContainer > [id^='regItemCard_']");
+      itemCards.forEach((card, idx) => {
+        const pCode = card.querySelector(".reg-item-progcode")?.value;
+        const pCat = card.querySelector(".reg-item-progcat")?.value;
+        const pTitle = card.querySelector(".reg-item-progtitle")?.value;
+        const itemName = card.querySelector(".reg-item-name")?.value.trim();
+        const itemCostRaw = card.querySelector(".reg-item-cost")?.value;
+        const itemCost = itemCostRaw !== "" && !isNaN(parseFloat(itemCostRaw)) ? parseFloat(itemCostRaw) : 0;
+        const itemQty = parseInt(card.querySelector(".reg-item-qty")?.value || "1", 10);
+        const allocStatus = card.querySelector(".reg-item-status")?.value || "Satisfied";
+
+        if (pCode || itemName) {
+          newRecord.allocations.push({
+            allocId: "ALC-" + Date.now().toString().slice(-4) + "-" + (idx + 1),
+            programCode: pCode || "BCF-E02",
+            programCategory: pCat || (BCF_PROGRAMS[pCode]?.category || "General"),
+            programTitle: pTitle || (BCF_PROGRAMS[pCode]?.defaultTitle || "Distribution"),
+            allocQty: 1,
+            itemName: itemName || "Aid Supply Item",
+            itemCost: itemCost,
+            itemQty: isNaN(itemQty) ? 1 : itemQty,
+            status: allocStatus,
+            date: newRecord.regDate,
+            notes: "Initial intake allocation."
+          });
+        }
+      });
+
+      if (existingIdx >= 0) {
+        beneficiaries[existingIdx] = newRecord;
+      } else {
+        beneficiaries.push(newRecord);
+      }
+
+      saveData();
+      renderAll();
+      showToast(`Beneficiary ${bId} successfully enrolled!`);
+      switchSheet("summary");
+    }
+
+    // Modal controls: Enroll
+    function openEnrollModal() {
+      switchSheet("registration");
+      document.getElementById("regBeneficiaryId").value = getNextBeneficiaryId();
+      document.getElementById("regDate").value = new Date().toISOString().split('T')[0];
+      document.getElementById("regName").focus();
+    }
+
+    // Modal controls: Allocation
+    function openAllocationModal() {
+      populateBeneficiarySelect();
+      document.getElementById("allocDate").value = new Date().toISOString().split('T')[0];
+      document.getElementById("allocationModal").classList.remove("hidden");
+    }
+
+    function openAllocationModalFor(beneficiaryId) {
+      openAllocationModal();
+      const sel = document.getElementById("allocBeneficiarySelect");
+      if (sel) sel.value = beneficiaryId;
+    }
+
+    function closeAllocationModal() {
+      document.getElementById("allocationModal").classList.add("hidden");
+    }
+
+    function populateBeneficiarySelect() {
+      const sel = document.getElementById("allocBeneficiarySelect");
+      if (!sel) return;
+      sel.innerHTML = '<option value="">Select Beneficiary</option>';
+      beneficiaries.forEach(b => {
+        const opt = document.createElement("option");
+        opt.value = b.id;
+        opt.textContent = `${b.id} — ${b.name} (${b.district})`;
+        sel.appendChild(opt);
+      });
+    }
+
+    function handleAllocationSubmit(event) {
+      event.preventDefault();
+      const bId = document.getElementById("allocBeneficiarySelect")?.value;
+      const pCode = document.getElementById("allocProgCode")?.value;
+      const pCat = document.getElementById("allocProgCat")?.value;
+      const pTitle = document.getElementById("allocProgTitle")?.value;
+      const itemName = document.getElementById("allocItemName")?.value;
+      const itemCostRaw = document.getElementById("allocItemCost")?.value;
+      const itemCost = itemCostRaw !== "" && !isNaN(parseFloat(itemCostRaw)) ? parseFloat(itemCostRaw) : 0;
+      const qty = parseInt(document.getElementById("allocQty")?.value || "1", 10);
+      const status = document.getElementById("allocStatus")?.value;
+      const date = document.getElementById("allocDate")?.value;
+      const notes = document.getElementById("allocNotes")?.value;
+
+      if (!bId || !pCode || !itemName) {
+        alert("Please complete required allocation fields.");
+        return;
+      }
+
+      const targetBeneficiary = beneficiaries.find(b => b.id === bId);
+      if (!targetBeneficiary) {
+        alert("Beneficiary not found.");
+        return;
+      }
+
+      if (!targetBeneficiary.allocations) targetBeneficiary.allocations = [];
+      targetBeneficiary.allocations.push({
+        allocId: "ALC-" + Date.now().toString().slice(-4),
+        programCode: pCode,
+        programCategory: pCat || (BCF_PROGRAMS[pCode]?.category || "General"),
+        programTitle: pTitle,
+        allocQty: 1,
+        itemName: itemName,
+        itemCost: itemCost,
+        itemQty: qty,
+        status: status,
+        date: date,
+        notes: notes
+      });
+
+      saveData();
+      renderAll();
+      closeAllocationModal();
+      showToast(`Allocation logged for ${targetBeneficiary.name}!`);
+    }
+
+    // View Beneficiary Records Modal
+    let currentViewingBeneficiary = null;
+
+    function viewRecord(beneficiaryId) {
+      const b = beneficiaries.find(x => x.id === beneficiaryId);
+      if (!b) return;
+      currentViewingBeneficiary = b;
+
+      const body = document.getElementById("dossierModalBody");
+      if (!body) return;
+
+      let photoHtml = "";
+      if (b.photoDataUrl) {
+        photoHtml = `<img src="${b.photoDataUrl}" class="w-24 h-28 object-cover rounded-lg border border-slate-300 shadow-sm"/>`;
+      } else {
+        photoHtml = `<div class="w-24 h-28 bg-slate-100 border border-slate-300 rounded-lg flex flex-col items-center justify-center text-slate-400 font-bold text-center p-2"><span class="material-symbols-outlined text-[32px]">badge</span><span class="text-[9px] mt-1">${b.photoRef || b.id + '.jpg'}</span></div>`;
+      }
+
+      let allocListHtml = "";
+      if (b.allocations && b.allocations.length > 0) {
+        allocListHtml = b.allocations.map((a, i) => `
+          <div class="p-2.5 rounded-lg bg-slate-50 border border-slate-200 flex flex-col gap-1">
+            <div class="flex items-center justify-between font-bold">
+              <span class="text-brand-900">${a.programCode} &bull; ${a.programCategory}</span>
+              <span class="px-2 py-0.5 rounded text-[10px] ${a.status === 'Satisfied' ? 'bg-emerald-100 text-emerald-800' : a.status === 'Average' ? 'bg-amber-100 text-amber-800' : 'bg-rose-100 text-rose-800'}">${a.status}</span>
+            </div>
+            <div class="text-slate-800 font-semibold">${a.programTitle}</div>
+            <div class="text-slate-600">Item/Service: <strong>${a.itemName}</strong> (Qty: ${a.itemQty || 1}${a.itemCost ? ' &bull; Cost: <strong class="text-emerald-900">' + Number(a.itemCost).toLocaleString() + ' NLe</strong>' : ''}) &bull; Date: ${a.date}</div>
+            ${a.notes ? `<div class="text-slate-500 italic">Notes: ${a.notes}</div>` : ''}
+          </div>
+        `).join('');
+      } else {
+        allocListHtml = '<div class="text-slate-400 italic">No allocations logged yet.</div>';
+      }
+
+      body.innerHTML = `
+        <div class="flex flex-col sm:flex-row items-start justify-between gap-4 p-4 rounded-xl bg-purpleKey-50/60 border border-purpleKey-200">
+          <div class="flex items-start gap-4">
+            ${photoHtml}
+            <div>
+              <div class="flex items-center gap-2">
+                <span class="px-2 py-0.5 rounded font-mono font-bold text-xs bg-purpleKey-700 text-white">${b.id}</span>
+                ${b.isExample ? '<span class="badge-example-row px-2 py-0.5 rounded text-[10px]">WORKED EXAMPLE</span>' : ''}
+              </div>
+              <h2 class="text-base font-black text-slate-900 mt-1">${b.name}</h2>
+              <p class="text-slate-600 font-medium">${b.age} years old &bull; ${b.gender ? b.gender + ' &bull; ' : ''}${b.maritalStatus} &bull; ${b.children} Children</p>
+              <p class="text-slate-500 font-mono text-[11px] mt-0.5">NIN: ${b.nin || 'N/A'}</p>
+            </div>
+          </div>
+          <div class="text-right flex flex-col items-end text-[11px] text-slate-500">
+            <span>Reg Date: <strong>${b.regDate}</strong></span>
+            <span>Staff: <strong>${b.registeredBy || 'Albert J. Bandama'}</strong></span>
+            <span class="text-emerald-700 font-semibold mt-1">Verified BCF Record</span>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-2 sm:grid-cols-3 gap-3">
+          <div class="p-2.5 rounded-lg bg-slate-50 border border-slate-200">
+            <span class="text-[10px] uppercase font-bold text-slate-400 block">District &amp; Town</span>
+            <span class="font-bold text-slate-800">${b.district}, ${b.town}</span>
+          </div>
+          <div class="p-2.5 rounded-lg bg-slate-50 border border-slate-200">
+            <span class="text-[10px] uppercase font-bold text-slate-400 block">Residential Address</span>
+            <span class="font-bold text-slate-800 truncate block">${b.address}</span>
+          </div>
+          <div class="p-2.5 rounded-lg bg-slate-50 border border-slate-200">
+            <span class="text-[10px] uppercase font-bold text-slate-400 block">Contact Phone</span>
+            <span class="font-bold text-slate-800">${b.phone || 'N/A'}</span>
+          </div>
+          <div class="p-2.5 rounded-lg bg-slate-50 border border-slate-200">
+            <span class="text-[10px] uppercase font-bold text-slate-400 block">Educational Status</span>
+            <span class="font-bold text-slate-800">${b.educationalStatus || 'N/A'}</span>
+          </div>
+          <div class="p-2.5 rounded-lg bg-slate-50 border border-slate-200">
+            <span class="text-[10px] uppercase font-bold text-slate-400 block">Institution</span>
+            <span class="font-bold text-slate-800">${b.institution || 'N/A'}</span>
+          </div>
+          <div class="p-2.5 rounded-lg bg-slate-50 border border-slate-200">
+            <span class="text-[10px] uppercase font-bold text-slate-400 block">Disability</span>
+            <span class="font-bold text-slate-800">${b.disability === 'Yes' ? 'Yes (' + (b.disabilityDetail || 'Not specified') + ')' : 'No'}</span>
+          </div>
+        </div>
+
+        <div class="p-3 rounded-xl bg-rose-50/70 border border-rose-200">
+          <div class="text-[11px] font-bold text-rose-900 uppercase tracking-wider mb-1 flex items-center gap-1">
+            <span class="material-symbols-outlined text-[15px]">emergency</span>
+            <span>Emergency Contact</span>
+          </div>
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-2 text-slate-700">
+            <div>Person: <strong>${b.emergPerson || 'N/A'}</strong></div>
+            <div>Phone: <strong>${b.emergContact || 'N/A'}</strong></div>
+            <div>Address: <strong>${b.emergAddress || 'N/A'}</strong></div>
+          </div>
+        </div>
+
+        <div>
+          <div class="text-xs font-black text-slate-900 uppercase tracking-wider mb-2 flex items-center gap-1.5">
+            <span class="material-symbols-outlined text-[16px] text-brand-900">inventory</span>
+            <span>Programme Allocations &amp; Aid Disbursed</span>
+          </div>
+          <div class="flex flex-col gap-2">
+            ${allocListHtml}
+          </div>
+        </div>
+      `;
+
+      document.getElementById("dossierModal").classList.remove("hidden");
+    }
+
+    const viewDossier = viewRecord;
+
+    function closeDossierModal() {
+      document.getElementById("dossierModal").classList.add("hidden");
+    }
+
+    // Print dedicated record popup window or trigger native print dialog
+    function printCurrentRecord() {
+      if (!currentViewingBeneficiary) {
+        window.print();
+        return;
+      }
+      const b = currentViewingBeneficiary;
+      const modalBody = document.getElementById("dossierModalBody")?.innerHTML || "";
+      const printWin = window.open("", "_blank", "width=850,height=900");
+      if (printWin) {
+        printWin.document.write(`<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8"/>
+  <title>BCF-SL Record - ${b.id} - ${b.name}</title>
+  <script src="https://cdn.tailwindcss.com"><\/script>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
+  <style>
+    body { font-family: 'Plus Jakarta Sans', sans-serif; background: white; color: #0f172a; padding: 20px; }
+    @media print {
+      @page { margin: 12mm; size: A4 portrait; }
+      body { padding: 0; }
+      .no-print { display: none !important; }
+    }
+  </style>
+</head>
+<body class="p-6">
+  <div class="max-w-2xl mx-auto border border-slate-300 rounded-2xl p-6 bg-white">
+    <div class="flex items-center justify-between border-b border-slate-200 pb-4 mb-4">
+      <div class="flex items-center gap-3">
+        <img src="${window.location.origin}/bcf_official_logo.png" onerror="this.src='bcf_official_logo.png'" class="h-10 w-auto rounded"/>
+        <div>
+          <span class="text-[10px] font-black text-emerald-800 uppercase tracking-wider block">Bandama Charity Foundation – Sierra Leone</span>
+          <h1 class="text-base font-black text-slate-900">Official Beneficiary Registration Record</h1>
+        </div>
+      </div>
+      <div class="text-right text-[11px] font-mono text-slate-500">
+        STATUS: VERIFIED<br/>ID: ${b.id}
+      </div>
+    </div>
+    ${modalBody}
+    <div class="mt-6 pt-4 border-t border-slate-200 flex items-center justify-between text-[11px] text-slate-400">
+      <span>Bandama Charity Foundation (BCF-SL) &bull; Verified Beneficiary Log</span>
+      <span>Printed: ${new Date().toLocaleDateString()}</span>
+    </div>
+  </div>
+  <script>
+    setTimeout(() => {
+      window.focus();
+      window.print();
+    }, 400);
+  <\/script>
+</body>
+</html>`);
+        printWin.document.close();
+      } else {
+        window.print();
+      }
+    }
+
+    // Save and download record as standalone file
+    function downloadCurrentRecordHTML() {
+      if (!currentViewingBeneficiary) return;
+      const b = currentViewingBeneficiary;
+      const modalBody = document.getElementById("dossierModalBody")?.innerHTML || "";
+      const docHtml = `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <title>BCF-SL Record - ${b.id} - ${b.name}</title>
+  <script src="https://cdn.tailwindcss.com"><\/script>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
+  <style>
+    body { font-family: 'Plus Jakarta Sans', sans-serif; background: #f8fafc; color: #0f172a; padding: 24px; }
+    @media print { body { background: white; padding: 0; } .no-print { display: none !important; } }
+  </style>
+</head>
+<body class="flex flex-col items-center">
+  <div class="no-print w-full max-w-2xl mb-4 flex items-center justify-between bg-white p-3 rounded-xl border border-slate-200 shadow-sm">
+    <span class="text-xs font-bold text-slate-700">Official Beneficiary Record &bull; ${b.id}</span>
+    <button onclick="window.print()" class="px-3 py-1.5 bg-emerald-800 hover:bg-emerald-700 text-white rounded-lg text-xs font-bold shadow">Print / Save PDF</button>
+  </div>
+  <div class="w-full max-w-2xl bg-white border border-slate-200 rounded-2xl p-6 shadow-sm">
+    <div class="flex items-center justify-between border-b border-slate-200 pb-4 mb-4">
+      <div class="flex items-center gap-3">
+        <img src="bcf_official_logo.png" class="h-10 w-auto rounded" alt="BCF Logo"/>
+        <div>
+          <span class="text-[10px] font-black text-emerald-800 uppercase tracking-wider block">Bandama Charity Foundation – Sierra Leone</span>
+          <h1 class="text-base font-black text-slate-900">Official Beneficiary Registration Record</h1>
+        </div>
+      </div>
+      <div class="text-right text-[11px] font-mono text-slate-500">
+        STATUS: VERIFIED<br/>ID: ${b.id}
+      </div>
+    </div>
+    ${modalBody}
+    <div class="mt-6 pt-4 border-t border-slate-200 flex items-center justify-between text-[11px] text-slate-400">
+      <span>Bandama Charity Foundation (BCF-SL) &bull; Verified Beneficiary Log</span>
+      <span>Saved: ${new Date().toLocaleString()}</span>
+    </div>
+  </div>
+</body>
+</html>`;
+
+      const blob = new Blob([docHtml], { type: "text/html;charset=utf-8;" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `BCF_Record_${b.id}_${b.name.replace(/[^a-zA-Z0-9]/g, '_')}.html`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      showToast(`Record for ${b.name} (${b.id}) saved to your computer!`);
+    }
+
+    // Delete handlers
+    function deleteBeneficiary(bId) {
+      if (confirm(`Are you sure you want to delete beneficiary ${bId} and all associated allocations?`)) {
+        beneficiaries = beneficiaries.filter(b => b.id !== bId);
+        saveData();
+        renderAll();
+        showToast(`Beneficiary ${bId} removed from log.`);
+      }
+    }
+
+    function deleteAllocation(bId, allocId) {
+      if (confirm("Delete this allocation record?")) {
+        const b = beneficiaries.find(x => x.id === bId);
+        if (b && b.allocations) {
+          b.allocations = b.allocations.filter(a => a.allocId !== allocId);
+          saveData();
+          renderAll();
+          showToast("Allocation record deleted.");
+        }
+      }
+    }
+
+    // ==========================================
+    // PASSPORT PHOTO: FILE SELECT & LIVE CAMERA
+    // ==========================================
+    let cameraStream = null;
+    let availableVideoDevices = [];
+    let currentCameraIndex = 0;
+    let cameraFacingMode = "user"; // 'user' (front) or 'environment' (back)
+    let isFrontCamera = true;
+    let isSwitchingCamera = false;
+    let capturedPhotoDataUrl = null;
+
+    function triggerPhotoFileSelect() {
+      const input = document.getElementById("regPhotoFile");
+      if (input) input.click();
+    }
+
+    function previewPhotoUpload(event) {
+      const file = event.target?.files?.[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        const dataUrl = e.target.result;
+        setPhotoPreview(dataUrl, file.name);
+        showToast("Photo uploaded successfully!");
+      };
+      reader.readAsDataURL(file);
+    }
+
+    function setPhotoPreview(dataUrl, fileRefName) {
+      const box = document.getElementById("photoPreviewBox");
+      const refInput = document.getElementById("regPhotoRef");
+      const btnRemove = document.getElementById("btnRemovePhoto");
+
+      if (box) {
+        box.innerHTML = `<img src="${dataUrl}" class="w-full h-full object-cover" alt="Passport Photo"/>`;
+        box.dataset.dataUrl = dataUrl;
+      }
+
+      if (refInput) {
+        const bId = document.getElementById("regBeneficiaryId")?.value.trim() || "BCF-PHOTO";
+        refInput.value = fileRefName || `${bId}.jpg`;
+      }
+
+      if (btnRemove) {
+        btnRemove.classList.remove("hidden");
+      }
+    }
+
+    function clearPhotoPreview() {
+      const box = document.getElementById("photoPreviewBox");
+      const refInput = document.getElementById("regPhotoRef");
+      const fileInput = document.getElementById("regPhotoFile");
+      const btnRemove = document.getElementById("btnRemovePhoto");
+
+      if (box) {
+        box.innerHTML = '<span class="material-symbols-outlined text-[36px] text-slate-400">person</span>';
+        delete box.dataset.dataUrl;
+      }
+      if (refInput) refInput.value = "";
+      if (fileInput) fileInput.value = "";
+      if (btnRemove) btnRemove.classList.add("hidden");
+      showToast("Photo removed.");
+    }
+
+    async function refreshCameraDeviceList() {
+      if (!navigator.mediaDevices || !navigator.mediaDevices.enumerateDevices) {
+        availableVideoDevices = [];
+        return;
+      }
+      try {
+        const devices = await navigator.mediaDevices.enumerateDevices();
+        availableVideoDevices = devices.filter(d => d.kind === "videoinput");
+      } catch (e) {
+        console.warn("enumerateDevices error:", e);
+        availableVideoDevices = [];
+      }
+    }
+
+    async function openCameraModal() {
+      const modal = document.getElementById("cameraModal");
+      const statusMsg = document.getElementById("cameraStatusMsg");
+      const video = document.getElementById("cameraVideo");
+      const preview = document.getElementById("cameraSnapshotPreview");
+      const guideline = document.getElementById("cameraGuideline");
+      const badge = document.getElementById("cameraLiveBadge");
+      const controlsInitial = document.getElementById("cameraControlsInitial");
+      const controlsCaptured = document.getElementById("cameraControlsCaptured");
+
+      if (!modal) return;
+
+      modal.classList.remove("hidden");
+      if (statusMsg) statusMsg.classList.add("hidden");
+      if (video) video.classList.remove("hidden");
+      if (preview) preview.classList.add("hidden");
+      if (guideline) guideline.classList.remove("hidden");
+      if (badge) badge.classList.remove("hidden");
+      if (controlsInitial) controlsInitial.classList.remove("hidden");
+      if (controlsCaptured) controlsCaptured.classList.add("hidden");
+      capturedPhotoDataUrl = null;
+      isSwitchingCamera = false;
+
+      if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+        if (statusMsg) {
+          statusMsg.textContent = "Camera access is not supported by your browser or environment. Please use 'Choose file' instead.";
+          statusMsg.classList.remove("hidden");
+        }
+        return;
+      }
+
+      cameraFacingMode = "user";
+      currentCameraIndex = 0;
+
+      await startCameraStream();
+      await refreshCameraDeviceList();
+      updateFlipButtonUI();
+    }
+
+    async function startCameraStream(targetDeviceId = null) {
+      const statusMsg = document.getElementById("cameraStatusMsg");
+      const video = document.getElementById("cameraVideo");
+
+      stopCameraStream();
+
+      // Pause briefly so hardware device is released cleanly by the operating system
+      await new Promise(r => setTimeout(r, 120));
+
+      let stream = null;
+      let errLast = null;
+
+      // Strategy 1: Specific deviceId requested or from available list
+      if (targetDeviceId) {
+        try {
+          stream = await navigator.mediaDevices.getUserMedia({
+            video: {
+              deviceId: { exact: targetDeviceId },
+              width: { ideal: 640 },
+              height: { ideal: 640 }
+            },
+            audio: false
+          });
+        } catch (e1) {
+          console.warn("Exact deviceId failed, attempting fallback:", e1);
+          errLast = e1;
+        }
+      }
+
+      // Strategy 2: If requesting back camera specifically
+      if (!stream && cameraFacingMode === "environment") {
+        try {
+          // Attempt exact environment first
+          stream = await navigator.mediaDevices.getUserMedia({
+            video: {
+              facingMode: { exact: "environment" },
+              width: { ideal: 640 },
+              height: { ideal: 640 }
+            },
+            audio: false
+          });
+        } catch (eExactEnv) {
+          console.warn("exact environment failed, attempting ideal:", eExactEnv);
+          try {
+            stream = await navigator.mediaDevices.getUserMedia({
+              video: {
+                facingMode: { ideal: "environment" },
+                width: { ideal: 640 },
+                height: { ideal: 640 }
+              },
+              audio: false
+            });
+          } catch (eIdealEnv) {
+            errLast = eIdealEnv;
+          }
+        }
+      }
+
+      // Strategy 3: Standard front camera or general video
+      if (!stream) {
+        try {
+          stream = await navigator.mediaDevices.getUserMedia({
+            video: {
+              facingMode: { ideal: "user" },
+              width: { ideal: 640 },
+              height: { ideal: 640 }
+            },
+            audio: false
+          });
+        } catch (eUser) {
+          try {
+            stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: false });
+          } catch (eGen) {
+            errLast = eGen;
+          }
+        }
+      }
+
+      if (stream) {
+        cameraStream = stream;
+        if (video) {
+          video.srcObject = stream;
+          try { await video.play(); } catch (pe) { console.warn("video.play err:", pe); }
+        }
+
+        // Detect if active camera is front or back
+        const track = stream.getVideoTracks()[0];
+        const settings = track?.getSettings ? track.getSettings() : {};
+        const label = (track?.label || "").toLowerCase();
+
+        if (settings.facingMode) {
+          isFrontCamera = (settings.facingMode === "user");
+        } else if (label.includes("back") || label.includes("rear") || label.includes("environment")) {
+          isFrontCamera = false;
+        } else if (label.includes("front") || label.includes("user") || label.includes("selfie")) {
+          isFrontCamera = true;
+        } else {
+          isFrontCamera = (cameraFacingMode === "user");
+        }
+
+        // Apply mirror to front camera; keep back camera natural
+        if (video) {
+          video.style.transform = isFrontCamera ? "scaleX(-1)" : "scaleX(1)";
+        }
+
+        // Synchronize currentCameraIndex
+        if (availableVideoDevices.length > 0 && settings.deviceId) {
+          const matchIdx = availableVideoDevices.findIndex(d => d.deviceId === settings.deviceId);
+          if (matchIdx !== -1) {
+            currentCameraIndex = matchIdx;
+          }
+        }
+
+        if (statusMsg) statusMsg.classList.add("hidden");
+        return true;
+      } else {
+        console.error("Camera access failed completely:", errLast);
+        if (statusMsg) {
+          statusMsg.textContent = "Unable to access camera: " + (errLast?.message || "Device busy or permission denied.") + ". Please grant camera permission or use 'Choose file'.";
+          statusMsg.classList.remove("hidden");
+        }
+        return false;
+      }
+    }
+
+    function stopCameraStream() {
+      if (cameraStream) {
+        cameraStream.getTracks().forEach(track => track.stop());
+        cameraStream = null;
+      }
+      const video = document.getElementById("cameraVideo");
+      if (video) {
+        video.srcObject = null;
+      }
+    }
+
+    function closeCameraModal() {
+      stopCameraStream();
+      isSwitchingCamera = false;
+      const modal = document.getElementById("cameraModal");
+      if (modal) modal.classList.add("hidden");
+    }
+
+    async function switchCameraToDeviceId(deviceId) {
+      if (isSwitchingCamera || !deviceId) return;
+      isSwitchingCamera = true;
+
+      const btnFlip = document.getElementById("btnFlipCam");
+      if (btnFlip) btnFlip.disabled = true;
+
+      const idx = availableVideoDevices.findIndex(d => d.deviceId === deviceId);
+      if (idx !== -1) {
+        currentCameraIndex = idx;
+        const targetDev = availableVideoDevices[idx];
+        const label = (targetDev.label || "").toLowerCase();
+        if (label.includes("back") || label.includes("rear") || label.includes("environment")) {
+          cameraFacingMode = "environment";
+        } else {
+          cameraFacingMode = "user";
+        }
+      }
+
+      await startCameraStream(deviceId);
+      isSwitchingCamera = false;
+      if (btnFlip) btnFlip.disabled = false;
+      updateFlipButtonUI();
+    }
+
+    async function switchCameraFacing() {
+      if (isSwitchingCamera) return;
+      isSwitchingCamera = true;
+
+      const btnFlip = document.getElementById("btnFlipCam");
+      const labelEl = document.getElementById("flipCamLabel");
+      const statusMsg = document.getElementById("cameraStatusMsg");
+      if (btnFlip) btnFlip.disabled = true;
+      if (labelEl) labelEl.textContent = "Flipping...";
+      if (statusMsg) statusMsg.classList.add("hidden");
+
+      try {
+        await refreshCameraDeviceList();
+
+        if (availableVideoDevices.length > 1) {
+          // Multiple physical cameras available! Cycle sequentially one at a time
+          currentCameraIndex = (currentCameraIndex + 1) % availableVideoDevices.length;
+          const targetDev = availableVideoDevices[currentCameraIndex];
+          const targetLabel = (targetDev.label || "").toLowerCase();
+
+          if (targetLabel.includes("back") || targetLabel.includes("rear") || targetLabel.includes("environment")) {
+            cameraFacingMode = "environment";
+          } else {
+            cameraFacingMode = "user";
+          }
+
+          const ok = await startCameraStream(targetDev.deviceId);
+          if (ok) {
+            showToast(`Switched to: ${targetDev.label || 'Camera ' + (currentCameraIndex + 1)}`);
+          }
+        } else {
+          // Device reports 1 camera (typical PC/laptop with front webcam)
+          const targetFacing = (cameraFacingMode === "user") ? "environment" : "user";
+          cameraFacingMode = targetFacing;
+
+          const ok = await startCameraStream();
+
+          // Check if hardware actually switched to a back camera or just stayed front
+          const track = cameraStream?.getVideoTracks()?.[0];
+          const settings = track?.getSettings ? track.getSettings() : {};
+          const label = (track?.label || "").toLowerCase();
+          const isActuallyFront = (settings.facingMode === "user") || label.includes("front") || label.includes("user") || label.includes("integrated");
+
+          if (targetFacing === "environment" && isActuallyFront) {
+            cameraFacingMode = "user";
+            if (statusMsg) {
+              statusMsg.innerHTML = "<strong>Notice:</strong> This computer only has 1 built-in camera (Front Webcam). A rear/back camera was not detected on this device.<br/>To attach a photo from your phone or camera, please use <strong>Choose file</strong>.";
+              statusMsg.classList.remove("hidden");
+            }
+            showToast("No rear camera found on this computer. (1 camera installed)");
+          } else if (ok) {
+            showToast(`Flipped to ${targetFacing === "environment" ? "Back Camera" : "Front Camera"}`);
+          }
+        }
+      } catch (err) {
+        console.error("Flip error:", err);
+        showToast("Unable to switch camera.");
+      } finally {
+        isSwitchingCamera = false;
+        if (btnFlip) btnFlip.disabled = false;
+        updateFlipButtonUI();
+      }
+    }
+
+    function updateFlipButtonUI() {
+      const labelEl = document.getElementById("flipCamLabel");
+      const sel = document.getElementById("cameraDeviceSelect");
+      const singleNotice = document.getElementById("cameraSingleNotice");
+      const total = availableVideoDevices.length;
+
+      // Update dropdown options
+      if (sel) {
+        sel.innerHTML = "";
+        if (total > 0) {
+          availableVideoDevices.forEach((dev, idx) => {
+            const opt = document.createElement("option");
+            opt.value = dev.deviceId;
+            let displayLabel = dev.label;
+            if (!displayLabel) {
+              displayLabel = idx === 0 ? "Camera 1 (Front/Default)" : `Camera ${idx + 1}`;
+            }
+            opt.textContent = displayLabel;
+            if (idx === currentCameraIndex) opt.selected = true;
+            sel.appendChild(opt);
+          });
+        } else {
+          const opt = document.createElement("option");
+          opt.value = "";
+          opt.textContent = isFrontCamera ? "Front Camera" : "Back Camera";
+          sel.appendChild(opt);
+        }
+      }
+
+      if (singleNotice) {
+        if (total === 1) {
+          singleNotice.classList.remove("hidden");
+        } else {
+          singleNotice.classList.add("hidden");
+        }
+      }
+
+      if (labelEl) {
+        if (total > 1) {
+          labelEl.textContent = `Flip (${currentCameraIndex + 1}/${total})`;
+        } else {
+          labelEl.textContent = isFrontCamera ? "Flip to Back" : "Flip to Front";
+        }
+      }
+    }
+
+    function takeSnapshot() {
+      const video = document.getElementById("cameraVideo");
+      const canvas = document.getElementById("cameraCanvas");
+      const preview = document.getElementById("cameraSnapshotPreview");
+      const guideline = document.getElementById("cameraGuideline");
+      const badge = document.getElementById("cameraLiveBadge");
+      const controlsInitial = document.getElementById("cameraControlsInitial");
+      const controlsCaptured = document.getElementById("cameraControlsCaptured");
+
+      if (!video || !canvas) return;
+
+      const width = video.videoWidth || 480;
+      const height = video.videoHeight || 480;
+      canvas.width = width;
+      canvas.height = height;
+
+      const ctx = canvas.getContext("2d");
+      // If front camera, mirror image to match viewfinder; if back camera, keep natural orientation
+      if (isFrontCamera) {
+        ctx.save();
+        ctx.translate(width, 0);
+        ctx.scale(-1, 1);
+        ctx.drawImage(video, 0, 0, width, height);
+        ctx.restore();
+      } else {
+        ctx.drawImage(video, 0, 0, width, height);
+      }
+
+      capturedPhotoDataUrl = canvas.toDataURL("image/jpeg", 0.92);
+
+      if (preview) {
+        preview.src = capturedPhotoDataUrl;
+        preview.classList.remove("hidden");
+      }
+      if (video) video.classList.add("hidden");
+      if (guideline) guideline.classList.add("hidden");
+      if (badge) badge.classList.add("hidden");
+
+      if (controlsInitial) controlsInitial.classList.add("hidden");
+      if (controlsCaptured) controlsCaptured.classList.remove("hidden");
+
+      stopCameraStream();
+    }
+
+    async function retakePhoto() {
+      const video = document.getElementById("cameraVideo");
+      const preview = document.getElementById("cameraSnapshotPreview");
+      const guideline = document.getElementById("cameraGuideline");
+      const badge = document.getElementById("cameraLiveBadge");
+      const controlsInitial = document.getElementById("cameraControlsInitial");
+      const controlsCaptured = document.getElementById("cameraControlsCaptured");
+
+      if (preview) preview.classList.add("hidden");
+      if (video) video.classList.remove("hidden");
+      if (guideline) guideline.classList.remove("hidden");
+      if (badge) badge.classList.remove("hidden");
+
+      if (controlsInitial) controlsInitial.classList.remove("hidden");
+      if (controlsCaptured) controlsCaptured.classList.add("hidden");
+
+      capturedPhotoDataUrl = null;
+      await startCameraStream();
+    }
+
+    function acceptCapturedPhoto() {
+      if (!capturedPhotoDataUrl) return;
+
+      const bId = document.getElementById("regBeneficiaryId")?.value.trim() || "BCF-PHOTO";
+      setPhotoPreview(capturedPhotoDataUrl, `${bId}.jpg`);
+      closeCameraModal();
+      showToast("Passport photo captured and attached!");
+    }
+
+    // Reset Form
+    function resetForm() {
+      document.getElementById("beneficiaryForm")?.reset();
+      document.getElementById("regBeneficiaryId").value = getNextBeneficiaryId();
+      document.getElementById("regDate").value = new Date().toISOString().split('T')[0];
+      const box = document.getElementById("photoPreviewBox");
+      if (box) {
+        box.innerHTML = '<span class="material-symbols-outlined text-[36px] text-slate-400">person</span>';
+        delete box.dataset.dataUrl;
+      }
+      const btnRemove = document.getElementById("btnRemovePhoto");
+      if (btnRemove) btnRemove.classList.add("hidden");
+      const fileInput = document.getElementById("regPhotoFile");
+      if (fileInput) fileInput.value = "";
+      toggleDisabilityDetail();
+
+      // Reset dynamic items container to 1 blank item
+      const container = document.getElementById("regItemsContainer");
+      if (container) {
+        container.innerHTML = "";
+        regItemRowCount = 0;
+        addRegistrationItemRow();
+      }
+    }
+
+    function printRegistrationForm() {
+      window.print();
+    }
+
+    // CSV Export
+    function exportDataCSV() {
+      let csv = "No,Beneficiary ID,Beneficiary Name,Age,Gender,Marital Status,NIN,Children,Institution,Educational Status,Disability,Phone,District,Town,Address,Program Code,Program Category,Program Title,Item/Service Name,Cost of Item/Service (NLe),Item Qty,Status,Allocation Date,Additional Information\n";
+
+      beneficiaries.forEach(b => {
+        const a = (b.allocations && b.allocations.length > 0) ? b.allocations[0] : {};
+        const row = [
+          b.no || "",
+          b.id || "",
+          `"${(b.name || "").replace(/"/g, '""')}"`,
+          b.age || "",
+          b.gender || "",
+          b.maritalStatus || "",
+          b.nin || "",
+          b.children || 0,
+          `"${(b.institution || "").replace(/"/g, '""')}"`,
+          `"${(b.educationalStatus || "").replace(/"/g, '""')}"`,
+          b.disability || "No",
+          b.phone || "",
+          b.district || "",
+          `"${(b.town || "").replace(/"/g, '""')}"`,
+          `"${(b.address || "").replace(/"/g, '""')}"`,
+          a.programCode || "",
+          `"${(a.programCategory || "").replace(/"/g, '""')}"`,
+          `"${(a.programTitle || "").replace(/"/g, '""')}"`,
+          `"${(a.itemName || "").replace(/"/g, '""')}"`,
+          a.itemCost || 0,
+          a.itemQty || 1,
+          a.status || "Satisfied",
+          a.date || b.regDate || "",
+          `"${(a.notes || "").replace(/"/g, '""')}"`
+        ];
+        csv += row.join(",") + "\n";
+      });
+
+      const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.setAttribute("href", url);
+      link.setAttribute("download", `BCF_SL_Beneficiaries_Log_${new Date().toISOString().split('T')[0]}.csv`);
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      showToast("Beneficiary Log exported to CSV!");
+    }
+
+    // Toast Alert
+    function showToast(msg) {
+      const toast = document.getElementById("toastNotification");
+      const msgEl = document.getElementById("toastMsg");
+      if (!toast || !msgEl) return;
+      msgEl.textContent = msg;
+      toast.classList.remove("translate-y-20", "opacity-0");
+      setTimeout(() => {
+        toast.classList.add("translate-y-20", "opacity-0");
+      }, 3000);
+    }
+
+    function clearFilters() {
+      const search = document.getElementById("summarySearchInput");
+      const dist = document.getElementById("filterDistrict");
+      const cat = document.getElementById("filterCategory");
+      const st = document.getElementById("filterStatus");
+      if (search) search.value = "";
+      if (dist) dist.value = "ALL";
+      if (cat) cat.value = "ALL";
+      if (st) st.value = "ALL";
+      renderSummaryTable();
+    }
+
+    function renderAll() {
+      renderSummaryTable();
+      renderAllocationsTable();
+      updateKPIs();
+    }
+
+    // Dynamic Item Rows Engine for Beneficiary Intake Form
+    let regItemRowCount = 0;
+
+    function addRegistrationItemRow(data = {}) {
+      regItemRowCount++;
+      const id = regItemRowCount;
+      const container = document.getElementById("regItemsContainer");
+      if (!container) return;
+
+      const itemCard = document.createElement("div");
+      itemCard.id = `regItemCard_${id}`;
+      itemCard.className = "p-3.5 bg-white rounded-xl border border-emerald-200 shadow-2xs flex flex-col gap-2.5 transition";
+
+      itemCard.innerHTML = `
+        <div class="flex items-center justify-between pb-1.5 border-b border-slate-100">
+          <div class="flex items-center gap-2">
+            <span class="w-5 h-5 rounded-full bg-emerald-100 text-emerald-900 text-[10px] font-extrabold flex items-center justify-center">
+              ${id}
+            </span>
+            <span class="text-xs font-bold text-slate-800">Aid Item / Program Allocation #${id}</span>
+          </div>
+          <button type="button" onclick="removeRegistrationItemRow(${id})" class="text-slate-400 hover:text-rose-600 p-1 rounded hover:bg-rose-50 text-[11px] font-bold flex items-center gap-1 transition" title="Remove this item">
+            <span class="material-symbols-outlined text-[15px]">delete</span>
+            <span class="hidden sm:inline">Remove</span>
+          </button>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+          <div>
+            <label class="block text-[11px] font-bold text-brand-900 mb-1">Program Code</label>
+            <select class="reg-item-progcode w-full px-2.5 py-1.5 text-xs rounded border border-emerald-300 bg-white focus:outline-none focus:ring-1 focus:ring-emerald-600" onchange="autoFillItemRow(this)">
+              <option value="">Select Code</option>
+              <option value="BCF-H01">BCF-H01 (Health)</option>
+              <option value="BCF-E02">BCF-E02 (Education)</option>
+              <option value="BCF-A03">BCF-A03 (Agriculture)</option>
+              <option value="BCF-CC04">BCF-CC04 (Climate Change)</option>
+              <option value="BCF-SJ05">BCF-SJ05 (Social Justice)</option>
+              <option value="BCF-I06">BCF-I06 (Innovation)</option>
+              <option value="BCF-AR07">BCF-AR07 (Addiction Rehab)</option>
+              <option value="BCF-EP08">BCF-EP08 (Empowerment)</option>
+            </select>
+          </div>
+
+          <div>
+            <label class="block text-[11px] font-bold text-brand-900 mb-1">Program Category</label>
+            <input type="text" class="reg-item-progcat w-full px-2.5 py-1.5 text-xs rounded border border-emerald-200 bg-slate-50 font-medium" placeholder="Category" readonly value="${data.programCategory || ''}"/>
+          </div>
+
+          <div>
+            <label class="block text-[11px] font-bold text-brand-900 mb-1">Program Title</label>
+            <input type="text" class="reg-item-progtitle w-full px-2.5 py-1.5 text-xs rounded border border-emerald-300 bg-white" placeholder="Title of distribution project" value="${data.programTitle || ''}"/>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-12 gap-3 pt-1">
+          <div class="sm:col-span-5">
+            <label class="block text-[11px] font-bold text-brand-900 mb-1">Item/Service Name *</label>
+            <input type="text" class="reg-item-name w-full px-2.5 py-1.5 text-xs rounded border border-emerald-300 bg-white" placeholder="e.g. Exercise books, rice seeds, medical service, land" value="${data.itemName || ''}"/>
+          </div>
+
+          <div class="sm:col-span-3">
+            <label class="block text-[11px] font-bold text-brand-900 mb-1">Cost of the Item/Service (NLe)</label>
+            <input type="number" min="0" step="any" class="reg-item-cost w-full px-2.5 py-1.5 text-xs rounded border border-emerald-300 bg-white font-mono" placeholder="e.g. 500" value="${data.itemCost !== undefined ? data.itemCost : ''}"/>
+          </div>
+
+          <div class="sm:col-span-2">
+            <label class="block text-[11px] font-bold text-brand-900 mb-1">Item/Service Qty</label>
+            <input type="number" min="1" class="reg-item-qty w-full px-2.5 py-1.5 text-xs rounded border border-emerald-300 bg-white font-mono" value="${data.itemQty || 1}"/>
+          </div>
+
+          <div class="sm:col-span-2">
+            <label class="block text-[11px] font-bold text-brand-900 mb-1">Allocation Status</label>
+            <select class="reg-item-status w-full px-2.5 py-1.5 text-xs rounded border border-emerald-300 bg-white">
+              <option value="Satisfied" ${data.status === 'Satisfied' ? 'selected' : ''}>Satisfied</option>
+              <option value="Average" ${data.status === 'Average' ? 'selected' : ''}>Average</option>
+              <option value="Not Satisfied" ${data.status === 'Not Satisfied' ? 'selected' : ''}>Not Satisfied</option>
+            </select>
+          </div>
+        </div>
+      `;
+
+      container.appendChild(itemCard);
+
+      if (data.programCode) {
+        const sel = itemCard.querySelector(".reg-item-progcode");
+        if (sel) {
+          sel.value = data.programCode;
+          autoFillItemRow(sel);
+        }
+      }
+    }
+
+    function removeRegistrationItemRow(id) {
+      const card = document.getElementById(`regItemCard_${id}`);
+      if (card) {
+        card.remove();
+      }
+      const container = document.getElementById("regItemsContainer");
+      if (container && container.children.length === 0) {
+        addRegistrationItemRow();
+      }
+    }
+
+    function autoFillItemRow(selectEl) {
+      const code = selectEl.value;
+      const card = selectEl.closest("[id^='regItemCard_']");
+      if (!card) return;
+
+      const p = BCF_PROGRAMS[code];
+      const catInput = card.querySelector(".reg-item-progcat");
+      const titleInput = card.querySelector(".reg-item-progtitle");
+
+      if (p) {
+        if (catInput) catInput.value = p.category;
+        if (titleInput && !titleInput.value) titleInput.value = p.defaultTitle;
+      }
+    }
+
+    // Initialization
+    window.addEventListener("DOMContentLoaded", () => {
+      initDistrictDropdowns();
+      loadData();
+      renderAll();
+
+      const regDateInput = document.getElementById("regDate");
+      if (regDateInput && !regDateInput.value) {
+        regDateInput.value = new Date().toISOString().split('T')[0];
+      }
+      const nextId = getNextBeneficiaryId();
+      const idInput = document.getElementById("regBeneficiaryId");
+      if (idInput) idInput.value = nextId;
+
+      // Initialize with 1 default item row in registration form
+      addRegistrationItemRow();
+
+      // Listen for year changes and performance evaluation updates
+      window.addEventListener("storage", (e) => {
+        if (e.key === "bcf_performance_active_year" || e.key === "bcf_performance_eval_years") {
+          updateKPIs();
+        }
+      });
+
+      try {
+        const bcPerf = new BroadcastChannel("bcf_performance_channel");
+        bcPerf.onmessage = (ev) => {
+          if (ev.data && (ev.data.type === "YEAR_CHANGED" || ev.data.year)) {
+            updateKPIs();
+          }
+        };
+      } catch (e) {}
+    });
+  </script>
+</body>
+</html>

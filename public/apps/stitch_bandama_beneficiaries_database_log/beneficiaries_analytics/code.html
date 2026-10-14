@@ -1,0 +1,887 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" name="viewport"/>
+  <title>BCF-SL Beneficiaries Analytics &amp; Program Intelligence</title>
+
+  <!-- Google Fonts & Material Symbols -->
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin=""/>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
+
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+            mono: ['"JetBrains Mono"', 'monospace'],
+          },
+          colors: {
+            brand: {
+              50: '#f0fdf4',
+              100: '#dcfce7',
+              200: '#bbf7d0',
+              600: '#16a34a',
+              700: '#15803d',
+              800: '#166534',
+              900: '#14532d',
+              950: '#052e16',
+            },
+            accentGold: '#d97706',
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    body { font-family: 'Plus Jakarta Sans', sans-serif; }
+    @media print {
+      .no-print { display: none !important; }
+      body { background: white !important; }
+    }
+    .custom-scroll::-webkit-scrollbar { height: 6px; width: 6px; }
+    .custom-scroll::-webkit-scrollbar-track { background: #f1f5f9; }
+    .custom-scroll::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 9999px; }
+  </style>
+</head>
+<body class="bg-slate-50 text-slate-900 min-h-screen flex flex-col antialiased">
+
+  <!-- TOP HEADER -->
+  <header class="bg-white border-b border-slate-200 sticky top-0 z-40 shadow-xs">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 py-3.5 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+      
+      <!-- Brand & Title -->
+      <div class="flex items-center gap-3.5">
+        <img src="../beneficiaries_database_log/bcf_official_logo.png" 
+             onerror="this.onerror=null; this.src='/bcf-logo.jpg';"
+             class="h-11 w-auto object-contain rounded shadow-2xs" 
+             alt="BCF-SL Official Crest"/>
+        <div>
+          <div class="flex items-center gap-2">
+            <span class="text-[10px] font-black tracking-widest uppercase text-brand-900 bg-brand-50 px-2 py-0.5 rounded border border-brand-200">
+              Bandama Charity Foundation • Sierra Leone
+            </span>
+            <span class="inline-flex items-center gap-1 text-[11px] font-bold text-emerald-700">
+              <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+              Live Database Connected
+            </span>
+          </div>
+          <h1 class="text-lg sm:text-xl font-extrabold text-slate-900 flex items-center gap-2">
+            <span>Beneficiaries Analytics &amp; Impact Intelligence</span>
+            <span class="material-symbols-outlined text-brand-800 text-[20px]">insights</span>
+          </h1>
+        </div>
+      </div>
+
+      <!-- Quick Action Controls -->
+      <div class="flex items-center gap-2 no-print">
+        <a href="/beneficiaries/beneficiaries-log" onclick="if(window.top){window.top.location.href='/beneficiaries/beneficiaries-log'; return false;}" 
+           class="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-bold bg-white hover:bg-slate-100 text-slate-700 border border-slate-300 transition shadow-2xs">
+          <span class="material-symbols-outlined text-[16px] text-brand-800">table_chart</span>
+          <span>Beneficiaries Log</span>
+        </a>
+
+        <button onclick="window.print()" class="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-bold bg-slate-100 hover:bg-slate-200 text-slate-800 border border-slate-300 transition shadow-2xs">
+          <span class="material-symbols-outlined text-[16px]">print</span>
+          <span class="hidden sm:inline">Print Report</span>
+        </button>
+
+        <button onclick="exportAnalyticsCSV()" class="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-lg text-xs font-bold bg-brand-900 hover:bg-brand-950 text-white transition shadow-sm">
+          <span class="material-symbols-outlined text-[16px]">download</span>
+          <span>Export Analytics</span>
+        </button>
+      </div>
+
+    </div>
+
+    <!-- SUB-BAR / FILTER STRIP -->
+    <div class="bg-slate-100/80 border-t border-slate-200 px-4 sm:px-6 py-2">
+      <div class="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-3 text-xs">
+        
+        <div class="flex flex-wrap items-center gap-3">
+          <span class="font-bold text-slate-700 uppercase tracking-wider text-[11px] flex items-center gap-1">
+            <span class="material-symbols-outlined text-[15px]">filter_alt</span> Filters:
+          </span>
+
+          <!-- District Filter -->
+          <div class="flex items-center gap-1.5">
+            <span class="text-slate-500 font-medium">District:</span>
+            <select id="filterDistrict" onchange="applyFilters()" class="px-2.5 py-1 text-xs rounded border border-slate-300 bg-white font-semibold text-slate-800">
+              <option value="ALL">All 16 Districts</option>
+              <option value="Bo">Bo District</option>
+              <option value="Kenema">Kenema District</option>
+              <option value="Bombali">Bombali District</option>
+              <option value="Western Area Urban">Western Area Urban (Freetown)</option>
+              <option value="Western Area Rural">Western Area Rural</option>
+              <option value="Port Loko">Port Loko District</option>
+              <option value="Kono">Kono District</option>
+              <option value="Kailahun">Kailahun District</option>
+              <option value="Moyamba">Moyamba District</option>
+              <option value="Pujehun">Pujehun District</option>
+              <option value="Tonkolili">Tonkolili District</option>
+              <option value="Kambia">Kambia District</option>
+              <option value="Koinadugu">Koinadugu District</option>
+              <option value="Falaba">Falaba District</option>
+              <option value="Karene">Karene District</option>
+              <option value="Bonthe">Bonthe District</option>
+            </select>
+          </div>
+
+          <!-- Category Filter -->
+          <div class="flex items-center gap-1.5">
+            <span class="text-slate-500 font-medium">Sector:</span>
+            <select id="filterCategory" onchange="applyFilters()" class="px-2.5 py-1 text-xs rounded border border-slate-300 bg-white font-semibold text-slate-800">
+              <option value="ALL">All Program Sectors</option>
+              <option value="Education">Education (BCF-E02)</option>
+              <option value="Health">Health (BCF-H01)</option>
+              <option value="Agriculture">Agriculture (BCF-A03)</option>
+              <option value="Climate Change">Climate Change (BCF-CC04)</option>
+              <option value="Social Justice">Social Justice (BCF-SJ05)</option>
+              <option value="Innovation">Innovation (BCF-I06)</option>
+              <option value="Addiction Rehab">Addiction Rehab (BCF-AR07)</option>
+              <option value="Empowerment">Empowerment (BCF-EP08)</option>
+            </select>
+          </div>
+
+          <!-- Status Filter -->
+          <div class="flex items-center gap-1.5">
+            <span class="text-slate-500 font-medium">Outcome:</span>
+            <select id="filterStatus" onchange="applyFilters()" class="px-2.5 py-1 text-xs rounded border border-slate-300 bg-white font-semibold text-slate-800">
+              <option value="ALL">All Outcomes</option>
+              <option value="Satisfied">Satisfied</option>
+              <option value="Average">Average</option>
+              <option value="Not Satisfied">Not Satisfied</option>
+            </select>
+          </div>
+
+          <button onclick="resetFilters()" class="text-brand-900 font-bold hover:underline text-[11px] ml-1">
+            Reset
+          </button>
+        </div>
+
+        <div class="text-slate-500 font-mono text-[11px]">
+          Audited under BCF-SL National Humanitarian Framework
+        </div>
+
+      </div>
+    </div>
+  </header>
+
+  <!-- MAIN DASHBOARD CONTENT -->
+  <main class="max-w-7xl w-full mx-auto px-4 sm:px-6 py-6 flex-1 flex flex-col gap-6">
+
+    <!-- KPI SUMMARY GRID (6 TILES) -->
+    <div class="grid grid-cols-2 lg:grid-cols-6 gap-3.5">
+      
+      <!-- Total Enrolled -->
+      <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-2xs flex flex-col justify-between">
+        <div class="flex items-center justify-between text-slate-500 mb-1">
+          <span class="text-[11px] font-bold uppercase tracking-wider">Beneficiaries</span>
+          <span class="material-symbols-outlined text-[18px] text-brand-900">groups</span>
+        </div>
+        <div>
+          <div id="statTotalBeneficiaries" class="text-2xl font-black text-slate-900 font-mono">0</div>
+          <div class="text-[10px] font-semibold text-emerald-700 bg-emerald-50 px-1.5 py-0.5 rounded inline-block mt-1">Verified Roster</div>
+        </div>
+      </div>
+
+      <!-- Allocations Dispatched -->
+      <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-2xs flex flex-col justify-between">
+        <div class="flex items-center justify-between text-slate-500 mb-1">
+          <span class="text-[11px] font-bold uppercase tracking-wider">Allocations</span>
+          <span class="material-symbols-outlined text-[18px] text-blue-600">inventory_2</span>
+        </div>
+        <div>
+          <div id="statTotalAllocations" class="text-2xl font-black text-slate-900 font-mono">0</div>
+          <div class="text-[10px] font-semibold text-blue-700 bg-blue-50 px-1.5 py-0.5 rounded inline-block mt-1">Disbursed Events</div>
+        </div>
+      </div>
+
+      <!-- Total Aid Valuation (NLe) - Synchronized with Performance Evaluation Budget -->
+      <div class="bg-white p-4 rounded-xl border border-emerald-300 shadow-2xs bg-gradient-to-br from-white to-emerald-50/50 flex flex-col justify-between">
+        <div class="flex items-center justify-between text-emerald-900 mb-1">
+          <span class="text-[11px] font-extrabold uppercase tracking-wider">Total Aid Value</span>
+          <span class="material-symbols-outlined text-[18px] text-emerald-700">payments</span>
+        </div>
+        <div>
+          <div id="statTotalValue" class="text-2xl font-black text-emerald-950 font-mono">3.07M NLe</div>
+          <div id="statTotalValueSub" class="text-[10px] font-semibold text-emerald-800 bg-emerald-100/80 px-1.5 py-0.5 rounded inline-block mt-1">3.07M NLe &bull; 8 Pillars Monitored</div>
+        </div>
+      </div>
+
+      <!-- Satisfaction Rate -->
+      <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-2xs flex flex-col justify-between">
+        <div class="flex items-center justify-between text-slate-500 mb-1">
+          <span class="text-[11px] font-bold uppercase tracking-wider">Satisfaction</span>
+          <span class="material-symbols-outlined text-[18px] text-emerald-600">sentiment_very_satisfied</span>
+        </div>
+        <div>
+          <div id="statSatisfactionRate" class="text-2xl font-black text-emerald-700 font-mono">0%</div>
+          <div class="text-[10px] font-semibold text-slate-600 bg-slate-100 px-1.5 py-0.5 rounded inline-block mt-1">Positive Outcomes</div>
+        </div>
+      </div>
+
+      <!-- Children Impacted -->
+      <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-2xs flex flex-col justify-between">
+        <div class="flex items-center justify-between text-slate-500 mb-1">
+          <span class="text-[11px] font-bold uppercase tracking-wider">Children</span>
+          <span class="material-symbols-outlined text-[18px] text-purple-600">child_care</span>
+        </div>
+        <div>
+          <div id="statTotalChildren" class="text-2xl font-black text-slate-900 font-mono">0</div>
+          <div class="text-[10px] font-semibold text-purple-700 bg-purple-50 px-1.5 py-0.5 rounded inline-block mt-1">Family Dependents</div>
+        </div>
+      </div>
+
+      <!-- Disability Support Rate -->
+      <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-2xs flex flex-col justify-between">
+        <div class="flex items-center justify-between text-slate-500 mb-1">
+          <span class="text-[11px] font-bold uppercase tracking-wider">Inclusivity</span>
+          <span class="material-symbols-outlined text-[18px] text-amber-600">accessible</span>
+        </div>
+        <div>
+          <div id="statDisabilityCount" class="text-2xl font-black text-slate-900 font-mono">0</div>
+          <div class="text-[10px] font-semibold text-amber-800 bg-amber-50 px-1.5 py-0.5 rounded inline-block mt-1">Vulnerable / PWDs</div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- ROW 1: PROGRAM CATEGORY BREAKDOWN & DISTRICT GEOGRAPHIC PENETRATION -->
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+
+      <!-- Program Category Sector Analysis -->
+      <div class="lg:col-span-7 bg-white rounded-2xl border border-slate-200 p-5 shadow-2xs flex flex-col">
+        <div class="flex items-center justify-between pb-3 border-b border-slate-100 mb-4">
+          <div class="flex items-center gap-2">
+            <span class="material-symbols-outlined text-brand-900 text-[20px]">category</span>
+            <div>
+              <h2 class="text-sm font-extrabold text-slate-900">Programmatic Sector Allocation &amp; Value</h2>
+              <p class="text-[11px] text-slate-500">Distribution volume and total monetary value disbursed by statutory sector.</p>
+            </div>
+          </div>
+          <span class="text-[10px] font-mono bg-slate-100 text-slate-600 px-2 py-0.5 rounded font-bold">8 BCF SECTORS</span>
+        </div>
+
+        <div id="programSectorList" class="flex flex-col gap-3.5 flex-1 justify-center">
+          <!-- Dynamically populated program breakdown bars -->
+        </div>
+      </div>
+
+      <!-- District Distribution Ranking -->
+      <div class="lg:col-span-5 bg-white rounded-2xl border border-slate-200 p-5 shadow-2xs flex flex-col">
+        <div class="flex items-center justify-between pb-3 border-b border-slate-100 mb-4">
+          <div class="flex items-center gap-2">
+            <span class="material-symbols-outlined text-brand-900 text-[20px]">location_on</span>
+            <div>
+              <h2 class="text-sm font-extrabold text-slate-900">Geographic Penetration (Districts)</h2>
+              <p class="text-[11px] text-slate-500">Beneficiary concentration across Sierra Leone provinces.</p>
+            </div>
+          </div>
+          <span class="text-[10px] font-mono bg-brand-50 text-brand-900 px-2 py-0.5 rounded font-bold border border-brand-200">PROVINCIAL REACH</span>
+        </div>
+
+        <div id="districtRankList" class="flex flex-col gap-2.5 flex-1 overflow-y-auto max-h-[360px] custom-scroll pr-1">
+          <!-- Dynamically populated district rankings -->
+        </div>
+      </div>
+
+    </div>
+
+    <!-- ROW 2: DEMOGRAPHIC TAXONOMY & AID/SERVICE ITEM VALUATION LEDGER -->
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+
+      <!-- Demographic & Vulnerability Profiles (4 cols) -->
+      <div class="lg:col-span-4 bg-white rounded-2xl border border-slate-200 p-5 shadow-2xs flex flex-col gap-4">
+        <div class="pb-3 border-b border-slate-100">
+          <div class="flex items-center gap-2">
+            <span class="material-symbols-outlined text-brand-900 text-[20px]">demography</span>
+            <div>
+              <h2 class="text-sm font-extrabold text-slate-900">Demographic Taxonomy</h2>
+              <p class="text-[11px] text-slate-500">Education, marital status, and age profiling.</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Educational Status Breakdown -->
+        <div>
+          <span class="text-[11px] font-black uppercase text-slate-500 tracking-wider block mb-2">Education Status</span>
+          <div id="eduBreakdownList" class="flex flex-col gap-2 text-xs">
+            <!-- Dynamically populated -->
+          </div>
+        </div>
+
+        <!-- Marital Status Breakdown -->
+        <div class="pt-3 border-t border-slate-100">
+          <span class="text-[11px] font-black uppercase text-slate-500 tracking-wider block mb-2">Marital Profile</span>
+          <div id="maritalBreakdownList" class="grid grid-cols-2 gap-2 text-xs">
+            <!-- Dynamically populated -->
+          </div>
+        </div>
+
+        <!-- Satisfaction Breakdown Donut Indicator -->
+        <div class="pt-3 border-t border-slate-100">
+          <span class="text-[11px] font-black uppercase text-slate-500 tracking-wider block mb-2">Outcome Satisfaction</span>
+          <div id="satisfactionBreakdownList" class="flex flex-col gap-1.5 text-xs">
+            <!-- Dynamically populated -->
+          </div>
+        </div>
+      </div>
+
+      <!-- Item/Service Valuation & Distribution Matrix (8 cols) -->
+      <div class="lg:col-span-8 bg-white rounded-2xl border border-slate-200 p-5 shadow-2xs flex flex-col">
+        <div class="flex items-center justify-between pb-3 border-b border-slate-100 mb-4">
+          <div class="flex items-center gap-2">
+            <span class="material-symbols-outlined text-brand-900 text-[20px]">table_view</span>
+            <div>
+              <h2 class="text-sm font-extrabold text-slate-900">Item &amp; Service Distribution Ledger</h2>
+              <p class="text-[11px] text-slate-500">Audit matrix showing unit costs, total units disbursed, and total capital deployed.</p>
+            </div>
+          </div>
+          <span class="text-[10px] font-bold text-slate-500">All Figures in NLe (New Leones)</span>
+        </div>
+
+        <!-- Table Container -->
+        <div class="overflow-x-auto custom-scroll border border-slate-200 rounded-xl">
+          <table class="w-full text-left text-xs">
+            <thead class="bg-slate-100/90 text-slate-700 font-bold uppercase tracking-wider text-[10px] border-b border-slate-200">
+              <tr>
+                <th class="py-2.5 px-3">Item / Service Name</th>
+                <th class="py-2.5 px-3">Program Sector</th>
+                <th class="py-2.5 px-3 text-right">Unit Cost</th>
+                <th class="py-2.5 px-3 text-center">Total Qty</th>
+                <th class="py-2.5 px-3 text-right">Total Disbursed (NLe)</th>
+                <th class="py-2.5 px-3 text-center">Beneficiaries</th>
+              </tr>
+            </thead>
+            <tbody id="itemsLedgerTableBody" class="divide-y divide-slate-100 text-slate-800">
+              <!-- Dynamically populated -->
+            </tbody>
+            <tfoot class="bg-slate-50 font-bold border-t border-slate-200 text-slate-900">
+              <tr>
+                <td class="py-2.5 px-3" colspan="3">Grand Total Aid Disbursed:</td>
+                <td id="tfootTotalQty" class="py-2.5 px-3 text-center font-mono">0</td>
+                <td id="tfootTotalValue" class="py-2.5 px-3 text-right font-mono text-brand-900 text-sm">0 NLe</td>
+                <td id="tfootTotalRecipients" class="py-2.5 px-3 text-center font-mono">0</td>
+              </tr>
+            </tfoot>
+          </table>
+        </div>
+
+      </div>
+
+    </div>
+
+  </main>
+
+  <!-- AUDIT FOOTER -->
+  <footer class="bg-white border-t border-slate-200 py-4 px-4 sm:px-6 text-center text-xs text-slate-500">
+    <div class="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-2">
+      <div class="flex items-center gap-2">
+        <span class="w-2 h-2 rounded-full bg-brand-700"></span>
+        <span class="font-bold text-slate-700">Bandama Charity Foundation (BCF-SL)</span>
+        <span>• Beneficiaries Database &amp; Analytics Engine</span>
+      </div>
+      <div class="font-mono text-[11px] text-slate-400">
+        System Version 2.4 • Confidential Field Operations
+      </div>
+    </div>
+  </footer>
+
+  <!-- JAVASCRIPT ANALYTICS ENGINE -->
+  <script>
+    const STORAGE_KEY = "bcf_sl_beneficiaries_database_v2";
+
+    // Standard Fallback Data if localStorage is empty
+    const DEFAULT_BENEFICIARIES = [
+      {
+        id: "BCF-0001",
+        name: "Aminata Sesay",
+        age: 28,
+        maritalStatus: "Married",
+        educationalStatus: "Junior Secondary (JSS)",
+        disability: "No",
+        children: 4,
+        district: "Bo",
+        allocations: [{
+          programCode: "BCF-H01",
+          programCategory: "Health",
+          programTitle: "Maternal & Infant Healthcare Outreach",
+          itemName: "Prenatal Vitamins & Sanitation Kit",
+          itemCost: 800,
+          itemQty: 2,
+          status: "Satisfied"
+        }]
+      },
+      {
+        id: "BCF-0002",
+        name: "Santigie Kamara",
+        age: 42,
+        maritalStatus: "Married",
+        educationalStatus: "Primary",
+        disability: "No",
+        children: 6,
+        district: "Bombali",
+        allocations: [{
+          programCode: "BCF-A03",
+          programCategory: "Agriculture",
+          programTitle: "Smallholder Farmer Seed Grant & Food Security",
+          itemName: "Certified Rice Paddy Seeds (50kg) & Fertilizer",
+          itemCost: 2500,
+          itemQty: 3,
+          status: "Satisfied"
+        }]
+      },
+      {
+        id: "BCF-0003",
+        name: "Fatmata Bangura",
+        age: 24,
+        maritalStatus: "Single",
+        educationalStatus: "Vocational / TVET",
+        disability: "No",
+        children: 1,
+        district: "Kenema",
+        allocations: [{
+          programCode: "BCF-EP08",
+          programCategory: "Empowerment",
+          programTitle: "Youth & Women Enterprise Capital",
+          itemName: "Manual Sewing Machine & Fabric Roll",
+          itemCost: 3500,
+          itemQty: 1,
+          status: "Average"
+        }]
+      },
+      {
+        id: "BCF-0004",
+        name: "Alhaji Momoh Conteh",
+        age: 63,
+        maritalStatus: "Widowed",
+        educationalStatus: "Illiterate / No Formal Education",
+        disability: "Yes",
+        children: 0,
+        district: "Port Loko",
+        allocations: [{
+          programCode: "BCF-CC04",
+          programCategory: "Climate Change",
+          programTitle: "Flood Resilience & Solar Water Supply",
+          itemName: "Clean Water Filter Unit & Solar Lantern",
+          itemCost: 1800,
+          itemQty: 2,
+          status: "Satisfied"
+        }]
+      },
+      {
+        id: "BCF-0005",
+        name: "Mariama Kargbo",
+        age: 19,
+        maritalStatus: "Single",
+        educationalStatus: "Senior Secondary (SSS)",
+        disability: "No",
+        children: 0,
+        district: "Western Area Urban",
+        allocations: [{
+          programCode: "BCF-AR07",
+          programCategory: "Addiction Rehab",
+          programTitle: "Substance Recovery Counseling & Reintegration",
+          itemName: "Psychosocial Support Kit & Food Vouchers",
+          itemCost: 1200,
+          itemQty: 4,
+          status: "Satisfied"
+        }]
+      },
+      {
+        id: "BCF-0008",
+        name: "Aisha Mustapha",
+        age: 34,
+        maritalStatus: "Married",
+        educationalStatus: "Tertiary / University",
+        disability: "No",
+        children: 2,
+        district: "Western Area Urban",
+        allocations: [{
+          programCode: "BCF-E02",
+          programCategory: "Education",
+          programTitle: "School Provisiom",
+          itemName: "Land",
+          itemCost: 15000,
+          itemQty: 5,
+          status: "Satisfied"
+        }]
+      }
+    ];
+
+    const PROGRAM_COLORS = {
+      "Health": { bg: "bg-rose-500", text: "text-rose-700", badge: "bg-rose-50 border-rose-200" },
+      "Education": { bg: "bg-blue-500", text: "text-blue-700", badge: "bg-blue-50 border-blue-200" },
+      "Agriculture": { bg: "bg-emerald-600", text: "text-emerald-700", badge: "bg-emerald-50 border-emerald-200" },
+      "Climate Change": { bg: "bg-teal-500", text: "text-teal-700", badge: "bg-teal-50 border-teal-200" },
+      "Social Justice": { bg: "bg-amber-500", text: "text-amber-700", badge: "bg-amber-50 border-amber-200" },
+      "Innovation": { bg: "bg-indigo-500", text: "text-indigo-700", badge: "bg-indigo-50 border-indigo-200" },
+      "Addiction Rehab": { bg: "bg-purple-500", text: "text-purple-700", badge: "bg-purple-50 border-purple-200" },
+      "Empowerment": { bg: "bg-orange-500", text: "text-orange-700", badge: "bg-orange-50 border-orange-200" },
+    };
+
+    let allBeneficiaries = [];
+
+    function loadDatabase() {
+      try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if (raw) {
+          allBeneficiaries = JSON.parse(raw);
+          // Filter out example rows if any
+          allBeneficiaries = allBeneficiaries.filter(b => !b.isExample);
+        } else {
+          allBeneficiaries = JSON.parse(JSON.stringify(DEFAULT_BENEFICIARIES));
+        }
+      } catch (e) {
+        console.error("Failed to parse beneficiaries log:", e);
+        allBeneficiaries = JSON.parse(JSON.stringify(DEFAULT_BENEFICIARIES));
+      }
+    }
+
+    function getFilteredBeneficiaries() {
+      const d = document.getElementById("filterDistrict")?.value || "ALL";
+      const c = document.getElementById("filterCategory")?.value || "ALL";
+      const s = document.getElementById("filterStatus")?.value || "ALL";
+
+      return allBeneficiaries.filter(b => {
+        if (d !== "ALL" && b.district !== d) return false;
+        
+        if (c !== "ALL") {
+          const matchCat = (b.allocations || []).some(a => a.programCategory === c || a.programCode === c);
+          if (!matchCat) return false;
+        }
+
+        if (s !== "ALL") {
+          const matchStatus = (b.allocations || []).some(a => a.status === s);
+          if (!matchStatus) return false;
+        }
+
+        return true;
+      });
+    }
+
+    function renderDashboard() {
+      const list = getFilteredBeneficiaries();
+
+      // Flatten allocations
+      let totalAllocationsCount = 0;
+      let totalValuation = 0;
+      let totalChildren = 0;
+      let disabilityCount = 0;
+      let satisfiedCount = 0;
+      let totalAllocationsRated = 0;
+
+      const sectorMap = {};
+      const districtMap = {};
+      const eduMap = {};
+      const maritalMap = {};
+      const statusMap = { "Satisfied": 0, "Average": 0, "Not Satisfied": 0 };
+      const itemLedgerMap = {};
+
+      list.forEach(b => {
+        totalChildren += parseInt(b.children || 0, 10);
+        if (b.disability === "Yes") disabilityCount++;
+
+        // District aggregation
+        const dist = b.district || "Unassigned";
+        if (!districtMap[dist]) districtMap[dist] = { count: 0, totalVal: 0 };
+        districtMap[dist].count++;
+
+        // Education aggregation
+        const edu = b.educationalStatus || "Not Specified";
+        eduMap[edu] = (eduMap[edu] || 0) + 1;
+
+        // Marital aggregation
+        const mar = b.maritalStatus || "Not Specified";
+        maritalMap[mar] = (maritalMap[mar] || 0) + 1;
+
+        // Allocations breakdown
+        (b.allocations || []).forEach(a => {
+          totalAllocationsCount++;
+          const cost = parseFloat(a.itemCost || 0);
+          const qty = parseInt(a.itemQty || 1, 10);
+          const lineTotal = cost * (qty > 0 ? qty : 1);
+          totalValuation += lineTotal;
+
+          districtMap[dist].totalVal += lineTotal;
+
+          // Sector breakdown
+          const sec = a.programCategory || "General";
+          if (!sectorMap[sec]) sectorMap[sec] = { count: 0, value: 0 };
+          sectorMap[sec].count++;
+          sectorMap[sec].value += lineTotal;
+
+          // Status breakdown
+          const st = a.status || "Satisfied";
+          statusMap[st] = (statusMap[st] || 0) + 1;
+          totalAllocationsRated++;
+          if (st === "Satisfied") satisfiedCount++;
+
+          // Item Ledger breakdown
+          const itemKey = (a.itemName || "Unnamed Item").trim();
+          if (!itemLedgerMap[itemKey]) {
+            itemLedgerMap[itemKey] = {
+              name: itemKey,
+              sector: sec,
+              unitCost: cost,
+              totalQty: 0,
+              totalValue: 0,
+              recipients: 0
+            };
+          }
+          itemLedgerMap[itemKey].totalQty += qty;
+          itemLedgerMap[itemKey].totalValue += lineTotal;
+          itemLedgerMap[itemKey].recipients++;
+        });
+      });
+
+      // Update KPI Cards - Beneficiaries equal to Performance Evaluation & Annual Audit by year
+      let yearBen = "142,500+";
+      try {
+        const activeYr = localStorage.getItem("bcf_performance_active_year") || "2024";
+        const rawY = localStorage.getItem("bcf_performance_eval_years");
+        if (rawY) {
+          const parsed = JSON.parse(rawY);
+          if (parsed[activeYr]) {
+            yearBen = parsed[activeYr].beneficiariesText || "142,500+";
+          }
+        }
+      } catch (e) {}
+      document.getElementById("statTotalBeneficiaries").textContent = yearBen;
+      document.getElementById("statTotalAllocations").textContent = totalAllocationsCount.toLocaleString();
+      
+      // Total Aid Value equals Total Budget in Performance Evaluation (3.07M NLe, 8 Pillars Monitored)
+      let perfBudgetVal = 3070000;
+      try {
+        const stored = localStorage.getItem("bcf_performance_evaluation_budget");
+        if (stored && !isNaN(Number(stored))) {
+          perfBudgetVal = Number(stored);
+        }
+      } catch (e) {}
+
+      const formattedAidVal = (perfBudgetVal >= 1000000)
+        ? `${(perfBudgetVal / 1000000).toFixed(2)}M NLe`
+        : `${perfBudgetVal.toLocaleString()} NLe`;
+
+      document.getElementById("statTotalValue").textContent = formattedAidVal;
+      const subVal = document.getElementById("statTotalValueSub");
+      if (subVal) subVal.innerHTML = `${formattedAidVal} &bull; 8 Pillars Monitored`;
+      
+      const satRate = totalAllocationsRated > 0 ? ((satisfiedCount / totalAllocationsRated) * 100).toFixed(1) : 0;
+      document.getElementById("statSatisfactionRate").textContent = satRate + "%";
+      
+      document.getElementById("statTotalChildren").textContent = totalChildren.toLocaleString();
+      document.getElementById("statDisabilityCount").textContent = `${disabilityCount} (${list.length > 0 ? ((disabilityCount/list.length)*100).toFixed(0) : 0}%)`;
+
+      // Render Program Sector Allocation Bars
+      const sectorContainer = document.getElementById("programSectorList");
+      sectorContainer.innerHTML = "";
+      const sectorEntries = Object.entries(sectorMap).sort((a,b) => b[1].value - a[1].value);
+
+      if (sectorEntries.length === 0) {
+        sectorContainer.innerHTML = '<div class="text-slate-400 italic py-6 text-center text-xs">No allocations found matching current filters.</div>';
+      } else {
+        sectorEntries.forEach(([sec, data]) => {
+          const cfg = PROGRAM_COLORS[sec] || { bg: "bg-slate-600", text: "text-slate-700", badge: "bg-slate-100" };
+          const pct = totalValuation > 0 ? ((data.value / totalValuation) * 100).toFixed(1) : 0;
+
+          const row = document.createElement("div");
+          row.className = "flex flex-col gap-1";
+          row.innerHTML = `
+            <div class="flex items-center justify-between text-xs font-bold">
+              <span class="flex items-center gap-1.5 text-slate-800">
+                <span class="w-2.5 h-2.5 rounded-full ${cfg.bg}"></span>
+                <span>${sec}</span>
+              </span>
+              <div class="flex items-center gap-3">
+                <span class="text-slate-500 font-normal">${data.count} items</span>
+                <span class="font-mono text-slate-900 font-extrabold">${data.value.toLocaleString()} NLe</span>
+                <span class="text-slate-400 text-[11px] w-10 text-right">${pct}%</span>
+              </div>
+            </div>
+            <div class="w-full h-2.5 bg-slate-100 rounded-full overflow-hidden">
+              <div class="h-full ${cfg.bg} rounded-full transition-all duration-500" style="width: ${pct}%"></div>
+            </div>
+          `;
+          sectorContainer.appendChild(row);
+        });
+      }
+
+      // Render District Rankings
+      const districtContainer = document.getElementById("districtRankList");
+      districtContainer.innerHTML = "";
+      const distEntries = Object.entries(districtMap).sort((a,b) => b[1].count - a[1].count);
+
+      distEntries.forEach(([dName, dData]) => {
+        const dPct = list.length > 0 ? ((dData.count / list.length) * 100).toFixed(0) : 0;
+        const div = document.createElement("div");
+        div.className = "p-2.5 rounded-lg border border-slate-100 bg-slate-50/70 flex items-center justify-between";
+        div.innerHTML = `
+          <div class="flex items-center gap-2">
+            <span class="w-6 h-6 rounded-full bg-brand-100 text-brand-900 font-bold text-[10px] flex items-center justify-center">${dPct}%</span>
+            <div>
+              <span class="font-bold text-slate-900 block text-xs">${dName}</span>
+              <span class="text-[10px] text-slate-500">${dData.count} recipients</span>
+            </div>
+          </div>
+          <span class="font-mono text-xs font-bold text-brand-900">${dData.totalVal.toLocaleString()} NLe</span>
+        `;
+        districtContainer.appendChild(div);
+      });
+
+      // Render Educational Status Breakdown
+      const eduContainer = document.getElementById("eduBreakdownList");
+      eduContainer.innerHTML = "";
+      Object.entries(eduMap).sort((a,b) => b[1] - a[1]).forEach(([edu, count]) => {
+        const epct = list.length > 0 ? ((count / list.length) * 100).toFixed(0) : 0;
+        const eDiv = document.createElement("div");
+        eDiv.className = "flex items-center justify-between";
+        eDiv.innerHTML = `
+          <span class="text-slate-700 truncate max-w-[170px]" title="${edu}">${edu}</span>
+          <div class="flex items-center gap-2">
+            <span class="font-mono font-bold text-slate-900">${count}</span>
+            <span class="text-[10px] text-slate-400 font-mono w-8 text-right">${epct}%</span>
+          </div>
+        `;
+        eduContainer.appendChild(eDiv);
+      });
+
+      // Render Marital Status Breakdown
+      const maritalContainer = document.getElementById("maritalBreakdownList");
+      maritalContainer.innerHTML = "";
+      Object.entries(maritalMap).forEach(([m, count]) => {
+        const mDiv = document.createElement("div");
+        mDiv.className = "p-2 rounded bg-slate-50 border border-slate-200 text-center";
+        mDiv.innerHTML = `
+          <span class="block text-[10px] text-slate-500 uppercase font-semibold">${m}</span>
+          <span class="font-mono font-extrabold text-sm text-slate-900">${count}</span>
+        `;
+        maritalContainer.appendChild(mDiv);
+      });
+
+      // Render Satisfaction Breakdown
+      const satContainer = document.getElementById("satisfactionBreakdownList");
+      satContainer.innerHTML = "";
+      [
+        { name: "Satisfied", count: statusMap["Satisfied"] || 0, color: "text-emerald-700 bg-emerald-50 border-emerald-200" },
+        { name: "Average", count: statusMap["Average"] || 0, color: "text-amber-700 bg-amber-50 border-amber-200" },
+        { name: "Not Satisfied", count: statusMap["Not Satisfied"] || 0, color: "text-rose-700 bg-rose-50 border-rose-200" },
+      ].forEach(item => {
+        const spct = totalAllocationsRated > 0 ? ((item.count / totalAllocationsRated) * 100).toFixed(1) : 0;
+        const sDiv = document.createElement("div");
+        sDiv.className = `p-1.5 rounded border ${item.color} flex items-center justify-between font-bold text-xs`;
+        sDiv.innerHTML = `
+          <span>${item.name}</span>
+          <span class="font-mono">${item.count} (${spct}%)</span>
+        `;
+        satContainer.appendChild(sDiv);
+      });
+
+      // Render Item/Service Ledger Table
+      const ledgerBody = document.getElementById("itemsLedgerTableBody");
+      ledgerBody.innerHTML = "";
+      const ledgerEntries = Object.values(itemLedgerMap).sort((a,b) => b.totalValue - a.totalValue);
+
+      let grandUnits = 0;
+      let grandValue = 0;
+      let grandRecipients = 0;
+
+      ledgerEntries.forEach(item => {
+        grandUnits += item.totalQty;
+        grandValue += item.totalValue;
+        grandRecipients += item.recipients;
+
+        const tr = document.createElement("tr");
+        tr.className = "hover:bg-slate-50/80 transition";
+        tr.innerHTML = `
+          <td class="py-2.5 px-3 font-bold text-slate-900">${item.name}</td>
+          <td class="py-2.5 px-3">
+            <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-slate-100 text-slate-700 border border-slate-200">${item.sector}</span>
+          </td>
+          <td class="py-2.5 px-3 text-right font-mono font-medium">${item.unitCost ? Number(item.unitCost).toLocaleString() + ' NLe' : '—'}</td>
+          <td class="py-2.5 px-3 text-center font-mono font-bold text-slate-800">${item.totalQty}</td>
+          <td class="py-2.5 px-3 text-right font-mono font-extrabold text-brand-900">${item.totalValue.toLocaleString()} NLe</td>
+          <td class="py-2.5 px-3 text-center font-mono text-slate-600">${item.recipients}</td>
+        `;
+        ledgerBody.appendChild(tr);
+      });
+
+      // Update Table Footer Totals
+      document.getElementById("tfootTotalQty").textContent = grandUnits.toLocaleString();
+      document.getElementById("tfootTotalValue").textContent = grandValue.toLocaleString() + " NLe";
+      document.getElementById("tfootTotalRecipients").textContent = grandRecipients.toLocaleString();
+    }
+
+    function applyFilters() {
+      renderDashboard();
+    }
+
+    function resetFilters() {
+      document.getElementById("filterDistrict").value = "ALL";
+      document.getElementById("filterCategory").value = "ALL";
+      document.getElementById("filterStatus").value = "ALL";
+      renderDashboard();
+    }
+
+    function exportAnalyticsCSV() {
+      let csv = "Sector,Item/Service Name,Unit Cost (NLe),Total Quantity,Total Value (NLe),Recipients Count\n";
+      const rows = document.querySelectorAll("#itemsLedgerTableBody tr");
+      rows.forEach(tr => {
+        const tds = tr.querySelectorAll("td");
+        if (tds.length >= 6) {
+          const name = `"${tds[0].innerText.replace(/"/g, '""')}"`;
+          const sector = `"${tds[1].innerText.replace(/"/g, '""')}"`;
+          const unitCost = tds[2].innerText.replace(/[^0-9.]/g, '');
+          const qty = tds[3].innerText.trim();
+          const totalVal = tds[4].innerText.replace(/[^0-9.]/g, '');
+          const rec = tds[5].innerText.trim();
+          csv += `${sector},${name},${unitCost},${qty},${totalVal},${rec}\n`;
+        }
+      });
+
+      const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = `BCF_Beneficiaries_Analytics_${new Date().toISOString().split('T')[0]}.csv`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    }
+
+    // Initialize and live listeners
+    window.addEventListener("DOMContentLoaded", () => {
+      loadDatabase();
+      renderDashboard();
+
+      window.addEventListener("storage", (e) => {
+        if (e.key === "bcf_performance_evaluation_budget" || e.key === STORAGE_KEY) {
+          loadDatabase();
+          renderDashboard();
+        }
+      });
+
+      try {
+        const bcPerf = new BroadcastChannel("bcf_performance_channel");
+        bcPerf.onmessage = () => renderDashboard();
+      } catch (e) {}
+
+      try {
+        const bcBen = new BroadcastChannel("bcf_beneficiaries_channel");
+        bcBen.onmessage = () => {
+          loadDatabase();
+          renderDashboard();
+        };
+      } catch (e) {}
+    });
+  </script>
+
+</body>
+</html>

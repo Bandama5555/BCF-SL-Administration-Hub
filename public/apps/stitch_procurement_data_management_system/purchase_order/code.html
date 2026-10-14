@@ -1,0 +1,588 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover"/>
+  <title>Purchase Orders (PO) — BCF-SL Integrated Procurement</title>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: {
+            primary: "#0037b0",
+            "primary-dark": "#00247d",
+            secondary: "#565e74",
+            tertiary: "#006948",
+            "tertiary-dark": "#004f35",
+            surface: "#f8f9ff",
+            "surface-container": "#eff4ff",
+            "on-surface": "#0b1c30",
+            "on-surface-variant": "#434655",
+            outline: "#747686",
+            error: "#ba1a1a"
+          },
+          fontFamily: {
+            sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+            body: ['"Inter"', 'sans-serif'],
+            mono: ['"JetBrains Mono"', 'monospace']
+          }
+        }
+      }
+    };
+  </script>
+  <style>
+    body { font-family: 'Inter', sans-serif; background-color: #f8f9ff; }
+    h1, h2, h3, h4, .font-headline { font-family: 'Plus Jakarta Sans', sans-serif; }
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-thumb { background-color: #cbd5e1; border-radius: 4px; }
+  </style>
+</head>
+<body class="text-on-surface flex flex-col min-h-screen">
+
+  <!-- UNIFIED PROCUREMENT TOP NAVIGATION & WORKFLOW TABS -->
+  <div id="bcf-procurement-nav-header"></div>
+
+  <!-- MAIN VIEWPORT -->
+  <main class="flex-grow p-4 sm:p-6 max-w-7xl mx-auto w-full flex flex-col gap-6">
+
+    <!-- HERO & SUMMARY METRICS -->
+    <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+      <div>
+        <div class="flex items-center gap-2 mb-1">
+          <span class="inline-flex items-center justify-center w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+          <span class="text-xs font-extrabold uppercase tracking-wider text-emerald-800 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200">
+            Official Commitment Ledger
+          </span>
+          <span class="text-xs text-slate-500">• Financial Commitment Engine</span>
+        </div>
+        <h1 class="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight font-headline">
+          Purchase Orders (PO)
+        </h1>
+        <p class="text-xs sm:text-sm text-slate-600 mt-1 max-w-2xl">
+          Legally binding contract commitments issued to verified vendors, auto-generating budget reservations and initiating the delivery tracking lifecycle.
+        </p>
+      </div>
+
+      <div class="flex items-center gap-2.5 flex-wrap shrink-0">
+        <button onclick="openPoModal()" class="px-4 py-2 rounded-xl bg-primary hover:bg-primary-dark text-white text-xs font-extrabold flex items-center gap-1.5 transition shadow-md cursor-pointer active:scale-95">
+          <span class="material-symbols-outlined text-[18px]">add_circle</span>
+          <span>Generate New Purchase Order</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- STATS CARDS -->
+    <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+      <div class="p-4 sm:p-5 rounded-2xl bg-white border border-slate-200 shadow-xs flex flex-col justify-between">
+        <div class="flex items-center justify-between text-slate-500 mb-2">
+          <span class="text-xs font-extrabold uppercase tracking-wider">Total Purchase Orders</span>
+          <div class="w-8 h-8 rounded-lg bg-blue-50 text-primary flex items-center justify-center">
+            <span class="material-symbols-outlined text-[20px]">shopping_bag</span>
+          </div>
+        </div>
+        <div>
+          <span id="metric-total-pos" class="text-2xl sm:text-3xl font-black text-slate-900 font-mono">0</span>
+          <div class="flex items-center gap-1 mt-1 text-[11px] text-slate-500 font-semibold">
+            <span>Fiscal Year 2026 Commitments</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="p-4 sm:p-5 rounded-2xl bg-white border border-slate-200 shadow-xs flex flex-col justify-between">
+        <div class="flex items-center justify-between text-slate-500 mb-2">
+          <span class="text-xs font-extrabold uppercase tracking-wider">Total Committed Amount</span>
+          <div class="w-8 h-8 rounded-lg bg-purple-50 text-purple-700 flex items-center justify-center">
+            <span class="material-symbols-outlined text-[20px]">account_balance_wallet</span>
+          </div>
+        </div>
+        <div>
+          <span id="metric-committed-amt" class="text-xl sm:text-2xl font-black text-slate-900 font-mono">NLe 0.00</span>
+          <div class="flex items-center gap-1 mt-1 text-[11px] text-purple-700 font-bold">
+            <span>Reserved against Grant budgets</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="p-4 sm:p-5 rounded-2xl bg-white border border-slate-200 shadow-xs flex flex-col justify-between">
+        <div class="flex items-center justify-between text-slate-500 mb-2">
+          <span class="text-xs font-extrabold uppercase tracking-wider">Awaiting Delivery</span>
+          <div class="w-8 h-8 rounded-lg bg-amber-50 text-amber-700 flex items-center justify-center">
+            <span class="material-symbols-outlined text-[20px]">local_shipping</span>
+          </div>
+        </div>
+        <div>
+          <span id="metric-awaiting-delivery" class="text-2xl sm:text-3xl font-black text-amber-700 font-mono">0</span>
+          <div class="flex items-center gap-1 mt-1 text-[11px] text-slate-500">
+            <span>Pending GRN receipt</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="p-4 sm:p-5 rounded-2xl bg-white border border-slate-200 shadow-xs flex flex-col justify-between">
+        <div class="flex items-center justify-between text-slate-500 mb-2">
+          <span class="text-xs font-extrabold uppercase tracking-wider">Goods Received &amp; Verified</span>
+          <div class="w-8 h-8 rounded-lg bg-emerald-50 text-emerald-700 flex items-center justify-center">
+            <span class="material-symbols-outlined text-[20px]">inventory</span>
+          </div>
+        </div>
+        <div>
+          <span id="metric-delivered-pos" class="text-2xl sm:text-3xl font-black text-emerald-700 font-mono">0</span>
+          <div class="flex items-center gap-1 mt-1 text-[11px] text-emerald-700 font-bold">
+            <span>Cleared for 3-Way Match</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- PO LIST -->
+    <div id="pos-container" class="space-y-4">
+      <!-- Dynamic PO Cards -->
+    </div>
+
+    <!-- EMPTY STATE -->
+    <div id="pos-empty-state" class="hidden text-center py-16 bg-white rounded-2xl border border-slate-200">
+      <div class="w-16 h-16 rounded-full bg-slate-100 text-slate-400 mx-auto flex items-center justify-center mb-3">
+        <span class="material-symbols-outlined text-3xl">shopping_bag</span>
+      </div>
+      <h3 class="text-base font-bold text-slate-800">No Purchase Orders Issued</h3>
+      <p class="text-xs text-slate-500 mt-1 max-w-sm mx-auto">Generate a Purchase Order from an evaluated RFQ or approved Purchase Requisition.</p>
+      <button onclick="openPoModal()" class="mt-4 px-4 py-2 rounded-xl bg-primary hover:bg-primary-dark text-white text-xs font-bold">
+        Issue Purchase Order
+      </button>
+    </div>
+
+  </main>
+
+  <!-- GENERATE PO MODAL -->
+  <div id="po-modal" class="fixed inset-0 z-50 bg-black/50 backdrop-blur-xs hidden flex items-center justify-center p-3 sm:p-4 overflow-y-auto">
+    <div class="bg-white rounded-2xl max-w-3xl w-full p-5 sm:p-6 shadow-2xl border border-slate-200 flex flex-col my-auto max-h-[92vh]">
+      <div class="flex items-center justify-between border-b border-slate-100 pb-3 mb-4">
+        <div class="flex items-center gap-2.5">
+          <div class="w-9 h-9 rounded-xl bg-primary/10 text-primary flex items-center justify-center">
+            <span class="material-symbols-outlined text-[20px]">shopping_bag</span>
+          </div>
+          <div>
+            <h3 class="text-base font-extrabold text-slate-900 font-headline">Generate Official Purchase Order</h3>
+            <p class="text-xs text-slate-500">Binds transaction to vendor and records financial commitment</p>
+          </div>
+        </div>
+        <button onclick="closePoModal()" class="w-8 h-8 rounded-lg text-slate-400 hover:text-slate-600 hover:bg-slate-100 flex items-center justify-center">
+          <span class="material-symbols-outlined text-[20px]">close</span>
+        </button>
+      </div>
+
+      <form id="po-form" onsubmit="handlePoSubmit(event)" class="flex-1 overflow-y-auto pr-1 space-y-4 text-xs">
+        <!-- Requisition / RFQ Selector -->
+        <div class="p-3 bg-blue-50/70 rounded-xl border border-blue-200/60">
+          <label class="block font-bold text-blue-900 mb-1">Select Source Requisition or Awarded Bid *</label>
+          <select id="po-source-pr" required onchange="onSourcePrChange()" class="w-full px-3 py-2 rounded-xl border border-blue-300 bg-white text-xs font-semibold">
+            <option value="">Select Requisition...</option>
+            <!-- Populated via script -->
+          </select>
+        </div>
+
+        <!-- Supplier Selection -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div>
+            <label class="block font-bold text-slate-700 mb-1">Contracted Supplier *</label>
+            <select id="po-supplier" required class="w-full px-3 py-2 rounded-xl border border-slate-200 bg-slate-50 text-xs font-bold">
+              <!-- Populated via script -->
+            </select>
+          </div>
+          <div>
+            <label class="block font-bold text-slate-700 mb-1">Payment Settlement Terms *</label>
+            <select id="po-payment-terms" required class="w-full px-3 py-2 rounded-xl border border-slate-200 bg-slate-50 text-xs">
+              <option value="30 Days Net from GRN Verification">30 Days Net from GRN Verification</option>
+              <option value="15 Days Net from Inspection">15 Days Net from Inspection</option>
+              <option value="50% Advance, 50% on Delivery">50% Advance, 50% on Delivery</option>
+              <option value="100% on Acceptance">100% on Acceptance</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div>
+            <label class="block font-bold text-slate-700 mb-1">Delivery Destination Warehouse / Office *</label>
+            <select id="po-delivery-location" required class="w-full px-3 py-2 rounded-xl border border-slate-200 bg-slate-50 text-xs">
+              <!-- Populated via script -->
+            </select>
+          </div>
+          <div>
+            <label class="block font-bold text-slate-700 mb-1">Contractual Delivery Deadline *</label>
+            <input id="po-delivery-deadline" type="date" required class="w-full px-3 py-2 rounded-xl border border-slate-200 bg-slate-50 text-xs font-mono"/>
+          </div>
+        </div>
+
+        <div>
+          <label class="block font-bold text-slate-700 mb-1">Total Order Value (NLe) *</label>
+          <input id="po-total-amount" type="number" step="any" required placeholder="e.g. 175000" class="w-full px-3 py-2 rounded-xl border border-slate-200 bg-slate-50 font-mono font-black text-sm text-primary"/>
+        </div>
+
+        <!-- Submit buttons -->
+        <div class="flex items-center justify-end gap-2 pt-3 border-t border-slate-100">
+          <button type="button" onclick="closePoModal()" class="px-4 py-2 rounded-xl border border-slate-200 hover:bg-slate-100 text-xs font-bold text-slate-600">
+            Cancel
+          </button>
+          <button type="submit" class="px-5 py-2 rounded-xl bg-primary hover:bg-primary-dark text-white text-xs font-extrabold shadow-md active:scale-95">
+            Issue Purchase Order &amp; Commit Funds
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- OFFICIAL PRINTABLE PO VIEW MODAL -->
+  <div id="po-view-modal" class="fixed inset-0 z-50 bg-black/50 backdrop-blur-xs hidden flex items-center justify-center p-3 sm:p-4 overflow-y-auto">
+    <div class="bg-white rounded-2xl max-w-4xl w-full p-6 sm:p-8 shadow-2xl border border-slate-200 flex flex-col my-auto max-h-[94vh]">
+      <div class="flex items-center justify-between border-b border-slate-200 pb-4 mb-4">
+        <div class="flex items-center gap-3">
+          <img src="/bcf-logo.jpg" onerror="this.src='../bcf-logo.jpg'" alt="BCF-SL Logo" class="h-10 w-auto object-contain rounded"/>
+          <div>
+            <h3 class="text-lg font-black text-slate-900 font-headline uppercase tracking-tight">Bandama Charity Foundation (BCF-SL)</h3>
+            <p class="text-xs text-slate-500 font-mono">Official Purchase Order &bull; Institutional Procurement Engine</p>
+          </div>
+        </div>
+        <button onclick="closePoViewModal()" class="w-8 h-8 rounded-lg text-slate-400 hover:text-slate-600 hover:bg-slate-100 flex items-center justify-center">
+          <span class="material-symbols-outlined text-[20px]">close</span>
+        </button>
+      </div>
+
+      <div class="flex-1 overflow-y-auto pr-1 space-y-4 text-xs" id="po-view-content">
+        <!-- Rendered dynamically -->
+      </div>
+
+      <div class="flex items-center justify-between pt-4 border-t border-slate-200 mt-4">
+        <button id="po-create-grn-btn" onclick="routePoToGrn()" class="px-5 py-2 rounded-xl bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-extrabold shadow-md flex items-center gap-1.5 cursor-pointer">
+          <span class="material-symbols-outlined text-[18px]">inventory_2</span>
+          <span>Record Delivery Receipt (Issue GRN)</span>
+        </button>
+
+        <button onclick="window.print()" class="px-4 py-2 rounded-xl border border-slate-300 hover:bg-slate-100 text-slate-700 text-xs font-bold flex items-center gap-1">
+          <span class="material-symbols-outlined text-[16px]">print</span>
+          <span>Print Official PO Document</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Shared Library -->
+  <script src="../bcf_procurement_shared.js"></script>
+
+  <!-- Controller Logic -->
+  <script>
+    let currentViewingPo = null;
+
+    document.addEventListener('DOMContentLoaded', () => {
+      // Shared top navigation
+      BCF_PROCUREMENT.renderHeaderAndTabs('purchase-order');
+
+      loadPos();
+
+      // Check if TXN was passed
+      const passedTxn = localStorage.getItem('bcf_selected_txn_id');
+      if (passedTxn) {
+        localStorage.removeItem('bcf_selected_txn_id');
+        const matched = BCF_PROCUREMENT.getPurchaseOrders().find(p => p.txnId === passedTxn);
+        if (matched) viewPo(matched.id);
+      }
+    });
+
+    function loadPos() {
+      renderPos();
+      updateMetrics();
+    }
+
+    function updateMetrics() {
+      const pos = BCF_PROCUREMENT.getPurchaseOrders();
+      const totalCommitted = pos.reduce((sum, p) => sum + (p.totalAmount || 0), 0);
+      const grns = BCF_PROCUREMENT.getGrns();
+      const deliveredCount = grns.length;
+      const awaiting = Math.max(0, pos.length - deliveredCount);
+
+      document.getElementById('metric-total-pos').textContent = pos.length;
+      document.getElementById('metric-committed-amt').textContent = BCF_PROCUREMENT.formatCurrency(totalCommitted);
+      document.getElementById('metric-awaiting-delivery').textContent = awaiting;
+      document.getElementById('metric-delivered-pos').textContent = deliveredCount;
+    }
+
+    function renderPos() {
+      const container = document.getElementById('pos-container');
+      const emptyState = document.getElementById('pos-empty-state');
+      if (!container) return;
+
+      const pos = BCF_PROCUREMENT.getPurchaseOrders();
+
+      if (pos.length === 0) {
+        container.innerHTML = '';
+        emptyState?.classList.remove('hidden');
+        return;
+      }
+
+      emptyState?.classList.add('hidden');
+
+      container.innerHTML = pos.map(po => {
+        return `
+          <div class="bg-white rounded-2xl border border-slate-200 shadow-xs p-4 sm:p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div class="flex items-start gap-3.5 flex-1 min-w-0">
+              <div class="w-11 h-11 rounded-xl bg-primary/10 text-primary flex items-center justify-center shrink-0 mt-0.5">
+                <span class="material-symbols-outlined text-[22px]">shopping_bag</span>
+              </div>
+              <div class="flex-1 min-w-0">
+                <div class="flex items-center gap-2 flex-wrap mb-1">
+                  <span class="font-mono text-xs font-black text-primary bg-blue-50 px-2 py-0.5 rounded border border-blue-200">
+                    ${po.poNumber || po.id}
+                  </span>
+                  <span class="font-mono text-xs font-bold text-slate-700 bg-slate-100 px-2 py-0.5 rounded border border-slate-200 flex items-center gap-1">
+                    <span class="material-symbols-outlined text-[13px] text-slate-500">key</span>
+                    <span>${po.txnId}</span>
+                  </span>
+                  <span class="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold bg-blue-100 text-blue-800 border border-blue-200">
+                    ${po.status}
+                  </span>
+                </div>
+
+                <h3 class="text-sm sm:text-base font-extrabold text-slate-900 leading-snug font-headline">
+                  Supplier: ${po.supplierName}
+                </h3>
+
+                <div class="flex items-center gap-3 text-xs text-slate-500 mt-1 flex-wrap">
+                  <span>Programme: <strong class="text-slate-700">${po.programmeName || '—'}</strong></span>
+                  <span>Donor: <strong class="text-slate-700">${po.donorName || '—'}</strong></span>
+                  <span>Destination: <strong class="text-slate-700">${po.deliveryLocation || '—'}</strong></span>
+                  <span>Deadline: <strong class="text-slate-700 font-mono">${BCF_PROCUREMENT.formatDate(po.deliveryDeadline)}</strong></span>
+                </div>
+              </div>
+            </div>
+
+            <div class="flex sm:flex-col items-center sm:items-end justify-between sm:justify-center border-t sm:border-t-0 pt-3 sm:pt-0 border-slate-100 shrink-0 gap-2">
+              <div class="text-left sm:text-right">
+                <span class="text-[10px] font-bold uppercase text-slate-400 block">Total Commitment</span>
+                <span class="font-mono text-base sm:text-lg font-black text-primary">${BCF_PROCUREMENT.formatCurrency(po.totalAmount)}</span>
+              </div>
+
+              <div class="flex items-center gap-1.5">
+                <button onclick="viewPo('${po.id}')" class="px-3.5 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-800 text-xs font-bold transition flex items-center gap-1 cursor-pointer">
+                  <span class="material-symbols-outlined text-[16px]">visibility</span>
+                  <span>View Official PO</span>
+                </button>
+                <button onclick="quickReceiveGoods('${po.id}')" class="px-3.5 py-2 rounded-xl bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-extrabold transition flex items-center gap-1 cursor-pointer">
+                  <span class="material-symbols-outlined text-[16px]">inventory_2</span>
+                  <span>Receive GRN</span>
+                </button>
+              </div>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function openPoModal() {
+      const modal = document.getElementById('po-modal');
+      const form = document.getElementById('po-form');
+      form.reset();
+
+      // Populate PRs
+      const prSelect = document.getElementById('po-source-pr');
+      const prs = BCF_PROCUREMENT.getRequisitions().filter(p => p.status === 'Approved');
+      prSelect.innerHTML = '<option value="">Select Requisition...</option>' + prs.map(p => `
+        <option value="${p.id}">${p.id} — ${p.title} (${BCF_PROCUREMENT.formatCurrency(p.estimatedTotal)})</option>
+      `).join('');
+
+      // Populate Suppliers (exclude terminated vendors)
+      const supSelect = document.getElementById('po-supplier');
+      const suppliers = (BCF_PROCUREMENT.getActiveSuppliers ? BCF_PROCUREMENT.getActiveSuppliers() : BCF_PROCUREMENT.getSuppliers().filter(s => s.status !== 'Terminated' && s.agreementStatus !== 'Terminated'));
+      supSelect.innerHTML = suppliers.map(s => `
+        <option value="${s.id}">${s.name} (${s.district || 'Sierra Leone'})</option>
+      `).join('');
+
+      // Populate Locations
+      const locSelect = document.getElementById('po-delivery-location');
+      locSelect.innerHTML = BCF_PROCUREMENT.POLICY.LOCATIONS.map(l => `
+        <option value="${l}">${l}</option>
+      `).join('');
+
+      // Default date
+      document.getElementById('po-delivery-deadline').value = new Date(Date.now() + 14 * 86400000).toISOString().split('T')[0];
+
+      modal.classList.remove('hidden');
+    }
+
+    function closePoModal() {
+      document.getElementById('po-modal').classList.add('hidden');
+    }
+
+    function onSourcePrChange() {
+      const prId = document.getElementById('po-source-pr').value;
+      if (!prId) return;
+
+      const pr = BCF_PROCUREMENT.getRequisition(prId);
+      if (pr) {
+        document.getElementById('po-total-amount').value = pr.estimatedTotal || 0;
+        document.getElementById('po-delivery-location').value = pr.deliveryLocation || BCF_PROCUREMENT.POLICY.LOCATIONS[0];
+        document.getElementById('po-delivery-deadline').value = pr.requiredDate || '';
+      }
+    }
+
+    function handlePoSubmit(e) {
+      e.preventDefault();
+
+      const prId = document.getElementById('po-source-pr').value;
+      const pr = BCF_PROCUREMENT.getRequisition(prId);
+      const supId = document.getElementById('po-supplier').value;
+      const supplier = BCF_PROCUREMENT.getSupplier(supId);
+      const total = parseFloat(document.getElementById('po-total-amount').value) || 0;
+
+      const po = {
+        txnId: pr ? pr.txnId : BCF_PROCUREMENT.generateTxnId('BCF-TXN'),
+        prId: pr ? pr.id : null,
+        supplierId: supId,
+        supplierName: supplier ? supplier.name : '',
+        supplierAddress: supplier ? supplier.address : '',
+        supplierContact: supplier ? `${supplier.contactPerson} (${supplier.phone})` : '',
+        programmeId: pr ? pr.programmeId : '',
+        programmeName: pr ? pr.programmeName : '',
+        donorId: pr ? pr.donorId : '',
+        donorName: pr ? pr.donorName : '',
+        grantId: pr ? pr.grantId : '',
+        budgetLineId: pr ? pr.budgetLineId : '',
+        items: pr ? pr.items : [{ description: 'Procured Items', quantity: 1, unit: 'Lump Sum', unitPrice: total, total: total }],
+        subtotal: total,
+        totalAmount: total,
+        paymentTerms: document.getElementById('po-payment-terms').value,
+        deliveryLocation: document.getElementById('po-delivery-location').value,
+        deliveryDeadline: document.getElementById('po-delivery-deadline').value,
+        issuedBy: 'Joseph Conteh (Procurement Officer)',
+        authorizedBy: 'Aminata Turay (Finance Director)',
+        status: 'Issued'
+      };
+
+      const saved = BCF_PROCUREMENT.savePurchaseOrder(po);
+      closePoModal();
+      loadPos();
+      BCF_PROCUREMENT.showToast(`Purchase Order ${saved.poNumber} issued under Master TXN ${saved.txnId}!`, 'success');
+    }
+
+    function viewPo(poId) {
+      const po = BCF_PROCUREMENT.getPurchaseOrder(poId);
+      if (!po) return;
+      currentViewingPo = po;
+
+      const content = document.getElementById('po-view-content');
+      content.innerHTML = `
+        <div class="grid grid-cols-2 gap-4 p-4 rounded-xl bg-slate-50 border border-slate-200">
+          <div>
+            <span class="text-[10px] uppercase font-bold text-slate-400 block mb-1">Vendor Credentials</span>
+            <div class="font-extrabold text-slate-900 text-sm">${po.supplierName}</div>
+            <div class="text-slate-600 mt-0.5">${po.supplierAddress || 'Sierra Leone'}</div>
+            <div class="text-slate-600 font-mono mt-0.5">${po.supplierContact || '—'}</div>
+          </div>
+          <div class="text-right">
+            <span class="text-[10px] uppercase font-bold text-slate-400 block mb-1">Order References</span>
+            <div class="font-mono font-black text-primary text-base">${po.poNumber}</div>
+            <div class="text-slate-700 font-mono font-bold mt-0.5">Master TXN: ${po.txnId}</div>
+            <div class="text-slate-500 font-mono mt-0.5">Date: ${BCF_PROCUREMENT.formatDate(po.issuedDate)}</div>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs">
+          <div class="p-2.5 rounded-lg bg-white border border-slate-200">
+            <span class="text-[10px] text-slate-400 font-bold block">Programme</span>
+            <span class="font-bold text-slate-900">${po.programmeName || '—'}</span>
+          </div>
+          <div class="p-2.5 rounded-lg bg-white border border-slate-200">
+            <span class="text-[10px] text-slate-400 font-bold block">Donor Partner</span>
+            <span class="font-bold text-slate-900">${po.donorName || '—'}</span>
+          </div>
+          <div class="p-2.5 rounded-lg bg-white border border-slate-200">
+            <span class="text-[10px] text-slate-400 font-bold block">Payment Terms</span>
+            <span class="font-semibold text-slate-800">${po.paymentTerms || '30 Days Net'}</span>
+          </div>
+          <div class="p-2.5 rounded-lg bg-white border border-slate-200">
+            <span class="text-[10px] text-slate-400 font-bold block">Delivery Deadline</span>
+            <span class="font-mono font-bold text-slate-900">${BCF_PROCUREMENT.formatDate(po.deliveryDeadline)}</span>
+          </div>
+        </div>
+
+        <!-- Line items -->
+        <div>
+          <span class="text-xs font-extrabold text-slate-800 uppercase tracking-wider block mb-2">Itemised Contract Schedule</span>
+          <div class="rounded-xl border border-slate-200 overflow-x-auto bg-white">
+            <table class="w-full text-left text-xs border-collapse">
+              <thead class="bg-slate-50 border-b border-slate-200 font-bold text-slate-600">
+                <tr>
+                  <th class="py-2 px-3">#</th>
+                  <th class="py-2 px-3">Description</th>
+                  <th class="py-2 px-3 text-center">Unit</th>
+                  <th class="py-2 px-3 text-center">Qty</th>
+                  <th class="py-2 px-3 text-right">Unit Price</th>
+                  <th class="py-2 px-3 text-right">Total (NLe)</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-slate-100">
+                ${(po.items || []).map((item, idx) => `
+                  <tr>
+                    <td class="py-2 px-3 text-slate-400 font-mono">${idx + 1}</td>
+                    <td class="py-2 px-3 font-semibold text-slate-900">${item.description}</td>
+                    <td class="py-2 px-3 text-center text-slate-600">${item.unit || 'Units'}</td>
+                    <td class="py-2 px-3 text-center font-mono font-bold">${item.quantity}</td>
+                    <td class="py-2 px-3 text-right font-mono">${BCF_PROCUREMENT.formatCurrency(item.unitPrice || item.estimatedUnitPrice)}</td>
+                    <td class="py-2 px-3 text-right font-mono font-black text-slate-900">${BCF_PROCUREMENT.formatCurrency((item.quantity || 1) * (item.unitPrice || item.estimatedUnitPrice || 0))}</td>
+                  </tr>
+                `).join('')}
+              </tbody>
+              <tfoot class="bg-slate-50 border-t border-slate-200 font-bold">
+                <tr>
+                  <td colspan="5" class="py-2 px-3 text-right text-slate-700">Total Purchase Order Value:</td>
+                  <td class="py-2 px-3 text-right font-mono text-base font-black text-primary">${BCF_PROCUREMENT.formatCurrency(po.totalAmount)}</td>
+                </tr>
+              </tfoot>
+            </table>
+          </div>
+        </div>
+
+        <!-- Institutional Signoff Block -->
+        <div class="grid grid-cols-2 sm:grid-cols-3 gap-3 pt-3 border-t border-slate-200">
+          <div class="p-3 rounded-xl bg-slate-50 border border-slate-200 text-center">
+            <span class="text-[10px] text-slate-400 font-bold block mb-1">Prepared By</span>
+            <span class="font-bold text-slate-900 block">${po.issuedBy || 'Procurement Officer'}</span>
+            <span class="text-[9px] text-emerald-700 font-bold">Signed Digitally ✓</span>
+          </div>
+          <div class="p-3 rounded-xl bg-slate-50 border border-slate-200 text-center">
+            <span class="text-[10px] text-slate-400 font-bold block mb-1">Financial Commitment Certified</span>
+            <span class="font-bold text-slate-900 block">${po.authorizedBy || 'Finance Director'}</span>
+            <span class="text-[9px] text-emerald-700 font-bold">Budget Committed ✓</span>
+          </div>
+          <div class="p-3 rounded-xl bg-slate-50 border border-slate-200 text-center col-span-2 sm:col-span-1">
+            <span class="text-[10px] text-slate-400 font-bold block mb-1">Executive Authorization</span>
+            <span class="font-bold text-slate-900 block">Chief Executive Officer</span>
+            <span class="text-[9px] text-emerald-700 font-bold">Approved per Policy ✓</span>
+          </div>
+        </div>
+      `;
+
+      document.getElementById('po-view-modal').classList.remove('hidden');
+    }
+
+    function closePoViewModal() {
+      document.getElementById('po-view-modal').classList.add('hidden');
+    }
+
+    function quickReceiveGoods(poId) {
+      const po = BCF_PROCUREMENT.getPurchaseOrder(poId);
+      if (!po) return;
+      localStorage.setItem('bcf_selected_po_id', po.id);
+      localStorage.setItem('bcf_selected_txn_id', po.txnId);
+      BCF_PROCUREMENT.switchTab('goods-received-note');
+    }
+
+    function routePoToGrn() {
+      if (!currentViewingPo) return;
+      quickReceiveGoods(currentViewingPo.id);
+    }
+  </script>
+</body>
+</html>

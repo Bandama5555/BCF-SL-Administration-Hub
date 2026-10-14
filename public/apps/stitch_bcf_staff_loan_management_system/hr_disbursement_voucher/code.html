@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover"/>
+    <title>HR Disbursement Voucher Preparation - BCF-SL</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: "#004328",
+                        "primary-dark": "#002b1a",
+                        secondary: "#1A56DB",
+                        tertiary: "#7B2FBE",
+                        surface: "#ffffff",
+                        "surface-container": "#f8f9fc",
+                        "on-surface": "#0d1c2e",
+                        "on-surface-variant": "#4b5563",
+                        outline: "#d1d5db",
+                        error: "#dc2626",
+                        success: "#16a34a"
+                    },
+                    fontFamily: {
+                        sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+                        mono: ['"JetBrains Mono"', 'monospace']
+                    }
+                }
+            }
+        };
+    </script>
+    <style>
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #f4f6fa; }
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-thumb { background-color: #cbd5e1; border-radius: 3px; }
+    </style>
+</head>
+<body class="text-on-surface flex flex-col min-h-screen">
+
+    <!-- Unified Top Navigation & 8 Tabs Bar -->
+    <div id="bcf-loans-nav-header"></div>
+
+    <main class="flex-grow p-4 sm:p-6 max-w-7xl mx-auto w-full flex flex-col gap-6">
+
+        <!-- HEADER BANNER -->
+        <div class="bg-surface rounded-2xl border border-slate-200 shadow-sm p-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div class="flex items-center gap-4">
+                <div class="w-12 h-12 rounded-xl bg-primary/10 text-primary flex items-center justify-center shrink-0">
+                    <span class="material-symbols-outlined text-2xl">receipt_long</span>
+                </div>
+                <div>
+                    <span class="text-xs font-extrabold uppercase text-primary tracking-wider">Step 5 of 8 Workflow</span>
+                    <h1 class="text-lg sm:text-2xl font-extrabold text-slate-900 tracking-tight">
+                        HR Disbursement Voucher Preparation
+                    </h1>
+                    <p class="text-xs text-slate-500 mt-0.5">
+                        Prepare and certify the official BCF Staff Loan Disbursement Voucher following CEO authorization.
+                    </p>
+                </div>
+            </div>
+
+            <div class="flex items-center gap-2">
+                <span id="disp-voucher-badge" class="px-3.5 py-1.5 rounded-full text-xs font-extrabold bg-blue-100 text-blue-900 border border-blue-300">
+                    CEO Clearance Confirmed
+                </span>
+            </div>
+        </div>
+
+        <!-- OFFICIAL DISBURSEMENT VOUCHER TEMPLATE -->
+        <div class="bg-surface rounded-2xl border-2 border-slate-300 shadow-lg p-6 sm:p-10 max-w-4xl mx-auto w-full space-y-6">
+            <!-- Voucher Letterhead -->
+            <div class="flex flex-col sm:flex-row items-center justify-between border-b-2 border-slate-800 pb-5 gap-4">
+                <div class="flex items-center gap-3">
+                    <img src="/bcf-logo.jpg" onerror="this.src='../bcf-logo.jpg'" alt="BCF SL Logo" class="h-12 w-auto object-contain shrink-0"/>
+                    <div>
+                        <h2 class="text-base sm:text-lg font-black text-slate-900 tracking-tight">
+                            BANDAMA CHARITY FOUNDATION SIERRA LEONE
+                        </h2>
+                        <p class="text-xs font-bold text-primary">STAFF WELFARE &amp; MICRO-CREDIT ADVANCE SCHEME</p>
+                    </div>
+                </div>
+                <div class="text-right">
+                    <span class="text-[10px] font-black uppercase text-slate-400">Official Voucher No.</span>
+                    <p id="v-voucher-no" class="font-mono text-base sm:text-lg font-black text-primary">BCF-DV-2026-0842</p>
+                    <span class="text-[10px] text-slate-500 font-mono">Date: <strong id="v-date">03-Oct-2026</strong></span>
+                </div>
+            </div>
+
+            <!-- Beneficiary & Bank Details Grid -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
+                <div class="p-4 rounded-xl bg-slate-50 border border-slate-200 space-y-2">
+                    <h3 class="font-black text-slate-800 uppercase tracking-wide border-b border-slate-200 pb-1 flex items-center gap-1.5">
+                        <span class="material-symbols-outlined text-[16px] text-primary">person</span>
+                        <span>Beneficiary Staff Particulars</span>
+                    </h3>
+                    <div class="flex justify-between"><span class="text-slate-500">Full Name:</span> <strong id="v-name" class="text-slate-900 font-bold uppercase">-</strong></div>
+                    <div class="flex justify-between"><span class="text-slate-500">Employee ID:</span> <strong id="v-empid" class="font-mono text-primary">-</strong></div>
+                    <div class="flex justify-between"><span class="text-slate-500">Designation / Title:</span> <span id="v-title" class="font-semibold text-slate-800">-</span></div>
+                    <div class="flex justify-between"><span class="text-slate-500">Department:</span> <span id="v-dept" class="font-semibold text-slate-800">-</span></div>
+                    <div class="flex justify-between"><span class="text-slate-500">Loan Reference:</span> <strong id="v-ref" class="font-mono text-slate-900">-</strong></div>
+                </div>
+
+                <div class="p-4 rounded-xl bg-slate-50 border border-slate-200 space-y-2">
+                    <h3 class="font-black text-slate-800 uppercase tracking-wide border-b border-slate-200 pb-1 flex items-center gap-1.5">
+                        <span class="material-symbols-outlined text-[16px] text-secondary">account_balance</span>
+                        <span>Designated Disbursement Account</span>
+                    </h3>
+                    <div class="flex justify-between"><span class="text-slate-500">Bank Name:</span> <strong id="v-bank" class="text-slate-900 font-bold">Sierra Leone Commercial Bank</strong></div>
+                    <div class="flex justify-between"><span class="text-slate-500">Account Number:</span> <strong id="v-acc" class="font-mono text-secondary font-bold">003001892341</strong></div>
+                    <div class="flex justify-between"><span class="text-slate-500">BBAN:</span> <span id="v-bban" class="font-mono text-slate-700">003001892341001</span></div>
+                    <div class="flex justify-between"><span class="text-slate-500">Disbursement Method:</span> <span class="font-bold text-slate-800">Electronic Bank Transfer</span></div>
+                </div>
+            </div>
+
+            <!-- Financial Sums & Deduction Terms -->
+            <div class="p-5 rounded-xl bg-emerald-50/70 border border-emerald-300 grid grid-cols-1 sm:grid-cols-3 gap-4 text-center">
+                <div class="flex flex-col items-center justify-center p-2 bg-white rounded-lg border border-emerald-200">
+                    <span class="text-[10px] font-extrabold uppercase text-emerald-800">Authorized Principal</span>
+                    <span id="v-amount" class="text-xl font-mono font-black text-emerald-950 mt-1">NLe 0.00</span>
+                    <span class="text-[10px] text-slate-400">Zero-Interest Advance</span>
+                </div>
+                <div class="flex flex-col items-center justify-center p-2 bg-white rounded-lg border border-emerald-200">
+                    <span class="text-[10px] font-extrabold uppercase text-secondary">Monthly Deduction</span>
+                    <span id="v-monthly" class="text-xl font-mono font-black text-secondary mt-1">NLe 0.00</span>
+                    <span class="text-[10px] text-slate-400">10% per Month</span>
+                </div>
+                <div class="flex flex-col items-center justify-center p-2 bg-white rounded-lg border border-emerald-200">
+                    <span class="text-[10px] font-extrabold uppercase text-slate-600">Amortization Period</span>
+                    <span class="text-xl font-mono font-black text-slate-800 mt-1">10 Months</span>
+                    <span class="text-[10px] text-slate-400">Fixed Statutory Tenor</span>
+                </div>
+            </div>
+
+            <!-- Dual Officer Certification Box -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 pt-4 border-t border-slate-200 text-xs">
+                <div class="p-3 bg-slate-50 rounded-xl border border-slate-200 flex flex-col justify-between">
+                    <div>
+                        <span class="text-[10px] font-extrabold uppercase text-slate-400">Prepared &amp; Certified by HR Director</span>
+                        <p class="font-serif italic font-bold text-base text-primary mt-1">Dr. Sorie Sesay</p>
+                        <p class="text-[11px] text-slate-500">Director of Human Resources &bull; BCF-SL</p>
+                    </div>
+                    <span class="text-[10px] text-emerald-700 font-bold mt-2 flex items-center gap-1">
+                        <span class="material-symbols-outlined text-[14px]">verified</span> Digital Sign-off Confirmed
+                    </span>
+                </div>
+                <div class="p-3 bg-slate-50 rounded-xl border border-slate-200 flex flex-col justify-between">
+                    <div>
+                        <span class="text-[10px] font-extrabold uppercase text-slate-400">Executive CEO Sanction Code</span>
+                        <p class="font-mono font-bold text-sm text-slate-800 mt-1">BCF-CEO-AUTH-4B-VERIFIED</p>
+                        <p class="text-[11px] text-slate-500">Albert J. Bandama &bull; Chief Executive Officer</p>
+                    </div>
+                    <span class="text-[10px] text-emerald-700 font-bold mt-2 flex items-center gap-1">
+                        <span class="material-symbols-outlined text-[14px]">lock</span> Executive Seal Validated
+                    </span>
+                </div>
+            </div>
+
+            <!-- Action Controls -->
+            <div class="pt-4 flex flex-col sm:flex-row items-center justify-between gap-4">
+                <button type="button" onclick="window.print()" class="px-4 py-2.5 rounded-xl border border-slate-300 hover:bg-slate-100 text-xs font-bold text-slate-700 flex items-center gap-1.5 transition">
+                    <span class="material-symbols-outlined text-[18px]">print</span>
+                    <span>Print Disbursement Voucher</span>
+                </button>
+
+                <button type="button" onclick="forwardVoucherToFinance()" class="w-full sm:w-auto px-6 py-3.5 bg-primary hover:bg-primary-dark text-white rounded-xl text-sm font-extrabold shadow-md flex items-center justify-center gap-2 transition active:scale-95">
+                    <span class="material-symbols-outlined text-[20px]">send</span>
+                    <span>Forward Voucher to Finance for Release</span>
+                </button>
+            </div>
+        </div>
+    </main>
+
+    <!-- Shared Library -->
+    <script src="../bcf_loans_shared.js"></script>
+
+    <script>
+        let currentApp = null;
+
+        document.addEventListener('DOMContentLoaded', () => {
+            BCF_LOANS.renderHeaderAndTabs('hr-disbursement-voucher');
+            loadVoucherData();
+        });
+
+        function loadVoucherData() {
+            currentApp = BCF_LOANS.getActiveLoanApplication();
+            if (!currentApp) return;
+
+            const voucherNo = 'BCF-DV-' + currentApp.refNo.replace('BCF-LN-', '');
+            document.getElementById('v-voucher-no').textContent = voucherNo;
+            document.getElementById('v-date').textContent = new Date().toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
+
+            document.getElementById('v-name').textContent = currentApp.staff.fullName || '-';
+            document.getElementById('v-empid').textContent = currentApp.staff.employeeId || '-';
+            document.getElementById('v-title').textContent = currentApp.staff.title || '-';
+            const normDept = BCF_LOANS.normalizeDepartment ? BCF_LOANS.normalizeDepartment(currentApp.staff.department) : (currentApp.staff.department || '-');
+            document.getElementById('v-dept').textContent = normDept;
+            document.getElementById('v-ref').textContent = currentApp.refNo;
+
+            document.getElementById('v-bank').textContent = currentApp.staff.bankName || 'Sierra Leone Commercial Bank';
+            document.getElementById('v-acc').textContent = currentApp.staff.accNo || '003001892341';
+            document.getElementById('v-bban').textContent = (currentApp.staff.accNo || '003001892341') + '001';
+
+            const approvedAmt = currentApp.ceoReview && currentApp.ceoReview.approvedAmount
+                ? currentApp.ceoReview.approvedAmount
+                : (currentApp.financeReview ? currentApp.financeReview.approvedAmount : 8500);
+
+            const monthly = approvedAmt * 0.10;
+
+            document.getElementById('v-amount').textContent = `NLe ${parseFloat(approvedAmt).toLocaleString('en-US', { minimumFractionDigits: 2 })}`;
+            document.getElementById('v-monthly').textContent = `NLe ${parseFloat(monthly).toLocaleString('en-US', { minimumFractionDigits: 2 })}`;
+        }
+
+        function forwardVoucherToFinance() {
+            if (!currentApp) return;
+
+            currentApp.status = 'VOUCHER_PREPARED';
+            currentApp.voucher = {
+                voucherNo: document.getElementById('v-voucher-no').textContent,
+                preparedDate: new Date().toISOString(),
+                certifiedBy: 'Dr. Sorie Sesay (HR Director)'
+            };
+
+            BCF_LOANS.saveLoanApplication(currentApp);
+
+            BCF_LOANS.dispatchEmail({
+                to: "finance.cashier@bcf-sl.org",
+                toName: "Finance Disbursement Treasury",
+                subject: `[VOUCHER READY FOR RELEASE] ${currentApp.voucher.voucherNo} - ${currentApp.staff.fullName}`,
+                body: `Disbursement voucher ${currentApp.voucher.voucherNo} has been prepared and certified by HR Director for ${currentApp.staff.fullName}. Please execute physical funds release and log transaction reference.`,
+                badgeText: "Awaiting Fund Release",
+                tabId: "finance-disbursement-release"
+            });
+
+            alert(`Voucher ${currentApp.voucher.voucherNo} certified and forwarded to Finance Treasury for final fund release.`);
+
+            BCF_LOANS.switchTab('finance-disbursement-release');
+        }
+    </script>
+</body>
+</html>

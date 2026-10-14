@@ -1,0 +1,1555 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover"/>
+    <title>Payroll Integration & Deduction - BCF-SL</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: "#004328",
+                        "primary-dark": "#002b1a",
+                        secondary: "#1A56DB",
+                        tertiary: "#7B2FBE",
+                        surface: "#ffffff",
+                        "surface-container": "#f8f9fc",
+                        "on-surface": "#0d1c2e",
+                        "on-surface-variant": "#4b5563",
+                        outline: "#d1d5db",
+                        error: "#dc2626",
+                        success: "#16a34a"
+                    },
+                    fontFamily: {
+                        sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+                        mono: ['"JetBrains Mono"', 'monospace']
+                    }
+                }
+            }
+        };
+    </script>
+    <style>
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #f4f6fa; }
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-thumb { background-color: #cbd5e1; border-radius: 3px; }
+    </style>
+</head>
+<body class="text-on-surface flex flex-col min-h-screen">
+
+    <!-- Unified Top Navigation & 8 Tabs Bar -->
+    <div id="bcf-loans-nav-header"></div>
+
+    <main class="flex-grow p-4 sm:p-6 max-w-7xl mx-auto w-full flex flex-col gap-6">
+
+        <!-- HERO HEADER WITH GENERAL DEDUCT ALL BUTTON -->
+        <div class="bg-gradient-to-r from-primary to-primary-dark rounded-2xl p-6 sm:p-8 text-white shadow-xl relative overflow-hidden flex flex-col lg:flex-row lg:items-center justify-between gap-6">
+            <div class="absolute -right-10 -bottom-10 w-48 h-48 bg-white/5 rounded-full pointer-events-none"></div>
+            <div class="relative z-10 max-w-2xl">
+                <div class="inline-flex items-center gap-2 px-3 py-1 bg-white/10 rounded-full text-xs font-semibold uppercase tracking-wider text-emerald-300 mb-3">
+                    <span class="material-symbols-outlined text-sm">sync_alt</span>
+                    Automatic Amortization & Salary Sync Engine
+                </div>
+                <h1 class="text-2xl sm:text-3xl font-extrabold tracking-tight">Payroll Integration & Monthly Deduction</h1>
+                <p class="text-emerald-100/90 text-sm sm:text-base mt-2 leading-relaxed">
+                    Synchronize staff loan recovery with monthly payroll: fixed 10% of the loan principal deducted from monthly salary over a 10-month repayment window.
+                </p>
+            </div>
+            
+            <!-- GENERAL ACTION BUTTONS (DEDUCT AS ONCE FOR ALL STAFFS) -->
+            <div class="relative z-10 flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
+                <div id="hero-deduct-btn-container">
+                    <button type="button" id="btn-deduct-all-general" disabled class="px-6 py-4 bg-white/10 text-white/50 border border-white/20 rounded-xl font-bold flex items-center justify-center gap-2.5 cursor-not-allowed shadow-none opacity-80 pointer-events-none">
+                        <span class="material-symbols-outlined text-2xl text-amber-300">lock</span>
+                        <div class="text-left">
+                            <span class="block text-xs font-black uppercase tracking-wider text-amber-300">VIEW ACCESS ONLY</span>
+                            <span class="block text-sm font-bold text-white/80 leading-tight">DEDUCTION RESTRICTED TO FINANCE</span>
+                        </div>
+                    </button>
+                </div>
+
+                <button type="button" onclick="openBatchDeductionModal()" class="px-4 py-4 bg-white/10 hover:bg-white/20 active:scale-95 text-white font-bold rounded-xl border border-white/20 transition-all flex items-center justify-center gap-2 cursor-pointer">
+                    <span class="material-symbols-outlined text-xl">preview</span>
+                    <span class="text-xs uppercase tracking-wide">Review &amp; Verify First</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- KPI METRICS SUMMARY -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
+            <!-- 1. Active Repayments -->
+            <div class="bg-white p-5 rounded-xl border border-gray-200 shadow-sm flex items-center justify-between">
+                <div>
+                    <p class="text-xs uppercase tracking-wider font-semibold text-gray-500">Active Repayments</p>
+                    <p id="kpi-active-count" class="text-2xl font-black text-gray-900 mt-1">0 Staff</p>
+                    <p class="text-xs text-emerald-700 mt-1 flex items-center gap-1 font-medium">
+                        <span class="material-symbols-outlined text-xs">check_circle</span> In good standing
+                    </p>
+                </div>
+                <div class="w-12 h-12 rounded-xl bg-emerald-50 text-emerald-800 flex items-center justify-center font-bold">
+                    <span class="material-symbols-outlined">group</span>
+                </div>
+            </div>
+
+            <!-- 2. Monthly Deduction Pipeline -->
+            <div class="bg-white p-5 rounded-xl border border-gray-200 shadow-sm flex items-center justify-between">
+                <div>
+                    <p class="text-xs uppercase tracking-wider font-semibold text-gray-500">Monthly Deduction Pipeline</p>
+                    <p id="kpi-monthly-pipeline" class="text-2xl font-black text-primary mt-1">NLe 0.00</p>
+                    <p class="text-xs text-gray-500 mt-1 font-medium">10% fixed rate / month</p>
+                </div>
+                <div class="w-12 h-12 rounded-xl bg-blue-50 text-blue-700 flex items-center justify-center">
+                    <span class="material-symbols-outlined">calendar_month</span>
+                </div>
+            </div>
+
+            <!-- 3. Total Amount of Loan (After Monthly Deduction Tab) -->
+            <div class="bg-white p-5 rounded-xl border border-gray-200 shadow-sm flex items-center justify-between">
+                <div>
+                    <p class="text-xs uppercase tracking-wider font-semibold text-gray-500">Total Amount of Loan</p>
+                    <p id="kpi-total-loan-amount" class="text-2xl font-black text-gray-900 mt-1">NLe 0.00</p>
+                    <p class="text-xs text-teal-700 mt-1 flex items-center gap-1 font-medium">
+                        <span class="material-symbols-outlined text-xs">account_balance</span> Recovered + Outstanding
+                    </p>
+                </div>
+                <div class="w-12 h-12 rounded-xl bg-teal-50 text-teal-800 flex items-center justify-center font-bold">
+                    <span class="material-symbols-outlined">payments</span>
+                </div>
+            </div>
+
+            <!-- 4. Total Recovered To Date -->
+            <div class="bg-white p-5 rounded-xl border border-gray-200 shadow-sm flex items-center justify-between">
+                <div>
+                    <p class="text-xs uppercase tracking-wider font-semibold text-gray-500">Total Recovered To Date</p>
+                    <p id="kpi-total-recovered" class="text-2xl font-black text-emerald-700 mt-1">NLe 0.00</p>
+                    <p class="text-xs text-gray-500 mt-1 font-medium">Credited to BCF Account</p>
+                </div>
+                <div class="w-12 h-12 rounded-xl bg-amber-50 text-amber-700 flex items-center justify-center">
+                    <span class="material-symbols-outlined">savings</span>
+                </div>
+            </div>
+
+            <!-- 5. Outstanding Balance -->
+            <div class="bg-white p-5 rounded-xl border border-gray-200 shadow-sm flex items-center justify-between">
+                <div>
+                    <p class="text-xs uppercase tracking-wider font-semibold text-gray-500">Outstanding Balance</p>
+                    <p id="kpi-total-outstanding" class="text-2xl font-black text-gray-900 mt-1">NLe 0.00</p>
+                    <p class="text-xs text-gray-500 mt-1 font-medium">Across active accounts</p>
+                </div>
+                <div class="w-12 h-12 rounded-xl bg-purple-50 text-purple-700 flex items-center justify-center">
+                    <span class="material-symbols-outlined">account_balance_wallet</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- ROLE PRIVILEGE STATUS BANNER -->
+        <div id="payroll-role-banner"></div>
+
+        <!-- SEARCH & FILTER TOOLBAR -->
+        <div class="bg-white p-4 rounded-xl border border-gray-200 shadow-sm flex flex-col md:flex-row items-center justify-between gap-4">
+            <div class="relative w-full md:w-96">
+                <span class="material-symbols-outlined absolute left-3 top-2.5 text-gray-400">search</span>
+                <input type="text" id="filter-search" oninput="renderLedger()" placeholder="Search staff name, ID, or loan ref..." class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-primary focus:border-transparent outline-none"/>
+            </div>
+
+            <div class="flex items-center gap-3 w-full md:w-auto flex-wrap">
+                <select id="filter-status" onchange="renderLedger()" class="px-3 py-2 border border-gray-300 rounded-lg text-sm bg-white text-gray-700 focus:ring-2 focus:ring-primary outline-none">
+                    <option value="ALL">All Account Statuses</option>
+                    <option value="ACTIVE" selected>Active Deductions</option>
+                    <option value="COMPLETED">Fully Settled</option>
+                </select>
+
+                <select id="filter-dept" onchange="renderLedger()" class="px-3 py-2 border border-gray-300 rounded-lg text-sm bg-white text-gray-700 focus:ring-2 focus:ring-primary outline-none">
+                    <option value="ALL" selected>All Departments</option>
+                    <option value="Executive Management">Executive Management</option>
+                    <option value="Finance Department">Finance Department</option>
+                    <option value="Health & Safety Department">Health &amp; Safety Department</option>
+                    <option value="Human Resources Management Department">Human Resources Management Department</option>
+                    <option value="Information Technology (IT) Department">Information Technology (IT) Department</option>
+                    <option value="Internal Risk & Audits Department">Internal Risk &amp; Audits Department</option>
+                    <option value="Legal & Communication Department">Legal &amp; Communication Department</option>
+                    <option value="Procurement Department">Procurement Department</option>
+                    <option value="Programs Department">Programs Department</option>
+                </select>
+
+                <button onclick="reseedDefaultLoans()" title="Reset / Re-enroll Sample Active Loans" class="px-3 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg text-xs font-bold transition flex items-center gap-1 cursor-pointer">
+                    <span class="material-symbols-outlined text-sm">refresh</span>
+                    <span>Reset Data</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- DEDUCTIONS & AMORTIZATION TABLE -->
+        <div class="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
+            <div class="px-6 py-4 border-b border-gray-200 flex items-center justify-between bg-gray-50/70">
+                <div class="flex items-center gap-2">
+                    <span class="material-symbols-outlined text-primary">table_chart</span>
+                    <h2 class="font-bold text-gray-900">Staff Loan Deduction Schedule</h2>
+                </div>
+                
+                <div class="flex items-center gap-3">
+                    <div id="batch-deduct-btn-container">
+                        <button type="button" id="btn-deduct-all-staff" disabled class="px-3 py-1.5 bg-slate-100 text-slate-400 border border-slate-200 rounded-lg font-bold text-xs flex items-center gap-1 cursor-not-allowed opacity-60 pointer-events-none">
+                            <span class="material-symbols-outlined text-sm">lock</span>
+                            <span>Deductions Locked (Finance Only)</span>
+                        </button>
+                    </div>
+                    <span id="ledger-count-tag" class="text-xs bg-gray-200 text-gray-700 px-2.5 py-1 rounded-full font-semibold">0 records</span>
+                </div>
+            </div>
+
+            <div class="overflow-x-auto">
+                <table class="w-full text-left text-sm">
+                    <thead class="bg-gray-100 text-gray-600 uppercase text-xs tracking-wider border-b border-gray-200 font-semibold">
+                        <tr>
+                            <th class="py-3 px-4">Staff Member</th>
+                            <th class="py-3 px-4">Multiplier Category</th>
+                            <th class="py-3 px-4">Monthly Salary</th>
+                            <th class="py-3 px-4">Loan Principal</th>
+                            <th class="py-3 px-4">
+                                <div>Monthly Deduction</div>
+                                <div class="text-[10px] text-emerald-600 font-normal lowercase tracking-normal">10% of loan principal</div>
+                            </th>
+                            <th class="py-3 px-4">Progress (10 Mos)</th>
+                            <th class="py-3 px-4">Remaining Balance</th>
+                            <th class="py-3 px-4 text-center">Status</th>
+                            <th class="py-3 px-4 text-right">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="ledger-tbody" class="divide-y divide-gray-200 font-medium">
+                        <!-- Populated by JavaScript -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- MODAL: CONFIRM BATCH DEDUCTION CYCLE -->
+    <div id="modal-confirm-batch" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center hidden p-4">
+        <div class="bg-white rounded-2xl max-w-xl w-full shadow-2xl overflow-hidden flex flex-col">
+            <div class="px-6 py-4 bg-primary text-white flex items-center justify-between">
+                <div class="flex items-center gap-2">
+                    <span class="material-symbols-outlined text-2xl text-emerald-300">payments</span>
+                    <div>
+                        <h3 class="font-bold text-base sm:text-lg">Execute Monthly Payroll Deductions</h3>
+                        <p class="text-xs text-emerald-200">10% Statutory Staff Loan Recovery Cycle</p>
+                    </div>
+                </div>
+                <button type="button" onclick="closeModal('modal-confirm-batch')" class="text-white/80 hover:text-white p-1 rounded-lg hover:bg-white/10 transition cursor-pointer">
+                    <span class="material-symbols-outlined">close</span>
+                </button>
+            </div>
+
+            <div class="p-6 space-y-4">
+                <div class="bg-emerald-50 border border-emerald-200 rounded-xl p-4 flex items-center justify-between">
+                    <div>
+                        <p class="text-xs font-semibold text-emerald-800 uppercase tracking-wider">Total Accounts to Debit</p>
+                        <p id="batch-accounts-count" class="text-2xl font-black text-emerald-950 mt-0.5">0 Staff</p>
+                    </div>
+                    <div class="text-right">
+                        <p class="text-xs font-semibold text-emerald-800 uppercase tracking-wider">Total Recovery Amount</p>
+                        <p id="batch-total-amount" class="text-2xl font-black text-primary mt-0.5 font-mono">NLe 0.00</p>
+                    </div>
+                </div>
+
+                <div class="border border-slate-200 rounded-xl overflow-hidden max-h-56 overflow-y-auto">
+                    <table class="w-full text-left text-xs">
+                        <thead class="bg-slate-50 text-slate-600 font-bold border-b border-slate-200 sticky top-0">
+                            <tr>
+                                <th class="py-2.5 px-3">Staff Name</th>
+                                <th class="py-2.5 px-3">Tenor</th>
+                                <th class="py-2.5 px-3 text-right">Deduction (10%)</th>
+                                <th class="py-2.5 px-3 text-right">New Balance</th>
+                            </tr>
+                        </thead>
+                        <tbody id="batch-preview-tbody" class="divide-y divide-slate-100 font-mono">
+                            <!-- Populated dynamically -->
+                        </tbody>
+                    </table>
+                </div>
+
+                <p class="text-xs text-slate-500 leading-relaxed">
+                    Executing this action will deduct exactly one monthly installment (10% of approved principal) from each active beneficiary account and automatically update the amortization schedule.
+                </p>
+            </div>
+
+            <div class="px-6 py-4 bg-slate-50 border-t border-slate-200 flex items-center justify-end gap-3">
+                <button type="button" onclick="closeModal('modal-confirm-batch')" class="px-4 py-2 border border-slate-300 text-slate-700 hover:bg-slate-100 rounded-xl text-xs font-bold transition cursor-pointer">
+                    Cancel
+                </button>
+                <div id="modal-batch-submit-container">
+                    <button type="button" id="btn-batch-confirm-submit" onclick="executeBatchPayrollCycle()" class="px-5 py-2.5 bg-primary hover:bg-primary-dark text-white rounded-xl text-xs font-extrabold shadow-md transition flex items-center gap-1.5 cursor-pointer">
+                        <span class="material-symbols-outlined text-sm">check_circle</span>
+                        <span>Confirm &amp; Execute Deductions Now</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL: AMORTIZATION SCHEDULE DETAILS -->
+    <div id="modal-amortization" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center hidden p-4">
+        <div class="bg-white rounded-2xl max-w-3xl w-full max-h-[90vh] flex flex-col shadow-2xl overflow-hidden">
+            <div class="px-6 py-4 bg-primary text-white flex items-center justify-between">
+                <div class="flex items-center gap-2">
+                    <span class="material-symbols-outlined">receipt_long</span>
+                    <div>
+                        <h3 class="font-bold text-base sm:text-lg">Staff Loan Amortization Schedule</h3>
+                        <p id="modal-subheading" class="text-xs text-emerald-200">10-Month Repayment Breakdown</p>
+                    </div>
+                </div>
+                <button onclick="closeModal('modal-amortization')" class="text-white/80 hover:text-white p-1 rounded-lg hover:bg-white/10 transition cursor-pointer">
+                    <span class="material-symbols-outlined">close</span>
+                </button>
+            </div>
+
+            <div class="p-6 overflow-y-auto space-y-6">
+                <!-- Summary Chips -->
+                <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 bg-gray-50 p-4 rounded-xl border border-gray-200">
+                    <div>
+                        <span class="text-xs text-gray-500 font-medium">Staff ID</span>
+                        <p id="modal-staff-id" class="font-mono text-sm font-bold text-gray-800">--</p>
+                    </div>
+                    <div>
+                        <span class="text-xs text-gray-500 font-medium">Principal Loan</span>
+                        <p id="modal-loan-principal" class="text-sm font-bold text-gray-800">NLe 0.00</p>
+                    </div>
+                    <div>
+                        <span class="text-xs text-gray-500 font-medium">Monthly Deduction</span>
+                        <p id="modal-monthly-ded" class="text-sm font-bold text-emerald-700">NLe 0.00</p>
+                    </div>
+                    <div>
+                        <span class="text-xs text-gray-500 font-medium">Outstanding Bal.</span>
+                        <p id="modal-outstanding" class="text-sm font-bold text-red-600">NLe 0.00</p>
+                    </div>
+                </div>
+
+                <!-- 10 Month Schedule Table -->
+                <div class="border border-gray-200 rounded-xl overflow-hidden">
+                    <table class="w-full text-left text-xs sm:text-sm">
+                        <thead class="bg-gray-100 text-gray-600 font-semibold border-b border-gray-200">
+                            <tr>
+                                <th class="py-2.5 px-3">Inst. #</th>
+                                <th class="py-2.5 px-3">Opening Bal. (NLe)</th>
+                                <th class="py-2.5 px-3">Deduction (10%)</th>
+                                <th class="py-2.5 px-3">Closing Bal. (NLe)</th>
+                                <th class="py-2.5 px-3">Payment Status</th>
+                            </tr>
+                        </thead>
+                        <tbody id="modal-schedule-tbody" class="divide-y divide-gray-200 font-mono">
+                            <!-- Populated by JS -->
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="bg-blue-50 border border-blue-200 rounded-xl p-4 text-xs text-blue-900 leading-relaxed flex items-start gap-2">
+                    <span class="material-symbols-outlined text-blue-600 text-base mt-0.5">info</span>
+                    <div>
+                        <strong>Payroll Policy Clause 6.2:</strong> Monthly deductions commence immediately in the payroll cycle succeeding loan disbursement. In the event of early resignation or termination, all unpaid installments automatically collapse and are recovered from the staff member's End of Service (EOS) entitlement.
+                    </div>
+                </div>
+            </div>
+
+            <div class="px-6 py-4 bg-gray-50 border-t border-gray-200 flex justify-end gap-3">
+                <button onclick="closeModal('modal-amortization')" class="px-4 py-2 border border-gray-300 text-gray-700 hover:bg-gray-100 rounded-lg text-sm font-semibold transition cursor-pointer">
+                    Close
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL: PAYSLIP IMPACT SIMULATION -->
+    <div id="modal-payslip" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center hidden p-4">
+        <div class="bg-white rounded-2xl max-w-lg w-full shadow-2xl overflow-hidden flex flex-col">
+            <div class="px-6 py-4 bg-gradient-to-r from-primary to-primary-dark text-white flex items-center justify-between">
+                <div class="flex items-center gap-2">
+                    <span class="material-symbols-outlined">payments</span>
+                    <h3 class="font-bold text-base sm:text-lg">Monthly Payslip Deduction Preview</h3>
+                </div>
+                <button onclick="closeModal('modal-payslip')" class="text-white/80 hover:text-white p-1 rounded-lg hover:bg-white/10 transition cursor-pointer">
+                    <span class="material-symbols-outlined">close</span>
+                </button>
+            </div>
+
+            <div class="p-6 space-y-4">
+                <div class="text-center pb-2 border-b border-gray-200">
+                    <h4 id="payslip-name" class="font-bold text-gray-900 text-base">--</h4>
+                    <p id="payslip-pos" class="text-xs text-gray-500">--</p>
+                </div>
+
+                <div class="space-y-2 text-sm">
+                    <div class="flex justify-between py-1.5 border-b border-gray-100">
+                        <span class="text-gray-600">Basic Monthly Salary</span>
+                        <span id="payslip-basic" class="font-mono font-bold text-gray-900">NLe 0.00</span>
+                    </div>
+                    <div class="flex justify-between py-1.5 border-b border-gray-100 text-red-600">
+                        <span class="flex items-center gap-1"><span class="material-symbols-outlined text-xs">remove</span> NASSIT Pension (5%)</span>
+                        <span id="payslip-nassit" class="font-mono font-bold">-NLe 0.00</span>
+                    </div>
+                    <div class="flex justify-between py-1.5 border-b border-gray-100 text-red-600">
+                        <span class="flex items-center gap-1"><span class="material-symbols-outlined text-xs">remove</span> PAYE Income Tax (Est. 15%)</span>
+                        <span id="payslip-paye" class="font-mono font-bold">-NLe 0.00</span>
+                    </div>
+                    <div class="flex justify-between py-2 border-y-2 border-emerald-200 bg-emerald-50/70 px-2 rounded-lg text-emerald-900 font-bold">
+                        <div>
+                            <span class="flex items-center gap-1"><span class="material-symbols-outlined text-xs text-emerald-700">lock</span> BCF Loan Monthly Repayment</span>
+                            <span class="block text-[10px] text-emerald-700 font-normal">Fixed 10% of loan principal deducted from salary</span>
+                        </div>
+                        <span id="payslip-loan-ded" class="font-mono text-emerald-800 font-extrabold">-NLe 0.00</span>
+                    </div>
+                    <div class="flex justify-between pt-3 text-base font-extrabold text-primary">
+                        <span>Net Take-Home Pay</span>
+                        <span id="payslip-net" class="font-mono text-lg text-primary">NLe 0.00</span>
+                    </div>
+                </div>
+
+                <p class="text-[11px] text-gray-500 italic mt-3 text-center">
+                    Simulated payslip calculation reflecting statutory deductions and approved BCF loan amortizations.
+                </p>
+            </div>
+
+            <div class="px-6 py-4 bg-gray-50 border-t border-gray-200 flex justify-end">
+                <button onclick="closeModal('modal-payslip')" class="px-4 py-2 bg-primary hover:bg-primary-dark text-white rounded-lg text-sm font-semibold transition cursor-pointer">
+                    Done
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- SHARED BCF LOANS SCRIPT -->
+    <script src="../bcf_loans_shared.js"></script>
+    <script>
+        let loansList = [];
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const currentRole = (window.BCF_LOANS && typeof BCF_LOANS.getCurrentUserRole === 'function') 
+                ? BCF_LOANS.getCurrentUserRole() 
+                : (localStorage.getItem('bcf_loan_user_role') || localStorage.getItem('bcf_user_role') || 'STAFF');
+
+            const normRole = (window.BCF_LOANS && typeof BCF_LOANS.normalizeRoleKey === 'function')
+                ? (BCF_LOANS.normalizeRoleKey(currentRole) || currentRole)
+                : String(currentRole || 'STAFF').trim().toUpperCase();
+
+            // 1. Render Institutional Nav & Tabs
+            if (window.BCF_LOANS) {
+                BCF_LOANS.renderHeaderAndTabs('payroll-integration');
+            }
+
+            // 2. CRITICAL RBAC ENFORCEMENT: Staff has ZERO access to Payroll Integration & Deduction
+            if (normRole === 'STAFF' || (window.BCF_LOANS && !BCF_LOANS.hasTabAccess('payroll-integration', normRole))) {
+                enforceStaffAccessDenied();
+                return; // STOP execution completely! No loans or salary data is fetched or rendered for staff!
+            }
+
+            // 3. Authorized Roles Only (HR, CEO, FINANCE, ADMIN)
+            applyPayrollRBAC();
+            loadAndSyncData();
+            renderLedger();
+            applyPayrollRBAC();
+        });
+
+        function enforceStaffAccessDenied() {
+            const main = document.querySelector('main');
+            if (main) {
+                main.innerHTML = `
+                    <div class="max-w-2xl mx-auto my-12 p-8 sm:p-10 bg-white border-2 border-red-500 rounded-3xl shadow-2xl text-center animate-in fade-in zoom-in-95">
+                        <div class="w-20 h-20 mx-auto rounded-full bg-red-100 text-red-600 flex items-center justify-center shadow-inner border border-red-200 mb-6">
+                            <span class="material-symbols-outlined text-5xl">gpp_bad</span>
+                        </div>
+                        <span class="inline-block px-4 py-1.5 rounded-full text-xs font-black uppercase tracking-wider bg-red-600 text-white shadow-2xs mb-3">
+                            Access Restricted &bull; 403 Forbidden
+                        </span>
+                        <h2 class="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight mb-2">
+                            Payroll Integration &amp; Deduction
+                        </h2>
+                        <p class="text-base font-bold text-red-700 mb-6">
+                            Staff members do not have access to this financial module.
+                        </p>
+                        
+                        <div class="p-5 bg-slate-50 border border-slate-200 rounded-2xl text-xs sm:text-sm text-slate-700 text-left space-y-3 mb-8">
+                            <div class="flex items-start gap-2.5">
+                                <span class="material-symbols-outlined text-red-600 text-lg shrink-0 mt-0.5">block</span>
+                                <div>
+                                    <strong class="text-slate-900">Staff Access Policy:</strong>
+                                    <span class="text-slate-600 block text-xs mt-0.5">Staff members are authorized exclusively to access and submit applications via the <strong>Staff Loan Application Form</strong>.</span>
+                                </div>
+                            </div>
+                            <div class="flex items-start gap-2.5 pt-2 border-t border-slate-200">
+                                <span class="material-symbols-outlined text-blue-600 text-lg shrink-0 mt-0.5">visibility</span>
+                                <div>
+                                    <strong class="text-slate-900">View-Only Access:</strong>
+                                    <span class="text-slate-600 block text-xs mt-0.5">Executive Management (CEO) and Human Resources Management (HR Director).</span>
+                                </div>
+                            </div>
+                            <div class="flex items-start gap-2.5 pt-2 border-t border-slate-200">
+                                <span class="material-symbols-outlined text-emerald-600 text-lg shrink-0 mt-0.5">verified_user</span>
+                                <div>
+                                    <strong class="text-slate-900">Deduction &amp; Amortization Authority:</strong>
+                                    <span class="text-slate-600 block text-xs mt-0.5">Finance Department (Finance Director) and System Administrator.</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="flex flex-col sm:flex-row items-center justify-center gap-3">
+                            <button type="button" onclick="navigateToLoanApplication()" class="w-full sm:w-auto px-6 py-3.5 bg-emerald-700 hover:bg-emerald-800 text-white font-black text-xs sm:text-sm rounded-xl shadow-lg transition active:scale-95 flex items-center justify-center gap-2 cursor-pointer">
+                                <span class="material-symbols-outlined text-lg">edit_document</span>
+                                <span>Go to Staff Loan Application</span>
+                            </button>
+                            <button type="button" onclick="if(window.BCF_LOANS) BCF_LOANS.toggleRoleDropdown()" class="w-full sm:w-auto px-5 py-3.5 bg-slate-800 hover:bg-slate-900 text-white font-bold text-xs sm:text-sm rounded-xl shadow transition active:scale-95 flex items-center justify-center gap-2 cursor-pointer">
+                                <span class="material-symbols-outlined text-lg">manage_accounts</span>
+                                <span>Switch Role Privilege</span>
+                            </button>
+                        </div>
+                    </div>
+                `;
+                main.style.display = 'block';
+            }
+        }
+
+        function navigateToLoanApplication() {
+            if (window.BCF_LOANS && typeof BCF_LOANS.switchTab === 'function') {
+                BCF_LOANS.switchTab('loan-application');
+                return;
+            }
+            try {
+                if (window.top && window.top !== window && window.top.location) {
+                    window.top.location.href = '/loans/loan-application';
+                    return;
+                }
+            } catch (e) {}
+            window.location.href = '../staff_eligibility_loan_application/code.html';
+        }
+
+        function getFormatNLe(amt) {
+            if (window.BCF_LOANS && typeof BCF_LOANS.formatNLe === 'function') {
+                return BCF_LOANS.formatNLe(amt);
+            }
+            const val = parseFloat(amt || 0);
+            return 'NLe ' + val.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+        }
+
+        function getNormalizedDept(dept) {
+            if (window.BCF_LOANS && typeof BCF_LOANS.normalizeDepartment === 'function') {
+                return BCF_LOANS.normalizeDepartment(dept);
+            }
+            const d = String(dept || '').toLowerCase();
+            if (d.includes('exec')) return 'Executive Management';
+            if (d.includes('finan')) return 'Finance Department';
+            if (d.includes('health') || d.includes('safe')) return 'Health & Safety Department';
+            if (d.includes('human') || d.includes('admin')) return 'Human Resources Management Department';
+            if (d.includes('tech') || d.includes('it')) return 'Information Technology (IT) Department';
+            if (d.includes('audit')) return 'Internal Risk & Audits Department';
+            if (d.includes('legal')) return 'Legal & Communication Department';
+            if (d.includes('procure')) return 'Procurement Department';
+            return 'Programs Department';
+        }
+
+        // Retrieve full employee profile from system registry to ensure synchronized monthly salaries
+        function getEmployeeProfile(empId, fullName) {
+            let registry = [];
+            try {
+                if (window.BCF_LOANS && typeof BCF_LOANS.getStaffRegistry === 'function') {
+                    registry = BCF_LOANS.getStaffRegistry();
+                }
+            } catch (e) {}
+
+            if (!Array.isArray(registry) || registry.length === 0) {
+                try {
+                    registry = JSON.parse(localStorage.getItem('bcf_staff_registry') || '[]');
+                } catch (e) {}
+            }
+
+            const cleanId = (empId || '').trim().toLowerCase();
+            const cleanName = (fullName || '').trim().toLowerCase();
+
+            // 1. Check registry by Employee ID
+            if (cleanId) {
+                const byId = registry.find(e => {
+                    const eid = (e.employeeId || '').trim().toLowerCase();
+                    return eid === cleanId || cleanId.includes(eid) || eid.includes(cleanId);
+                });
+                if (byId) return byId;
+            }
+
+            // 2. Check registry by Full Name
+            if (cleanName) {
+                const byName = registry.find(e => {
+                    const ename = (e.fullName || e.name || '').trim().toLowerCase();
+                    return ename === cleanName || cleanName.includes(ename) || ename.includes(cleanName);
+                });
+                if (byName) return byName;
+            }
+
+            // 3. Check selected profile in localStorage (from registration or profile detail)
+            try {
+                const sel = JSON.parse(localStorage.getItem('bcf_selected_profile') || '{}');
+                if (sel && sel.employeeId) {
+                    const selId = (sel.employeeId || '').trim().toLowerCase();
+                    const selName = (sel.fullName || '').trim().toLowerCase();
+                    if ((cleanId && (selId === cleanId || cleanId.includes(selId))) ||
+                        (cleanName && (selName === cleanName || cleanName.includes(selName)))) {
+                        return sel;
+                    }
+                }
+            } catch (e) {}
+
+            // 4. Check active loan applications register
+            try {
+                const apps = JSON.parse(localStorage.getItem('bcf_all_loan_applications') || localStorage.getItem('bcf_loan_applications') || '[]');
+                const app = apps.find(a => {
+                    const sid = (a.staff && a.staff.employeeId || '').trim().toLowerCase();
+                    const sname = (a.staff && a.staff.fullName || '').trim().toLowerCase();
+                    return (cleanId && sid && (sid === cleanId || cleanId.includes(sid))) ||
+                           (cleanName && sname && (sname === cleanName || cleanName.includes(sname)));
+                });
+                if (app && app.staff) {
+                    return {
+                        employeeId: app.staff.employeeId,
+                        fullName: app.staff.fullName,
+                        title: app.staff.title || app.staff.position,
+                        department: app.staff.department,
+                        payBasic: app.staff.basicSalary || app.staff.payBasic,
+                        multiplierCategory: app.staff.multiplierCategory
+                    };
+                }
+            } catch (e) {}
+
+            // 5. Standard Institutional Profiles Fallback
+            if (cleanId.includes('1001') || cleanName.includes('albert')) {
+                return { employeeId: 'BCF-SL-1001', fullName: 'Albert J. Bandama', title: 'Executive Director / CEO', department: 'Executive Management', payBasic: 35000, multiplierCategory: 'CEO/Governing Board' };
+            }
+            if (cleanId.includes('1002') || cleanName.includes('sorie')) {
+                return { employeeId: 'BCF-SL-1002', fullName: 'Dr. Sorie Sesay', title: 'Director of Human Resources', department: 'Human Resources Management Department', payBasic: 22000, multiplierCategory: 'Director' };
+            }
+            if (cleanId.includes('1005') || cleanName.includes('turay')) {
+                return { employeeId: 'BCF-SL-1005', fullName: 'Aminata Turay', title: 'Director of Financial Operations', department: 'Finance Department', payBasic: 24000, multiplierCategory: 'Director' };
+            }
+            if (cleanId.includes('1007') || cleanName.includes('sahr')) {
+                return { employeeId: 'BCF-SL-1007', fullName: 'Sahr Bangura', title: 'Senior Finance Manager', department: 'Finance Department', payBasic: 20000, multiplierCategory: 'Manager/Assistant Manager' };
+            }
+            if (cleanId.includes('1012') || cleanName.includes('mohamed')) {
+                return { employeeId: 'BCF-SL-1012', fullName: 'Mohamed Bangura', title: 'Program Monitoring Manager', department: 'Programs Department', payBasic: 14000, multiplierCategory: 'Manager/Assistant Manager' };
+            }
+            if (cleanId.includes('1019') || cleanName.includes('joseph')) {
+                return { employeeId: 'BCF-SL-1019', fullName: 'Joseph Conteh', title: 'Assistant Logistics Manager', department: 'Procurement Department', payBasic: 11500, multiplierCategory: 'Manager/Assistant Manager' };
+            }
+            if (cleanId.includes('1048') || (cleanName.includes('mariama') && !cleanName.includes('bundu'))) {
+                return { employeeId: 'BCF-SL-1048', fullName: 'Mariama Kamara', title: 'Senior Field Coordinator', department: 'Programs Department', payBasic: 8500, multiplierCategory: 'Officer' };
+            }
+            if (cleanId.includes('1025') || cleanName.includes('fatmata')) {
+                return { employeeId: 'BCF-SL-1025', fullName: 'Fatmata Mansaray', title: 'Junior Community Facilitator', department: 'Programs Department', payBasic: 6500, multiplierCategory: 'Officer' };
+            }
+            if (cleanName.includes('bundu') || cleanId.includes('2026-0007')) {
+                return { employeeId: 'BCF-EMP-2026-0007', fullName: 'Mariama J. Bundu', title: 'Field Operations Officer', department: 'Programs Department', payBasic: 8500, multiplierCategory: 'Officer' };
+            }
+
+            return null;
+        }
+
+        // UNIVERSAL LOAN NORMALIZER: Supports all possible key namings across all databases
+        function normalizeLoanRecord(raw, defaultIndex = 1) {
+            if (!raw) return null;
+
+            const cleanStr = (val) => {
+                if (val === undefined || val === null) return '';
+                const s = String(val).trim();
+                return (s === 'undefined' || s === 'null' || s === '[object Object]') ? '' : s;
+            };
+
+            // Handle nested staff or root fields
+            const staff = raw.staff || {};
+            const req = raw.request || {};
+            const ceo = raw.ceoReview || {};
+            const fin = raw.financeReview || {};
+
+            let fullName = cleanStr(raw.fullName) || cleanStr(raw.employeeName) || cleanStr(raw.staffName) || cleanStr(raw.name) || cleanStr(staff.fullName);
+            let empId = cleanStr(raw.empId) || cleanStr(raw.employeeId) || cleanStr(raw.staffId) || cleanStr(staff.employeeId);
+            let department = getNormalizedDept(cleanStr(raw.department) || cleanStr(staff.department));
+            let position = cleanStr(raw.position) || cleanStr(raw.title) || cleanStr(staff.title) || 'Officer';
+            let multiplierCategory = cleanStr(raw.multiplierCategory) || cleanStr(staff.multiplierCategory) || 'Officer';
+
+            // Approved principal (Loan Principal)
+            let approvedAmount = Number(
+                raw.approvedAmount ||
+                raw.totalPrincipal ||
+                raw.principal ||
+                raw.loanAmount ||
+                raw.amount ||
+                ceo.approvedAmount ||
+                fin.approvedAmount ||
+                req.loanAmount ||
+                0
+            );
+
+            // Synchronize directly with employee profile
+            const profile = getEmployeeProfile(empId, fullName);
+            let monthlyBasicSalary = 0;
+
+            if (profile) {
+                const profSalary = parseFloat(profile.payBasic || profile.basicSalary || profile.monthlySalary || profile.pay_basic || 0);
+                if (profSalary > 0) {
+                    monthlyBasicSalary = profSalary;
+                }
+                if (profile.fullName && (!fullName || fullName === 'Staff Beneficiary' || fullName.startsWith('Staff Beneficiary'))) {
+                    fullName = profile.fullName;
+                }
+                if (profile.employeeId && (!empId || empId.startsWith('BCF-EMP-10'))) {
+                    empId = profile.employeeId;
+                }
+                if (profile.department) {
+                    department = getNormalizedDept(profile.department);
+                }
+                if (profile.title) {
+                    position = profile.title;
+                }
+                if (profile.multiplierCategory) {
+                    multiplierCategory = profile.multiplierCategory;
+                }
+            }
+
+            // Fallback for monthly basic salary if not found in profile
+            if (monthlyBasicSalary <= 0) {
+                monthlyBasicSalary = Number(
+                    raw.monthlyBasicSalary ||
+                    raw.basicSalary ||
+                    raw.payBasic ||
+                    staff.basicSalary ||
+                    staff.payBasic ||
+                    8500
+                );
+            }
+
+            // BCF-SL POLICY RULE:
+            // Monthly deduction is ALWAYS 10% OF THE LOAN PRINCIPAL (approvedAmount * 0.10).
+            // It is deducted from the monthly salary, NOT 10% of the monthly salary!
+            let monthlyDeduction = Number(
+                raw.monthlyDeduction ||
+                raw.monthlyDed ||
+                raw.deduction ||
+                req.proposedMonthlyDeduction ||
+                0
+            );
+
+            if (approvedAmount > 0) {
+                // Strictly 10% of the loan principal
+                monthlyDeduction = Math.round(approvedAmount * 0.10 * 100) / 100;
+            } else if (monthlyDeduction > 0) {
+                approvedAmount = monthlyDeduction * 10;
+            }
+
+            // Fallback recovery if name is still missing or corrupted
+            if (!fullName || fullName === 'Staff Beneficiary') {
+                if (monthlyDeduction >= 6000 && monthlyDeduction <= 6500) {
+                    fullName = 'Dr. Sorie Sesay';
+                    empId = empId || 'BCF-SL-1002';
+                    department = 'Human Resources Management Department';
+                    position = 'Director of Human Resources';
+                    multiplierCategory = 'Director';
+                    monthlyBasicSalary = 22000;
+                } else if (monthlyDeduction >= 740 && monthlyDeduction <= 760) {
+                    fullName = 'Mariama Kamara';
+                    empId = empId || 'BCF-SL-1048';
+                    department = 'Programs Department';
+                    position = 'Senior Field Coordinator';
+                    multiplierCategory = 'Officer';
+                    monthlyBasicSalary = 8500;
+                } else if (monthlyDeduction >= 410 && monthlyDeduction <= 430) {
+                    fullName = 'Albert Joseph Bandama';
+                    empId = empId || 'BCF-SL-1001';
+                    department = 'Executive Management';
+                    position = 'Executive Director / CEO';
+                    multiplierCategory = 'CEO/Governing Board';
+                    monthlyBasicSalary = 35000;
+                } else if (monthlyDeduction >= 2400 && monthlyDeduction <= 2600) {
+                    fullName = 'Ibrahim Kargbo';
+                    empId = empId || 'BCF-SL-1003';
+                    department = 'Health & Safety Department';
+                    position = 'Senior Program Coordinator';
+                    multiplierCategory = 'Manager/Assistant Manager';
+                    monthlyBasicSalary = 16000;
+                } else if (monthlyDeduction >= 1700 && monthlyDeduction <= 1900) {
+                    fullName = 'Aminata Kamara';
+                    empId = empId || 'BCF-SL-1025';
+                    department = 'Programs Department';
+                    position = 'Community Liaison Officer';
+                    multiplierCategory = 'Officer';
+                    monthlyBasicSalary = 12000;
+                } else if (monthlyDeduction >= 2900 && monthlyDeduction <= 3100) {
+                    fullName = 'Sahr Bangura';
+                    empId = empId || 'BCF-SL-1007';
+                    department = 'Finance Department';
+                    position = 'Senior Finance Manager';
+                    multiplierCategory = 'Manager/Assistant Manager';
+                    monthlyBasicSalary = 20000;
+                } else if (monthlyDeduction >= 190 && monthlyDeduction <= 210) {
+                    fullName = 'Mariama J. Bundu';
+                    empId = empId || 'BCF-EMP-2026-0007';
+                    department = 'Programs Department';
+                    position = 'Field Operations Officer';
+                    multiplierCategory = 'Officer';
+                    monthlyBasicSalary = 8500;
+                } else {
+                    fullName = `Staff Beneficiary ${defaultIndex}`;
+                    empId = empId || `BCF-SL-${1000 + defaultIndex}`;
+                }
+            }
+
+            if (!empId) {
+                empId = `BCF-SL-${1000 + defaultIndex}`;
+            }
+
+            const monthsTotal = Number(raw.monthsTotal || raw.totalMonths || 10);
+            const monthsPaid = Math.min(monthsTotal, Math.max(0, Number(raw.monthsPaid || 0)));
+
+            // Exact financial calculation: Outstanding Balance is strictly capped at remaining unpaid principal
+            let recoveredAmount = Math.min(approvedAmount, monthsPaid * monthlyDeduction);
+            let outstandingBalance = Math.max(0, approvedAmount - recoveredAmount);
+
+            // If loan is settled or all 10 months have elapsed, balance is strictly 0
+            if (monthsPaid >= monthsTotal || outstandingBalance <= 0 || (raw.status || '').toUpperCase() === 'COMPLETED') {
+                outstandingBalance = 0;
+                recoveredAmount = approvedAmount;
+            }
+
+            const status = (outstandingBalance <= 0 || monthsPaid >= monthsTotal) ? 'COMPLETED' : 'ACTIVE';
+
+            return {
+                refNo: raw.refNo || raw.loanId || `BCF-LN-2026-${String(defaultIndex).padStart(4, '0')}`,
+                empId: empId,
+                fullName: fullName,
+                department: department,
+                position: position,
+                multiplierCategory: multiplierCategory,
+                monthlyBasicSalary: monthlyBasicSalary,
+                approvedAmount: approvedAmount,
+                monthlyDeduction: monthlyDeduction,
+                monthsTotal: monthsTotal,
+                monthsPaid: monthsPaid,
+                recoveredAmount: recoveredAmount,
+                outstandingBalance: outstandingBalance,
+                status: status,
+                disbursedDate: raw.disbursedDate || raw.date || '2026-08-15',
+                repaymentHistory: Array.isArray(raw.repaymentHistory) ? raw.repaymentHistory : []
+            };
+        }
+
+        function loadAndSyncData() {
+            let rawList = [];
+
+            // 1. Try reading existing bcf_staff_loans
+            try {
+                const stored = JSON.parse(localStorage.getItem('bcf_staff_loans') || '[]');
+                if (Array.isArray(stored) && stored.length > 0) {
+                    rawList = stored;
+                }
+            } catch (e) {}
+
+            // 2. If empty, check bcf_all_loan_applications
+            if (rawList.length === 0) {
+                try {
+                    const allApps = JSON.parse(localStorage.getItem('bcf_all_loan_applications') || '[]');
+                    if (Array.isArray(allApps) && allApps.length > 0) {
+                        rawList = allApps;
+                    }
+                } catch (e) {}
+            }
+
+            // 3. If empty, check standard loan applications
+            if (rawList.length === 0) {
+                try {
+                    const apps = JSON.parse(localStorage.getItem('bcf_loan_applications') || '[]');
+                    if (Array.isArray(apps) && apps.length > 0) {
+                        rawList = apps;
+                    }
+                } catch (e) {}
+            }
+
+            // 4. Normalize every item in rawList
+            let normalized = rawList.map((item, idx) => normalizeLoanRecord(item, idx + 1)).filter(Boolean);
+
+            // 5. If no active loans or empty, seed standard personnel with active loan balances
+            const activeCount = normalized.filter(l => l.status === 'ACTIVE' && l.outstandingBalance > 0).length;
+            if (normalized.length === 0 || activeCount === 0) {
+                normalized = [
+                    {
+                        refNo: 'BCF-LN-2026-0001',
+                        empId: 'BCF-SL-1048',
+                        fullName: 'Mariama Kamara',
+                        department: 'Programs Department',
+                        position: 'Senior Field Coordinator',
+                        multiplierCategory: 'Officer',
+                        monthlyBasicSalary: 8500,
+                        approvedAmount: 7500,
+                        monthlyDeduction: 750,
+                        monthsTotal: 10,
+                        monthsPaid: 2,
+                        recoveredAmount: 1500,
+                        outstandingBalance: 6000,
+                        status: 'ACTIVE',
+                        disbursedDate: '2026-08-15',
+                        repaymentHistory: [
+                            { month: 1, date: '31/08/2026', opening: 7500, deduction: 750, closing: 6750 },
+                            { month: 2, date: '30/09/2026', opening: 6750, deduction: 750, closing: 6000 }
+                        ]
+                    },
+                    {
+                        refNo: 'BCF-LN-2026-0002',
+                        empId: 'BCF-SL-1001',
+                        fullName: 'Albert Joseph Bandama',
+                        department: 'Executive Management',
+                        position: 'Executive Director / CEO',
+                        multiplierCategory: 'CEO/Governing Board',
+                        monthlyBasicSalary: 35000,
+                        approvedAmount: 4200,
+                        monthlyDeduction: 420,
+                        monthsTotal: 10,
+                        monthsPaid: 3,
+                        recoveredAmount: 1260,
+                        outstandingBalance: 2940,
+                        status: 'ACTIVE',
+                        disbursedDate: '2026-07-01',
+                        repaymentHistory: [
+                            { month: 1, date: '31/07/2026', opening: 4200, deduction: 420, closing: 3780 },
+                            { month: 2, date: '31/08/2026', opening: 3780, deduction: 420, closing: 3360 },
+                            { month: 3, date: '30/09/2026', opening: 3360, deduction: 420, closing: 2940 }
+                        ]
+                    },
+                    {
+                        refNo: 'BCF-LN-2026-0003',
+                        empId: 'BCF-SL-1003',
+                        fullName: 'Ibrahim Kargbo',
+                        department: 'Health & Safety Department',
+                        position: 'Senior Program Coordinator',
+                        multiplierCategory: 'Manager/Assistant Manager',
+                        monthlyBasicSalary: 16000,
+                        approvedAmount: 25000,
+                        monthlyDeduction: 2500,
+                        monthsTotal: 10,
+                        monthsPaid: 8,
+                        recoveredAmount: 20000,
+                        outstandingBalance: 5000,
+                        status: 'ACTIVE',
+                        disbursedDate: '2026-02-15',
+                        repaymentHistory: []
+                    },
+                    {
+                        refNo: 'BCF-LN-2026-0004',
+                        empId: 'BCF-SL-1004',
+                        fullName: 'Aminata Kamara',
+                        department: 'Programs Department',
+                        position: 'Operations Officer',
+                        multiplierCategory: 'Officer',
+                        monthlyBasicSalary: 9500,
+                        approvedAmount: 18000,
+                        monthlyDeduction: 1800,
+                        monthsTotal: 10,
+                        monthsPaid: 2,
+                        recoveredAmount: 3600,
+                        outstandingBalance: 14400,
+                        status: 'ACTIVE',
+                        disbursedDate: '2026-08-01',
+                        repaymentHistory: []
+                    },
+                    {
+                        refNo: 'BCF-LN-2026-0005',
+                        empId: 'BCF-SL-1005',
+                        fullName: 'Sahr Bangura',
+                        department: 'Finance Department',
+                        position: 'Senior Finance Officer',
+                        multiplierCategory: 'Officer',
+                        monthlyBasicSalary: 12000,
+                        approvedAmount: 30000,
+                        monthlyDeduction: 3000,
+                        monthsTotal: 10,
+                        monthsPaid: 8,
+                        recoveredAmount: 24000,
+                        outstandingBalance: 6000,
+                        status: 'ACTIVE',
+                        disbursedDate: '2026-02-01',
+                        repaymentHistory: []
+                    },
+                    {
+                        refNo: 'BCF-LN-2026-0006',
+                        empId: 'BCF-SL-1012',
+                        fullName: 'Mohamed Bangura',
+                        department: 'Programs Department',
+                        position: 'Program Monitoring Manager',
+                        multiplierCategory: 'Manager/Assistant Manager',
+                        monthlyBasicSalary: 14000,
+                        approvedAmount: 2000,
+                        monthlyDeduction: 200,
+                        monthsTotal: 10,
+                        monthsPaid: 1,
+                        recoveredAmount: 200,
+                        outstandingBalance: 1800,
+                        status: 'ACTIVE',
+                        disbursedDate: '2026-09-01',
+                        repaymentHistory: []
+                    }
+                ];
+            }
+
+            loansList = normalized;
+            localStorage.setItem('bcf_staff_loans', JSON.stringify(loansList));
+        }
+
+        function reseedDefaultLoans() {
+            localStorage.removeItem('bcf_staff_loans');
+            localStorage.removeItem('bcf_all_loan_applications');
+            loadAndSyncData();
+            renderLedger();
+            if (window.BCF_LOANS && typeof BCF_LOANS.showToast === 'function') {
+                BCF_LOANS.showToast('Reset and reloaded active staff loan records.', 'success');
+            }
+        }
+
+        // =========================================================================
+        // SECURITY & RBAC HELPERS
+        // =========================================================================
+        function canApplyPayrollDeductions() {
+            let role = null;
+            if (window.BCF_LOANS && typeof BCF_LOANS.getCurrentUserRole === 'function') {
+                role = BCF_LOANS.getCurrentUserRole();
+            }
+            if (!role) {
+                const r = localStorage.getItem('bcf_loan_user_role') || localStorage.getItem('bcf_user_role') || '';
+                const up = r.toUpperCase();
+                if (up.includes('FINAN')) role = 'FINANCE';
+                else if (up.includes('ADMIN')) role = 'ADMIN';
+                else if (up.includes('HR')) role = 'HR';
+                else if (up.includes('CEO')) role = 'CEO';
+                else role = 'STAFF';
+            }
+            const norm = (role || 'STAFF').toUpperCase();
+            return (norm === 'FINANCE' || norm === 'ADMIN');
+        }
+
+        function applyPayrollRBAC() {
+            const canDeduct = canApplyPayrollDeductions();
+            let userRole = (window.BCF_LOANS && typeof BCF_LOANS.getCurrentUserRole === 'function') 
+                ? BCF_LOANS.getCurrentUserRole() 
+                : (canDeduct ? 'FINANCE' : 'STAFF');
+            if (!userRole) userRole = canDeduct ? 'FINANCE' : 'STAFF';
+
+            const normRole = (window.BCF_LOANS && typeof BCF_LOANS.normalizeRoleKey === 'function')
+                ? (BCF_LOANS.normalizeRoleKey(userRole) || userRole)
+                : String(userRole).toUpperCase();
+
+            // CRITICAL: Staff has ZERO ACCESS to Payroll Integration (No view, no deduct)
+            if (normRole === 'STAFF') {
+                enforceStaffAccessDenied();
+                return;
+            }
+
+            const roleObj = (window.BCF_LOANS && BCF_LOANS.ROLES && BCF_LOANS.ROLES[normRole]) 
+                ? BCF_LOANS.ROLES[normRole] 
+                : { name: normRole, badge: normRole };
+
+            // 1. Role Authority Banner
+            const roleBanner = document.getElementById('payroll-role-banner');
+            if (roleBanner) {
+                if (canDeduct) {
+                    roleBanner.innerHTML = `
+                        <div class="p-3.5 bg-emerald-50 border-2 border-emerald-300 rounded-xl text-xs font-bold text-emerald-950 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-2xs mb-4">
+                            <div class="flex items-center gap-2.5">
+                                <span class="material-symbols-outlined text-emerald-700 text-xl font-bold">verified_user</span>
+                                <div>
+                                    <span class="font-black text-emerald-900 uppercase tracking-wide mr-1">[${roleObj.name} Privilege Active]:</span>
+                                    <span>Authorized to <strong>View</strong> and <strong>Apply Automatic Monthly Deductions</strong>.</span>
+                                </div>
+                            </div>
+                            <span class="px-3 py-1 rounded-full text-[10px] font-black uppercase bg-emerald-600 text-white tracking-wider shrink-0 shadow-2xs text-center">
+                                Deduction Authorized
+                            </span>
+                        </div>
+                    `;
+                } else {
+                    roleBanner.innerHTML = `
+                        <div class="p-3.5 bg-blue-50 border-2 border-blue-300 rounded-xl text-xs font-bold text-blue-950 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-2xs mb-4">
+                            <div class="flex items-center gap-2.5">
+                                <span class="material-symbols-outlined text-blue-700 text-xl font-bold">visibility</span>
+                                <div>
+                                    <span class="font-black text-blue-900 uppercase tracking-wide mr-1">[${roleObj.name} View Access]:</span>
+                                    <span>You have <strong>View Access Only</strong> to staff loan repayment schedules and amortization ledgers. <strong>Applying automatic monthly deductions is strictly restricted to the Finance Director and Administrator.</strong></span>
+                                </div>
+                            </div>
+                            <span class="px-3 py-1 rounded-full text-[10px] font-black uppercase bg-blue-600 text-white tracking-wider shrink-0 shadow-2xs text-center">
+                                View-Only Mode
+                            </span>
+                        </div>
+                    `;
+                }
+            }
+
+            // 2. Hero Header Button ("Deduct All Staff Loans At Once")
+            const heroContainer = document.getElementById('hero-deduct-btn-container');
+            if (heroContainer) {
+                if (canDeduct) {
+                    heroContainer.innerHTML = `
+                        <button type="button" id="btn-deduct-all-general" onclick="executeOneClickDeductAll()" class="px-6 py-4 bg-emerald-400 hover:bg-emerald-300 active:scale-95 text-primary-dark font-black rounded-xl shadow-2xl transition-all flex items-center justify-center gap-2.5 cursor-pointer ring-4 ring-emerald-400/30">
+                            <span class="material-symbols-outlined text-2xl font-bold">bolt</span>
+                            <div class="text-left">
+                                <span class="block text-xs font-extrabold uppercase tracking-wider">GENERAL EXECUTION</span>
+                                <span class="block text-sm font-black leading-tight">DEDUCT ALL STAFF LOANS AT ONCE</span>
+                            </div>
+                        </button>
+                    `;
+                } else {
+                    heroContainer.innerHTML = `
+                        <button type="button" id="btn-deduct-all-general" disabled class="px-6 py-4 bg-white/10 text-white/50 border border-white/20 rounded-xl font-bold flex items-center justify-center gap-2.5 cursor-not-allowed shadow-none opacity-80 pointer-events-none" title="View Access Only: Automatic Monthly Deductions can only be applied by the Finance Director & Admin">
+                            <span class="material-symbols-outlined text-2xl text-amber-300">lock</span>
+                            <div class="text-left">
+                                <span class="block text-xs font-black uppercase tracking-wider text-amber-300">VIEW ACCESS ONLY</span>
+                                <span class="block text-sm font-bold text-white/80 leading-tight">DEDUCTION RESTRICTED TO FINANCE</span>
+                            </div>
+                        </button>
+                    `;
+                }
+            }
+
+            // 3. Table Header Button ("Deduct All Staff Loans Now")
+            const batchContainer = document.getElementById('batch-deduct-btn-container');
+            if (batchContainer) {
+                if (canDeduct) {
+                    batchContainer.innerHTML = `
+                        <button type="button" id="btn-deduct-all-staff" onclick="executeOneClickDeductAll()" class="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg font-bold text-xs shadow-sm transition flex items-center gap-1 cursor-pointer" title="Execute automatic 10% principal deduction for all active accounts">
+                            <span class="material-symbols-outlined text-sm">bolt</span>
+                            <span>Deduct All Staff Loans Now</span>
+                        </button>
+                    `;
+                } else {
+                    batchContainer.innerHTML = `
+                        <button type="button" id="btn-deduct-all-staff" disabled class="px-3 py-1.5 bg-slate-100 text-slate-400 border border-slate-200 rounded-lg font-bold text-xs flex items-center gap-1 cursor-not-allowed opacity-60 pointer-events-none" title="View Access Only: Only Finance Director & Admin are authorized to apply loan deductions">
+                            <span class="material-symbols-outlined text-sm">lock</span>
+                            <span>Deductions Locked (Finance Only)</span>
+                        </button>
+                    `;
+                }
+            }
+        }
+
+        function renderLedger() {
+            // Apply RBAC controls first thing
+            applyPayrollRBAC();
+            const canDeduct = canApplyPayrollDeductions();
+
+            const query = (document.getElementById('filter-search').value || '').toLowerCase();
+            const statusFilter = document.getElementById('filter-status').value;
+            const rawDeptFilter = document.getElementById('filter-dept').value;
+            const normDeptFilter = (rawDeptFilter === 'ALL' || !rawDeptFilter) ? 'ALL' : getNormalizedDept(rawDeptFilter);
+
+            const filtered = loansList.filter(l => {
+                const matchQ = (l.fullName || '').toLowerCase().includes(query) ||
+                               (l.empId || '').toLowerCase().includes(query) ||
+                               (l.refNo || '').toLowerCase().includes(query);
+                
+                const isComplete = l.status === 'COMPLETED' || (Number(l.outstandingBalance || 0) <= 0);
+                let matchStatus = true;
+                if (statusFilter === 'ACTIVE') matchStatus = !isComplete;
+                if (statusFilter === 'COMPLETED') matchStatus = isComplete;
+
+                const loanDept = getNormalizedDept(l.department);
+                const matchDept = (normDeptFilter === 'ALL') || (loanDept === normDeptFilter);
+
+                return matchQ && matchStatus && matchDept;
+            });
+
+            // Update KPIs
+            let activeCount = 0;
+            let monthlyPipeline = 0;
+            let totalRecovered = 0;
+            let totalOutstanding = 0;
+
+            loansList.forEach(l => {
+                const isAct = l.status === 'ACTIVE' && Number(l.outstandingBalance || 0) > 0;
+                if (isAct) {
+                    activeCount++;
+                    monthlyPipeline += Number(l.monthlyDeduction || 0);
+                    totalOutstanding += Number(l.outstandingBalance || 0);
+                }
+                totalRecovered += Number(l.recoveredAmount || 0);
+            });
+
+            // User Requirement: Total Amount of Loan = Total Recovered To date + Outstanding Balance
+            const totalLoanAmount = totalRecovered + totalOutstanding;
+
+            document.getElementById('kpi-active-count').textContent = `${activeCount} Staff`;
+            document.getElementById('kpi-monthly-pipeline').textContent = getFormatNLe(monthlyPipeline);
+            const kpiTotalLoanEl = document.getElementById('kpi-total-loan-amount');
+            if (kpiTotalLoanEl) {
+                kpiTotalLoanEl.textContent = getFormatNLe(totalLoanAmount);
+            }
+            document.getElementById('kpi-total-recovered').textContent = getFormatNLe(totalRecovered);
+            document.getElementById('kpi-total-outstanding').textContent = getFormatNLe(totalOutstanding);
+
+            document.getElementById('ledger-count-tag').textContent = `${filtered.length} records`;
+
+            const tbody = document.getElementById('ledger-tbody');
+            if (filtered.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="9" class="py-12 text-center text-gray-500 font-normal">
+                            <span class="material-symbols-outlined text-4xl text-gray-300 block mb-2">payments_off</span>
+                            <p class="font-bold text-gray-700">No loan records matching the current filters.</p>
+                            <p class="text-xs text-gray-400 mt-1">Select "All Departments" or click "Reset Data" to reload active records.</p>
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+
+            tbody.innerHTML = filtered.map(l => {
+                const pct = Math.min(100, Math.round(((l.monthsPaid || 0) / (l.monthsTotal || 10)) * 100));
+                const isComplete = l.status === 'COMPLETED' || (Number(l.outstandingBalance || 0) <= 0);
+
+                const statusBadge = isComplete
+                    ? `<span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-semibold bg-emerald-100 text-emerald-800">Settled</span>`
+                    : `<span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-semibold bg-blue-100 text-blue-800">Active (M${l.monthsPaid || 0}/10)</span>`;
+
+                return `
+                    <tr class="hover:bg-gray-50 transition">
+                        <td class="py-3 px-4">
+                            <div class="font-bold text-gray-900">${l.fullName}</div>
+                            <div class="text-xs text-gray-500 font-mono">${l.empId} • ${l.department}</div>
+                        </td>
+                        <td class="py-3 px-4 text-xs font-semibold text-gray-700">
+                            ${l.multiplierCategory || 'Officer'}
+                        </td>
+                        <td class="py-3 px-4 font-mono font-bold text-gray-800">
+                            <div>${getFormatNLe(l.monthlyBasicSalary || 0)}</div>
+                            <div class="text-[10px] text-gray-400 font-sans font-normal">Monthly Salary</div>
+                        </td>
+                        <td class="py-3 px-4 font-mono font-bold text-primary">
+                            <div>${getFormatNLe(l.approvedAmount || 0)}</div>
+                            <div class="text-[10px] text-gray-400 font-sans font-normal">Loan Principal</div>
+                        </td>
+                        <td class="py-3 px-4 font-mono font-bold text-emerald-700">
+                            <div>${getFormatNLe(l.monthlyDeduction || (l.approvedAmount * 0.10))}</div>
+                            <div class="text-[10px] text-emerald-600 font-sans font-medium">10% of Principal</div>
+                        </td>
+                        <td class="py-3 px-4">
+                            <div class="flex items-center justify-between text-xs mb-1">
+                                <span class="font-semibold text-gray-700">${l.monthsPaid || 0} / 10 Mos</span>
+                                <span class="text-gray-500">${pct}%</span>
+                            </div>
+                            <div class="w-28 bg-gray-200 rounded-full h-1.5 overflow-hidden">
+                                <div class="bg-primary h-1.5 rounded-full" style="width: ${pct}%"></div>
+                            </div>
+                        </td>
+                        <td class="py-3 px-4 font-mono font-bold ${isComplete ? 'text-gray-400' : 'text-red-600'}">
+                            ${getFormatNLe(l.outstandingBalance || 0)}
+                        </td>
+                        <td class="py-3 px-4 text-center">
+                            ${statusBadge}
+                        </td>
+                        <td class="py-3 px-4 text-right">
+                            <div class="inline-flex items-center gap-1">
+                                <button type="button" onclick="openScheduleModal('${l.empId}')" title="View 10-Month Schedule" class="p-1.5 text-gray-500 hover:text-primary hover:bg-gray-100 rounded-md transition cursor-pointer">
+                                    <span class="material-symbols-outlined text-lg">calendar_view_month</span>
+                                </button>
+                                <button type="button" onclick="openPayslipModal('${l.empId}')" title="Preview Payslip Impact" class="p-1.5 text-gray-500 hover:text-emerald-700 hover:bg-gray-100 rounded-md transition cursor-pointer">
+                                    <span class="material-symbols-outlined text-lg">receipt</span>
+                                </button>
+                                ${!isComplete ? (
+                                    canDeduct ? `
+                                    <button type="button" onclick="executeSingleDeduction('${l.empId}')" title="Process Single Installment" class="px-2.5 py-1 bg-emerald-600 hover:bg-emerald-700 text-white rounded text-xs font-extrabold shadow-sm transition flex items-center gap-1 cursor-pointer">
+                                        <span class="material-symbols-outlined text-xs">arrow_downward</span> Deduct
+                                    </button>` : `
+                                    <span class="px-2.5 py-1 bg-slate-100 text-slate-400 border border-slate-200 rounded text-[11px] font-bold cursor-not-allowed inline-flex items-center gap-1" title="View-Only: Restricted to Finance Director & Admin"><span class="material-symbols-outlined text-xs text-slate-400">visibility</span>View Only</span>`
+                                ) : ''}
+                            </div>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        // =========================================================================
+        // GENERAL EXECUTION: ONE-CLICK DEDUCT ALL STAFF LOANS AT ONCE
+        // =========================================================================
+        function executeOneClickDeductAll() {
+            if (!canApplyPayrollDeductions()) {
+                const userRole = (window.BCF_LOANS && typeof BCF_LOANS.getCurrentUserRole === 'function') ? BCF_LOANS.getCurrentUserRole() : 'UNKNOWN';
+                alert(`Access Restricted!\n\nHR, CEO, and Staff have View-Only access to Payroll Integration & Monthly Deductions.\n\nOnly the Finance Director and System Administrator are authorized to apply automatic monthly deductions to payroll.\n\nYour current active role is: ${userRole}.`);
+                return;
+            }
+
+            const activeLoans = loansList.filter(l => l.status === 'ACTIVE' && Number(l.outstandingBalance || 0) > 0);
+            
+            if (activeLoans.length === 0) {
+                if (confirm('All current staff loans are fully settled! Would you like to reset and re-load active staff loan accounts for testing?')) {
+                    reseedDefaultLoans();
+                }
+                return;
+            }
+
+            let totalDed = 0;
+            activeLoans.forEach(loan => {
+                const installment = Math.min(Number(loan.outstandingBalance), Number(loan.monthlyDeduction));
+                totalDed += installment;
+            });
+
+            // Instant General Execution Confirmation
+            const proceed = confirm(`GENERAL PAYROLL LOAN RECOVERY:\n\nAre you sure you want to deduct 1 monthly installment from ALL ${activeLoans.length} active staff members simultaneously?\n\nTotal Sum to Debit: ${getFormatNLe(totalDed)}\n\nClick OK to execute all deductions at once.`);
+            if (!proceed) return;
+
+            let totalCycleDeducted = 0;
+            const todayStr = new Date().toLocaleDateString('en-GB');
+
+            activeLoans.forEach(loan => {
+                const currentBal = Number(loan.outstandingBalance || 0);
+                const installment = Math.min(currentBal, Number(loan.monthlyDeduction || 0));
+                
+                loan.monthsPaid = Math.min(Number(loan.monthsTotal || 10), (Number(loan.monthsPaid) || 0) + 1);
+                loan.recoveredAmount = Math.min(Number(loan.approvedAmount || 0), (Number(loan.recoveredAmount) || 0) + installment);
+                loan.outstandingBalance = Math.max(0, Number(loan.approvedAmount || 0) - loan.recoveredAmount);
+                totalCycleDeducted += installment;
+
+                if (!Array.isArray(loan.repaymentHistory)) {
+                    loan.repaymentHistory = [];
+                }
+                loan.repaymentHistory.push({
+                    month: loan.monthsPaid,
+                    date: todayStr,
+                    opening: currentBal,
+                    deduction: installment,
+                    closing: loan.outstandingBalance
+                });
+
+                if (loan.outstandingBalance <= 0 || loan.monthsPaid >= Number(loan.monthsTotal || 10)) {
+                    loan.status = 'COMPLETED';
+                    loan.outstandingBalance = 0;
+                    loan.recoveredAmount = Number(loan.approvedAmount || 0);
+                }
+            });
+
+            // Save to localStorage
+            localStorage.setItem('bcf_staff_loans', JSON.stringify(loansList));
+            window.dispatchEvent(new Event('storage'));
+            try {
+                if (window.parent && window.parent !== window) {
+                    window.parent.postMessage({ type: 'BCF_LOAN_DEDUCTED', timestamp: Date.now() }, '*');
+                }
+            } catch(e) {}
+
+            // Notify Finance Director & HR
+            if (window.BCF_LOANS && typeof BCF_LOANS.dispatchEmail === 'function') {
+                BCF_LOANS.dispatchEmail({
+                    to: 'finance.director@bandamafoundation.org',
+                    role: 'Finance Director',
+                    subject: `GENERAL BATCH: Monthly Staff Loan Recovery Executed (${getFormatNLe(totalCycleDeducted)})`,
+                    body: `Dear Finance Director,\n\nThe General Monthly Staff Loan deduction cycle has been executed as once for all staff members.\n\nTotal Accounts Debited: ${activeLoans.length} staff\nTotal Amount Recovered: ${getFormatNLe(totalCycleDeducted)}\n\nAmortization ledgers have been updated across the organization.\n\nBandama Charity Foundation Payroll Management`
+                });
+            }
+
+            renderLedger();
+
+            // High-impact visual confirmation toast
+            if (window.BCF_LOANS && typeof BCF_LOANS.showToast === 'function') {
+                BCF_LOANS.showToast(`GENERAL DEDUCTION COMPLETED: ${getFormatNLe(totalCycleDeducted)} recovered across all ${activeLoans.length} staff accounts!`, 'success');
+            } else {
+                alert(`GENERAL DEDUCTION COMPLETED!\n\n${getFormatNLe(totalCycleDeducted)} successfully deducted across all ${activeLoans.length} staff members.`);
+            }
+        }
+
+        // BATCH DEDUCTION FLOW (PREVIEW MODAL)
+        function openBatchDeductionModal() {
+            const activeLoans = loansList.filter(l => l.status === 'ACTIVE' && Number(l.outstandingBalance || 0) > 0);
+            if (activeLoans.length === 0) {
+                if (confirm('All current staff loans are fully settled! Would you like to reset and re-load active staff loan accounts for testing?')) {
+                    reseedDefaultLoans();
+                }
+                return;
+            }
+
+            let totalDed = 0;
+            const rows = activeLoans.map(loan => {
+                const installment = Math.min(Number(loan.outstandingBalance), Number(loan.monthlyDeduction));
+                totalDed += installment;
+                const newBal = Math.max(0, Number(loan.outstandingBalance) - installment);
+                const nextMonth = Number(loan.monthsPaid || 0) + 1;
+
+                return `
+                    <tr class="hover:bg-slate-50">
+                        <td class="py-2.5 px-3">
+                            <span class="font-bold text-slate-800">${loan.fullName}</span>
+                            <span class="block text-[10px] text-slate-400 font-sans">${loan.empId}</span>
+                        </td>
+                        <td class="py-2.5 px-3 font-sans text-emerald-800 font-bold">Month ${nextMonth}/10</td>
+                        <td class="py-2.5 px-3 text-right font-bold text-emerald-700">-${getFormatNLe(installment)}</td>
+                        <td class="py-2.5 px-3 text-right font-bold text-slate-800">${getFormatNLe(newBal)}</td>
+                    </tr>
+                `;
+            }).join('');
+
+            document.getElementById('batch-accounts-count').textContent = `${activeLoans.length} Staff Accounts`;
+            document.getElementById('batch-total-amount').textContent = getFormatNLe(totalDed);
+            document.getElementById('batch-preview-tbody').innerHTML = rows;
+
+            // Configure modal action buttons based on Finance / Admin rights vs View-Only (HR, CEO, Staff)
+            const canDeduct = canApplyPayrollDeductions();
+            const submitContainer = document.getElementById('modal-batch-submit-container');
+            if (submitContainer) {
+                if (canDeduct) {
+                    submitContainer.innerHTML = `
+                        <button type="button" id="btn-batch-confirm-submit" onclick="executeBatchPayrollCycle()" class="px-5 py-2.5 bg-primary hover:bg-primary-dark text-white rounded-xl text-xs font-extrabold shadow-md transition flex items-center gap-1.5 cursor-pointer">
+                            <span class="material-symbols-outlined text-sm">check_circle</span>
+                            <span>Confirm &amp; Execute Deductions Now</span>
+                        </button>
+                    `;
+                } else {
+                    submitContainer.innerHTML = `
+                        <span class="px-4 py-2 bg-slate-100 text-slate-500 rounded-xl text-xs font-bold border border-slate-200 flex items-center gap-1.5 cursor-not-allowed" title="Execution restricted to Finance Director & Admin">
+                            <span class="material-symbols-outlined text-sm text-slate-400">lock</span>
+                            <span>View-Only &bull; Execution Restricted to Finance Director</span>
+                        </span>
+                    `;
+                }
+            }
+
+            document.getElementById('modal-confirm-batch').classList.remove('hidden');
+        }
+
+        function executeBatchPayrollCycle() {
+            if (!canApplyPayrollDeductions()) {
+                alert("Access Restricted: Only the Finance Director and System Administrator are authorized to apply monthly deductions.");
+                return;
+            }
+            closeModal('modal-confirm-batch');
+            executeOneClickDeductAll();
+        }
+
+        // SINGLE LOAN DEDUCTION
+        function executeSingleDeduction(empId) {
+            if (!canApplyPayrollDeductions()) {
+                alert("Access Restricted: HR, CEO, and Staff have View-Only access. Only the Finance Director and System Administrator are authorized to apply monthly deductions.");
+                return;
+            }
+
+            const loan = loansList.find(l => l.empId === empId);
+            if (!loan || Number(loan.outstandingBalance || 0) <= 0) return;
+
+            const installment = Math.min(Number(loan.outstandingBalance), Number(loan.monthlyDeduction));
+            if (!confirm(`Confirm monthly deduction of ${getFormatNLe(installment)} from ${loan.fullName}'s salary?`)) return;
+
+            const currentBal = Number(loan.outstandingBalance);
+            loan.monthsPaid = Math.min(Number(loan.monthsTotal || 10), (Number(loan.monthsPaid) || 0) + 1);
+            loan.recoveredAmount = Math.min(Number(loan.approvedAmount || 0), (Number(loan.recoveredAmount) || 0) + installment);
+            loan.outstandingBalance = Math.max(0, Number(loan.approvedAmount || 0) - loan.recoveredAmount);
+
+            if (!Array.isArray(loan.repaymentHistory)) loan.repaymentHistory = [];
+            loan.repaymentHistory.push({
+                month: loan.monthsPaid,
+                date: new Date().toLocaleDateString('en-GB'),
+                opening: currentBal,
+                deduction: installment,
+                closing: loan.outstandingBalance
+            });
+
+            if (loan.outstandingBalance <= 0 || loan.monthsPaid >= Number(loan.monthsTotal || 10)) {
+                loan.status = 'COMPLETED';
+                loan.outstandingBalance = 0;
+                loan.recoveredAmount = Number(loan.approvedAmount || 0);
+            }
+
+            localStorage.setItem('bcf_staff_loans', JSON.stringify(loansList));
+            window.dispatchEvent(new Event('storage'));
+            try {
+                if (window.parent && window.parent !== window) {
+                    window.parent.postMessage({ type: 'BCF_LOAN_DEDUCTED', timestamp: Date.now() }, '*');
+                }
+            } catch(e) {}
+
+            // Notify staff member
+            if (window.BCF_LOANS && typeof BCF_LOANS.dispatchEmail === 'function') {
+                BCF_LOANS.dispatchEmail({
+                    to: `${loan.fullName.toLowerCase().replace(/[^a-z]/g, '.')}@bandamafoundation.org`,
+                    role: 'Staff Member',
+                    subject: `BCF-SL Payroll Deduction Notification: Month ${loan.monthsPaid} of 10`,
+                    body: `Dear ${loan.fullName},\n\nA monthly loan repayment installment of ${getFormatNLe(installment)} has been deducted from your salary in accordance with the BCF Staff Loan Policy.\n\nRemaining Outstanding Balance: ${getFormatNLe(loan.outstandingBalance)}\nInstallment: ${loan.monthsPaid} / 10\n\nBandama Charity Foundation Finance & Payroll Department`
+                });
+            }
+
+            renderLedger();
+
+            if (window.BCF_LOANS && typeof BCF_LOANS.showToast === 'function') {
+                BCF_LOANS.showToast(`Processed ${getFormatNLe(installment)} deduction for ${loan.fullName}!`, 'success');
+            }
+        }
+
+        // AMORTIZATION MODAL
+        function openScheduleModal(empId) {
+            const loan = loansList.find(l => l.empId === empId);
+            if (!loan) return;
+
+            document.getElementById('modal-subheading').textContent = `${loan.fullName} (${loan.refNo})`;
+            document.getElementById('modal-staff-id').textContent = loan.empId;
+            document.getElementById('modal-loan-principal').textContent = getFormatNLe(loan.approvedAmount);
+            document.getElementById('modal-monthly-ded').textContent = getFormatNLe(loan.monthlyDeduction);
+            document.getElementById('modal-outstanding').textContent = getFormatNLe(loan.outstandingBalance);
+
+            const tbody = document.getElementById('modal-schedule-tbody');
+            const principal = Number(loan.approvedAmount || 0);
+            const monthlyDed = Number(loan.monthlyDeduction || (principal * 0.10));
+            const monthsPaid = Number(loan.monthsPaid || 0);
+
+            let rows = '';
+            let currentOpening = principal;
+
+            for (let i = 1; i <= 10; i++) {
+                const ded = Math.min(currentOpening, monthlyDed);
+                const closing = Math.max(0, currentOpening - ded);
+                const isPaid = i <= monthsPaid;
+
+                rows += `
+                    <tr class="${isPaid ? 'bg-emerald-50/50' : ''}">
+                        <td class="py-2.5 px-3 font-bold ${isPaid ? 'text-emerald-900' : 'text-gray-700'}">Month ${i}</td>
+                        <td class="py-2.5 px-3 font-mono">${getFormatNLe(currentOpening)}</td>
+                        <td class="py-2.5 px-3 font-mono font-semibold text-emerald-700">-${getFormatNLe(ded)}</td>
+                        <td class="py-2.5 px-3 font-mono font-bold">${getFormatNLe(closing)}</td>
+                        <td class="py-2.5 px-3">
+                            ${isPaid 
+                                ? `<span class="inline-flex items-center gap-1 text-emerald-800 text-xs font-bold"><span class="material-symbols-outlined text-sm">check_circle</span> Processed</span>` 
+                                : `<span class="text-xs text-gray-400 font-medium">Pending Cycle</span>`}
+                        </td>
+                    </tr>
+                `;
+                currentOpening = closing;
+            }
+
+            tbody.innerHTML = rows;
+            document.getElementById('modal-amortization').classList.remove('hidden');
+        }
+
+        // PAYSLIP MODAL
+        function openPayslipModal(empId) {
+            const loan = loansList.find(l => l.empId === empId);
+            if (!loan) return;
+
+            const basic = Number(loan.monthlyBasicSalary || 0);
+            const nassit = basic * 0.05; // 5% statutory employee pension
+            const paye = basic * 0.15;   // 15% estimated PAYE tier
+            const loanDed = Number(loan.monthlyDeduction || 0);
+            const net = Math.max(0, basic - nassit - paye - loanDed);
+
+            document.getElementById('payslip-name').textContent = loan.fullName;
+            document.getElementById('payslip-pos').textContent = `${loan.position} • ${loan.department}`;
+            document.getElementById('payslip-basic').textContent = getFormatNLe(basic);
+            document.getElementById('payslip-nassit').textContent = `-${getFormatNLe(nassit)}`;
+            document.getElementById('payslip-paye').textContent = `-${getFormatNLe(paye)}`;
+            document.getElementById('payslip-loan-ded').textContent = `-${getFormatNLe(loanDed)}`;
+            document.getElementById('payslip-net').textContent = getFormatNLe(net);
+
+            document.getElementById('modal-payslip').classList.remove('hidden');
+        }
+
+        function closeModal(id) {
+            document.getElementById(id).classList.add('hidden');
+        }
+    </script>
+</body>
+</html>

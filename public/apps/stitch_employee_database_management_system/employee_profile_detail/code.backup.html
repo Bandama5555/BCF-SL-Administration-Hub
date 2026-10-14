@@ -1,0 +1,971 @@
+<!DOCTYPE html>
+
+<html lang="en"><head><meta charset="utf-8"/><meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" name="viewport"/><title>StaffHub BCF</title><link href="https://fonts.googleapis.com" rel="preconnect"/><link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=JetBrains+Mono:wght@500&amp;display=swap" rel="stylesheet"/><link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/><script src="https://cdn.tailwindcss.com"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script><script id="tailwind-config">tailwind.config = { darkMode: "class", theme: { extend: { "colors": { "secondary": "#006c49", "on-secondary-fixed": "#002113", "surface-tint": "#4059aa", "primary-container": "#1e3a8a", "error": "#ba1a1a", "surface": "#f8f9ff", "secondary-container": "#6cf8bb", "error-container": "#ffdad6", "on-tertiary-fixed-variant": "#653e00", "surface-container": "#e5eeff", "on-surface": "#0b1c30", "on-surface-variant": "#444651", "secondary-fixed-dim": "#4edea3", "on-tertiary-fixed": "#2a1700", "on-primary-fixed-variant": "#264191", "inverse-surface": "#213145", "tertiary-fixed-dim": "#ffb95f", "surface-container-lowest": "#ffffff", "surface-container-low": "#eff4ff", "tertiary": "#3e2400", "surface-dim": "#cbdbf5", "on-tertiary": "#ffffff", "surface-bright": "#f8f9ff", "on-secondary-fixed-variant": "#005236", "surface-container-high": "#dce9ff", "tertiary-fixed": "#ffddb8", "on-primary": "#ffffff", "inverse-primary": "#b6c4ff", "on-background": "#0b1c30", "on-tertiary-container": "#ef9900", "surface-container-highest": "#d3e4fe", "primary": "#00236f", "background": "#f8f9ff", "secondary-fixed": "#6ffbbe", "surface-variant": "#d3e4fe", "on-secondary": "#ffffff", "outline-variant": "#c5c5d3", "tertiary-container": "#5c3800", "on-primary-fixed": "#00164e", "primary-fixed-dim": "#b6c4ff", "inverse-on-surface": "#eaf1ff", "on-primary-container": "#90a8ff", "primary-fixed": "#dce1ff", "on-error": "#ffffff", "on-error-container": "#93000a", "on-secondary-container": "#00714d", "outline": "#757682" }, "borderRadius": { "DEFAULT": "0.125rem", "lg": "0.25rem", "xl": "0.5rem", "full": "0.75rem" }, "spacing": { "space-sm": "0.5rem", "space-xs": "0.25rem", "gutter-mobile": "0.75rem", "space-xxs": "0.125rem", "space-lg": "1.25rem", "touch-target": "2.75rem", "space-3xl": "2.5rem", "margin-mobile": "1rem", "space-2xl": "2rem", "space-md": "0.75rem", "space-base": "1rem", "space-xl": "1.5rem" }, "fontFamily": { "body-lg": ["Inter"], "body-sm": ["Inter"], "code-xs": ["JetBrains Mono"], "headline-lg": ["Inter"], "label-sm": ["Inter"], "title-sm": ["Inter"], "headline-md": ["Inter"], "display-sm": ["Inter"], "body-md": ["Inter"], "label-md": ["Inter"] }, "fontSize": { "body-lg": ["16px", { "lineHeight": "24px", "letterSpacing": "0em", "fontWeight": "400" }], "body-sm": ["13px", { "lineHeight": "18px", "letterSpacing": "0.005em", "fontWeight": "400" }], "code-xs": ["11px", { "lineHeight": "14px", "letterSpacing": "0.02em", "fontWeight": "500" }], "headline-lg": ["20px", { "lineHeight": "28px", "letterSpacing": "-0.015em", "fontWeight": "600" }], "label-sm": ["11px", { "lineHeight": "14px", "letterSpacing": "0.03em", "fontWeight": "600" }], "title-sm": ["15px", { "lineHeight": "20px", "letterSpacing": "-0.005em", "fontWeight": "600" }], "headline-md": ["18px", { "lineHeight": "24px", "letterSpacing": "-0.01em", "fontWeight": "600" }], "display-sm": ["24px", { "lineHeight": "32px", "letterSpacing": "-0.02em", "fontWeight": "700" }], "body-md": ["14px", { "lineHeight": "20px", "letterSpacing": "0em", "fontWeight": "400" }], "label-md": ["12px", { "lineHeight": "16px", "letterSpacing": "0.02em", "fontWeight": "600" }] } } } }</script><style>@layer base{html,body{width:100%;min-height:100%;margin:0;padding:0;}body{overscroll-behavior-y:none;}.pb-safe{padding-bottom:env(safe-area-inset-bottom,0px);}.pt-safe{padding-top:env(safe-area-inset-top,0px);}main>:first-child{margin-top:0!important;}main>:last-child{margin-bottom:0!important;}}::-webkit-scrollbar{display:none;}</style></head><body class="bg-surface text-on-surface flex flex-col min-h-screen"><script>
+(function() {
+  var forceLoad = sessionStorage.getItem('bcf_force_profile_load');
+  if (!forceLoad) {
+    document.addEventListener('DOMContentLoaded', function() {
+      var mainEl = document.querySelector('main');
+      if(mainEl) mainEl.style.display = 'none';
+      var registry = JSON.parse(localStorage.getItem('bcf_staff_registry') || '[]');
+      var overlay = document.createElement('div');
+      overlay.className = 'fixed inset-0 z-[100] bg-surface flex flex-col items-center justify-start p-space-base overflow-y-auto pt-16 pb-24';
+      var html = '<h2 class="font-headline-md text-headline-md font-bold mb-4 mt-8">Select an Employee</h2>';
+      html += '<div class="w-full max-w-2xl flex flex-col gap-2">';
+      if (registry.length === 0) {
+        html += '<p class="text-on-surface-variant text-center mt-8">No staff records found in registry.</p>';
+      } else {
+        registry.forEach(function(emp) {
+          var name = emp.fullName || 'Unknown';
+          var title = emp.jobTitle || 'No Title';
+          var initial = name.charAt(0).toUpperCase();
+          html += '<button class="w-full bg-surface-container-lowest hover:bg-surface-container-low p-4 rounded-xl text-left flex items-center gap-4 transition-colors shadow-sm border border-outline-variant" onclick="window.selectEmployeeAndLoad(\'' + emp.employeeId + '\')">';
+          html += '<div class="w-10 h-10 rounded-full bg-primary-container text-on-primary-container flex items-center justify-center font-bold text-title-sm shrink-0">' + initial + '</div>';
+          html += '<div class="flex flex-col min-w-0"><span class="font-title-sm text-title-sm font-semibold truncate">' + name + '</span>';
+          html += '<span class="font-label-sm text-label-sm text-on-surface-variant truncate">' + title + ' &bull; ' + (emp.employeeId || '') + '</span></div>';
+          html += '<span class="material-symbols-outlined ml-auto text-on-surface-variant shrink-0">chevron_right</span>';
+          html += '</button>';
+        });
+      }
+      html += '</div>';
+      overlay.innerHTML = html;
+      document.body.appendChild(overlay);
+      
+      window.selectEmployeeAndLoad = function(id) {
+        var emp = registry.find(function(r) { return r.employeeId === id; });
+        if (emp) {
+          localStorage.setItem('bcf_selected_profile', JSON.stringify(emp));
+          sessionStorage.setItem('bcf_force_profile_load', 'true');
+          window.location.reload();
+        }
+      };
+    });
+    return;
+  }
+  
+  sessionStorage.removeItem('bcf_force_profile_load');
+
+  var raw = localStorage.getItem('bcf_selected_profile');
+  if (!raw) return;
+  var p;
+  try { p = JSON.parse(raw); } catch(_) { return; }
+
+  function set(sel, val) {
+    document.querySelectorAll(sel).forEach(function(el) { if (val) el.textContent = val; });
+  }
+  function setHref(sel, val) {
+    document.querySelectorAll(sel).forEach(function(el) { if (val) el.setAttribute('href', val); });
+  }
+  function setSrc(sel, val) {
+    document.querySelectorAll(sel).forEach(function(el) { if (val) el.src = val; });
+  }
+
+  document.addEventListener('DOMContentLoaded', function() {
+    var name = p.fullName || p.name || '';
+    var id   = p.employeeId || p.id || '';
+    var role = p.jobTitle || p.role || '';
+    var dept = p.department || p.dept || '';
+    var phone = p.phone || p.mobilePhone || p.primaryPhone || '';
+    var email = p.workEmail || p.email || '';
+    var bank  = p.salaryBank || p.bank || '';
+    var photo = p.photo || '';
+    var dob   = p.dateOfBirth || p.dob || '';
+    var gender = p.gender || '';
+    var nationality = p.nationality || 'Sierra Leonean';
+    var marital = p.maritalStatus || '';
+    var nin  = p.nin || '';
+    var nassit = p.nassit || '';
+    var startDate = p.startDate || p.employmentStartDate || '';
+    var children = p.children || p.dependents || '';
+    var qualification = p.qualification || '';
+    var residence = p.residence || '';
+    var accountName = p.accountName || '';
+    var accountNumber = p.accountNumber || '';
+    var bban = p.bban || '';
+
+    // Hero section
+    set('h2', name);
+    set('p.font-title-sm.text-primary-container', role);
+    set('p.font-body-sm.text-on-surface-variant.truncate', dept);
+
+    // Employee IDs chips
+    var chips = document.querySelectorAll('.font-code-xs.text-code-xs');
+    if (chips[0]) chips[0].textContent = id;
+
+    // Profile photo
+    if (photo) {
+      setSrc('img[alt*="profile"], img[alt*="Profile"], section img.rounded-xl', photo);
+    }
+
+    // Personal tab
+    var boxes = document.querySelectorAll('.bg-surface-container-low\\/60 .font-body-md');
+    if (boxes[0]) boxes[0].textContent = name;
+    if (boxes[1] && dob) boxes[1].innerHTML = dob;
+    if (boxes[2] && gender) boxes[2].textContent = gender;
+    if (boxes[4] && marital) boxes[4].textContent = marital;
+    
+    var personalBoxes = document.querySelectorAll('#tab-personal .bg-surface-container-low\\/60 .font-body-md');
+    if (personalBoxes[5] && children) personalBoxes[5].textContent = children;
+    if (personalBoxes[6] && qualification) personalBoxes[6].textContent = qualification;
+
+    // NIN & NASSIT
+    var codeSpans = document.querySelectorAll('.font-code-xs.font-semibold.text-on-surface');
+    if (codeSpans[0] && nin) codeSpans[0].textContent = nin;
+    if (codeSpans[1] && nassit) codeSpans[1].textContent = nassit;
+
+    // Contact tab
+    var phoneLink = document.querySelector('a[href^="tel:"]');
+    if (phoneLink && phone) {
+      phoneLink.setAttribute('href', 'tel:' + phone);
+      var pSpan = phoneLink.querySelector('.font-body-md');
+      if (pSpan) pSpan.textContent = phone;
+    }
+    var emailLink = document.querySelector('a[href^="mailto:"]');
+    if (emailLink && email) {
+      emailLink.setAttribute('href', 'mailto:' + email);
+      var eSpan = emailLink.querySelector('.font-body-md');
+      if (eSpan) eSpan.textContent = email;
+    }
+    var contactBoxes = document.querySelectorAll('#tab-contact .font-body-md');
+    if (contactBoxes[2] && residence) contactBoxes[2].textContent = residence;
+
+    // Employment tab bank / start date
+    var bankSpans = document.querySelectorAll('.font-semibold');
+    bankSpans.forEach(function(s) {
+      if (bank && s.textContent.toLowerCase().includes('slcb') || s.textContent.toLowerCase().includes('rcbank') || s.textContent.toLowerCase().includes('rokel')) {
+        s.textContent = bank;
+      }
+    });
+
+    if (accountNumber) {
+        var accSpan = document.querySelector('#tab-banking .font-mono');
+        if (accSpan) accSpan.textContent = accountNumber;
+    }
+    if (accountName) {
+        var accNameSpan = document.querySelector('#tab-banking .font-code-xs.text-sm.font-semibold');
+        if (accNameSpan) accNameSpan.textContent = accountName;
+    }
+    if (bban) {
+        var bbanSpan = document.querySelector('#tab-banking .font-code-xs.select-all');
+        if (bbanSpan) bbanSpan.textContent = bban;
+    }
+
+    // Populate Edit Modal
+    var ef = document.getElementById('editFullName'); if(ef) ef.value = name;
+    var ed = document.getElementById('editDob'); if(ed) ed.value = dob;
+    var eg = document.getElementById('editGender'); if(eg && gender) eg.value = gender;
+    var em = document.getElementById('editMarital'); if(em && marital) em.value = marital;
+    var ec = document.getElementById('editChildren'); if(ec) ec.value = children;
+    var eq = document.getElementById('editQualification'); if(eq) eq.value = qualification;
+    var ep = document.getElementById('editPosition'); if(ep) ep.value = role;
+    var edp = document.getElementById('editDept'); if(edp) edp.value = dept;
+    var eph = document.getElementById('editPhone'); if(eph) eph.value = phone;
+    var eem = document.getElementById('editEmail'); if(eem) eem.value = email;
+    var er = document.getElementById('editResidence'); if(er) er.value = residence;
+    var eb = document.getElementById('editBank'); if(eb) eb.value = bank;
+    var ea = document.getElementById('editAcc'); if(ea) ea.value = accountNumber;
+    var ean = document.getElementById('editAccName'); if(ean) ean.value = accountName;
+    var ebb = document.getElementById('editBban'); if(ebb) ebb.value = bban;
+
+    // Page title
+    document.title = (name || 'Employee') + ' — BCF Staff Profile';
+  });
+})();
+</script><header class="fixed top-0 w-full z-50 bg-surface-container-lowest/90 backdrop-blur-xl shadow-[0_1px_8px_rgba(0,0,0,0.04)] pt-safe"><div class="h-16 px-space-base flex items-center justify-between"><div class="flex items-center gap-space-xs"><a href="../staff_directory/code.html" aria-label="Go Back" class="w-touch-target h-touch-target -ml-space-xs flex items-center justify-center text-on-surface hover:text-primary transition-colors"><span class="material-symbols-outlined text-[24px]">arrow_back</span></a><img alt="StaffHub BCF Logo" class="h-7 w-auto object-contain mr-space-xs" src="../bcf-logo.png"/><h1 class="font-headline-md text-headline-md text-on-surface font-semibold tracking-tight truncate max-w-[180px]">Employee Detail</h1><button class="ml-4 px-3 py-1.5 rounded-lg bg-surface-container hover:bg-surface-container-high text-primary font-label-md text-label-md font-semibold flex items-center gap-1 transition-colors" onclick="sessionStorage.removeItem('bcf_force_profile_load'); window.location.reload();"><span class="material-symbols-outlined text-[16px]">swap_horiz</span> Switch</button></div><div class="flex items-center"><img alt="Profile" class="w-8 h-8 rounded-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCK2-CeOxj8ycWebEk8XnXzMylsfUf8hOsHlAtbN-UGYixXMaab2phrcmNkATDmmM4ICUuQGkKGaSFIwyB6ruki7SjHOepKjdpZWwXa91Fac4437NHXj_CwnpO1laySmn6X8uvBX6x1ctpFKZL0trXhQyeObzrr1kOo17afgYhcxCXA3mWYeu7A-5bawdlAW9IRKSElV9VncIbCgKDwKvqQzej1_3Zby40qEtO5Yti1GazvSIH5JskX"/></div></div></header><main class="flex-1 flex flex-col relative w-full pt-16 pb-safe bg-surface px-space-base"><div class="flex flex-col w-full pb-28">
+<!-- Top Operational Context / Hero Pill -->
+<div class="flex items-center justify-between py-space-sm mb-space-xs">
+<div class="flex items-center gap-space-xs">
+<span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-secondary/10 text-secondary font-label-sm text-label-sm font-semibold">
+<span class="w-1.5 h-1.5 rounded-full bg-secondary animate-pulse"></span>
+        Active Service
+      </span>
+<span class="font-code-xs text-code-xs text-on-surface-variant font-medium">Synced: Today 08:45</span>
+</div>
+<div class="flex items-center gap-1 text-on-surface-variant">
+<button class="w-8 h-8 rounded-full bg-surface-container-low flex items-center justify-center hover:bg-surface-container transition-colors" title="Print Dossier">
+<span class="material-symbols-outlined text-[18px]">print</span>
+</button>
+<button class="w-8 h-8 rounded-full bg-surface-container-low flex items-center justify-center hover:bg-surface-container transition-colors" title="Audit Log">
+<span class="material-symbols-outlined text-[18px]">history</span>
+</button>
+</div>
+</div>
+<!-- Profile Hero Master Card -->
+<section class="relative overflow-hidden rounded-xl bg-surface-container-lowest p-space-base shadow-sm mb-space-md">
+<div class="absolute -right-10 -top-10 w-36 h-36 bg-surface-container-high/40 rounded-full blur-2xl pointer-events-none"></div>
+<div class="flex items-start gap-space-md relative z-10">
+<div class="relative shrink-0">
+<img alt="Aminata Kadiatu Turay profile picture" class="w-20 h-20 rounded-xl object-cover shadow-sm bg-surface-container" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCK2-CeOxj8ycWebEk8XnXzMylsfUf8hOsHlAtbN-UGYixXMaab2phrcmNkATDmmM4ICUuQGkKGaSFIwyB6ruki7SjHOepKjdpZWwXa91Fac4437NHXj_CwnpO1laySmn6X8uvBX6x1ctpFKZL0trXhQyeObzrr1kOo17afgYhcxCXA3mWYeu7A-5bawdlAW9IRKSElV9VncIbCgKDwKvqQzej1_3Zby40qEtO5Yti1GazvSIH5JskX"/>
+<span class="absolute -bottom-1 -right-1 w-5 h-5 rounded-full bg-secondary-container text-on-secondary-container flex items-center justify-center shadow-xs" title="Permanent Status Verified">
+<span class="material-symbols-outlined text-[13px] font-bold">verified</span>
+</span>
+</div>
+<div class="flex flex-col min-w-0 flex-1">
+<div class="flex items-start justify-between gap-1">
+<h2 class="font-headline-lg text-headline-lg font-bold text-on-surface tracking-tight truncate">
+            Aminata K. Turay
+          </h2>
+</div>
+<p class="font-title-sm text-title-sm font-semibold text-primary-container truncate mt-0.5">
+          Senior Officer — HR Management
+        </p>
+<p class="font-body-sm text-body-sm text-on-surface-variant truncate">
+          Talent Acquisition &amp; Records
+        </p>
+<!-- Identity Identifiers -->
+<div class="flex flex-wrap items-center gap-1.5 mt-2.5">
+<span class="px-2 py-0.5 rounded bg-surface-container-low text-primary-container font-code-xs text-code-xs font-semibold">
+            BCF-EMP-2026-00042
+          </span>
+<span class="px-2 py-0.5 rounded bg-surface-container-low text-on-surface-variant font-code-xs text-code-xs">
+            MEM-SL-88421
+          </span>
+</div>
+</div>
+</div>
+<!-- Quick Stat Strip inside Card -->
+<div class="grid grid-cols-3 gap-2 mt-space-md pt-space-sm bg-surface-container-low rounded-lg p-2.5">
+<div class="flex flex-col">
+<span class="font-label-sm text-label-sm text-on-surface-variant">Tenure</span>
+<span class="font-title-sm text-title-sm font-semibold text-on-surface mt-0.5">3y 2m</span>
+</div>
+<div class="flex flex-col">
+<span class="font-label-sm text-label-sm text-on-surface-variant">Grade Tier</span>
+<span class="font-title-sm text-title-sm font-semibold text-on-surface mt-0.5">L-04 / Mid</span>
+</div>
+<div class="flex flex-col">
+<span class="font-label-sm text-label-sm text-on-surface-variant">Annual Leave</span>
+<span class="font-title-sm text-title-sm font-semibold text-secondary mt-0.5">18d rem</span>
+</div>
+</div>
+</section>
+<!-- Interactive Navigation Section Tabs -->
+<div class="flex items-center gap-1.5 p-1 bg-surface-container-low rounded-xl mb-space-md overflow-x-auto no-scrollbar">
+<button class="tab-btn px-3 py-1.5 rounded-lg bg-surface-container-lowest font-label-md text-label-md font-semibold text-primary shadow-xs transition-all shrink-0" onclick="switchTab('tab-personal', this)">
+      Personal
+    </button>
+<button class="tab-btn px-3 py-1.5 rounded-lg font-label-md text-label-md font-medium text-on-surface-variant hover:text-on-surface transition-all shrink-0" onclick="switchTab('tab-contact', this)">
+      Contact
+    </button>
+<button class="tab-btn px-3 py-1.5 rounded-lg font-label-md text-label-md font-medium text-on-surface-variant hover:text-on-surface transition-all shrink-0" onclick="switchTab('tab-employment', this)">
+      Employment
+    </button>
+<button class="tab-btn px-3 py-1.5 rounded-lg font-label-md text-label-md font-medium text-on-surface-variant hover:text-on-surface transition-all shrink-0" onclick="switchTab('tab-banking', this)">
+      Payroll &amp; Bank
+    </button>
+</div>
+<!-- TAB PANELS CONTAINER -->
+<div class="flex flex-col gap-space-md">
+<!-- 1. Personal Information Section -->
+<section class="tab-content flex flex-col rounded-xl bg-surface-container-lowest p-space-base shadow-sm" id="tab-personal">
+<div class="flex items-center justify-between mb-space-sm">
+<div class="flex items-center gap-space-xs">
+<span class="w-8 h-8 rounded-lg bg-surface-container flex items-center justify-center text-primary">
+<span class="material-symbols-outlined text-[20px]">person</span>
+</span>
+<div>
+<h3 class="font-title-sm text-title-sm font-semibold text-on-surface">Personal Information</h3>
+<p class="font-label-sm text-label-sm text-on-surface-variant">Civil registry &amp; identity</p>
+</div>
+</div>
+<span class="font-code-xs text-code-xs px-2 py-0.5 rounded bg-surface-container text-on-surface-variant">KYC Pass</span>
+</div>
+<div class="grid grid-cols-2 gap-space-sm pt-2">
+<div class="bg-surface-container-low/60 rounded-lg p-2.5">
+<span class="font-label-sm text-label-sm text-on-surface-variant block">Full Legal Name</span>
+<span class="font-body-md text-body-md font-semibold text-on-surface block mt-0.5">Aminata Kadiatu Turay</span>
+</div>
+<div class="bg-surface-container-low/60 rounded-lg p-2.5">
+<span class="font-label-sm text-label-sm text-on-surface-variant block">Date of Birth &amp; Age</span>
+<span class="font-body-md text-body-md font-semibold text-on-surface block mt-0.5">14 May 1991 <span class="text-on-surface-variant font-normal text-xs">(34 yrs)</span></span>
+</div>
+<div class="bg-surface-container-low/60 rounded-lg p-2.5">
+<span class="font-label-sm text-label-sm text-on-surface-variant block">Gender</span>
+<span class="font-body-md text-body-md font-semibold text-on-surface block mt-0.5">Female</span>
+</div>
+<div class="bg-surface-container-low/60 rounded-lg p-2.5">
+<span class="font-label-sm text-label-sm text-on-surface-variant block">Nationality</span>
+<span class="font-body-md text-body-md font-semibold text-on-surface block mt-0.5 flex items-center gap-1">
+<span class="material-symbols-outlined text-[16px] text-secondary">flag</span>
+            Sierra Leonean
+          </span>
+</div>
+<div class="bg-surface-container-low/60 rounded-lg p-2.5">
+<span class="font-label-sm text-label-sm text-on-surface-variant block">Marital Status</span>
+<span class="font-body-md text-body-md font-semibold text-on-surface block mt-0.5">Married</span>
+</div>
+<div class="bg-surface-container-low/60 rounded-lg p-2.5">
+<span class="font-label-sm text-label-sm text-on-surface-variant block">Dependents / Children</span>
+<span class="font-body-md text-body-md font-semibold text-on-surface block mt-0.5">2 Children</span>
+</div>
+<div class="bg-surface-container-low/60 rounded-lg p-2.5 col-span-2">
+<span class="font-label-sm text-label-sm text-on-surface-variant block">Highest Qualification</span>
+<span class="font-body-md text-body-md font-semibold text-on-surface block mt-0.5">BSc. Human Resources Management</span>
+</div>
+</div>
+<!-- Government Identification Tokens -->
+<div class="mt-space-sm pt-space-xs flex flex-col gap-2">
+<div class="flex items-center justify-between p-2.5 rounded-lg bg-surface-container-low">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-[20px] text-on-surface-variant">badge</span>
+<div>
+<span class="font-label-sm text-label-sm text-on-surface-variant block">NIN / National ID</span>
+<span class="font-code-xs text-code-xs font-semibold text-on-surface">SL-NIN-99482104-A</span>
+</div>
+</div>
+<span class="material-symbols-outlined text-[18px] text-secondary" title="Biometrically Verified">check_circle</span>
+</div>
+<div class="flex items-center justify-between p-2.5 rounded-lg bg-surface-container-low">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-[20px] text-on-surface-variant">shield</span>
+<div>
+<span class="font-label-sm text-label-sm text-on-surface-variant block">NASSIT Pension Scheme No.</span>
+<span class="font-code-xs text-code-xs font-semibold text-on-surface">NSS-440291-B</span>
+</div>
+</div>
+<span class="material-symbols-outlined text-[18px] text-secondary" title="Active Contribution">check_circle</span>
+</div>
+</div>
+</section>
+<!-- 2. Contact & Address Section -->
+<section class="tab-content flex flex-col rounded-xl bg-surface-container-lowest p-space-base shadow-sm" id="tab-contact">
+<div class="flex items-center justify-between mb-space-sm">
+<div class="flex items-center gap-space-xs">
+<span class="w-8 h-8 rounded-lg bg-surface-container flex items-center justify-center text-primary">
+<span class="material-symbols-outlined text-[20px]">contact_phone</span>
+</span>
+<div>
+<h3 class="font-title-sm text-title-sm font-semibold text-on-surface">Contact &amp; Address</h3>
+<p class="font-label-sm text-label-sm text-on-surface-variant">Reachability &amp; Residence</p>
+</div>
+</div>
+<button class="font-label-sm text-label-sm text-primary font-semibold flex items-center gap-1 hover:underline">
+<span class="material-symbols-outlined text-[16px]">share</span> Share
+        </button>
+</div>
+<div class="flex flex-col gap-2.5 pt-1">
+<!-- Direct Phone -->
+<a class="flex items-center justify-between p-2.5 rounded-lg bg-surface-container-low hover:bg-surface-container transition-colors group" href="tel:+23276542109">
+<div class="flex items-center gap-2.5 min-w-0">
+<div class="w-8 h-8 rounded-full bg-surface-container-lowest flex items-center justify-center text-primary">
+<span class="material-symbols-outlined text-[18px]">call</span>
+</div>
+<div class="min-w-0">
+<span class="font-label-sm text-label-sm text-on-surface-variant block">Primary Phone</span>
+<span class="font-body-md text-body-md font-semibold text-on-surface block truncate">+232 76 542 109</span>
+</div>
+</div>
+<span class="font-label-sm text-label-sm text-primary font-semibold group-hover:translate-x-0.5 transition-transform flex items-center">
+            Dial <span class="material-symbols-outlined text-[16px]">arrow_forward</span>
+</span>
+</a>
+<!-- Corporate Email -->
+<a class="flex items-center justify-between p-2.5 rounded-lg bg-surface-container-low hover:bg-surface-container transition-colors group" href="mailto:aminata.turay@staffhub-bcf.sl">
+<div class="flex items-center gap-2.5 min-w-0">
+<div class="w-8 h-8 rounded-full bg-surface-container-lowest flex items-center justify-center text-primary">
+<span class="material-symbols-outlined text-[18px]">mail</span>
+</div>
+<div class="min-w-0">
+<span class="font-label-sm text-label-sm text-on-surface-variant block">Official Work Email</span>
+<span class="font-body-md text-body-md font-semibold text-on-surface block truncate">aminata.turay@staffhub-bcf.sl</span>
+</div>
+</div>
+<span class="font-label-sm text-label-sm text-primary font-semibold group-hover:translate-x-0.5 transition-transform flex items-center">
+            Mail <span class="material-symbols-outlined text-[16px]">arrow_forward</span>
+</span>
+</a>
+<!-- Residential Address -->
+<div class="p-2.5 rounded-lg bg-surface-container-low flex items-start gap-2.5">
+<div class="w-8 h-8 rounded-full bg-surface-container-lowest flex items-center justify-center text-primary shrink-0 mt-0.5">
+<span class="material-symbols-outlined text-[18px]">home_pin</span>
+</div>
+<div class="flex-1 min-w-0">
+<span class="font-label-sm text-label-sm text-on-surface-variant block">Physical Residence</span>
+<span class="font-body-md text-body-md font-semibold text-on-surface block leading-snug">
+              24 Wilkinson Road, Freetown, Sierra Leone
+            </span>
+</div>
+</div>
+<!-- Emergency Contact Card (Highlighted Warm Framing) -->
+<div class="p-3 rounded-lg bg-surface-container-high/60 flex items-start gap-2.5">
+<div class="w-8 h-8 rounded-full bg-primary-container text-on-primary flex items-center justify-center shrink-0 mt-0.5 shadow-xs">
+<span class="material-symbols-outlined text-[18px]">e911_emergency</span>
+</div>
+<div class="flex-1 min-w-0">
+<div class="flex items-center justify-between">
+<span class="font-label-sm text-label-sm text-on-surface-variant font-semibold uppercase tracking-wider">Emergency Contact</span>
+<span class="px-2 py-0.2 rounded bg-surface-container-lowest text-primary font-code-xs text-code-xs font-semibold">Spouse</span>
+</div>
+<p class="font-body-md text-body-md font-semibold text-on-surface mt-0.5">Ibrahim Turay</p>
+<a class="inline-flex items-center gap-1 font-body-sm text-body-sm text-primary font-medium hover:underline mt-0.5" href="tel:+23278901234">
+<span class="material-symbols-outlined text-[15px]">phone_enabled</span>
+              +232 78 901 234
+            </a>
+</div>
+</div>
+</div>
+</section>
+<!-- 3. Employment & Organization Section -->
+<section class="tab-content flex flex-col rounded-xl bg-surface-container-lowest p-space-base shadow-sm" id="tab-employment">
+<div class="flex items-center justify-between mb-space-sm">
+<div class="flex items-center gap-space-xs">
+<span class="w-8 h-8 rounded-lg bg-surface-container flex items-center justify-center text-primary">
+<span class="material-symbols-outlined text-[20px]">domain</span>
+</span>
+<div>
+<h3 class="font-title-sm text-title-sm font-semibold text-on-surface">Employment &amp; Organization</h3>
+<p class="font-label-sm text-label-sm text-on-surface-variant">Structure &amp; hierarchy role</p>
+</div>
+</div>
+<span class="inline-flex items-center px-2 py-0.5 rounded-full bg-secondary/15 text-secondary font-label-sm text-label-sm font-semibold">
+          Active Staff
+        </span>
+</div>
+<div class="grid grid-cols-2 gap-space-sm pt-2">
+<div class="bg-surface-container-low/60 rounded-lg p-2.5">
+<span class="font-label-sm text-label-sm text-on-surface-variant block">Position / Title</span>
+<span class="font-body-md text-body-md font-semibold text-on-surface block mt-0.5">Lead HR &amp; Database Officer</span>
+</div>
+<div class="bg-surface-container-low/60 rounded-lg p-2.5">
+<span class="font-label-sm text-label-sm text-on-surface-variant block">Job Level</span>
+<span class="font-body-md text-body-md font-semibold text-on-surface block mt-0.5">Senior Officer</span>
+</div>
+<div class="bg-surface-container-low/60 rounded-lg p-2.5">
+<span class="font-label-sm text-label-sm text-on-surface-variant block">Department</span>
+<span class="font-body-md text-body-md font-semibold text-on-surface block mt-0.5">Human Resources Management</span>
+</div>
+<div class="bg-surface-container-low/60 rounded-lg p-2.5">
+<span class="font-label-sm text-label-sm text-on-surface-variant block">Operating Unit</span>
+<span class="font-body-md text-body-md font-semibold text-on-surface block mt-0.5">Talent Acquisition &amp; Records</span>
+</div>
+<div class="bg-surface-container-low/60 rounded-lg p-2.5">
+<span class="font-label-sm text-label-sm text-on-surface-variant block">Management Tier</span>
+<span class="font-body-md text-body-md font-semibold text-on-surface block mt-0.5">Middle Management</span>
+</div>
+<div class="bg-surface-container-low/60 rounded-lg p-2.5">
+<span class="font-label-sm text-label-sm text-on-surface-variant block">Employment Type</span>
+<span class="font-body-md text-body-md font-semibold text-on-surface block mt-0.5">Permanent Staff</span>
+</div>
+<div class="bg-surface-container-low/60 rounded-lg p-2.5">
+<span class="font-label-sm text-label-sm text-on-surface-variant block">Date of Employment</span>
+<span class="font-body-md text-body-md font-semibold text-on-surface block mt-0.5">12 Jan 2022</span>
+</div>
+<div class="bg-surface-container-low/60 rounded-lg p-2.5">
+<span class="font-label-sm text-label-sm text-on-surface-variant block">Current Status</span>
+<span class="font-body-md text-body-md font-semibold text-secondary block mt-0.5 flex items-center gap-1">
+<span class="w-2 h-2 rounded-full bg-secondary"></span> Active • Confirmed
+          </span>
+</div>
+</div>
+<!-- Organizational Lineage Snippet -->
+<div class="mt-space-sm p-3 rounded-lg bg-surface-container-low flex items-center justify-between">
+<div class="flex items-center gap-2.5">
+<span class="w-8 h-8 rounded-full bg-primary/10 text-primary flex items-center justify-center font-bold text-xs">
+            DIR
+          </span>
+<div>
+<span class="font-label-sm text-label-sm text-on-surface-variant block">Reports To</span>
+<span class="font-body-md text-body-md font-semibold text-on-surface block">Director of Human Resources</span>
+</div>
+</div>
+<span class="font-label-sm text-label-sm text-primary font-semibold">Line 01</span>
+</div>
+</section>
+<!-- 4. Banking & Payroll Details Section -->
+<section class="tab-content flex flex-col rounded-xl bg-surface-container-lowest p-space-base shadow-sm" id="tab-banking">
+<div class="flex items-center justify-between mb-space-sm">
+<div class="flex items-center gap-space-xs">
+<span class="w-8 h-8 rounded-lg bg-surface-container flex items-center justify-center text-primary">
+<span class="material-symbols-outlined text-[20px]">account_balance</span>
+</span>
+<div>
+<h3 class="font-title-sm text-title-sm font-semibold text-on-surface">Banking &amp; Payroll Details</h3>
+<p class="font-label-sm text-label-sm text-on-surface-variant">Direct deposit disbursement</p>
+</div>
+</div>
+<span class="px-2 py-0.5 rounded bg-secondary-container/60 text-on-secondary-container font-label-sm text-label-sm font-semibold">
+          Active Remit
+        </span>
+</div>
+<!-- Bank Card Presentation -->
+<div class="relative overflow-hidden rounded-xl bg-gradient-to-r from-primary-container to-primary p-4 text-on-primary shadow-sm mb-space-sm">
+<div class="flex items-start justify-between">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-[24px]">account_balance</span>
+<span class="font-title-sm text-title-sm font-bold tracking-tight">SLCB</span>
+</div>
+<span class="font-code-xs text-code-xs uppercase tracking-widest px-2 py-0.5 rounded bg-white/20 text-white font-medium">
+            Savings
+          </span>
+</div>
+<p class="font-label-sm text-label-sm opacity-80 mt-3">Sierra Leone Commercial Bank (SLCB)</p>
+<div class="mt-4 flex items-end justify-between">
+<div>
+<span class="font-label-sm text-label-sm block opacity-75">Account Number</span>
+<span class="font-code-xs text-base font-semibold tracking-wider font-mono block">003-490218-01</span>
+<span class="font-label-sm text-label-sm block opacity-75 mt-1">Account Name</span>
+<span class="font-code-xs text-sm font-semibold tracking-wider block">Aminata K. Turay</span>
+</div>
+<span class="material-symbols-outlined text-[28px] opacity-70">contactless</span>
+</div>
+</div>
+<!-- Additional Detailed Financial Coordinates -->
+<div class="flex flex-col gap-2">
+<div class="p-2.5 rounded-lg bg-surface-container-low flex items-center justify-between">
+<div>
+<span class="font-label-sm text-label-sm text-on-surface-variant block">BBAN Identifier</span>
+<span class="font-code-xs text-code-xs font-semibold text-on-surface select-all">SL02003003490218010023</span>
+</div>
+<button class="w-8 h-8 rounded flex items-center justify-center text-primary hover:bg-surface-container-high transition-colors" onclick="copyBBAN('SL02003003490218010023', this)" title="Copy BBAN">
+<span class="material-symbols-outlined text-[18px]">content_copy</span>
+</button>
+</div>
+<div class="grid grid-cols-2 gap-2">
+<div class="p-2.5 rounded-lg bg-surface-container-low">
+<span class="font-label-sm text-label-sm text-on-surface-variant block">Currency</span>
+<span class="font-body-md text-body-md font-semibold text-on-surface">SLE (New Leone)</span>
+</div>
+<div class="p-2.5 rounded-lg bg-surface-container-low">
+<span class="font-label-sm text-label-sm text-on-surface-variant block">Pay Cycle</span>
+<span class="font-body-md text-body-md font-semibold text-on-surface">Monthly (25th)</span>
+</div>
+</div>
+</div>
+</section>
+</div>
+<!-- Persistent Floating Action Command Bar -->
+<div class="fixed bottom-0 left-0 right-0 z-40 bg-surface-container-lowest/95 backdrop-blur-md p-space-base border-t border-surface-container pb-safe">
+<div class="max-w-md mx-auto flex items-center gap-2">
+<!-- Edit Employee Primary Action -->
+<button class="flex-1 h-11 px-4 rounded-xl bg-primary hover:bg-primary-container text-on-primary font-title-sm text-title-sm font-semibold flex items-center justify-center gap-1.5 shadow-sm active:scale-95 transition-all" onclick="openActionSheet('editModal')">
+<span class="material-symbols-outlined text-[18px]">edit</span>
+<span>Edit Employee</span>
+</button>
+<!-- Export PDF Profile -->
+<button class="h-11 px-3.5 rounded-xl bg-surface-container hover:bg-surface-container-high text-primary font-title-sm text-title-sm font-semibold flex items-center justify-center gap-1 shadow-xs active:scale-95 transition-all" onclick="triggerExportProfile()" title="Export Profile PDF">
+<span class="material-symbols-outlined text-[20px]">picture_as_pdf</span>
+<span class="hidden sm:inline">Export</span>
+</button>
+<!-- Update Employment Status Overflow / Modal Trigger -->
+<button class="h-11 px-3.5 rounded-xl bg-surface-container hover:bg-surface-container-high text-on-surface font-title-sm text-title-sm font-semibold flex items-center justify-center gap-1 shadow-xs active:scale-95 transition-all" onclick="openActionSheet('statusModal')" title="Status Actions">
+<span class="material-symbols-outlined text-[20px]">published_with_changes</span>
+</button>
+</div>
+</div>
+<!-- Status Transition Action Drawer / Sheet -->
+<div class="fixed inset-0 z-50 hidden flex items-end justify-center bg-on-surface/40 backdrop-blur-xs transition-opacity" id="statusModal">
+<div class="w-full max-w-md rounded-t-2xl bg-surface-container-lowest p-space-base shadow-xl flex flex-col gap-space-sm animate-in slide-in-from-bottom duration-200">
+<div class="flex items-center justify-between pb-2 border-b border-surface-container">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-primary text-[22px]">published_with_changes</span>
+<h4 class="font-headline-md text-headline-md font-semibold text-on-surface">Update Status</h4>
+</div>
+<button class="w-8 h-8 rounded-full bg-surface-container-low flex items-center justify-center text-on-surface" onclick="closeActionSheet('statusModal')">
+<span class="material-symbols-outlined text-[20px]">close</span>
+</button>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant">
+        Record official lifecycle state change for <strong class="text-on-surface">Aminata K. Turay</strong>.
+      </p>
+<div class="flex flex-col gap-2 my-2">
+<label class="flex items-center justify-between p-3 rounded-xl bg-surface-container-low cursor-pointer hover:bg-surface-container transition-colors">
+<div class="flex items-center gap-3">
+<span class="w-3 h-3 rounded-full bg-secondary"></span>
+<div>
+<p class="font-title-sm text-title-sm font-semibold text-on-surface">Active Duty</p>
+<p class="font-label-sm text-label-sm text-on-surface-variant">In regular operational capacity</p>
+</div>
+</div>
+<input checked="" class="w-5 h-5 accent-primary" name="statusOption" type="radio" value="active"/>
+</label>
+<label class="flex items-center justify-between p-3 rounded-xl bg-surface-container-low cursor-pointer hover:bg-surface-container transition-colors">
+<div class="flex items-center gap-3">
+<span class="w-3 h-3 rounded-full bg-on-tertiary-container"></span>
+<div>
+<p class="font-title-sm text-title-sm font-semibold text-on-surface">On Leave of Absence</p>
+<p class="font-label-sm text-label-sm text-on-surface-variant">Maternity / Study / Sabbatical</p>
+</div>
+</div>
+<input class="w-5 h-5 accent-primary" name="statusOption" type="radio" value="leave"/>
+</label>
+<label class="flex items-center justify-between p-3 rounded-xl bg-surface-container-low cursor-pointer hover:bg-surface-container transition-colors">
+<div class="flex items-center gap-3">
+<span class="w-3 h-3 rounded-full bg-outline"></span>
+<div>
+<p class="font-title-sm text-title-sm font-semibold text-on-surface">Seconded</p>
+<p class="font-label-sm text-label-sm text-on-surface-variant">Assigned to external affiliate</p>
+</div>
+</div>
+<input class="w-5 h-5 accent-primary" name="statusOption" type="radio" value="seconded"/>
+</label>
+<label class="flex items-center justify-between p-3 rounded-xl bg-error-container/40 cursor-pointer hover:bg-error-container/60 transition-colors">
+<div class="flex items-center gap-3">
+<span class="w-3 h-3 rounded-full bg-error"></span>
+<div>
+<p class="font-title-sm text-title-sm font-semibold text-error">Suspension / Separation</p>
+<p class="font-label-sm text-label-sm text-on-surface-variant">Initiate formal separation</p>
+</div>
+</div>
+<input class="w-5 h-5 accent-error" name="statusOption" type="radio" value="terminate"/>
+</label>
+</div>
+<div class="flex items-center gap-2 pt-2">
+<button class="flex-1 h-11 rounded-xl bg-surface-container font-title-sm text-title-sm font-semibold text-on-surface" onclick="closeActionSheet('statusModal')">
+          Cancel
+        </button>
+<button class="flex-1 h-11 rounded-xl bg-primary text-on-primary font-title-sm text-title-sm font-semibold shadow-sm" onclick="confirmStatusUpdate()">
+          Apply Update
+        </button>
+</div>
+</div>
+</div>
+
+<!-- Edit Employee Drawer / Sheet -->
+<div class="fixed inset-0 z-50 hidden flex items-end justify-center bg-on-surface/40 backdrop-blur-xs transition-opacity" id="editModal">
+<div class="w-full max-w-md rounded-t-2xl bg-surface-container-lowest p-space-base shadow-xl flex flex-col gap-space-sm animate-in slide-in-from-bottom duration-200 max-h-[85vh] overflow-y-auto">
+<div class="flex items-center justify-between pb-2 border-b border-surface-container sticky top-0 bg-surface-container-lowest z-10">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-primary text-[22px]">edit_document</span>
+<h4 class="font-headline-md text-headline-md font-semibold text-on-surface">Edit Employee</h4>
+</div>
+<button class="w-8 h-8 rounded-full bg-surface-container-low flex items-center justify-center text-on-surface" onclick="closeActionSheet('editModal')">
+<span class="material-symbols-outlined text-[20px]">close</span>
+</button>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant">
+        Update personnel file for <strong class="text-on-surface">Aminata K. Turay</strong>.
+      </p>
+<div class="flex flex-col gap-4 my-2">
+    <!-- Personal Details -->
+    <div>
+        <h5 class="font-label-sm text-primary mb-2 uppercase tracking-wider">Personal</h5>
+        <div class="grid gap-3">
+            <div>
+                <label class="font-label-sm text-label-sm text-on-surface-variant block mb-1">Full Legal Name</label>
+                <input type="text" id="editFullName" class="w-full h-11 px-3 rounded-xl bg-surface-container-low border border-outline-variant focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all text-on-surface font-body-md" value="Aminata K. Turay" />
+            </div>
+            <div class="grid grid-cols-2 gap-3">
+                <div>
+                    <label class="font-label-sm text-label-sm text-on-surface-variant block mb-1">Date of Birth</label>
+                    <input type="text" id="editDob" class="w-full h-11 px-3 rounded-xl bg-surface-container-low border border-outline-variant focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all text-on-surface font-body-md" value="14 May 1991" />
+                </div>
+                <div>
+                    <label class="font-label-sm text-label-sm text-on-surface-variant block mb-1">Gender</label>
+                    <select id="editGender" class="w-full h-11 px-3 rounded-xl bg-surface-container-low border border-outline-variant focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all text-on-surface font-body-md">
+                        <option value="Female" selected>Female</option>
+                        <option value="Male">Male</option>
+                    </select>
+                </div>
+            </div>
+            <div class="grid grid-cols-2 gap-3">
+                <div>
+                    <label class="font-label-sm text-label-sm text-on-surface-variant block mb-1">Marital Status</label>
+                    <select id="editMarital" class="w-full h-11 px-3 rounded-xl bg-surface-container-low border border-outline-variant focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all text-on-surface font-body-md">
+                        <option value="Single">Single</option>
+                        <option value="Married" selected>Married</option>
+                        <option value="Divorced">Divorced</option>
+                        <option value="Widowed">Widowed</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="font-label-sm text-label-sm text-on-surface-variant block mb-1">Dependents / Children</label>
+                    <input type="text" id="editChildren" class="w-full h-11 px-3 rounded-xl bg-surface-container-low border border-outline-variant focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all text-on-surface font-body-md" value="2 Children" />
+                </div>
+            </div>
+            <div>
+                <label class="font-label-sm text-label-sm text-on-surface-variant block mb-1">Qualification</label>
+                <input type="text" id="editQualification" class="w-full h-11 px-3 rounded-xl bg-surface-container-low border border-outline-variant focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all text-on-surface font-body-md" value="BSc. Human Resources Management" />
+            </div>
+        </div>
+    </div>
+
+    <!-- Employment Details -->
+    <div>
+        <h5 class="font-label-sm text-primary mb-2 uppercase tracking-wider">Employment</h5>
+        <div class="grid gap-3">
+            <div>
+                <label class="font-label-sm text-label-sm text-on-surface-variant block mb-1">Position / Title</label>
+                <input type="text" id="editPosition" class="w-full h-11 px-3 rounded-xl bg-surface-container-low border border-outline-variant focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all text-on-surface font-body-md" value="Senior Officer — HR Management" />
+            </div>
+            <div>
+                <label class="font-label-sm text-label-sm text-on-surface-variant block mb-1">Department</label>
+                <input type="text" id="editDept" class="w-full h-11 px-3 rounded-xl bg-surface-container-low border border-outline-variant focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all text-on-surface font-body-md" value="Human Resources Management" />
+            </div>
+        </div>
+    </div>
+
+    <!-- Contact & Payroll -->
+    <div>
+        <h5 class="font-label-sm text-primary mb-2 uppercase tracking-wider">Contact & Payroll</h5>
+        <div class="grid gap-3">
+            <div class="grid grid-cols-2 gap-3">
+                <div>
+                    <label class="font-label-sm text-label-sm text-on-surface-variant block mb-1">Primary Phone</label>
+                    <input type="tel" id="editPhone" class="w-full h-11 px-3 rounded-xl bg-surface-container-low border border-outline-variant focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all text-on-surface font-body-md" value="+232 76 542 109" />
+                </div>
+                <div>
+                    <label class="font-label-sm text-label-sm text-on-surface-variant block mb-1">Work Email</label>
+                    <input type="email" id="editEmail" class="w-full h-11 px-3 rounded-xl bg-surface-container-low border border-outline-variant focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all text-on-surface font-body-md" value="aminata.turay@staffhub-bcf.sl" />
+                </div>
+            </div>
+            <div>
+                <label class="font-label-sm text-label-sm text-on-surface-variant block mb-1">Physical Residence</label>
+                <input type="text" id="editResidence" class="w-full h-11 px-3 rounded-xl bg-surface-container-low border border-outline-variant focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all text-on-surface font-body-md" value="24 Wilkinson Road, Freetown, Sierra Leone" />
+            </div>
+            <div class="grid grid-cols-2 gap-3">
+                <div>
+                    <label class="font-label-sm text-label-sm text-on-surface-variant block mb-1">Bank Name</label>
+                    <input type="text" id="editBank" class="w-full h-11 px-3 rounded-xl bg-surface-container-low border border-outline-variant focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all text-on-surface font-body-md" value="SLCB" />
+                </div>
+                <div>
+                    <label class="font-label-sm text-label-sm text-on-surface-variant block mb-1">Account No.</label>
+                    <input type="text" id="editAcc" class="w-full h-11 px-3 rounded-xl bg-surface-container-low border border-outline-variant focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all text-on-surface font-body-md" value="003-490218-01" />
+                </div>
+            </div>
+            <div class="grid grid-cols-2 gap-3">
+                <div>
+                    <label class="font-label-sm text-label-sm text-on-surface-variant block mb-1">Account Name</label>
+                    <input type="text" id="editAccName" class="w-full h-11 px-3 rounded-xl bg-surface-container-low border border-outline-variant focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all text-on-surface font-body-md" value="Aminata K. Turay" />
+                </div>
+                <div>
+                    <label class="font-label-sm text-label-sm text-on-surface-variant block mb-1">BBAN</label>
+                    <input type="text" id="editBban" class="w-full h-11 px-3 rounded-xl bg-surface-container-low border border-outline-variant focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all text-on-surface font-body-md" value="SL02003003490218010023" />
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="flex items-center gap-2 pt-2 sticky bottom-0 bg-surface-container-lowest pb-1">
+<button class="flex-1 h-11 rounded-xl bg-surface-container font-title-sm text-title-sm font-semibold text-on-surface" onclick="closeActionSheet('editModal')">
+          Cancel
+        </button>
+<button class="flex-1 h-11 rounded-xl bg-primary text-on-primary font-title-sm text-title-sm font-semibold shadow-sm" onclick="saveEmployeeEdits()">
+          Save Changes
+        </button>
+</div>
+</div>
+</div>
+
+<!-- Toast Notification Template -->
+<div class="fixed top-20 left-1/2 -translate-x-1/2 z-50 hidden px-4 py-2 rounded-full bg-on-surface text-inverse-on-surface font-body-sm text-body-sm shadow-md flex items-center gap-2 transition-all" id="toastNotification">
+<span class="material-symbols-outlined text-[18px] text-secondary-fixed">check_circle</span>
+<span id="toastMessage">Success</span>
+</div>
+</div>
+<script>
+  function switchTab(tabId, buttonElement) {
+    // Scroll element softly into view if clicked on mobile
+    const target = document.getElementById(tabId);
+    if (target) {
+      target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+
+    // Update Tab Styles
+    document.querySelectorAll('.tab-btn').forEach(btn => {
+      btn.classList.remove('bg-surface-container-lowest', 'text-primary', 'shadow-xs', 'font-semibold');
+      btn.classList.add('text-on-surface-variant', 'font-medium');
+    });
+
+    buttonElement.classList.add('bg-surface-container-lowest', 'text-primary', 'shadow-xs', 'font-semibold');
+    buttonElement.classList.remove('text-on-surface-variant', 'font-medium');
+  }
+
+  function copyBBAN(text, btn) {
+    if (navigator.clipboard) {
+      navigator.clipboard.writeText(text).then(() => {
+        showToast('BBAN copied to clipboard');
+      });
+    } else {
+      showToast('BBAN: ' + text);
+    }
+  }
+
+  function openActionSheet(id) {
+    const modal = document.getElementById(id);
+    if (modal) {
+      modal.classList.remove('hidden');
+    }
+  }
+
+  function closeActionSheet(id) {
+    const modal = document.getElementById(id);
+    if (modal) {
+      modal.classList.add('hidden');
+    }
+  }
+
+  function confirmStatusUpdate() {
+    closeActionSheet('statusModal');
+    showToast('Employment status recorded successfully');
+  }
+
+  function triggerExportProfile() {
+    showToast('Preparing PDF...');
+    
+    // Select the main element containing the profile details
+    const element = document.querySelector('main');
+    
+    // Save current styling to restore later
+    const originalPadding = element.style.paddingBottom;
+    
+    // Optional: Hide the sticky bottom action bar before saving
+    const actionBars = document.querySelectorAll('.fixed.bottom-0');
+    actionBars.forEach(bar => bar.style.display = 'none');
+    
+    // Remove padding bottom temporarily to remove blank space
+    element.style.paddingBottom = '20px';
+
+    const empName = document.querySelector('h2').textContent || 'Employee';
+    const opt = {
+      margin:       [0.5, 0.5, 0.5, 0.5],
+      filename:     empName.trim().replace(/\s+/g, '_') + '_Profile.pdf',
+      image:        { type: 'jpeg', quality: 0.98 },
+      html2canvas:  { scale: 2, useCORS: true, logging: false },
+      jsPDF:        { unit: 'in', format: 'letter', orientation: 'portrait' }
+    };
+
+    html2pdf().set(opt).from(element).save().then(() => {
+        // Restore elements
+        actionBars.forEach(bar => bar.style.display = '');
+        element.style.paddingBottom = originalPadding;
+        showToast('PDF downloaded successfully');
+    });
+  }
+
+  function saveEmployeeEdits() {
+    const newName = document.getElementById('editFullName').value;
+    const newPosition = document.getElementById('editPosition').value;
+    const newPhone = document.getElementById('editPhone').value;
+    
+    // Additional fields
+    const newDob = document.getElementById('editDob').value;
+    const newGender = document.getElementById('editGender').value;
+    const newMarital = document.getElementById('editMarital').value;
+    const newChildren = document.getElementById('editChildren').value;
+    const newQualification = document.getElementById('editQualification').value;
+    const newDept = document.getElementById('editDept').value;
+    const newEmail = document.getElementById('editEmail').value;
+    const newResidence = document.getElementById('editResidence').value;
+    const newBank = document.getElementById('editBank').value;
+    const newAcc = document.getElementById('editAcc').value;
+    const newAccName = document.getElementById('editAccName').value;
+    const newBban = document.getElementById('editBban').value;
+
+    // Update DOM Visually
+    if (newName) {
+        const h2 = document.querySelector('h2');
+        if (h2) h2.textContent = newName;
+        const boxes = document.querySelectorAll('.bg-surface-container-low\\/60 .font-body-md');
+        if (boxes[0]) boxes[0].textContent = newName;
+    }
+    if (newPosition) {
+        const pos = document.querySelector('p.font-title-sm.text-primary-container');
+        if (pos) pos.textContent = newPosition;
+        const boxes = document.querySelectorAll('#tab-employment .bg-surface-container-low\\/60 .font-body-md');
+        if (boxes[0]) boxes[0].textContent = newPosition;
+    }
+    
+    if (newDob) {
+        const boxes = document.querySelectorAll('#tab-personal .bg-surface-container-low\\/60 .font-body-md');
+        if (boxes[1]) boxes[1].innerHTML = newDob + ' <span class="text-on-surface-variant font-normal text-xs">(updated)</span>';
+    }
+    if (newGender) {
+        const boxes = document.querySelectorAll('#tab-personal .bg-surface-container-low\\/60 .font-body-md');
+        if (boxes[2]) boxes[2].textContent = newGender;
+    }
+    if (newMarital) {
+        const boxes = document.querySelectorAll('#tab-personal .bg-surface-container-low\\/60 .font-body-md');
+        if (boxes[4]) boxes[4].textContent = newMarital;
+    }
+    if (newChildren) {
+        const boxes = document.querySelectorAll('#tab-personal .bg-surface-container-low\\/60 .font-body-md');
+        if (boxes[5]) boxes[5].textContent = newChildren;
+    }
+    if (newQualification) {
+        const boxes = document.querySelectorAll('#tab-personal .bg-surface-container-low\\/60 .font-body-md');
+        if (boxes[6]) boxes[6].textContent = newQualification;
+    }
+    if (newDept) {
+        const dept = document.querySelector('p.font-body-sm.text-on-surface-variant.truncate');
+        if (dept) dept.textContent = newDept;
+        const boxes = document.querySelectorAll('#tab-employment .bg-surface-container-low\\/60 .font-body-md');
+        if (boxes[2]) boxes[2].textContent = newDept;
+    }
+    if (newBank) {
+        const bankTitle = document.querySelector('#tab-banking .font-title-sm.font-bold');
+        if (bankTitle) bankTitle.textContent = newBank;
+        const bankNameFull = document.querySelector('#tab-banking .font-label-sm.opacity-80.mt-3');
+        if(bankNameFull) bankNameFull.textContent = newBank;
+    }
+    if (newAcc) {
+        const accSpan = document.querySelector('#tab-banking .font-mono');
+        if (accSpan) accSpan.textContent = newAcc;
+    }
+    if (newAccName) {
+        const accNameSpan = document.querySelector('#tab-banking .font-code-xs.text-sm.font-semibold');
+        if (accNameSpan) accNameSpan.textContent = newAccName;
+    }
+    if (newBban) {
+        const bbanSpan = document.querySelector('#tab-banking .font-code-xs.select-all');
+        if (bbanSpan) bbanSpan.textContent = newBban;
+    }
+    if (newResidence) {
+        const boxes = document.querySelectorAll('#tab-contact .font-body-md');
+        if (boxes[2]) boxes[2].textContent = newResidence;
+    }
+    
+    if (newPhone) {
+      const phoneLink = document.querySelector('a[href^="tel:"]');
+      if (phoneLink) {
+        phoneLink.setAttribute('href', 'tel:' + newPhone);
+        const pSpan = phoneLink.querySelector('.font-body-md');
+        if (pSpan) pSpan.textContent = newPhone;
+      }
+    }
+    if (newEmail) {
+      const emailLink = document.querySelector('a[href^="mailto:"]');
+      if (emailLink) {
+        emailLink.setAttribute('href', 'mailto:' + newEmail);
+        const eSpan = emailLink.querySelector('.font-body-md');
+        if (eSpan) eSpan.textContent = newEmail;
+      }
+    }
+    
+    // UPDATE LOCAL STORAGE SO IT PERSISTS
+    try {
+        var raw = localStorage.getItem('bcf_selected_profile');
+        if (raw) {
+            var p = JSON.parse(raw);
+            if (newName) { p.fullName = newName; p.name = newName; }
+            if (newPosition) { p.jobTitle = newPosition; p.role = newPosition; }
+            if (newPhone) { p.phone = newPhone; p.primaryPhone = newPhone; p.mobilePhone = newPhone; }
+            if (newDob) { p.dateOfBirth = newDob; p.dob = newDob; }
+            if (newGender) { p.gender = newGender; }
+            if (newMarital) { p.maritalStatus = newMarital; }
+            if (newDept) { p.department = newDept; p.dept = newDept; }
+            if (newEmail) { p.workEmail = newEmail; p.email = newEmail; }
+            if (newBank) { p.salaryBank = newBank; p.bank = newBank; }
+            localStorage.setItem('bcf_selected_profile', JSON.stringify(p));
+        }
+    } catch(e) {
+        console.error("Failed to save to localStorage", e);
+    }
+    
+    closeActionSheet('editModal');
+    showToast('Employee information updated successfully');
+  }
+
+  function showToast(message) {
+    const toast = document.getElementById('toastNotification');
+    const msg = document.getElementById('toastMessage');
+    if (toast && msg) {
+      msg.innerText = message;
+      toast.classList.remove('hidden');
+      setTimeout(() => {
+        toast.classList.add('hidden');
+      }, 2600);
+    }
+  }
+</script></main></body></html>
+

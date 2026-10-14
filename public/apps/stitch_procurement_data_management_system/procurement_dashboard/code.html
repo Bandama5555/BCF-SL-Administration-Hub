@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover"/>
+  <title>Procurement Executive Dashboard — BCF-SL Integrated Procurement</title>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: {
+            primary: "#0037b0",
+            "primary-dark": "#00247d",
+            secondary: "#565e74",
+            tertiary: "#006948",
+            "tertiary-dark": "#004f35",
+            surface: "#f8f9ff",
+            "surface-container": "#eff4ff",
+            "on-surface": "#0b1c30",
+            "on-surface-variant": "#434655",
+            outline: "#747686",
+            error: "#ba1a1a"
+          },
+          fontFamily: {
+            sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+            body: ['"Inter"', 'sans-serif'],
+            mono: ['"JetBrains Mono"', 'monospace']
+          }
+        }
+      }
+    };
+  </script>
+  <style>
+    body { font-family: 'Inter', sans-serif; background-color: #f8f9ff; }
+    h1, h2, h3, h4, .font-headline { font-family: 'Plus Jakarta Sans', sans-serif; }
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-thumb { background-color: #cbd5e1; border-radius: 4px; }
+  </style>
+</head>
+<body class="text-on-surface flex flex-col min-h-screen">
+
+  <!-- UNIFIED PROCUREMENT TOP NAVIGATION & WORKFLOW TABS -->
+  <div id="bcf-procurement-nav-header"></div>
+
+  <!-- MAIN VIEWPORT -->
+  <main class="flex-grow p-4 sm:p-6 max-w-7xl mx-auto w-full flex flex-col gap-6">
+
+    <!-- HERO -->
+    <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+      <div>
+        <div class="flex items-center gap-2 mb-1">
+          <span class="inline-flex items-center justify-center w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+          <span class="text-xs font-extrabold uppercase tracking-wider text-emerald-800 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200">
+            Executive Procurement Intelligence
+          </span>
+          <span class="text-xs text-slate-500">• Live Performance Telemetry</span>
+        </div>
+        <h1 class="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight font-headline">
+          Procurement Executive Dashboard
+        </h1>
+        <p class="text-xs sm:text-sm text-slate-600 mt-1 max-w-2xl">
+          High-level institutional overview of donor-funded expenditure, procurement turnaround time, vendor performance, and compliance KPIs.
+        </p>
+      </div>
+
+      <div class="flex items-center gap-2.5 flex-wrap shrink-0">
+        <button onclick="window.print()" class="px-3.5 py-2 rounded-xl border border-slate-300 bg-white hover:bg-slate-50 text-xs font-bold text-slate-700 flex items-center gap-1.5 transition shadow-2xs cursor-pointer">
+          <span class="material-symbols-outlined text-[18px]">print</span>
+          <span>Print Executive Briefing</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- KPI TILES -->
+    <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+      <div class="p-5 rounded-2xl bg-white border border-slate-200 shadow-xs flex flex-col justify-between">
+        <div class="flex items-center justify-between text-slate-500 mb-2">
+          <span class="text-xs font-extrabold uppercase tracking-wider">Total Managed Spend</span>
+          <div class="w-8 h-8 rounded-lg bg-blue-50 text-primary flex items-center justify-center">
+            <span class="material-symbols-outlined text-[20px]">payments</span>
+          </div>
+        </div>
+        <div>
+          <span id="dash-total-spend" class="text-2xl sm:text-3xl font-black text-slate-900 font-mono">NLe 0.00</span>
+          <div class="flex items-center gap-1 mt-1 text-[11px] text-emerald-700 font-bold">
+            <span class="material-symbols-outlined text-[14px]">trending_up</span>
+            <span>Committed against Grants</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="p-5 rounded-2xl bg-white border border-slate-200 shadow-xs flex flex-col justify-between">
+        <div class="flex items-center justify-between text-slate-500 mb-2">
+          <span class="text-xs font-extrabold uppercase tracking-wider">Active Verified Vendors</span>
+          <div class="w-8 h-8 rounded-lg bg-emerald-50 text-emerald-700 flex items-center justify-center">
+            <span class="material-symbols-outlined text-[20px]">storefront</span>
+          </div>
+        </div>
+        <div>
+          <span id="dash-active-suppliers" class="text-2xl sm:text-3xl font-black text-emerald-700 font-mono">0</span>
+          <div class="flex items-center gap-1 mt-1 text-[11px] text-slate-500">
+            <span>NRA &amp; NASSIT compliant</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="p-5 rounded-2xl bg-white border border-slate-200 shadow-xs flex flex-col justify-between">
+        <div class="flex items-center justify-between text-slate-500 mb-2">
+          <span class="text-xs font-extrabold uppercase tracking-wider">Avg. Cycle Turnaround</span>
+          <div class="w-8 h-8 rounded-lg bg-purple-50 text-purple-700 flex items-center justify-center">
+            <span class="material-symbols-outlined text-[20px]">timer</span>
+          </div>
+        </div>
+        <div>
+          <span class="text-2xl sm:text-3xl font-black text-slate-900 font-mono">4.2 Days</span>
+          <div class="flex items-center gap-1 mt-1 text-[11px] text-purple-700 font-bold">
+            <span>PR &rarr; PO Issuance SLA</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="p-5 rounded-2xl bg-white border border-slate-200 shadow-xs flex flex-col justify-between">
+        <div class="flex items-center justify-between text-slate-500 mb-2">
+          <span class="text-xs font-extrabold uppercase tracking-wider">3-Way Match Integrity</span>
+          <div class="w-8 h-8 rounded-lg bg-teal-50 text-teal-700 flex items-center justify-center">
+            <span class="material-symbols-outlined text-[20px]">verified</span>
+          </div>
+        </div>
+        <div>
+          <span class="text-2xl sm:text-3xl font-black text-teal-700 font-mono">100%</span>
+          <div class="flex items-center gap-1 mt-1 text-[11px] text-slate-500">
+            <span>Zero payment leakage</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SPEND ANALYTICS GRIDS -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <!-- Spend by Programme -->
+      <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-xs space-y-4">
+        <div class="flex items-center justify-between border-b border-slate-100 pb-2.5">
+          <span class="text-xs font-extrabold uppercase text-slate-800 tracking-wider flex items-center gap-1.5">
+            <span class="material-symbols-outlined text-[18px] text-primary">pie_chart</span>
+            <span>Spend by Programme Portfolio</span>
+          </span>
+          <span class="text-[10px] font-bold text-slate-400 uppercase">FY26</span>
+        </div>
+
+        <div class="space-y-3" id="dash-programmes-breakdown">
+          <!-- Populated via script -->
+        </div>
+      </div>
+
+      <!-- Spend by Donor -->
+      <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-xs space-y-4">
+        <div class="flex items-center justify-between border-b border-slate-100 pb-2.5">
+          <span class="text-xs font-extrabold uppercase text-slate-800 tracking-wider flex items-center gap-1.5">
+            <span class="material-symbols-outlined text-[18px] text-tertiary">volunteer_activism</span>
+            <span>Spend by Donor Partner Grant</span>
+          </span>
+          <span class="text-[10px] font-bold text-slate-400 uppercase">FY26</span>
+        </div>
+
+        <div class="space-y-3" id="dash-donors-breakdown">
+          <!-- Populated via script -->
+        </div>
+      </div>
+    </div>
+
+    <!-- RECENT TRANSACTIONS PIPELINE -->
+    <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-xs space-y-4">
+      <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+        <div class="flex items-center gap-2">
+          <span class="material-symbols-outlined text-primary text-[20px]">timeline</span>
+          <span class="text-xs font-extrabold uppercase text-slate-800 tracking-wider">Live Procurement Pipeline</span>
+        </div>
+        <button onclick="BCF_PROCUREMENT.switchTab('transaction-audit-trail')" class="text-xs font-bold text-primary hover:underline flex items-center gap-0.5">
+          <span>View Master Audit Trail</span>
+          <span class="material-symbols-outlined text-[14px]">arrow_forward</span>
+        </button>
+      </div>
+
+      <div class="overflow-x-auto rounded-xl border border-slate-200">
+        <table class="w-full text-left text-xs border-collapse">
+          <thead class="bg-slate-50 border-b border-slate-200 font-bold text-slate-600">
+            <tr>
+              <th class="py-2.5 px-3">Master TXN Key</th>
+              <th class="py-2.5 px-3">Title &amp; Programme</th>
+              <th class="py-2.5 px-3">Committed Amount</th>
+              <th class="py-2.5 px-3">Lifecycle Stage</th>
+              <th class="py-2.5 px-3">Status</th>
+              <th class="py-2.5 px-3 text-right">Action</th>
+            </tr>
+          </thead>
+          <tbody id="dash-pipeline-body" class="divide-y divide-slate-100">
+            <!-- Populated via script -->
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- Shared Library -->
+  <script src="../bcf_procurement_shared.js"></script>
+
+  <!-- Controller Logic -->
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      // Shared top navigation
+      BCF_PROCUREMENT.renderHeaderAndTabs('procurement-dashboard');
+
+      renderDashboard();
+    });
+
+    function renderDashboard() {
+      const pos = BCF_PROCUREMENT.getPurchaseOrders();
+      const prs = BCF_PROCUREMENT.getRequisitions();
+      const sups = BCF_PROCUREMENT.getSuppliers();
+      const progs = BCF_PROCUREMENT.getProgrammes();
+      const donors = BCF_PROCUREMENT.getDonors();
+
+      const totalSpend = pos.reduce((sum, p) => sum + (p.totalAmount || 0), 0);
+
+      document.getElementById('dash-total-spend').textContent = BCF_PROCUREMENT.formatCurrency(totalSpend);
+      document.getElementById('dash-active-suppliers').textContent = sups.length;
+
+      // Spend by Programme
+      const progContainer = document.getElementById('dash-programmes-breakdown');
+      progContainer.innerHTML = progs.map(prg => {
+        const progPos = pos.filter(p => p.programmeId === prg.id);
+        const progSpend = progPos.reduce((sum, p) => sum + (p.totalAmount || 0), 0);
+        const pct = totalSpend > 0 ? Math.round((progSpend / totalSpend) * 100) : 0;
+
+        return `
+          <div>
+            <div class="flex items-center justify-between text-xs mb-1">
+              <span class="font-bold text-slate-800">${prg.name}</span>
+              <span class="font-mono font-black text-slate-900">${BCF_PROCUREMENT.formatCurrency(progSpend)} (${pct}%)</span>
+            </div>
+            <div class="w-full bg-slate-100 h-2 rounded-full overflow-hidden">
+              <div class="bg-primary h-full rounded-full" style="width: ${pct || 5}%"></div>
+            </div>
+          </div>
+        `;
+      }).join('');
+
+      // Spend by Donor
+      const donorContainer = document.getElementById('dash-donors-breakdown');
+      donorContainer.innerHTML = donors.map(dnr => {
+        const dnrPos = pos.filter(p => p.donorId === dnr.id);
+        const dnrSpend = dnrPos.reduce((sum, p) => sum + (p.totalAmount || 0), 0);
+        const pct = totalSpend > 0 ? Math.round((dnrSpend / totalSpend) * 100) : 0;
+
+        return `
+          <div>
+            <div class="flex items-center justify-between text-xs mb-1">
+              <span class="font-bold text-slate-800">${dnr.name}</span>
+              <span class="font-mono font-black text-tertiary">${BCF_PROCUREMENT.formatCurrency(dnrSpend)} (${pct}%)</span>
+            </div>
+            <div class="w-full bg-slate-100 h-2 rounded-full overflow-hidden">
+              <div class="bg-emerald-600 h-full rounded-full" style="width: ${pct || 5}%"></div>
+            </div>
+          </div>
+        `;
+      }).join('');
+
+      // Pipeline Table
+      const pipelineBody = document.getElementById('dash-pipeline-body');
+      pipelineBody.innerHTML = prs.map(pr => {
+        const txn = BCF_PROCUREMENT.getTransaction(pr.txnId);
+        const colors = BCF_PROCUREMENT.getStatusColor(pr.status);
+
+        return `
+          <tr>
+            <td class="py-2.5 px-3 font-mono font-bold text-primary">
+              ${pr.txnId}
+            </td>
+            <td class="py-2.5 px-3">
+              <span class="font-bold text-slate-900 block">${pr.title}</span>
+              <span class="text-[11px] text-slate-500">${pr.programmeName || '—'} &bull; ${pr.donorName || '—'}</span>
+            </td>
+            <td class="py-2.5 px-3 font-mono font-black text-slate-900">
+              ${BCF_PROCUREMENT.formatCurrency(pr.estimatedTotal)}
+            </td>
+            <td class="py-2.5 px-3 font-semibold text-slate-700">
+              ${txn ? txn.stage : 'Initiated'}
+            </td>
+            <td class="py-2.5 px-3">
+              <span class="px-2 py-0.5 rounded text-[10px] font-bold border ${colors.bg} ${colors.text} ${colors.border}">
+                ${pr.status}
+              </span>
+            </td>
+            <td class="py-2.5 px-3 text-right">
+              <button onclick="inspectTxn('${pr.txnId}')" class="px-2.5 py-1 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold transition">
+                Inspect
+              </button>
+            </td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    function inspectTxn(txnId) {
+      localStorage.setItem('bcf_selected_txn_id', txnId);
+      BCF_PROCUREMENT.switchTab('transaction-audit-trail');
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,572 @@
+<!DOCTYPE html>
+
+<html lang="en"><head><meta charset="utf-8"/><meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" name="viewport"/><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/><link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/><style>@layer base{html,body{width:100%;margin:0;padding:0;background-color:#f8f9ff;}body{overscroll-behavior-y:none;-webkit-tap-highlight-color:transparent;}.pb-safe{padding-bottom:env(safe-area-inset-bottom,0px);}.pt-safe{padding-top:env(safe-area-inset-top,0px);}main>:first-child{margin-top:0!important;}main>:last-child{margin-bottom:0!important;}}::-webkit-scrollbar{display:none;}</style><script src="https://cdn.tailwindcss.com"></script><script id="tailwind-config">tailwind.config = { darkMode: 'class', theme: { extend: { colors: { 'surface-container-highest': '#d5e3fc', 'surface-container': '#e6eeff', 'on-primary-fixed-variant': '#005232', 'on-secondary-fixed-variant': '#3f465c', 'secondary': '#565e74', 'surface': '#f8f9ff', 'surface-variant': '#d5e3fc', 'on-error-container': '#93000a', 'outline': '#707971', 'primary-container': '#0d5c3a', 'surface-container-lowest': '#ffffff', 'background': '#f8f9ff', 'on-secondary': '#ffffff', 'primary-fixed': '#a9f3c5', 'surface-tint': '#226b47', 'secondary-fixed-dim': '#bec6e0', 'on-tertiary-fixed': '#2f1500', 'inverse-on-surface': '#eaf1ff', 'surface-dim': '#ccdbf3', 'tertiary-fixed-dim': '#ffb77d', 'on-primary-fixed': '#002111', 'inverse-primary': '#8ed6aa', 'on-primary': '#ffffff', 'on-surface': '#0d1c2e', 'on-secondary-fixed': '#131b2e', 'surface-container-low': '#eff4ff', 'on-tertiary-container': '#ffb273', 'outline-variant': '#bfc9c0', 'tertiary': '#5a2e00', 'surface-container-high': '#dce9ff', 'tertiary-fixed': '#ffdcc3', 'primary': '#004328', 'on-tertiary-fixed-variant': '#6e3900', 'on-surface-variant': '#404942', 'secondary-fixed': '#dae2fd', 'surface-bright': '#f8f9ff', 'on-tertiary': '#ffffff', 'on-error': '#ffffff', 'inverse-surface': '#233144', 'tertiary-container': '#7c4100', 'secondary-container': '#dae2fd', 'error': '#ba1a1a', 'on-background': '#0d1c2e', 'error-container': '#ffdad6', 'primary-fixed-dim': '#8ed6aa', 'on-primary-container': '#8ad2a7', 'on-secondary-container': '#5c647a' }, borderRadius: { 'DEFAULT': '0.125rem', 'lg': '0.25rem', 'xl': '0.5rem', 'full': '0.75rem' }, spacing: { 'space-sm': '0.5rem', 'space-2xs': '0.125rem', 'space-xl': '1.5rem', 'card-padding-compact': '0.75rem', 'space-md': '0.75rem', 'gutter-mobile': '0.75rem', 'gutter-desktop': '1.5rem', 'space-lg': '1.25rem', 'card-padding-default': '1.25rem', 'space-xs': '0.25rem', 'space-base': '1rem', 'space-2xl': '2rem', 'space-3xl': '3rem' }, fontFamily: { 'display-lg': ['Inter'], 'currency-display': ['Inter'], 'title-lg': ['Inter'], 'body-sm': ['Inter'], 'tabular-ledger': ['Inter'], 'label-lg': ['Inter'], 'body-lg': ['Inter'], 'currency-md': ['Inter'], 'title-md': ['Inter'], 'label-md': ['Inter'], 'headline-md': ['Inter'], 'label-sm': ['Inter'], 'headline-lg': ['Inter'], 'body-md': ['Inter'] }, fontSize: { 'display-lg': ['32px', { lineHeight: '40px', letterSpacing: '-0.02em', fontWeight: '700' }], 'currency-display': ['28px', { lineHeight: '32px', letterSpacing: '-0.02em', fontWeight: '700' }], 'title-lg': ['18px', { lineHeight: '24px', letterSpacing: '-0.005em', fontWeight: '600' }], 'body-sm': ['13px', { lineHeight: '18px', letterSpacing: '0.005em', fontWeight: '400' }], 'tabular-ledger': ['13px', { lineHeight: '18px', letterSpacing: '0em', fontWeight: '500' }], 'label-lg': ['13px', { lineHeight: '16px', letterSpacing: '0.01em', fontWeight: '600' }], 'body-lg': ['15px', { lineHeight: '22px', letterSpacing: '0em', fontWeight: '400' }], 'currency-md': ['16px', { lineHeight: '20px', letterSpacing: '-0.01em', fontWeight: '600' }], 'title-md': ['16px', { lineHeight: '24px', letterSpacing: '0em', fontWeight: '600' }], 'label-md': ['12px', { lineHeight: '16px', letterSpacing: '0.02em', fontWeight: '500' }], 'headline-md': ['20px', { lineHeight: '28px', letterSpacing: '-0.01em', fontWeight: '600' }], 'label-sm': ['11px', { lineHeight: '14px', letterSpacing: '0.04em', fontWeight: '600' }], 'headline-lg': ['24px', { lineHeight: '32px', letterSpacing: '-0.015em', fontWeight: '600' }], 'body-md': ['14px', { lineHeight: '20px', letterSpacing: '0em', fontWeight: '400' }] } } } }</script><style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head><body class="bg-surface font-body-md text-body-md text-on-surface min-h-screen flex flex-col antialiased selection:bg-primary selection:text-on-primary"><header class="fixed top-0 inset-x-0 z-50 bg-surface/90 backdrop-blur-xl shadow-[0_1px_8px_rgba(13,28,46,0.04)] pt-safe"><div class="h-16 px-gutter-mobile flex items-center justify-between gap-space-sm"><div class="flex items-center gap-space-xs min-w-0 flex-1"><img alt="Bandama Charity Foundation Logo" class="h-8 w-auto object-contain shrink-0" src="https://lh3.googleusercontent.com/aida/AEtjO1UjWKdxSztphZd7RTtP9Dakd0jP7-7cnj1OLQIRcKLhYCDTyRZ0hz_7tWzbJpgZXmwfbt-ndFek8ewobzCGFHM-qgCe9qmEbvNWbNP0tg3BHDrFFmARgJnrE-X3NfLZIOPGf6HhEUiCn6WvfzDQ94W01dKRl9ObbQLctt5Njy7l6Nkmyxrvd2h5fQEgQUPEzElDJyNqxQRxHuDnRN69sTO7Bdfr4gcwkSNjN30KenQ4GwASwXkKLN3Sa_c"/><div class="flex flex-col min-w-0"><div class="flex items-center gap-space-xs"><span class="font-label-md text-label-md text-primary truncate tracking-tight uppercase">BCF</span><span class="px-space-xs py-space-2xs rounded bg-surface-container-high text-on-surface-variant font-label-sm text-label-sm">SLE</span></div><h1 class="font-title-md text-title-md text-on-surface truncate leading-none">Programs</h1></div></div><div class="flex items-center gap-space-xs shrink-0"><button aria-label="Notifications" class="relative w-11 h-11 flex items-center justify-center rounded-xl bg-surface-container-low text-on-surface hover:bg-surface-container transition-colors" type="button"><span class="material-symbols-outlined text-[20px]">notifications</span><span class="absolute top-2 right-2 w-2 h-2 rounded-full bg-error ring-2 ring-surface"></span></button><div class="flex items-center gap-space-xs pl-space-xs"><div class="relative flex items-center"><img alt="Profile" class="w-8 h-8 rounded-full object-cover shrink-0 ring-1 ring-outline-variant" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD162K4KtincPTik7LnoU9QwUpSiho7afLo7POYhmtaARMQ3zMQBXUkQ4FhPbiNV7NtRo-KKWk4pPOYhxCyc38DifjsExRkGykZoSTEs9A058kwW2mUk2FHcRCJO98rPfOzNqXQKpOpGZaDcYirnTTy5mxWCrDcEtHLv9bhdplvKyFf_pALPCu9xm3nxTnFcFsD8Q7BsEf-go0_fVwyIFl4mUp-tTZSMtVHq1PRe0ebxdARAuXFq2Rr"/><span class="absolute -bottom-1 -right-1 w-2.5 h-2.5 rounded-full bg-primary ring-2 ring-surface" title="Active"></span></div><div class="hidden xs:flex flex-col"><span class="font-label-sm text-label-sm text-on-surface-variant leading-tight">Finance Dir</span></div></div></div></div></header><main class="flex-1 flex flex-col relative w-full pt-16 pb-24 bg-surface px-gutter-mobile"><div class="flex flex-col w-full gap-space-md">
+<!-- Top Sovereign Assurance Callout -->
+<section class="bg-surface-container-low p-card-padding-compact rounded-xl flex items-center justify-between gap-space-sm shadow-sm">
+<div class="flex items-center gap-space-sm min-w-0">
+<div class="w-9 h-9 rounded-lg bg-primary text-on-primary flex items-center justify-center shrink-0 shadow-sm">
+<span class="material-symbols-outlined text-[20px]">verified_user</span>
+</div>
+<div class="flex flex-col min-w-0">
+<span class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider">Statutory Oversight</span>
+<p class="font-label-md text-label-md text-on-surface truncate">Every voucher verified against BCF Bank disbursements</p>
+</div>
+</div>
+<span class="px-space-xs py-space-2xs rounded bg-surface-container-high text-primary font-label-sm text-label-sm font-semibold shrink-0">
+      FY 2024/25
+    </span>
+</section>
+<!-- Executive Governance Portfolio Card -->
+<section class="bg-surface-container-lowest rounded-xl p-card-padding-default shadow-sm flex flex-col gap-space-md relative overflow-hidden">
+<div class="absolute -right-8 -top-8 w-28 h-28 rounded-full bg-primary/5 pointer-events-none"></div>
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-space-xs">
+<span class="material-symbols-outlined text-primary text-[20px]">account_balance_wallet</span>
+<span class="font-label-sm text-label-sm uppercase tracking-wider text-on-surface-variant">Portfolio Capital Position</span>
+</div>
+<span class="px-space-xs py-space-2xs rounded-full bg-surface-container text-on-secondary-container font-label-sm text-label-sm">
+        6 Active Programs
+      </span>
+</div>
+<div>
+<div class="flex items-baseline gap-space-2xs">
+<span class="font-currency-md text-currency-md text-primary">NLe</span>
+<span class="font-display-lg text-display-lg text-on-surface tracking-tight font-bold">11,600,000</span>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant mt-space-2xs">Total Approved Statutory Allocation</p>
+</div>
+<!-- Progress Allocation Bar -->
+<div class="flex flex-col gap-space-2xs">
+<div class="h-2.5 w-full bg-surface-container rounded-full overflow-hidden flex">
+<div class="h-full bg-primary rounded-full transition-all duration-500" style="width: 41.6%;"></div>
+</div>
+<div class="flex items-center justify-between font-label-sm text-label-sm">
+<span class="text-primary font-semibold">Disbursed: NLe 4,820,400 (41.6%)</span>
+<span class="text-on-surface-variant">Available: 58.4%</span>
+</div>
+</div>
+<!-- Dual Metric Split Pill -->
+<div class="grid grid-cols-2 gap-space-sm pt-space-xs">
+<div class="bg-surface-container-low p-card-padding-compact rounded-lg flex flex-col">
+<span class="font-label-sm text-label-sm text-on-surface-variant flex items-center gap-space-2xs">
+<span class="w-2 h-2 rounded-full bg-primary shrink-0"></span>
+          Cumulative Spend
+        </span>
+<span class="font-title-md text-title-md text-on-surface mt-space-2xs tabular-nums font-bold">NLe 4,820,400</span>
+<span class="font-label-sm text-label-sm text-on-surface-variant">Reconciled to date</span>
+</div>
+<div class="bg-surface-container-high p-card-padding-compact rounded-lg flex flex-col">
+<span class="font-label-sm text-label-sm text-on-surface-variant flex items-center gap-space-2xs">
+<span class="w-2 h-2 rounded-full bg-primary-fixed-dim shrink-0"></span>
+          Remaining Balance
+        </span>
+<span class="font-title-md text-title-md text-primary mt-space-2xs tabular-nums font-bold">NLe 6,779,600</span>
+<span class="font-label-sm text-label-sm text-on-surface-variant">58.4% fiscal buffer</span>
+</div>
+</div>
+</section>
+<!-- Horizontal Scrollable Department Filter Pills -->
+<section class="flex flex-col gap-space-xs">
+<div class="flex items-center justify-between px-space-2xs">
+<span class="font-label-sm text-label-sm uppercase tracking-wider text-on-surface-variant font-semibold">Department Filter</span>
+<span class="font-label-sm text-label-sm text-primary" id="activeFilterBadge">All (3 Displayed)</span>
+</div>
+<div class="flex gap-space-xs overflow-x-auto pb-space-2xs no-scrollbar -mx-gutter-mobile px-gutter-mobile" id="deptFilterGroup">
+<button class="dept-btn px-space-md py-space-xs rounded-full bg-primary text-on-primary font-label-md text-label-md shrink-0 shadow-sm transition-transform active:scale-95 flex items-center gap-space-2xs" data-dept="all" type="button">
+<span class="material-symbols-outlined text-[16px]">domain</span>
+        All Departments
+      </button>
+<button class="dept-btn px-space-md py-space-xs rounded-full bg-surface-container-low text-on-surface-variant font-label-md text-label-md shrink-0 transition-transform active:scale-95 flex items-center gap-space-2xs hover:bg-surface-container" data-dept="healthcare" type="button">
+<span class="material-symbols-outlined text-[16px]">local_hospital</span>
+        Healthcare Unit
+      </button>
+<button class="dept-btn px-space-md py-space-xs rounded-full bg-surface-container-low text-on-surface-variant font-label-md text-label-md shrink-0 transition-transform active:scale-95 flex items-center gap-space-2xs hover:bg-surface-container" data-dept="education" type="button">
+<span class="material-symbols-outlined text-[16px]">school</span>
+        Education &amp; Youth
+      </button>
+<button class="dept-btn px-space-md py-space-xs rounded-full bg-surface-container-low text-on-surface-variant font-label-md text-label-md shrink-0 transition-transform active:scale-95 flex items-center gap-space-2xs hover:bg-surface-container" data-dept="agriculture" type="button">
+<span class="material-symbols-outlined text-[16px]">agriculture</span>
+        Community Agriculture
+      </button>
+<button class="dept-btn px-space-md py-space-xs rounded-full bg-surface-container-low text-on-surface-variant font-label-md text-label-md shrink-0 transition-transform active:scale-95 flex items-center gap-space-2xs hover:bg-surface-container" data-dept="wash" type="button">
+<span class="material-symbols-outlined text-[16px]">water_drop</span>
+        WASH Engineering
+      </button>
+</div>
+</section>
+<!-- Program Operational Detailed Cards -->
+<section class="flex flex-col gap-space-md" id="programCardsList">
+<!-- Program Card 1: Healthcare -->
+<article class="program-card bg-surface-container-lowest rounded-xl p-card-padding-default shadow-sm flex flex-col gap-space-md relative overflow-hidden" data-category="healthcare">
+<div class="absolute left-0 top-0 bottom-0 w-1.5 bg-primary"></div>
+<!-- Card Header -->
+<div class="flex items-start justify-between gap-space-sm pl-space-xs">
+<div class="flex flex-col min-w-0">
+<div class="flex items-center gap-space-xs flex-wrap">
+<span class="px-space-xs py-space-2xs rounded bg-surface-container text-primary font-label-sm text-label-sm font-semibold tracking-wider">
+              BCF-HLTH-01
+            </span>
+<span class="font-label-sm text-label-sm text-on-surface-variant">Healthcare Unit</span>
+</div>
+<h2 class="font-title-lg text-title-lg text-on-surface mt-space-xs font-bold leading-snug">
+            Maternal Health &amp; Mobile Clinic Outreach
+          </h2>
+<span class="font-body-sm text-body-sm text-secondary mt-space-2xs flex items-center gap-space-2xs">
+<span class="material-symbols-outlined text-[16px]">location_on</span>
+            Kenema &amp; Kailahun Districts
+          </span>
+</div>
+<div class="w-10 h-10 rounded-full bg-surface-container-low flex items-center justify-center text-primary shrink-0">
+<span class="material-symbols-outlined text-[22px]">medical_services</span>
+</div>
+</div>
+<!-- Lead & Operational Status Bar -->
+<div class="bg-surface-container-low p-card-padding-compact rounded-lg flex items-center justify-between gap-space-xs">
+<div class="flex items-center gap-space-xs min-w-0">
+<img class="w-7 h-7 rounded-full object-cover shrink-0" data-alt="Professional headshot of Dr. F. Sesay, Sierra Leonean physician and chief medical coordinator for Bandama Charity Foundation mobile outreach units, smiling warmly in executive clinical attire with natural daylight in Kenema." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDqT4BnJ5HeJFJ7GhlyrgKBV5sxrEO2u8HOTYGti4CL-lL9bFwH6fiS51A3AFnuuYF--iP8OqO9PttBBJYoHHwH725ZYo6t2BtI8uCEACcp36H73OtrDZeHIcv22jjdWn8dQwnMnsBiZpCFTUbhusXWo9Z_3IUoApeKwmmR1U36Tw03sO3Ur0abrZ9sUcHxEv24rn2vcxHyG1Ko2hOCLGDOTbAb4XtWUP-xOFRy7w9j4dILupTZMtkU"/>
+<div class="flex flex-col min-w-0">
+<span class="font-label-sm text-label-sm text-on-surface-variant">Lead Coordinator</span>
+<span class="font-label-md text-label-md text-on-surface font-semibold truncate">Dr. F. Sesay</span>
+</div>
+</div>
+<div class="flex items-center gap-space-xs shrink-0">
+<span class="px-space-xs py-space-2xs rounded-full bg-primary-fixed text-on-primary-fixed font-label-sm text-label-sm font-semibold flex items-center gap-space-2xs">
+<span class="material-symbols-outlined text-[14px]">trending_up</span>
+            Burn: 46.6%
+          </span>
+<span class="font-label-sm text-label-sm text-primary font-medium">On Schedule</span>
+</div>
+</div>
+<!-- Financial Metrics Grid -->
+<div class="grid grid-cols-3 gap-space-xs bg-surface-container-low/50 p-space-xs rounded-lg">
+<div class="flex flex-col min-w-0">
+<span class="font-label-sm text-label-sm text-on-surface-variant truncate">Donor Received</span>
+<span class="font-tabular-ledger text-tabular-ledger text-on-surface font-bold mt-space-2xs truncate">NLe 2.40M</span>
+</div>
+<div class="flex flex-col min-w-0">
+<span class="font-label-sm text-label-sm text-on-surface-variant truncate">Disbursed</span>
+<span class="font-tabular-ledger text-tabular-ledger text-primary font-bold mt-space-2xs truncate">NLe 1.12M</span>
+</div>
+<div class="flex flex-col min-w-0">
+<span class="font-label-sm text-label-sm text-on-surface-variant truncate">Remaining</span>
+<span class="font-tabular-ledger text-tabular-ledger text-on-surface font-bold mt-space-2xs truncate">NLe 1.28M</span>
+</div>
+</div>
+<!-- Visual Progress Meter -->
+<div class="flex flex-col gap-space-2xs">
+<div class="h-2 w-full bg-surface-container rounded-full overflow-hidden">
+<div class="h-full bg-primary rounded-full" style="width: 46.6%;"></div>
+</div>
+<div class="flex justify-between font-label-sm text-label-sm text-on-surface-variant">
+<span>Executed: 46.6%</span>
+<span>Buffer: NLe 1,280,000</span>
+</div>
+</div>
+<!-- Interaction Bar: Toggle Drawer Breakdown -->
+<button class="w-full py-space-xs px-space-md rounded-lg bg-surface-container-low text-primary font-label-md text-label-md flex items-center justify-between hover:bg-surface-container transition-colors" onclick="toggleDrawer('breakdown-1')" type="button">
+<span class="flex items-center gap-space-xs font-semibold">
+<span class="material-symbols-outlined text-[18px]">receipt_long</span>
+          Audit Voucher Allocation Breakdown
+        </span>
+<span class="material-symbols-outlined text-[20px] transition-transform duration-200" id="icon-breakdown-1">expand_more</span>
+</button>
+<!-- Expandable Statutory Drawer Panel -->
+<div class="hidden flex-col gap-space-sm pt-space-xs" id="breakdown-1">
+<div class="bg-surface-container-low p-card-padding-compact rounded-lg flex flex-col gap-space-xs">
+<div class="flex items-center justify-between pb-space-2xs border-b border-surface-container-high">
+<span class="font-label-sm text-label-sm uppercase tracking-wider text-on-surface-variant font-bold">Expenditure Channel</span>
+<span class="font-label-sm text-label-sm uppercase tracking-wider text-on-surface-variant font-bold">Voucher Total</span>
+</div>
+<div class="flex items-center justify-between py-space-2xs">
+<div class="flex items-center gap-space-xs">
+<span class="w-2 h-2 rounded-full bg-primary shrink-0"></span>
+<span class="font-body-sm text-body-sm text-on-surface">Medical Procurement &amp; Vaccines</span>
+</div>
+<span class="font-tabular-ledger text-tabular-ledger font-semibold text-on-surface">NLe 510,000</span>
+</div>
+<div class="flex items-center justify-between py-space-2xs">
+<div class="flex items-center gap-space-xs">
+<span class="w-2 h-2 rounded-full bg-secondary shrink-0"></span>
+<span class="font-body-sm text-body-sm text-on-surface">Mobile 4x4 Field Logistics &amp; Fuel</span>
+</div>
+<span class="font-tabular-ledger text-tabular-ledger font-semibold text-on-surface">NLe 290,000</span>
+</div>
+<div class="flex items-center justify-between py-space-2xs">
+<div class="flex items-center gap-space-xs">
+<span class="w-2 h-2 rounded-full bg-tertiary shrink-0"></span>
+<span class="font-body-sm text-body-sm text-on-surface">Clinical Staff Per Diem (NASSIT Reconciled)</span>
+</div>
+<span class="font-tabular-ledger text-tabular-ledger font-semibold text-on-surface">NLe 185,000</span>
+</div>
+<div class="flex items-center justify-between py-space-2xs">
+<div class="flex items-center gap-space-xs">
+<span class="w-2 h-2 rounded-full bg-primary-fixed-dim shrink-0"></span>
+<span class="font-body-sm text-body-sm text-on-surface">Direct Maternal Nutrition Grants</span>
+</div>
+<span class="font-tabular-ledger text-tabular-ledger font-semibold text-on-surface">NLe 135,000</span>
+</div>
+</div>
+<div class="flex items-center justify-between px-space-xs text-on-surface-variant font-label-sm text-label-sm">
+<span class="flex items-center gap-space-2xs">
+<span class="material-symbols-outlined text-[16px] text-primary">verified</span>
+            Voucher Series: SL-KEN-2024-88A
+          </span>
+<span class="font-semibold text-primary">NLe 1,120,000 Reconciled</span>
+</div>
+</div>
+</article>
+<!-- Program Card 2: Education & Youth -->
+<article class="program-card bg-surface-container-lowest rounded-xl p-card-padding-default shadow-sm flex flex-col gap-space-md relative overflow-hidden" data-category="education">
+<div class="absolute left-0 top-0 bottom-0 w-1.5 bg-secondary"></div>
+<!-- Card Header -->
+<div class="flex items-start justify-between gap-space-sm pl-space-xs">
+<div class="flex flex-col min-w-0">
+<div class="flex items-center gap-space-xs flex-wrap">
+<span class="px-space-xs py-space-2xs rounded bg-surface-container text-secondary font-label-sm text-label-sm font-semibold tracking-wider">
+              BCF-EDU-04
+            </span>
+<span class="font-label-sm text-label-sm text-on-surface-variant">Education &amp; Youth Services</span>
+</div>
+<h2 class="font-title-lg text-title-lg text-on-surface mt-space-xs font-bold leading-snug">
+            Rural Girls Digital Literacy &amp; STEM Hubs
+          </h2>
+<span class="font-body-sm text-body-sm text-secondary mt-space-2xs flex items-center gap-space-2xs">
+<span class="material-symbols-outlined text-[16px]">location_on</span>
+            Port Loko &amp; Bo Municipalities
+          </span>
+</div>
+<div class="w-10 h-10 rounded-full bg-surface-container-low flex items-center justify-center text-secondary shrink-0">
+<span class="material-symbols-outlined text-[22px]">laptop_chromebook</span>
+</div>
+</div>
+<!-- Lead & Operational Status Bar -->
+<div class="bg-surface-container-low p-card-padding-compact rounded-lg flex items-center justify-between gap-space-xs">
+<div class="flex items-center gap-space-xs min-w-0">
+<img class="w-7 h-7 rounded-full object-cover shrink-0" data-alt="Port Loko STEM youth education director A. Mansaray, Sierra Leonean female leader facilitating a computer laboratory session for young girls, bright educational setting." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAzfVnI8QJZ77SIm5Qw_2Wz7e5CrTKmWQQH-DUSzI2AMeC_91NinuAGxAWyWgho5UCAGN-IOTGlolrzB0ymfGpRd55S_LH82pJjjigpa-aKb1U7ut6KX9XMCLZgLWbOXbWUJOXjY3JOaeXZgHRvIkJ9ybD8z_B2gPv5WDFxEYMwYg8EBe-tznu6vvU-HGXtseOJqReSSEzqXzTvYj5KnZn1gRhveNIKcYv5qZZz1H7rM_eOpayjRZ9A"/>
+<div class="flex flex-col min-w-0">
+<span class="font-label-sm text-label-sm text-on-surface-variant">Lead Coordinator</span>
+<span class="font-label-md text-label-md text-on-surface font-semibold truncate">A. Mansaray</span>
+</div>
+</div>
+<div class="flex items-center gap-space-xs shrink-0">
+<span class="px-space-xs py-space-2xs rounded-full bg-primary-fixed text-on-primary-fixed font-label-sm text-label-sm font-semibold flex items-center gap-space-2xs">
+<span class="material-symbols-outlined text-[14px]">trending_up</span>
+            Burn: 39.4%
+          </span>
+<span class="font-label-sm text-label-sm text-primary font-medium">On Schedule</span>
+</div>
+</div>
+<!-- Financial Metrics Grid -->
+<div class="grid grid-cols-3 gap-space-xs bg-surface-container-low/50 p-space-xs rounded-lg">
+<div class="flex flex-col min-w-0">
+<span class="font-label-sm text-label-sm text-on-surface-variant truncate">Donor Received</span>
+<span class="font-tabular-ledger text-tabular-ledger text-on-surface font-bold mt-space-2xs truncate">NLe 5.20M</span>
+</div>
+<div class="flex flex-col min-w-0">
+<span class="font-label-sm text-label-sm text-on-surface-variant truncate">Disbursed</span>
+<span class="font-tabular-ledger text-tabular-ledger text-primary font-bold mt-space-2xs truncate">NLe 2.05M</span>
+</div>
+<div class="flex flex-col min-w-0">
+<span class="font-label-sm text-label-sm text-on-surface-variant truncate">Remaining</span>
+<span class="font-tabular-ledger text-tabular-ledger text-on-surface font-bold mt-space-2xs truncate">NLe 3.15M</span>
+</div>
+</div>
+<!-- Visual Progress Meter -->
+<div class="flex flex-col gap-space-2xs">
+<div class="h-2 w-full bg-surface-container rounded-full overflow-hidden">
+<div class="h-full bg-secondary rounded-full" style="width: 39.4%;"></div>
+</div>
+<div class="flex justify-between font-label-sm text-label-sm text-on-surface-variant">
+<span>Executed: 39.4%</span>
+<span>Buffer: NLe 3,150,000</span>
+</div>
+</div>
+<!-- Interaction Bar: Toggle Drawer Breakdown -->
+<button class="w-full py-space-xs px-space-md rounded-lg bg-surface-container-low text-secondary font-label-md text-label-md flex items-center justify-between hover:bg-surface-container transition-colors" onclick="toggleDrawer('breakdown-2')" type="button">
+<span class="flex items-center gap-space-xs font-semibold">
+<span class="material-symbols-outlined text-[18px]">receipt_long</span>
+          Audit Voucher Allocation Breakdown
+        </span>
+<span class="material-symbols-outlined text-[20px] transition-transform duration-200" id="icon-breakdown-2">expand_more</span>
+</button>
+<!-- Expandable Statutory Drawer Panel -->
+<div class="hidden flex-col gap-space-sm pt-space-xs" id="breakdown-2">
+<div class="bg-surface-container-low p-card-padding-compact rounded-lg flex flex-col gap-space-xs">
+<div class="flex items-center justify-between pb-space-2xs border-b border-surface-container-high">
+<span class="font-label-sm text-label-sm uppercase tracking-wider text-on-surface-variant font-bold">Expenditure Channel</span>
+<span class="font-label-sm text-label-sm uppercase tracking-wider text-on-surface-variant font-bold">Voucher Total</span>
+</div>
+<div class="flex items-center justify-between py-space-2xs">
+<div class="flex items-center gap-space-xs">
+<span class="w-2 h-2 rounded-full bg-primary shrink-0"></span>
+<span class="font-body-sm text-body-sm text-on-surface">Solar Laptops &amp; Network Gear</span>
+</div>
+<span class="font-tabular-ledger text-tabular-ledger font-semibold text-on-surface">NLe 1,180,000</span>
+</div>
+<div class="flex items-center justify-between py-space-2xs">
+<div class="flex items-center gap-space-xs">
+<span class="w-2 h-2 rounded-full bg-secondary shrink-0"></span>
+<span class="font-body-sm text-body-sm text-on-surface">Field Logistics &amp; Mobile Labs</span>
+</div>
+<span class="font-tabular-ledger text-tabular-ledger font-semibold text-on-surface">NLe 340,000</span>
+</div>
+<div class="flex items-center justify-between py-space-2xs">
+<div class="flex items-center gap-space-xs">
+<span class="w-2 h-2 rounded-full bg-tertiary shrink-0"></span>
+<span class="font-body-sm text-body-sm text-on-surface">STEM Instructors Facilitation &amp; Per Diem</span>
+</div>
+<span class="font-tabular-ledger text-tabular-ledger font-semibold text-on-surface">NLe 280,000</span>
+</div>
+<div class="flex items-center justify-between py-space-2xs">
+<div class="flex items-center gap-space-xs">
+<span class="w-2 h-2 rounded-full bg-primary-fixed-dim shrink-0"></span>
+<span class="font-body-sm text-body-sm text-on-surface">Direct Student Connectivity Stipends</span>
+</div>
+<span class="font-tabular-ledger text-tabular-ledger font-semibold text-on-surface">NLe 250,000</span>
+</div>
+</div>
+<div class="flex items-center justify-between px-space-xs text-on-surface-variant font-label-sm text-label-sm">
+<span class="flex items-center gap-space-2xs">
+<span class="material-symbols-outlined text-[16px] text-secondary">verified</span>
+            Voucher Series: SL-PLK-2024-41C
+          </span>
+<span class="font-semibold text-secondary">NLe 2,050,000 Reconciled</span>
+</div>
+</div>
+</article>
+<!-- Program Card 3: WASH Engineering -->
+<article class="program-card bg-surface-container-lowest rounded-xl p-card-padding-default shadow-sm flex flex-col gap-space-md relative overflow-hidden" data-category="wash">
+<div class="absolute left-0 top-0 bottom-0 w-1.5 bg-primary-container"></div>
+<!-- Card Header -->
+<div class="flex items-start justify-between gap-space-sm pl-space-xs">
+<div class="flex flex-col min-w-0">
+<div class="flex items-center gap-space-xs flex-wrap">
+<span class="px-space-xs py-space-2xs rounded bg-surface-container text-primary-container font-label-sm text-label-sm font-semibold tracking-wider">
+              BCF-WASH-02
+            </span>
+<span class="font-label-sm text-label-sm text-on-surface-variant">Water &amp; Sanitation Engineering</span>
+</div>
+<h2 class="font-title-lg text-title-lg text-on-surface mt-space-xs font-bold leading-snug">
+            Deep Boreholes &amp; Solar Pumping Infrastructure
+          </h2>
+<span class="font-body-sm text-body-sm text-secondary mt-space-2xs flex items-center gap-space-2xs">
+<span class="material-symbols-outlined text-[16px]">location_on</span>
+            Kambia District Communities
+          </span>
+</div>
+<div class="w-10 h-10 rounded-full bg-surface-container-low flex items-center justify-center text-primary-container shrink-0">
+<span class="material-symbols-outlined text-[22px]">water_drop</span>
+</div>
+</div>
+<!-- Lead & Operational Status Bar -->
+<div class="bg-surface-container-low p-card-padding-compact rounded-lg flex items-center justify-between gap-space-xs">
+<div class="flex items-center gap-space-xs min-w-0">
+<img class="w-7 h-7 rounded-full object-cover shrink-0" data-alt="Civil engineering project manager E. Koroma inspecting solar water borehole installations in rural Kambia, Sierra Leone, donning reflective safety vest and helmet." src="https://lh3.googleusercontent.com/aida-public/AB6AXuD-iJlWR4CUMXoY6WuY_YwUzw8gy7w27MKb1HEyCOCMb4QQukfPSRChag0GFEK6nhYi-u1o6q8v6OYhNWR3vQjib-6dbXVf8K1WFidy_DDQWsOcryfv1AOQt_gkhLDPzKFOaEseMpNWfNPtDIhoXU2xiiGvcbWfLPvYs8-ur42f0f0rQbfAON0tJxok6M7vEHBXSM7Wj3C5f4qxmH-XkYVMjznj5QZFpRzapcwmiGtRG4cU24qo8nAb"/>
+<div class="flex flex-col min-w-0">
+<span class="font-label-sm text-label-sm text-on-surface-variant">Lead Engineer</span>
+<span class="font-label-md text-label-md text-on-surface font-semibold truncate">E. Koroma</span>
+</div>
+</div>
+<div class="flex items-center gap-space-xs shrink-0">
+<span class="px-space-xs py-space-2xs rounded-full bg-primary-fixed text-on-primary-fixed font-label-sm text-label-sm font-semibold flex items-center gap-space-2xs">
+<span class="material-symbols-outlined text-[14px]">trending_up</span>
+            Burn: 41.2%
+          </span>
+<span class="font-label-sm text-label-sm text-primary font-medium">On Schedule</span>
+</div>
+</div>
+<!-- Financial Metrics Grid -->
+<div class="grid grid-cols-3 gap-space-xs bg-surface-container-low/50 p-space-xs rounded-lg">
+<div class="flex flex-col min-w-0">
+<span class="font-label-sm text-label-sm text-on-surface-variant truncate">Donor Received</span>
+<span class="font-tabular-ledger text-tabular-ledger text-on-surface font-bold mt-space-2xs truncate">NLe 4.00M</span>
+</div>
+<div class="flex flex-col min-w-0">
+<span class="font-label-sm text-label-sm text-on-surface-variant truncate">Disbursed</span>
+<span class="font-tabular-ledger text-tabular-ledger text-primary font-bold mt-space-2xs truncate">NLe 1.65M</span>
+</div>
+<div class="flex flex-col min-w-0">
+<span class="font-label-sm text-label-sm text-on-surface-variant truncate">Remaining</span>
+<span class="font-tabular-ledger text-tabular-ledger text-on-surface font-bold mt-space-2xs truncate">NLe 2.35M</span>
+</div>
+</div>
+<!-- Visual Progress Meter -->
+<div class="flex flex-col gap-space-2xs">
+<div class="h-2 w-full bg-surface-container rounded-full overflow-hidden">
+<div class="h-full bg-primary-container rounded-full" style="width: 41.2%;"></div>
+</div>
+<div class="flex justify-between font-label-sm text-label-sm text-on-surface-variant">
+<span>Executed: 41.2%</span>
+<span>Buffer: NLe 2,349,600</span>
+</div>
+</div>
+<!-- Interaction Bar: Toggle Drawer Breakdown -->
+<button class="w-full py-space-xs px-space-md rounded-lg bg-surface-container-low text-primary-container font-label-md text-label-md flex items-center justify-between hover:bg-surface-container transition-colors" onclick="toggleDrawer('breakdown-3')" type="button">
+<span class="flex items-center gap-space-xs font-semibold">
+<span class="material-symbols-outlined text-[18px]">receipt_long</span>
+          Audit Voucher Allocation Breakdown
+        </span>
+<span class="material-symbols-outlined text-[20px] transition-transform duration-200" id="icon-breakdown-3">expand_more</span>
+</button>
+<!-- Expandable Statutory Drawer Panel -->
+<div class="hidden flex-col gap-space-sm pt-space-xs" id="breakdown-3">
+<div class="bg-surface-container-low p-card-padding-compact rounded-lg flex flex-col gap-space-xs">
+<div class="flex items-center justify-between pb-space-2xs border-b border-surface-container-high">
+<span class="font-label-sm text-label-sm uppercase tracking-wider text-on-surface-variant font-bold">Expenditure Channel</span>
+<span class="font-label-sm text-label-sm uppercase tracking-wider text-on-surface-variant font-bold">Voucher Total</span>
+</div>
+<div class="flex items-center justify-between py-space-2xs">
+<div class="flex items-center gap-space-xs">
+<span class="w-2 h-2 rounded-full bg-primary shrink-0"></span>
+<span class="font-body-sm text-body-sm text-on-surface">Submersible Pumps &amp; Solar Panels</span>
+</div>
+<span class="font-tabular-ledger text-tabular-ledger font-semibold text-on-surface">NLe 920,000</span>
+</div>
+<div class="flex items-center justify-between py-space-2xs">
+<div class="flex items-center gap-space-xs">
+<span class="w-2 h-2 rounded-full bg-secondary shrink-0"></span>
+<span class="font-body-sm text-body-sm text-on-surface">Drilling Rig Transport &amp; Heavy Logistics</span>
+</div>
+<span class="font-tabular-ledger text-tabular-ledger font-semibold text-on-surface">NLe 410,400</span>
+</div>
+<div class="flex items-center justify-between py-space-2xs">
+<div class="flex items-center gap-space-xs">
+<span class="w-2 h-2 rounded-full bg-tertiary shrink-0"></span>
+<span class="font-body-sm text-body-sm text-on-surface">Hydrogeologist Field Team Allowances</span>
+</div>
+<span class="font-tabular-ledger text-tabular-ledger font-semibold text-on-surface">NLe 195,000</span>
+</div>
+<div class="flex items-center justify-between py-space-2xs">
+<div class="flex items-center gap-space-xs">
+<span class="w-2 h-2 rounded-full bg-primary-fixed-dim shrink-0"></span>
+<span class="font-body-sm text-body-sm text-on-surface">Village Water Committee Training Kits</span>
+</div>
+<span class="font-tabular-ledger text-tabular-ledger font-semibold text-on-surface">NLe 125,000</span>
+</div>
+</div>
+<div class="flex items-center justify-between px-space-xs text-on-surface-variant font-label-sm text-label-sm">
+<span class="flex items-center gap-space-2xs">
+<span class="material-symbols-outlined text-[16px] text-primary">verified</span>
+            Voucher Series: SL-KAM-2024-12W
+          </span>
+<span class="font-semibold text-primary">NLe 1,650,400 Reconciled</span>
+</div>
+</div>
+</article>
+<!-- Empty State / Filter Notice when no category matches (Hidden by default) -->
+<div class="hidden bg-surface-container-lowest p-card-padding-default rounded-xl flex-col items-center justify-center text-center gap-space-sm shadow-sm py-space-2xl" id="emptyCategoryNotice">
+<div class="w-12 h-12 rounded-full bg-surface-container flex items-center justify-center text-on-surface-variant">
+<span class="material-symbols-outlined text-[24px]">search_off</span>
+</div>
+<h3 class="font-title-md text-title-md text-on-surface font-semibold">No Direct Programs in Selection</h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant max-w-xs">Community Agriculture vouchers are scheduled for disbursement in next fiscal cycle.</p>
+<button class="px-space-md py-space-xs rounded bg-primary text-on-primary font-label-md text-label-md font-medium" onclick="resetFilters()" type="button">
+        Reset to All Programs
+      </button>
+</div>
+</section>
+<!-- Quick Action & Bank Disbursement Log Anchor -->
+<section class="bg-surface-container-lowest rounded-xl p-card-padding-default shadow-sm flex flex-col gap-space-sm">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-space-xs">
+<span class="material-symbols-outlined text-primary text-[20px]">account_balance</span>
+<span class="font-title-md text-title-md text-on-surface font-semibold">Audit Sign-off Trail</span>
+</div>
+<span class="px-space-xs py-space-2xs rounded bg-surface-container text-on-surface-variant font-label-sm text-label-sm">
+        Sierra Leone Commercial Bank (SLCB)
+      </span>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant">
+      Electronic batch disbursements match bank reconciliation code <strong class="text-on-surface">SLE-BCF-TR-8802</strong>. Last synchronized 42 minutes ago by Internal Financial Audit.
+    </p>
+<div class="flex items-center justify-between pt-space-xs">
+<div class="flex items-center gap-space-xs">
+<span class="w-2.5 h-2.5 rounded-full bg-primary"></span>
+<span class="font-label-sm text-label-sm text-on-surface font-semibold">All 4 Statutory Channels Compliant</span>
+</div>
+<button class="px-space-md py-space-xs rounded bg-surface-container-high text-on-surface font-label-md text-label-md hover:bg-surface-container transition-colors flex items-center gap-space-2xs font-semibold" type="button">
+<span class="material-symbols-outlined text-[16px]">download</span>
+        Export Ledger
+      </button>
+</div>
+</section>
+</div>
+<script>
+  function toggleDrawer(drawerId) {
+    const drawer = document.getElementById(drawerId);
+    const icon = document.getElementById('icon-' + drawerId);
+    if (!drawer) return;
+    
+    if (drawer.classList.contains('hidden')) {
+      drawer.classList.remove('hidden');
+      drawer.classList.add('flex');
+      if (icon) icon.textContent = 'expand_less';
+    } else {
+      drawer.classList.add('hidden');
+      drawer.classList.remove('flex');
+      if (icon) icon.textContent = 'expand_more';
+    }
+  }
+
+  function setupFilters() {
+    const filterButtons = document.querySelectorAll('.dept-btn');
+    const cards = document.querySelectorAll('.program-card');
+    const badge = document.getElementById('activeFilterBadge');
+    const emptyNotice = document.getElementById('emptyCategoryNotice');
+
+    filterButtons.forEach(btn => {
+      btn.addEventListener('click', () => {
+        const dept = btn.getAttribute('data-dept');
+
+        // Style updates for buttons
+        filterButtons.forEach(b => {
+          b.classList.remove('bg-primary', 'text-on-primary');
+          b.classList.add('bg-surface-container-low', 'text-on-surface-variant');
+        });
+        btn.classList.remove('bg-surface-container-low', 'text-on-surface-variant');
+        btn.classList.add('bg-primary', 'text-on-primary');
+
+        let matched = 0;
+        cards.forEach(card => {
+          const category = card.getAttribute('data-category');
+          if (dept === 'all' || dept === category) {
+            card.classList.remove('hidden');
+            card.classList.add('flex');
+            matched++;
+          } else {
+            card.classList.add('hidden');
+            card.classList.remove('flex');
+          }
+        });
+
+        if (badge) {
+          badge.textContent = dept === 'all' ? 'All (3 Displayed)' : `${matched} Program${matched === 1 ? '' : 's'}`;
+        }
+
+        if (matched === 0) {
+          emptyNotice.classList.remove('hidden');
+          emptyNotice.classList.add('flex');
+        } else {
+          emptyNotice.classList.add('hidden');
+          emptyNotice.classList.remove('flex');
+        }
+      });
+    });
+  }
+
+  function resetFilters() {
+    const allBtn = document.querySelector('.dept-btn[data-dept="all"]');
+    if (allBtn) {
+      allBtn.click();
+    }
+  }
+
+  document.addEventListener('DOMContentLoaded', setupFilters);
+  setupFilters();
+</script></main><nav class="fixed bottom-0 inset-x-0 z-50 pb-safe bg-surface/90 backdrop-blur-xl shadow-[0_-1px_12px_rgba(13,28,46,0.05)]" data-active-classes="text-primary font-bold"><div class="flex items-center justify-around h-16 px-space-xs"><a class="flex flex-col items-center justify-center flex-1 h-full py-space-xs text-on-surface-variant hover:text-on-surface transition-colors" data-path="treasury"  onclick="window.top.location.href='/finance/executive-treasury-bank-balance'; return false;" style="cursor:pointer"><span class="material-symbols-outlined text-[22px]">account_balance</span><span class="font-label-sm text-label-sm mt-space-2xs">Treasury</span></a><a class="flex flex-col items-center justify-center flex-1 h-full py-space-xs text-on-surface-variant hover:text-on-surface transition-colors" data-path="donors" href="#" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;"><span class="material-symbols-outlined text-[22px]">volunteer_activism</span><span class="font-label-sm text-label-sm mt-space-2xs">Donors</span></a><a aria-current="page" class="flex flex-col items-center justify-center flex-1 h-full py-space-xs transition-colors text-primary font-bold" data-path="programs" href="#" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;"><span class="material-symbols-outlined text-[22px]">pie_chart</span><span class="font-label-sm text-label-sm mt-space-2xs">Programs</span></a><a class="flex flex-col items-center justify-center flex-1 h-full py-space-xs text-on-surface-variant hover:text-on-surface transition-colors" data-path="payroll"  onclick="window.top.location.href='/finance/staff-payroll-statutory-schedule'; return false;" style="cursor:pointer"><span class="material-symbols-outlined text-[22px]">payments</span><span class="font-label-sm text-label-sm mt-space-2xs">Payroll</span></a><a class="flex flex-col items-center justify-center flex-1 h-full py-space-xs text-on-surface-variant hover:text-on-surface transition-colors" data-path="loans" href="#" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;"><span class="material-symbols-outlined text-[22px]">credit_score</span><span class="font-label-sm text-label-sm mt-space-2xs">Loans</span></a></div></nav></body></html>

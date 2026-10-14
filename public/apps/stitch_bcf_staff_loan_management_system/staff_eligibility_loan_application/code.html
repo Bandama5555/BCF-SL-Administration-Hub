@@ -1,0 +1,958 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover"/>
+    <title>Staff Loan Application &amp; Eligibility - BCF-SL</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: "#004328",
+                        "primary-dark": "#002b1a",
+                        "primary-light": "#0d5c3a",
+                        secondary: "#1A56DB",
+                        tertiary: "#7B2FBE",
+                        surface: "#ffffff",
+                        "surface-container": "#f8f9fc",
+                        "surface-container-high": "#eef2f6",
+                        "on-surface": "#0d1c2e",
+                        "on-surface-variant": "#4b5563",
+                        outline: "#d1d5db",
+                        error: "#dc2626",
+                        success: "#16a34a"
+                    },
+                    fontFamily: {
+                        sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+                        mono: ['"JetBrains Mono"', 'monospace']
+                    }
+                }
+            }
+        };
+    </script>
+    <style>
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #f4f6fa; }
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-thumb { background-color: #cbd5e1; border-radius: 3px; }
+        .req { color: #dc2626; }
+        .calc-box {
+            background: linear-gradient(135deg, #f0fdf4 0%, #e6f7ec 100%);
+            border: 1px solid #86efac;
+        }
+        .locked-overlay {
+            background: rgba(248, 250, 252, 0.85);
+            backdrop-filter: blur(3px);
+        }
+    </style>
+</head>
+<body class="text-on-surface flex flex-col min-h-screen">
+
+    <!-- Unified Top Navigation & 8 Tabs Bar -->
+    <div id="bcf-loans-nav-header"></div>
+
+    <main class="flex-grow p-4 sm:p-6 max-w-7xl mx-auto w-full flex flex-col gap-6">
+
+        <!-- ELIGIBILITY GATEWAY & STAFF AUTO-FILL ENGINE -->
+        <section class="bg-surface rounded-2xl border border-slate-200 shadow-sm p-5 sm:p-6">
+            <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-slate-100 pb-4">
+                <div class="flex items-center gap-3">
+                    <div class="w-12 h-12 rounded-xl bg-emerald-100 text-primary flex items-center justify-center shadow-xs">
+                        <span class="material-symbols-outlined text-2xl">verified_user</span>
+                    </div>
+                    <div>
+                        <div class="flex items-center gap-2">
+                            <h2 class="text-lg sm:text-xl font-extrabold text-slate-900 tracking-tight">Staff Loan Eligibility Engine</h2>
+                            <span class="px-2.5 py-0.5 rounded-full text-[11px] font-extrabold bg-emerald-100 text-emerald-800 border border-emerald-300">
+                                Mandated Gateway
+                            </span>
+                        </div>
+                        <p class="text-xs text-slate-500 mt-0.5">
+                            Under BCF-SL Staff Loan Policy, all staff must pass automated eligibility verification before the application form unlocks.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Staff Profile Selector -->
+                <div class="flex items-center gap-2">
+                    <label class="text-xs font-bold text-slate-600 whitespace-nowrap">Select Registered Staff:</label>
+                    <select id="staff-selector" onchange="onStaffSelected(this.value)" class="h-10 px-3 py-1 bg-slate-50 border border-slate-300 rounded-xl text-xs font-semibold focus:border-primary focus:ring-1 focus:ring-primary outline-none">
+                        <!-- Populated dynamically from bcf_staff_registry -->
+                    </select>
+                </div>
+            </div>
+
+            <!-- Profile Summary & Live Service Duration Calculation Box -->
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mt-5">
+                <div class="bg-slate-50 p-3.5 rounded-xl border border-slate-200 flex flex-col">
+                    <span class="text-[10px] font-extrabold uppercase text-slate-400">Employee Full Name</span>
+                    <span id="card-fullname" class="text-sm font-bold text-slate-800 mt-1">-</span>
+                    <span id="card-empid" class="text-[11px] font-mono text-emerald-700 font-semibold">-</span>
+                </div>
+                <div class="bg-slate-50 p-3.5 rounded-xl border border-slate-200 flex flex-col">
+                    <span class="text-[10px] font-extrabold uppercase text-slate-400">Position &amp; Department</span>
+                    <span id="card-title" class="text-sm font-bold text-slate-800 mt-1 truncate">-</span>
+                    <span id="card-dept" class="text-[11px] text-slate-500 truncate">-</span>
+                </div>
+                <div class="bg-slate-50 p-3.5 rounded-xl border border-slate-200 flex flex-col">
+                    <span class="text-[10px] font-extrabold uppercase text-slate-400">Employment Date (Day of Employment)</span>
+                    <span id="card-empdate" class="text-sm font-bold text-slate-800 mt-1">-</span>
+                    <span class="text-[10px] text-slate-400">Contract: <strong id="card-class" class="text-slate-700">-</strong></span>
+                </div>
+                <!-- AUTOMATED SERVICE DURATION BOX -->
+                <div class="calc-box p-3.5 rounded-xl flex flex-col justify-between relative overflow-hidden shadow-2xs">
+                    <div class="flex items-center justify-between">
+                        <span class="text-[10px] font-extrabold uppercase text-emerald-800 tracking-wider">Service Duration (Years)</span>
+                        <span class="material-symbols-outlined text-[18px] text-emerald-700">timer</span>
+                    </div>
+                    <div class="mt-1">
+                        <span id="calc-service-duration-box" class="text-base sm:text-lg font-extrabold text-emerald-950 font-mono">0.0 Years</span>
+                    </div>
+                    <span class="text-[10px] font-semibold text-emerald-700 mt-0.5">Automated Value (Calculated to Present Date)</span>
+                </div>
+            </div>
+
+            <!-- Eligibility Verification Checklist & Verdict -->
+            <div id="eligibility-verdict-container" class="mt-5 p-4 rounded-xl border transition-all">
+                <!-- Injected dynamically by renderEligibilityVerdict() -->
+            </div>
+        </section>
+
+
+        <!-- ========================================================================= -->
+        <!-- THE OFFICIAL BCF-SL STAFF LOAN APPLICATION FORM & APPROVAL TEMPLATE       -->
+        <!-- ========================================================================= -->
+        <section id="loan-application-section" class="relative bg-surface rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+            
+            <!-- LOCKED FORM OVERLAY (Active when ineligible) -->
+            <div id="form-lock-overlay" class="absolute inset-0 locked-overlay z-30 flex flex-col items-center justify-center p-6 text-center">
+                <div class="w-16 h-16 rounded-full bg-red-100 text-red-600 flex items-center justify-center mb-3 shadow-md border-2 border-red-300">
+                    <span class="material-symbols-outlined text-3xl">lock</span>
+                </div>
+                <span class="px-3 py-1 bg-red-600 text-white text-[11px] font-black uppercase rounded-full tracking-wider mb-2">
+                    Access Locked • Policy Restriction
+                </span>
+                <h3 class="text-xl font-extrabold text-slate-900 mb-2">Loan Application Form Locked</h3>
+                <div id="lock-reason-text" class="text-sm text-slate-700 max-w-lg mb-5 leading-relaxed bg-white/90 p-4 rounded-xl border border-red-200 shadow-sm">
+                    You have not settled and you are not eligible for another loan at this moment.
+                </div>
+                <div class="flex flex-wrap justify-center gap-3">
+                    <button type="button" onclick="selectStaffById('BCF-SL-1019')" class="px-4 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-bold transition shadow-xs flex items-center gap-1.5">
+                        <span class="material-symbols-outlined text-[18px]">verified_user</span>
+                        <span>Select Eligible Staff (Joseph Conteh - No Debt)</span>
+                    </button>
+                    <button type="button" onclick="selectStaffById('BCF-SL-1048')" class="px-4 py-2.5 bg-red-700 hover:bg-red-800 text-white rounded-xl text-xs font-bold transition shadow-xs flex items-center gap-1.5">
+                        <span class="material-symbols-outlined text-[18px]">block</span>
+                        <span>Select Staff with Unsettled Loan (Mariama Kamara)</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- FORM HEADER TEMPLATE -->
+            <div class="p-6 sm:p-8 border-b border-slate-200 bg-slate-50/50">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                    <div class="flex items-center gap-4">
+                        <img src="/bcf-logo.jpg" onerror="this.src='../bcf-logo.jpg'" alt="BCF SL Logo" class="h-14 w-auto object-contain shrink-0"/>
+                        <div>
+                            <span class="text-xs font-bold text-secondary tracking-widest uppercase">BCF SL OFFICIAL TEMPLATE</span>
+                            <h1 class="text-lg sm:text-2xl font-black text-slate-900 tracking-tight leading-tight">
+                                BANDAMA CHARITY FOUNDATION SIERRA LEONE
+                            </h1>
+                            <h2 class="text-sm sm:text-base font-bold text-primary tracking-wide">
+                                STAFF LOAN APPLICATION FORM &amp; APPROVAL TEMPLATE
+                            </h2>
+                        </div>
+                    </div>
+                    
+                    <div class="flex flex-col sm:items-end justify-center bg-white px-4 py-2.5 rounded-xl border border-slate-200 shadow-2xs">
+                        <span class="text-[10px] font-extrabold uppercase text-slate-400">Reference No.</span>
+                        <span id="form-ref-no" class="font-mono text-sm sm:text-base font-black text-primary">BCF-LN-2026-0842</span>
+                        <span class="text-[9px] text-slate-500 font-semibold">(Automatic Generation from System)</span>
+                    </div>
+                </div>
+
+                <!-- IMPORTANT INSTRUCTIONS -->
+                <div class="mt-5 p-3.5 rounded-xl bg-amber-50 border border-amber-200 text-amber-900 text-xs leading-relaxed flex items-start gap-2.5">
+                    <span class="material-symbols-outlined text-amber-600 text-[20px] shrink-0 mt-0.5">info</span>
+                    <div>
+                        <strong class="font-extrabold tracking-wide uppercase">IMPORTANT INSTRUCTIONS:</strong>
+                        Complete all fields legibly using block letters. Incomplete forms will not be processed. Attach supporting documents where required. This form is strictly confidential and for internal BCF use only.
+                    </div>
+                </div>
+            </div>
+
+            <!-- FORM BODY -->
+            <form id="staffLoanForm" onsubmit="handleFormSubmission(event)" class="p-6 sm:p-8 space-y-8">
+
+                <!-- ========================================== -->
+                <!-- SECTION A: STAFF PERSONAL & EMPLOYMENT     -->
+                <!-- ========================================== -->
+                <div class="space-y-4">
+                    <div class="flex items-center justify-between border-b-2 border-primary/20 pb-2">
+                        <div class="flex items-center gap-2">
+                            <span class="px-2 py-0.5 rounded bg-primary text-white text-xs font-black">SECTION A</span>
+                            <h3 class="text-base font-extrabold text-slate-900 uppercase tracking-tight">Staff Personal &amp; Employment Details</h3>
+                        </div>
+                        <span class="text-xs font-semibold text-slate-500">Auto-Filled from Employee Profile</span>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <!-- Full Legal Name -->
+                        <div class="flex flex-col gap-1">
+                            <label class="text-xs font-bold text-slate-700 uppercase">Full Legal Name <span class="req">*</span></label>
+                            <input type="text" id="a-fullname" oninput="syncDeclarationName(this.value)" class="h-10 px-3 uppercase font-bold text-slate-900 bg-slate-50 border border-slate-300 rounded-lg text-sm focus:border-primary outline-none" required placeholder="SURNAME FIRST MIDDLE"/>
+                        </div>
+
+                        <!-- Employee ID -->
+                        <div class="flex flex-col gap-1">
+                            <label class="text-xs font-bold text-slate-700 uppercase">Employee ID <span class="req">*</span></label>
+                            <input type="text" id="a-empid" class="h-10 px-3 font-mono font-bold text-primary bg-slate-50 border border-slate-300 rounded-lg text-sm outline-none" readonly required/>
+                        </div>
+
+                        <!-- Position / Title -->
+                        <div class="flex flex-col gap-1">
+                            <label class="text-xs font-bold text-slate-700 uppercase">Position / Title <span class="req">*</span></label>
+                            <input type="text" id="a-title" class="h-10 px-3 text-slate-800 bg-slate-50 border border-slate-300 rounded-lg text-sm focus:border-primary outline-none" required/>
+                        </div>
+
+                        <!-- Department (Dropdown) -->
+                        <div class="flex flex-col gap-1">
+                            <label class="text-xs font-bold text-slate-700 uppercase">Department <span class="req">*</span></label>
+                            <select id="a-dept" class="h-10 px-3 bg-white border border-slate-300 rounded-lg text-sm focus:border-primary outline-none" required>
+                                <option value="">Select Department...</option>
+                                <option value="Executive Management">Executive Management</option>
+                                <option value="Finance Department">Finance Department</option>
+                                <option value="Health & Safety Department">Health &amp; Safety Department</option>
+                                <option value="Human Resources Management Department">Human Resources Management Department</option>
+                                <option value="Information Technology (IT) Department">Information Technology (IT) Department</option>
+                                <option value="Internal Risk & Audits Department">Internal Risk &amp; Audits Department</option>
+                                <option value="Legal & Communication Department">Legal &amp; Communication Department</option>
+                                <option value="Procurement Department">Procurement Department</option>
+                                <option value="Programs Department">Programs Department</option>
+                            </select>
+                        </div>
+
+                        <!-- Employment Date -->
+                        <div class="flex flex-col gap-1">
+                            <label class="text-xs font-bold text-slate-700 uppercase">Employment Date <span class="req">*</span></label>
+                            <input type="date" id="a-empdate" onchange="onEmploymentDateChanged(this.value)" class="h-10 px-3 bg-white border border-slate-300 rounded-lg text-sm focus:border-primary outline-none" required/>
+                        </div>
+
+                        <!-- Total Years of Service (Automated value in box) -->
+                        <div class="flex flex-col gap-1">
+                            <label class="text-xs font-bold text-emerald-800 uppercase flex items-center justify-between">
+                                <span>Total Years of Service <span class="req">*</span></span>
+                                <span class="text-[10px] text-emerald-600 font-bold">AUTOMATED BOX</span>
+                            </label>
+                            <div class="h-10 px-3 rounded-lg border border-emerald-400 bg-emerald-50 text-emerald-950 font-mono font-extrabold text-sm flex items-center justify-between">
+                                <span id="a-service-years">0.0 Years</span>
+                                <span class="material-symbols-outlined text-[18px] text-emerald-600">check_circle</span>
+                            </div>
+                        </div>
+
+                        <!-- Classification Type (Dropdown) -->
+                        <div class="flex flex-col gap-1">
+                            <label class="text-xs font-bold text-slate-700 uppercase">Classification Type <span class="req">*</span></label>
+                            <select id="a-class" class="h-10 px-3 bg-white border border-slate-300 rounded-lg text-sm focus:border-primary outline-none" required>
+                                <option value="">Select Classification...</option>
+                                <option value="Permanent">Permanent</option>
+                                <option value="Fixed-Term Contract">Fixed-Term Contract</option>
+                                <option value="Part-Time">Part-Time</option>
+                                <option value="Casual">Casual</option>
+                                <option value="Consultant">Consultant</option>
+                                <option value="Volunteer">Volunteer</option>
+                                <option value="Intern">Intern</option>
+                            </select>
+                        </div>
+
+                        <!-- Phone -->
+                        <div class="flex flex-col gap-1">
+                            <label class="text-xs font-bold text-slate-700 uppercase">Phone <span class="req">*</span></label>
+                            <input type="tel" id="a-phone" class="h-10 px-3 bg-white border border-slate-300 rounded-lg text-sm focus:border-primary outline-none" required placeholder="+232..."/>
+                        </div>
+
+                        <!-- Email -->
+                        <div class="flex flex-col gap-1">
+                            <label class="text-xs font-bold text-slate-700 uppercase">Email <span class="req">*</span></label>
+                            <input type="email" id="a-email" class="h-10 px-3 bg-white border border-slate-300 rounded-lg text-sm focus:border-primary outline-none" required placeholder="user@bcf-sl.org"/>
+                        </div>
+
+                        <!-- Multiplier Category (Dropdown) -->
+                        <div class="flex flex-col gap-1">
+                            <label class="text-xs font-bold text-slate-700 uppercase">Multiplier Category <span class="req">*</span></label>
+                            <select id="a-multiplier-cat" onchange="recalculateCeilingAndDeduction()" class="h-10 px-3 bg-emerald-50/70 border border-emerald-300 text-emerald-950 font-bold rounded-lg text-sm focus:border-primary outline-none" required>
+                                <option value="Officer">1. Officer</option>
+                                <option value="Manager/Assistant Manager">2. Manager/Assistant Manager</option>
+                                <option value="Director">3. Director</option>
+                                <option value="CEO/Governing Board">4. CEO/Governing Board</option>
+                            </select>
+                        </div>
+
+                        <!-- Monthly Basic Salary -->
+                        <div class="flex flex-col gap-1 md:col-span-2">
+                            <label class="text-xs font-bold text-slate-700 uppercase">Monthly Basic Salary (NLe) <span class="req">*</span></label>
+                            <div class="relative">
+                                <span class="absolute left-3 top-2.5 font-bold text-xs text-slate-400">NLe</span>
+                                <input type="number" step="0.01" id="a-salary" oninput="recalculateCeilingAndDeduction()" class="h-10 pl-11 pr-3 w-full bg-white border border-slate-300 rounded-lg text-sm font-mono font-bold text-slate-900 focus:border-primary outline-none" required placeholder="e.g. 8500.00"/>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ========================================== -->
+                <!-- SECTION B: LOAN REQUEST DETAILS           -->
+                <!-- ========================================== -->
+                <div class="space-y-4 pt-4 border-t border-slate-200">
+                    <div class="flex items-center justify-between border-b-2 border-secondary/20 pb-2">
+                        <div class="flex items-center gap-2">
+                            <span class="px-2 py-0.5 rounded bg-secondary text-white text-xs font-black">SECTION B</span>
+                            <h3 class="text-base font-extrabold text-slate-900 uppercase tracking-tight">Loan Request Details</h3>
+                        </div>
+                        <span class="text-xs font-semibold text-secondary">Repayment &amp; Deduction Terms</span>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <!-- Loan Amount Requested -->
+                        <div class="flex flex-col gap-1">
+                            <label class="text-xs font-bold text-slate-700 uppercase">Loan Amount Requested (NLe) <span class="req">*</span></label>
+                            <div class="relative">
+                                <span class="absolute left-3 top-2.5 font-bold text-xs text-slate-400">NLe</span>
+                                <input type="number" step="100" min="500" id="b-amount" oninput="onLoanAmountInput(this.value)" class="h-10 pl-11 pr-3 w-full bg-white border border-slate-300 rounded-lg text-sm font-mono font-bold text-primary focus:border-primary outline-none" required placeholder="e.g. 8500.00"/>
+                            </div>
+                        </div>
+
+                        <!-- Loan Category Range (Per Policy Tier) (Dropdown) -->
+                        <div class="flex flex-col gap-1 md:col-span-2">
+                            <label class="text-xs font-bold text-slate-700 uppercase">Loan Category Range (Per Policy Tier) <span class="req">*</span></label>
+                            <select id="b-category-tier" class="h-10 px-3 bg-white border border-slate-300 rounded-lg text-sm focus:border-primary outline-none" required>
+                                <option value="Tier 1: Emergency & Welfare Advance (Up to NLe 5,000)">Tier 1: Emergency &amp; Welfare Advance (Up to NLe 5,000)</option>
+                                <option value="Tier 2: Medical & Personal Development (NLe 5,001 - NLe 10,000)" selected>Tier 2: Medical &amp; Personal Development (NLe 5,001 - NLe 10,000)</option>
+                                <option value="Tier 3: Education & Family Welfare (NLe 10,001 - NLe 20,000)">Tier 3: Education &amp; Family Welfare (NLe 10,001 - NLe 20,000)</option>
+                                <option value="Tier 4: Senior Executive Facility (Above NLe 20,000)">Tier 4: Senior Executive Facility (Above NLe 20,000)</option>
+                            </select>
+                        </div>
+
+                        <!-- Specific Purpose of Loan -->
+                        <div class="flex flex-col gap-1 md:col-span-3">
+                            <label class="text-xs font-bold text-slate-700 uppercase">Specific Purpose of Loan <span class="req">*</span></label>
+                            <textarea id="b-purpose" rows="2" class="p-3 bg-white border border-slate-300 rounded-lg text-sm focus:border-primary outline-none" required placeholder="State exact welfare, educational, family or medical need for the requested credit facility..."></textarea>
+                        </div>
+
+                        <!-- Proposed Repayment Period -->
+                        <div class="flex flex-col gap-1">
+                            <label class="text-xs font-bold text-slate-700 uppercase">Proposed Repayment Period</label>
+                            <div class="h-10 px-3 bg-slate-100 border border-slate-200 rounded-lg text-sm font-bold text-slate-800 flex items-center justify-between">
+                                <span>10 Months</span>
+                                <span class="material-symbols-outlined text-[18px] text-slate-400">calendar_month</span>
+                            </div>
+                        </div>
+
+                        <!-- Applicable Rate -->
+                        <div class="flex flex-col gap-1">
+                            <label class="text-xs font-bold text-slate-700 uppercase">Applicable Rate</label>
+                            <div class="h-10 px-3 bg-slate-100 border border-slate-200 rounded-lg text-sm font-bold text-emerald-800 flex items-center justify-between">
+                                <span>10% (Fixed — per BCF Staff Loan Policy)</span>
+                                <span class="material-symbols-outlined text-[18px] text-emerald-600">verified</span>
+                            </div>
+                        </div>
+
+                        <!-- Proposed Monthly Deduction (NLe) (Automatic Calculation) -->
+                        <div class="flex flex-col gap-1">
+                            <label class="text-xs font-bold text-primary uppercase flex items-center justify-between">
+                                <span>Proposed Monthly Deduction (NLe)</span>
+                                <span class="text-[10px] text-emerald-600 font-bold">10% OF LOAN AMOUNT</span>
+                            </label>
+                            <div class="h-10 px-3 bg-emerald-50 border border-emerald-400 rounded-lg text-sm font-mono font-extrabold text-emerald-950 flex items-center justify-between shadow-2xs">
+                                <span id="b-calc-monthly-deduction">NLe 0.00</span>
+                                <span class="text-[11px] font-sans font-bold text-emerald-700">Automatic calculation</span>
+                            </div>
+                        </div>
+
+                        <!-- Date of Application -->
+                        <div class="flex flex-col gap-1">
+                            <label class="text-xs font-bold text-slate-700 uppercase">Date of Application <span class="req">*</span></label>
+                            <input type="date" id="b-appdate" class="h-10 px-3 bg-white border border-slate-300 rounded-lg text-sm focus:border-primary outline-none" required/>
+                        </div>
+
+                        <!-- Previous Loan Reference (if any) -->
+                        <div class="flex flex-col gap-1 md:col-span-2">
+                            <label class="text-xs font-bold text-slate-700 uppercase">Previous Loan Reference (if any) <span class="req">*</span></label>
+                            <select id="b-prev-ref" class="h-10 px-3 bg-white border border-slate-300 rounded-lg text-sm focus:border-primary outline-none" required>
+                                <option value="None">None</option>
+                                <option value="Fully Settled" selected>Fully Settled</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ========================================== -->
+                <!-- SECTION C: APPLICANT'S DECLARATION         -->
+                <!-- ========================================== -->
+                <div class="space-y-4 pt-4 border-t border-slate-200">
+                    <div class="flex items-center justify-between border-b-2 border-tertiary/20 pb-2">
+                        <div class="flex items-center gap-2">
+                            <span class="px-2 py-0.5 rounded bg-tertiary text-white text-xs font-black">SECTION C</span>
+                            <h3 class="text-base font-extrabold text-slate-900 uppercase tracking-tight">Applicant's Declaration &amp; Consent</h3>
+                        </div>
+                        <span class="text-xs font-semibold text-tertiary">Legal Acknowledgment &amp; Payroll Deduction</span>
+                    </div>
+
+                    <!-- Preamble with Automated Full Legal Name -->
+                    <div class="p-4 rounded-xl bg-purple-50/70 border border-purple-200 text-sm text-purple-950 leading-relaxed">
+                        I, <strong id="c-declaration-name" class="font-black text-purple-900 uppercase text-base underline decoration-purple-400 underline-offset-2">[FULL LEGAL NAME]</strong>, hereby formally apply for a staff loan from Bandama Charity Foundation Sierra Leone (BCF). I solemnly confirm that:
+                    </div>
+
+                    <!-- AGGRED & ACCEPTANCE Checkboxes -->
+                    <div class="space-y-3 bg-slate-50 p-4 rounded-xl border border-slate-200">
+                        <span class="text-xs font-extrabold uppercase text-slate-700 tracking-wider flex items-center gap-1.5">
+                            <span class="material-symbols-outlined text-emerald-600 text-[18px]">check_box</span>
+                            AGREED &amp; ACCEPTANCE (Required - Tick each one)
+                        </span>
+
+                        <label class="flex items-start gap-3 p-2.5 rounded-lg bg-white border border-slate-200 hover:border-primary/40 cursor-pointer transition select-none">
+                            <input type="checkbox" id="chk-1" class="mt-0.5 w-4 h-4 rounded text-primary focus:ring-primary accent-primary" required/>
+                            <span class="text-xs text-slate-700 leading-snug">
+                                All information provided in this form is true, complete, and accurate to the best of my knowledge.
+                            </span>
+                        </label>
+
+                        <label class="flex items-start gap-3 p-2.5 rounded-lg bg-white border border-slate-200 hover:border-primary/40 cursor-pointer transition select-none">
+                            <input type="checkbox" id="chk-2" class="mt-0.5 w-4 h-4 rounded text-primary focus:ring-primary accent-primary" required/>
+                            <span class="text-xs text-slate-700 leading-snug">
+                                I have read, understood, and agree to comply with the BCF Staff Loan Policy and all applicable repayment terms.
+                            </span>
+                        </label>
+
+                        <label class="flex items-start gap-3 p-2.5 rounded-lg bg-white border border-slate-200 hover:border-primary/40 cursor-pointer transition select-none">
+                            <input type="checkbox" id="chk-3" class="mt-0.5 w-4 h-4 rounded text-primary focus:ring-primary accent-primary" required/>
+                            <span class="text-xs text-slate-700 leading-snug">
+                                I authorise BCF to deduct the agreed monthly repayment amount from my salary for the full duration of the loan repayment period.
+                            </span>
+                        </label>
+
+                        <label class="flex items-start gap-3 p-2.5 rounded-lg bg-white border border-slate-200 hover:border-primary/40 cursor-pointer transition select-none">
+                            <input type="checkbox" id="chk-4" class="mt-0.5 w-4 h-4 rounded text-primary focus:ring-primary accent-primary" required/>
+                            <span class="text-xs text-slate-700 leading-snug">
+                                I acknowledge that any default on repayment obligations may result in disciplinary proceedings or financial recovery action in line with BCF policy.
+                            </span>
+                        </label>
+
+                        <label class="flex items-start gap-3 p-2.5 rounded-lg bg-white border border-slate-200 hover:border-primary/40 cursor-pointer transition select-none">
+                            <input type="checkbox" id="chk-5" class="mt-0.5 w-4 h-4 rounded text-primary focus:ring-primary accent-primary" required/>
+                            <span class="text-xs text-slate-700 leading-snug">
+                                I understand that any outstanding loan balance shall be deducted from my End of Service (EOS) benefits upon exit from the organisation.
+                            </span>
+                        </label>
+                    </div>
+
+                    <!-- Digital Signature & Date -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2">
+                        <div class="p-3 bg-slate-50 rounded-xl border border-slate-200 flex flex-col justify-between">
+                            <span class="text-[10px] font-extrabold uppercase text-slate-400">Applicant Digital Signature</span>
+                            <span id="sig-display" class="font-serif italic font-bold text-lg text-primary mt-2">Mariama Kamara</span>
+                            <span class="text-[10px] text-slate-400 font-mono mt-1">Authenticated MFA SSO Session</span>
+                        </div>
+                        <div class="p-3 bg-slate-50 rounded-xl border border-slate-200 flex flex-col justify-between">
+                            <span class="text-[10px] font-extrabold uppercase text-slate-400">Timestamp</span>
+                            <span id="sig-date" class="font-mono text-sm font-bold text-slate-700 mt-2">03-Oct-2026</span>
+                            <span class="text-[10px] text-emerald-700 font-semibold mt-1">Dispatches Email Notification to HR Director</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- SUBMISSION BUTTONS -->
+                <div class="pt-6 border-t border-slate-200 flex flex-col sm:flex-row items-center justify-between gap-4">
+                    <div class="flex items-center gap-2 text-xs text-slate-500">
+                        <span class="material-symbols-outlined text-primary text-[18px]">outgoing_mail</span>
+                        <span>Upon submission, an official email notification is automatically dispatched to the HR Director for verification.</span>
+                    </div>
+
+                    <div class="flex items-center gap-3 w-full sm:w-auto">
+                        <button type="submit" id="btn-submit-app" class="w-full sm:w-auto px-6 py-3 bg-primary hover:bg-primary-dark text-white font-extrabold text-sm rounded-xl transition shadow-md flex items-center justify-center gap-2 active:scale-95">
+                            <span class="material-symbols-outlined text-[20px]">send</span>
+                            <span>Submit Staff Loan Application</span>
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </section>
+    </main>
+
+    <!-- Shared Library -->
+    <script src="../bcf_loans_shared.js"></script>
+
+    <script>
+        let selectedStaff = null;
+        let eligibilityResult = null;
+
+        document.addEventListener('DOMContentLoaded', () => {
+            // Render top bar & 8 tabs
+            BCF_LOANS.renderHeaderAndTabs('loan-application');
+
+            // Set current date
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('b-appdate').value = today;
+            document.getElementById('sig-date').textContent = new Date().toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
+
+            // Initialize Staff Selector
+            populateStaffDropdown();
+        });
+
+        function populateStaffDropdown() {
+            const registry = BCF_LOANS.getStaffRegistry();
+            const select = document.getElementById('staff-selector');
+            select.innerHTML = '';
+
+            registry.forEach((staff, idx) => {
+                const opt = document.createElement('option');
+                opt.value = staff.employeeId;
+                const check = BCF_LOANS.checkEligibility(staff);
+                let tag = "";
+                if (check.unsettledLoan) {
+                    tag = " [UNSETTLED LOAN - LOCKED]";
+                } else if (!check.checks.serviceRequirementPassed) {
+                    tag = ` [INELIGIBLE: SERVICE ${check.duration ? check.duration.years : 0} YR < 1.0 YR]`;
+                } else if (check.eligible) {
+                    tag = " [ELIGIBLE - UNLOCKED]";
+                } else {
+                    tag = " [INELIGIBLE]";
+                }
+                opt.textContent = `${staff.fullName} (${staff.employeeId} - ${staff.department})${tag}`;
+                select.appendChild(opt);
+            });
+
+            // Check if there is an active application staff or default to first
+            const activeApp = BCF_LOANS.getActiveLoanApplication();
+            if (activeApp && activeApp.staff && activeApp.staff.employeeId) {
+                select.value = activeApp.staff.employeeId;
+            }
+
+            onStaffSelected(select.value);
+        }
+
+        function onStaffSelected(empId) {
+            const registry = BCF_LOANS.getStaffRegistry();
+            const staff = registry.find(s => s.employeeId === empId);
+            if (!staff) return;
+
+            selectedStaff = staff;
+
+            const todayStr = new Date().toISOString().split('T')[0];
+            const effectiveEmpDate = staff.empDate || staff.employmentDate || staff.registrationDate || todayStr;
+
+            // 1. Update Profile Card
+            document.getElementById('card-fullname').textContent = staff.fullName || '-';
+            document.getElementById('card-empid').textContent = staff.employeeId || '-';
+            document.getElementById('card-title').textContent = staff.title || '-';
+            document.getElementById('card-dept').textContent = staff.department || '-';
+            document.getElementById('card-empdate').textContent = effectiveEmpDate;
+            document.getElementById('card-class').textContent = staff.classification || 'Permanent';
+
+            // 2. Automated Service Duration calculation
+            const duration = BCF_LOANS.calculateServiceDuration(effectiveEmpDate);
+            document.getElementById('calc-service-duration-box').textContent = duration.text;
+
+            // 3. Evaluate Eligibility Check First
+            eligibilityResult = BCF_LOANS.checkEligibility(staff);
+            renderEligibilityVerdict(eligibilityResult, staff, duration);
+
+            // 4. Auto-fill Section A
+            populateSectionA(staff, duration);
+        }
+
+        function renderEligibilityVerdict(res, staff, duration) {
+            const container = document.getElementById('eligibility-verdict-container');
+            const overlay = document.getElementById('form-lock-overlay');
+            const lockReason = document.getElementById('lock-reason-text');
+            const submitBtn = document.getElementById('btn-submit-app');
+
+            const isUnsettled = !res.checks.loanAccountCleanPassed || !!res.unsettledLoan;
+            const unsettled = res.unsettledLoan;
+            const effectiveDate = res.effectiveEmpDate || staff.empDate || staff.employmentDate || staff.registrationDate || new Date().toISOString().split('T')[0];
+
+            if (res.eligible) {
+                // ELIGIBLE
+                const settledLoans = (res.checks && res.checks.settledLoans) || [];
+                const hasSettledHistory = settledLoans.length > 0;
+                const settledNote = hasSettledHistory 
+                    ? `Previous Loan Cleared: <strong>${settledLoans[0].refNo}</strong> (Fully Settled)` 
+                    : `Clean Account: <strong>Zero Outstanding Debt</strong>`;
+
+                container.className = "mt-5 p-4 rounded-xl border border-emerald-300 bg-emerald-50/70 text-slate-800 transition-all flex flex-col gap-3";
+                container.innerHTML = `
+                    <div class="flex items-center justify-between flex-wrap gap-2">
+                        <div class="flex items-center gap-2 text-emerald-800 font-extrabold text-sm sm:text-base">
+                            <span class="material-symbols-outlined text-2xl text-emerald-600">check_circle</span>
+                            <span>ELIGIBLE FOR BCF-SL STAFF LOAN APPLICATION</span>
+                        </div>
+                        <span class="px-3 py-1 rounded-full text-xs font-black bg-emerald-600 text-white uppercase tracking-wider">
+                            Application Form Unlocked
+                        </span>
+                    </div>
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-2.5 text-xs text-slate-700 pt-1">
+                        <div class="flex items-center gap-2 bg-white/80 p-2 rounded-lg border border-emerald-200">
+                            <span class="material-symbols-outlined text-emerald-600 text-[18px]">verified</span>
+                            <span>Service Duration: <strong>${duration.years} Yrs</strong> (&gt;= 1.0 Yr Required)</span>
+                        </div>
+                        <div class="flex items-center gap-2 bg-white/80 p-2 rounded-lg border border-emerald-200">
+                            <span class="material-symbols-outlined text-emerald-600 text-[18px]">verified</span>
+                            <span>Active Contract: <strong>${staff.classification}</strong></span>
+                        </div>
+                        <div class="flex items-center gap-2 bg-white/80 p-2 rounded-lg border border-emerald-200">
+                            <span class="material-symbols-outlined text-emerald-600 text-[18px]">verified</span>
+                            <span>${settledNote}</span>
+                        </div>
+                    </div>
+                    ${hasSettledHistory ? `
+                    <div class="p-2.5 bg-emerald-100/70 border border-emerald-300 rounded-lg text-xs text-emerald-900 flex items-center gap-2">
+                        <span class="material-symbols-outlined text-emerald-700 text-[18px]">history_edu</span>
+                        <span>Employee has settled previous facility <strong>${settledLoans[0].refNo}</strong>. Eligible to apply for another credit facility under BCF-SL policy.</span>
+                    </div>
+                    ` : ''}
+                `;
+
+                // UNLOCK FORM
+                if (overlay) overlay.classList.add('hidden');
+                if (submitBtn) {
+                    submitBtn.disabled = false;
+                    submitBtn.classList.remove('opacity-40', 'cursor-not-allowed', 'pointer-events-none');
+                }
+
+                // Auto-fill previous loan ref if settled
+                if (hasSettledHistory) {
+                    const prevRefInput = document.getElementById('b-prev-ref');
+                    if (prevRefInput && !prevRefInput.value) {
+                        prevRefInput.value = settledLoans[0].refNo;
+                    }
+                }
+            } else {
+                // NOT ELIGIBLE
+                container.className = "mt-5 p-5 rounded-2xl border-2 border-red-500 bg-red-50 text-slate-800 transition-all flex flex-col gap-4 shadow-sm";
+
+                if (isUnsettled) {
+                    const outBal = unsettled ? Number(unsettled.outstandingBalance || 0).toLocaleString('en-US', { minimumFractionDigits: 2 }) : '0.00';
+                    const refNo = unsettled ? unsettled.refNo : 'Active Debt';
+                    const monthsPaid = unsettled ? (unsettled.monthsPaid || 0) : 0;
+                    const totalMonths = unsettled ? (unsettled.totalMonths || 10) : 10;
+
+                    container.innerHTML = `
+                        <div class="flex items-start justify-between flex-wrap gap-2">
+                            <div class="flex items-start gap-3">
+                                <div class="w-10 h-10 rounded-xl bg-red-600 text-white flex items-center justify-center shrink-0 shadow-sm">
+                                    <span class="material-symbols-outlined text-2xl">block</span>
+                                </div>
+                                <div>
+                                    <div class="flex items-center gap-2">
+                                        <span class="px-2 py-0.5 rounded text-[10px] font-black uppercase tracking-wider bg-red-600 text-white">Policy Restriction</span>
+                                        <span class="text-xs font-bold text-red-700 uppercase">Single Active Loan Facility Rule</span>
+                                    </div>
+                                    <h3 class="text-base sm:text-lg font-black text-red-900 mt-1">
+                                        You have not settled and you are not eligible for another loan at this moment.
+                                    </h3>
+                                </div>
+                            </div>
+                            <span class="px-3 py-1.5 rounded-full text-xs font-black bg-red-700 text-white uppercase tracking-wider flex items-center gap-1.5 shadow-xs">
+                                <span class="material-symbols-outlined text-[16px]">lock</span>
+                                <span>Form Locked</span>
+                            </span>
+                        </div>
+
+                        <!-- Unsettled Loan Ledger Snapshot -->
+                        <div class="bg-white p-3.5 rounded-xl border border-red-200 shadow-2xs grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs">
+                            <div>
+                                <span class="text-[10px] font-extrabold uppercase text-slate-400 block">Existing Loan Ref</span>
+                                <span class="font-mono font-black text-slate-900 text-sm">${refNo}</span>
+                            </div>
+                            <div>
+                                <span class="text-[10px] font-extrabold uppercase text-slate-400 block">Outstanding Balance</span>
+                                <span class="font-mono font-black text-red-600 text-sm">NLe ${outBal}</span>
+                            </div>
+                            <div>
+                                <span class="text-[10px] font-extrabold uppercase text-slate-400 block">Amortization Progress</span>
+                                <span class="font-bold text-slate-700 text-sm">Month ${monthsPaid} of ${totalMonths}</span>
+                            </div>
+                            <div>
+                                <span class="text-[10px] font-extrabold uppercase text-slate-400 block">Facility Status</span>
+                                <span class="inline-block px-2 py-0.5 rounded text-[10px] font-black uppercase bg-amber-100 text-amber-800">${unsettled ? unsettled.status : 'ACTIVE'}</span>
+                            </div>
+                        </div>
+
+                        <div class="p-3 bg-red-100/70 border border-red-300 rounded-xl text-xs text-red-900 flex items-start gap-2 leading-relaxed">
+                            <span class="material-symbols-outlined text-red-700 text-[18px] shrink-0 mt-0.5">warning</span>
+                            <span>
+                                <strong>BCF-SL Loan Regulation:</strong> Under Bandama Charity Foundation Sierra Leone Loan Policy, an employee can only apply for another loan if he/she had settled the previous loan. If the loan is not settled, the employee cannot apply for another loan.
+                            </span>
+                        </div>
+                    `;
+
+                    // LOCK OVERLAY MESSAGE
+                    if (lockReason) {
+                        lockReason.innerHTML = `
+                            <div class="space-y-2">
+                                <div class="p-3 bg-red-100 border border-red-300 rounded-xl text-red-900 font-extrabold text-sm sm:text-base leading-snug">
+                                    You have not settled and you are not eligible for another loan at this moment.
+                                </div>
+                                <p class="text-xs text-slate-600 leading-relaxed">
+                                    Staff member <strong>${staff.fullName}</strong> (${staff.employeeId}) has an active unsettled loan (<strong>${refNo}</strong>) with an outstanding balance of <strong class="text-red-600">NLe ${outBal}</strong>.
+                                </p>
+                                <p class="text-[11px] text-slate-500">
+                                    Please clear your balance in <strong>Payroll Integration & Monthly Deductions</strong> before applying for a new loan.
+                                </p>
+                            </div>
+                        `;
+                    }
+                } else if (!res.checks.serviceRequirementPassed) {
+                    const monthsRem = res.checks.monthsRemaining || Math.max(1, 12 - (duration.totalMonths || 0));
+                    container.innerHTML = `
+                        <div class="flex items-start justify-between flex-wrap gap-2">
+                            <div class="flex items-start gap-3">
+                                <div class="w-10 h-10 rounded-xl bg-amber-500 text-white flex items-center justify-center shrink-0 shadow-sm">
+                                    <span class="material-symbols-outlined text-2xl">hourglass_bottom</span>
+                                </div>
+                                <div>
+                                    <div class="flex items-center gap-2">
+                                        <span class="px-2 py-0.5 rounded text-[10px] font-black uppercase tracking-wider bg-amber-500 text-white">Policy Restriction</span>
+                                        <span class="text-xs font-bold text-amber-800 uppercase">1-Year Service Requirement</span>
+                                    </div>
+                                    <h3 class="text-base sm:text-lg font-black text-amber-950 mt-1">
+                                        Staff is not eligible: Minimum 1 year continuous service required from Employment Date.
+                                    </h3>
+                                </div>
+                            </div>
+                            <span class="px-3 py-1.5 rounded-full text-xs font-black bg-amber-600 text-white uppercase tracking-wider flex items-center gap-1.5 shadow-xs">
+                                <span class="material-symbols-outlined text-[16px]">lock</span>
+                                <span>Form Locked</span>
+                            </span>
+                        </div>
+
+                        <!-- Service Duration & Eligibility Breakdown -->
+                        <div class="bg-white p-3.5 rounded-xl border border-amber-200 shadow-2xs grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs">
+                            <div>
+                                <span class="text-[10px] font-extrabold uppercase text-slate-400 block">Employment Date</span>
+                                <span class="font-mono font-black text-slate-900 text-sm">${effectiveDate}</span>
+                            </div>
+                            <div>
+                                <span class="text-[10px] font-extrabold uppercase text-slate-400 block">Elapsed Service</span>
+                                <span class="font-mono font-black text-amber-700 text-sm">${duration.text}</span>
+                            </div>
+                            <div>
+                                <span class="text-[10px] font-extrabold uppercase text-slate-400 block">Policy Threshold</span>
+                                <span class="font-bold text-slate-700 text-sm">1.0 Year (12 Mos)</span>
+                            </div>
+                            <div>
+                                <span class="text-[10px] font-extrabold uppercase text-slate-400 block">Waiting Period</span>
+                                <span class="inline-block px-2 py-0.5 rounded text-[10px] font-black uppercase bg-amber-100 text-amber-800">${monthsRem} Month(s) Left</span>
+                            </div>
+                        </div>
+
+                        <div class="p-3 bg-amber-100/70 border border-amber-300 rounded-xl text-xs text-amber-950 flex items-start gap-2 leading-relaxed">
+                            <span class="material-symbols-outlined text-amber-700 text-[18px] shrink-0 mt-0.5">info</span>
+                            <span>
+                                <strong>BCF-SL Loan Policy Governance:</strong> The Employment Date is effective from the date of staff registration. All staff must complete a minimum of twelve (12) continuous months of service before becoming eligible to apply for a BCF-SL credit facility.
+                            </span>
+                        </div>
+                    `;
+
+                    if (lockReason) {
+                        lockReason.innerHTML = `
+                            <div class="space-y-2">
+                                <div class="p-3 bg-amber-100 border border-amber-300 rounded-xl text-amber-950 font-extrabold text-sm sm:text-base leading-snug">
+                                    Ineligible for Loan: Minimum 1 Continuous Year of Service Required
+                                </div>
+                                <p class="text-xs text-slate-600 leading-relaxed">
+                                    Staff member <strong>${staff.fullName}</strong> has Employment Date <strong>${effectiveDate}</strong> (effective from registration). Current service duration is <strong>${duration.text}</strong>.
+                                </p>
+                                <p class="text-[11px] text-amber-800 font-bold">
+                                    Required waiting period: ${monthsRem} more month(s) until loan eligibility becomes active.
+                                </p>
+                            </div>
+                        `;
+                    }
+                } else {
+                    container.innerHTML = `
+                        <div class="flex items-center justify-between flex-wrap gap-2">
+                            <div class="flex items-center gap-2 text-red-700 font-extrabold text-sm sm:text-base">
+                                <span class="material-symbols-outlined text-2xl text-red-600">error</span>
+                                <span>NOT ELIGIBLE PER BCF-SL LOAN POLICY</span>
+                            </div>
+                            <span class="px-3 py-1 rounded-full text-xs font-black bg-red-600 text-white uppercase tracking-wider">
+                                Form Locked
+                            </span>
+                        </div>
+                        <div class="bg-white/80 p-3 rounded-lg border border-red-200 text-xs text-red-800 space-y-1">
+                            <strong>Reason(s) for Ineligibility:</strong>
+                            <ul class="list-disc list-inside space-y-0.5">
+                                ${res.reasons.map(r => `<li>${r}</li>`).join('')}
+                            </ul>
+                        </div>
+                    `;
+
+                    if (lockReason) {
+                        lockReason.innerHTML = `
+                            <div class="space-y-2">
+                                <div class="p-3 bg-red-100 border border-red-300 rounded-xl text-red-900 font-extrabold text-sm">
+                                    ${res.reasons.join(' ')}
+                                </div>
+                            </div>
+                        `;
+                    }
+                }
+
+                // LOCK FORM
+                if (overlay) overlay.classList.remove('hidden');
+                if (submitBtn) {
+                    submitBtn.disabled = true;
+                    submitBtn.classList.add('opacity-40', 'cursor-not-allowed', 'pointer-events-none');
+                }
+            }
+        }
+
+        function populateSectionA(staff, duration) {
+            document.getElementById('a-fullname').value = (staff.fullName || '').toUpperCase();
+            document.getElementById('a-empid').value = staff.employeeId || '';
+            document.getElementById('a-title').value = staff.title || '';
+            const normalizedDept = BCF_LOANS.normalizeDepartment ? BCF_LOANS.normalizeDepartment(staff.department) : (staff.department || '');
+            document.getElementById('a-dept').value = normalizedDept;
+
+            const todayStr = new Date().toISOString().split('T')[0];
+            const effectiveEmpDate = staff.empDate || staff.employmentDate || staff.registrationDate || todayStr;
+            document.getElementById('a-empdate').value = effectiveEmpDate;
+            document.getElementById('a-service-years').textContent = duration.text;
+            document.getElementById('a-class').value = staff.classification || 'Permanent';
+            document.getElementById('a-phone').value = staff.phone || staff.workPhone || '';
+            document.getElementById('a-email').value = staff.email || staff.workEmail || '';
+            document.getElementById('a-multiplier-cat').value = staff.multiplierCategory || 'Officer';
+            document.getElementById('a-salary').value = parseFloat(staff.payBasic || 8500).toFixed(2);
+
+            syncDeclarationName(staff.fullName);
+
+            // Populate Section B Defaults
+            const requestedAmt = parseFloat(staff.payBasic || 8500);
+            document.getElementById('b-amount').value = requestedAmt;
+            onLoanAmountInput(requestedAmt);
+        }
+
+        function syncDeclarationName(val) {
+            document.getElementById('c-declaration-name').textContent = val ? val.toUpperCase() : '[FULL LEGAL NAME]';
+            document.getElementById('sig-display').textContent = val || 'Applicant';
+        }
+
+        function onEmploymentDateChanged(newDateStr) {
+            const duration = BCF_LOANS.calculateServiceDuration(newDateStr);
+            document.getElementById('calc-service-duration-box').textContent = duration.text;
+            document.getElementById('a-service-years').textContent = duration.text;
+
+            if (selectedStaff) {
+                selectedStaff.empDate = newDateStr;
+                selectedStaff.employmentDate = newDateStr;
+                eligibilityResult = BCF_LOANS.checkEligibility(selectedStaff);
+                renderEligibilityVerdict(eligibilityResult, selectedStaff, duration);
+            }
+        }
+
+        // Automatic Monthly Deduction Calculation: 10% of Loan Amount Requested
+        function onLoanAmountInput(val) {
+            const amount = parseFloat(val) || 0;
+            const monthlyDeduction = (amount * 0.10); // 10% Fixed per BCF Staff Loan Policy
+            document.getElementById('b-calc-monthly-deduction').textContent = 'NLe ' + monthlyDeduction.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+        }
+
+        function recalculateCeilingAndDeduction() {
+            const amt = document.getElementById('b-amount').value;
+            onLoanAmountInput(amt);
+        }
+
+        function selectStaffById(empId) {
+            const select = document.getElementById('staff-selector');
+            if (select) {
+                select.value = empId;
+                onStaffSelected(empId);
+            }
+        }
+
+        function selectEligibleDemoStaff() {
+            selectStaffById('BCF-SL-1019'); // Joseph Conteh (Eligible - No Debt)
+        }
+
+        function handleFormSubmission(e) {
+            e.preventDefault();
+
+            if (!eligibilityResult || !eligibilityResult.eligible) {
+                if (eligibilityResult && (eligibilityResult.unsettledLoan || (eligibilityResult.checks && !eligibilityResult.checks.loanAccountCleanPassed))) {
+                    alert("You have not settled and you are not eligible for another loan at this moment.");
+                } else {
+                    alert("Cannot submit form: Staff member is not eligible per BCF Loan Policy.\n\n" + (eligibilityResult ? eligibilityResult.reasons.join("\n") : ""));
+                }
+                return;
+            }
+
+            const refNo = document.getElementById('form-ref-no').textContent;
+            const loanAmount = parseFloat(document.getElementById('b-amount').value);
+            const proposedMonthlyDeduction = loanAmount * 0.10;
+
+            const applicationData = {
+                refNo: refNo,
+                status: 'PENDING_HR',
+                date: document.getElementById('b-appdate').value,
+                createdAt: new Date().toISOString(),
+                staff: {
+                    fullName: document.getElementById('a-fullname').value,
+                    employeeId: document.getElementById('a-empid').value,
+                    title: document.getElementById('a-title').value,
+                    department: document.getElementById('a-dept').value,
+                    empDate: document.getElementById('a-empdate').value,
+                    serviceYears: document.getElementById('a-service-years').textContent,
+                    classification: document.getElementById('a-class').value,
+                    phone: document.getElementById('a-phone').value,
+                    email: document.getElementById('a-email').value,
+                    multiplierCategory: document.getElementById('a-multiplier-cat').value,
+                    basicSalary: parseFloat(document.getElementById('a-salary').value),
+                    bankName: selectedStaff ? selectedStaff.bankName : 'Sierra Leone Commercial Bank',
+                    accNo: selectedStaff ? selectedStaff.accNo : '003001892341'
+                },
+                request: {
+                    loanAmount: loanAmount,
+                    categoryRange: document.getElementById('b-category-tier').value,
+                    purpose: document.getElementById('b-purpose').value,
+                    repaymentPeriod: '10 Months',
+                    applicableRate: '10% (Fixed — per BCF Staff Loan Policy)',
+                    proposedMonthlyDeduction: proposedMonthlyDeduction,
+                    applicationDate: document.getElementById('b-appdate').value,
+                    previousLoanRef: document.getElementById('b-prev-ref').value
+                },
+                declaration: {
+                    signed: true,
+                    applicantName: document.getElementById('a-fullname').value,
+                    agreedAll: true
+                },
+                hrReview: null,
+                financeReview: null,
+                ceoReview: null,
+                voucher: null,
+                disbursement: null
+            };
+
+            // Save to shared store
+            BCF_LOANS.saveLoanApplication(applicationData);
+
+            // Dispatch simulated email to HR Director
+            BCF_LOANS.dispatchEmail({
+                to: "hr.director@bcf-sl.org",
+                toName: "Dr. Sorie Sesay (HR Director)",
+                subject: `[ACTION REQUIRED] New Staff Loan Application: ${applicationData.refNo} - ${applicationData.staff.fullName}`,
+                body: `A new loan request of NLe ${loanAmount.toLocaleString('en-US')} has been submitted by ${applicationData.staff.fullName} (${applicationData.staff.employeeId}). Automated eligibility passed with ${applicationData.staff.serviceYears} service. Please conduct HR Verification and approval sign-off.`,
+                badgeText: "Awaiting HR Review",
+                tabId: "hr-approval"
+            });
+
+            alert(`Staff Loan Application ${refNo} successfully submitted!\n\nEmail notification has been dispatched to HR Director (Dr. Sorie Sesay) for HR Verification & Sign-off.`);
+
+            // Smooth route to HR Approval Console
+            BCF_LOANS.switchTab('hr-approval');
+        }
+    </script>
+</body>
+</html>

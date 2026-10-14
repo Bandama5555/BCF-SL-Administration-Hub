@@ -1,0 +1,1926 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" name="viewport"/>
+  <title>BCF-SL — Staff Monthly Payslip & Self-Service Portal</title>
+  
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <script id="tailwind-config">
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            primary: '#0D5C3A',
+            'primary-dark': '#083B25',
+            'primary-light': '#E8F5EE',
+            'bcf-blue': '#2563EB',
+            'bcf-purple': '#9333EA',
+            'bcf-amber': '#D97706',
+            surface: '#F8FAFC',
+            outline: '#E2E8F0',
+            'on-surface': '#0F172A',
+            'on-surface-variant': '#64748B'
+          },
+          fontFamily: {
+            sans: ['Inter', 'Calibri', 'system-ui', 'sans-serif'],
+            mono: ['JetBrains Mono', 'monospace']
+          }
+        }
+      }
+    };
+  </script>
+
+  <style>
+    @layer base {
+      html, body {
+        width: 100%;
+        margin: 0;
+        padding: 0;
+        background-color: #f8fafc;
+        color: #0f172a;
+        font-family: 'Inter', Calibri, system-ui, sans-serif;
+      }
+      body {
+        overscroll-behavior-y: none;
+        -webkit-tap-highlight-color: transparent;
+      }
+    }
+    .custom-scrollbar::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-track {
+      background: #f1f5f9;
+      border-radius: 4px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-thumb {
+      background: #cbd5e1;
+      border-radius: 4px;
+    }
+    .watermark-pattern {
+      background-image: radial-gradient(#0D5C3A 0.75px, transparent 0.75px);
+      background-size: 16px 16px;
+      opacity: 0.05;
+    }
+    @page {
+      size: A4 portrait;
+      margin: 5mm 8mm 5mm 8mm;
+    }
+    @media print {
+      html, body {
+        width: 100% !important;
+        height: 100% !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        background: #ffffff !important;
+        overflow: hidden !important;
+        font-size: 10px !important;
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+      }
+      body * {
+        visibility: hidden !important;
+      }
+      #official-payslip-modal {
+        position: absolute !important;
+        left: 0 !important;
+        top: 0 !important;
+        width: 100% !important;
+        height: 100% !important;
+        padding: 0 !important;
+        margin: 0 !important;
+        background: transparent !important;
+        display: block !important;
+      }
+      #official-payslip-voucher, #official-payslip-voucher * {
+        visibility: visible !important;
+      }
+      #official-payslip-voucher {
+        position: absolute !important;
+        left: 0 !important;
+        top: 0 !important;
+        width: 100% !important;
+        max-width: 100% !important;
+        box-shadow: none !important;
+        border: none !important;
+        margin: 0 !important;
+        padding: 4mm 6mm !important;
+        page-break-inside: avoid !important;
+        break-inside: avoid !important;
+        page-break-after: avoid !important;
+      }
+      .no-print {
+        display: none !important;
+      }
+    }
+  </style>
+</head>
+
+<body class="bg-surface text-on-surface min-h-screen flex flex-col antialiased">
+
+  <!-- TOP APP HEADER -->
+  <header class="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-outline shadow-xs no-print">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="h-16 flex items-center justify-between gap-4">
+        
+        <!-- Brand / Identity -->
+        <div class="flex items-center gap-3 min-w-0">
+          <img src="../bandama_charity_foundation_logo/bcf_official_logo.png" alt="Bandama Charity Foundation" class="h-10 w-auto object-contain shrink-0" onerror="this.src='/bcf_official_logo.png'" />
+          <div class="flex flex-col min-w-0">
+            <div class="flex items-center gap-2">
+              <span class="text-xs font-black tracking-widest text-primary uppercase">BCF-SL</span>
+              <span class="px-1.5 py-0.5 rounded text-[10px] font-bold bg-emerald-100 text-emerald-800 border border-emerald-200">STAFF SELF-SERVICE</span>
+              <span class="text-[10px] font-mono text-slate-500">ISO-4217: SLE</span>
+            </div>
+            <h1 class="text-base sm:text-lg font-bold text-on-surface truncate leading-tight">Monthly Payslip & Remuneration Portal</h1>
+          </div>
+        </div>
+
+        <!-- Role & Staff Navigation Controls -->
+        <div class="flex items-center gap-2 shrink-0">
+          
+          <!-- Role Switcher (RBAC) -->
+          <div class="relative flex items-center">
+            <label for="role-select" class="sr-only">Role</label>
+            <div class="flex items-center gap-1.5 bg-slate-100 px-2.5 py-1.5 rounded-lg border border-slate-200 cursor-pointer text-xs">
+              <span class="material-symbols-outlined text-[16px] text-primary" id="role-icon">person</span>
+              <select id="role-select" onchange="changeRole(this.value)" class="bg-transparent font-bold text-slate-800 focus:outline-none cursor-pointer">
+                <option value="staff" selected>Staff View (Self-Only)</option>
+                <option value="finance_director">Finance Director (Admin)</option>
+                <option value="super_admin">Super Admin (Admin)</option>
+                <option value="ceo">CEO / Trustee (Admin)</option>
+                <option value="audit_director">Audit & Risk (Auditor)</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Staff Selector (Available in Admin/Finance Mode) -->
+          <div id="admin-staff-selector-wrap" class="hidden relative flex items-center">
+            <label for="staff-picker" class="sr-only">Select Employee</label>
+            <div class="flex items-center gap-1.5 bg-emerald-50 px-2 py-1.5 rounded-lg border border-emerald-200 text-xs">
+              <span class="material-symbols-outlined text-[16px] text-primary">switch_account</span>
+              <select id="staff-picker" onchange="switchActiveEmployee(this.value)" class="bg-transparent font-bold text-emerald-950 focus:outline-none cursor-pointer">
+                <!-- Dynamically populated -->
+              </select>
+            </div>
+          </div>
+
+          <!-- Link to Payroll Schedule -->
+          <button type="button" onclick="navToSchedule()" class="h-9 px-3 rounded-lg border border-outline bg-white hover:bg-slate-50 text-xs font-semibold text-slate-700 flex items-center gap-1.5 transition shadow-2xs">
+            <span class="material-symbols-outlined text-[17px] text-primary">payments</span>
+            <span class="hidden sm:inline">Payroll Schedule</span>
+          </button>
+        </div>
+
+      </div>
+    </div>
+  </header>
+
+  <!-- MAIN SELF-SERVICE DASHBOARD -->
+  <main class="flex-1 max-w-6xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
+
+    <!-- 11. EMPLOYEE CARD LIST (STAFF ROSTER & RECEIPT SELECTOR) -->
+    <section class="bg-white border border-outline rounded-2xl p-5 shadow-xs" id="employee-roster-section">
+      <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-4 border-b border-slate-100">
+        <div>
+          <div class="flex items-center gap-2">
+            <span class="material-symbols-outlined text-primary text-[22px]">badge</span>
+            <h2 class="text-base font-bold text-slate-900">Staff Employee Roster & Receipt Cards</h2>
+            <span id="roster-badge-count" class="px-2 py-0.5 rounded-full text-xs font-bold bg-emerald-100 text-emerald-800 border border-emerald-200">15 Staff</span>
+          </div>
+          <p class="text-xs text-slate-500 mt-0.5">Select any employee card to open their payslip profile, view breakdown, or download the official receipt voucher.</p>
+        </div>
+
+        <!-- Search, Department Filter & Sync Status -->
+        <div class="flex flex-wrap items-center gap-2">
+          <div class="relative">
+            <span class="material-symbols-outlined absolute left-2.5 top-2 text-slate-400 text-[18px]">search</span>
+            <input type="text" id="roster-search" oninput="renderEmployeeCards()" placeholder="Search name, ID, title..." class="pl-8 pr-3 py-1.5 rounded-lg border border-slate-200 text-xs w-48 sm:w-56 focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary" />
+          </div>
+          <select id="roster-dept-filter" onchange="renderEmployeeCards()" class="px-2.5 py-1.5 rounded-lg border border-slate-200 text-xs font-semibold text-slate-700 bg-slate-50 focus:outline-none cursor-pointer">
+            <option value="ALL">All Departments</option>
+          </select>
+          <button type="button" onclick="manualSyncFromPayroll()" title="Force Refresh & Sync with Staff Payroll" class="h-8 px-2.5 rounded-lg border border-emerald-200 bg-emerald-50 hover:bg-emerald-100 text-emerald-800 text-xs font-bold flex items-center gap-1.5 transition shadow-2xs">
+            <span class="material-symbols-outlined text-[16px]">sync</span>
+            <span class="hidden sm:inline">Direct Synced</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- MONTHLY PREPARED RECEIPT FOLDERS (MONTH & YEAR ARCHIVE) -->
+      <div class="mt-4 pt-3 border-t border-slate-100 space-y-3">
+        
+        <!-- Folders Header & Action Strip -->
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
+          <div class="flex items-center gap-2">
+            <span class="material-symbols-outlined text-amber-500 text-[20px]">folder_open</span>
+            <span class="text-xs font-black uppercase tracking-wider text-slate-800">Monthly Prepared Receipt Folders</span>
+            <span class="text-[10px] text-slate-400 font-medium">Click any month folder to open and view/download receipts</span>
+          </div>
+          <div class="flex items-center gap-1.5">
+            <button type="button" onclick="openCreateMonthFolderModal()" class="h-7 px-2.5 rounded-lg border border-dashed border-primary text-primary hover:bg-emerald-50 text-[11px] font-bold inline-flex items-center gap-1 transition shadow-2xs">
+              <span class="material-symbols-outlined text-[14px]">create_new_folder</span>
+              <span>New Month Folder</span>
+            </button>
+            <button type="button" onclick="toggleFolderGridView()" id="btn-toggle-folder-view" class="h-7 px-2.5 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 text-[11px] font-bold inline-flex items-center gap-1 transition">
+              <span class="material-symbols-outlined text-[14px]">grid_view</span>
+              <span id="label-toggle-folder-view">Browse All Folders</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Folder Pills Strip (Horizontal Scrollable) -->
+        <div id="monthly-folders-strip" class="flex items-center gap-2 overflow-x-auto pb-1.5 custom-scrollbar">
+          <!-- Populated dynamically -->
+        </div>
+
+        <!-- Active Folder Banner & Batch Actions -->
+        <div class="bg-gradient-to-r from-emerald-50 via-slate-50 to-emerald-50/50 p-3 rounded-xl border border-emerald-200/80 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-2xs">
+          <div class="flex items-center gap-3">
+            <div class="w-9 h-9 rounded-lg bg-primary text-white flex items-center justify-center font-bold shrink-0 shadow-xs">
+              <span class="material-symbols-outlined text-[20px]">folder_open</span>
+            </div>
+            <div>
+              <div class="flex items-center gap-2">
+                <span class="text-xs font-black text-slate-900" id="active-folder-title">Month Folder: March 2026</span>
+                <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-800 border border-emerald-200" id="active-folder-status-badge">Active Run</span>
+              </div>
+              <p class="text-[11px] text-slate-500 mt-0.5" id="active-folder-subtitle">
+                All employee receipts prepared for this month are archived inside this folder. Click below to view or download.
+              </p>
+            </div>
+          </div>
+
+          <!-- Folder Batch Actions: Download All Receipts & Print All -->
+          <div class="flex items-center gap-2 shrink-0">
+            <button type="button" onclick="batchDownloadFolderReceipts()" class="h-8 px-3 rounded-lg bg-primary hover:bg-primary-dark text-white text-xs font-bold inline-flex items-center gap-1.5 transition shadow-2xs">
+              <span class="material-symbols-outlined text-[16px]">download_for_offline</span>
+              <span>Download All Receipts</span>
+            </button>
+            <button type="button" onclick="batchPrintFolderReceipts()" class="h-8 px-3 rounded-lg border border-slate-300 bg-white hover:bg-slate-50 text-slate-700 text-xs font-bold inline-flex items-center gap-1.5 transition shadow-2xs">
+              <span class="material-symbols-outlined text-[16px] text-primary">print</span>
+              <span>Print All</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Visual Grid of All Monthly Folders (Toggleable Directory) -->
+        <div id="all-folders-grid-wrapper" class="hidden bg-slate-50 p-4 rounded-xl border border-slate-200 space-y-3">
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-bold text-slate-700 uppercase tracking-wider">All Prepared Month Folders Directory</span>
+            <span class="text-[11px] text-slate-500 font-mono" id="folders-count-label">5 Folders Available</span>
+          </div>
+          <div id="all-folders-grid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3">
+            <!-- Populated dynamically -->
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Cards Grid -->
+      <div id="employee-cards-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3.5 pt-4">
+        <!-- Populated dynamically with employee cards -->
+      </div>
+      <div id="employee-cards-empty" class="hidden py-8 text-center text-slate-400 text-xs">
+        <span class="material-symbols-outlined text-3xl mb-1 text-slate-300">person_search</span>
+        <p>No matching staff members found for your query.</p>
+      </div>
+    </section>
+
+    <!-- 12. STAFF PAYSLIP SELF-SERVICE: WELCOME BANNER -->
+    <section aria-labelledby="welcome-title" id="welcome-banner-section" class="bg-gradient-to-r from-emerald-950 via-primary to-emerald-900 text-white rounded-2xl p-6 shadow-md relative overflow-hidden">
+      <!-- Watermark Background -->
+      <div class="absolute inset-0 watermark-pattern pointer-events-none"></div>
+
+      <div class="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
+        
+        <!-- Welcome Details -->
+        <div class="flex items-center gap-4 min-w-0">
+          <div class="w-16 h-16 rounded-2xl bg-white/10 border border-white/20 flex items-center justify-center text-white text-2xl font-black shrink-0 shadow-inner" id="staff-avatar">
+            AB
+          </div>
+          <div class="min-w-0">
+            <div class="flex items-center gap-2">
+              <span class="text-xs font-mono font-bold px-2 py-0.5 rounded bg-white/20 text-emerald-100" id="staff-badge-id">BCF-EMP-2026-0001</span>
+              <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-400/20 text-emerald-200 border border-emerald-400/30">● Active Payroll</span>
+            </div>
+            <h2 id="welcome-title" class="text-xl sm:text-2xl font-black text-white tracking-tight mt-1 truncate">
+              WELCOME, <span id="staff-welcome-name">ALBERT JOSEPH BANDAMA</span>
+            </h2>
+            <div class="flex items-center gap-2 text-xs text-emerald-200/90 mt-1 flex-wrap">
+              <span id="staff-welcome-dept">Finance Department</span>
+              <span>•</span>
+              <span id="staff-welcome-position" class="font-semibold text-white">Accounts Officer</span>
+              <span>•</span>
+              <span id="staff-welcome-level" class="bg-emerald-800/60 px-1.5 py-0.5 rounded text-[11px]">Officer Level</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Bank & Remittance Meta Card -->
+        <div class="bg-white/10 backdrop-blur-xs p-4 rounded-xl border border-white/20 text-xs shrink-0 max-w-xs space-y-1.5">
+          <div class="flex items-center justify-between text-emerald-200 text-[11px]">
+            <span class="font-bold uppercase tracking-wider">Salary Remittance Bank</span>
+            <span class="material-symbols-outlined text-[16px] text-white">account_balance</span>
+          </div>
+          <div class="font-bold text-white text-sm truncate" id="staff-bank-name">Sierra Leone Commercial Bank</div>
+          <div class="font-mono text-emerald-100 text-xs flex items-center gap-1">
+            <span>Acc:</span>
+            <span id="staff-bank-acc" class="tracking-wider">00300123456789</span>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- CURRENT PAYSLIP HERO CARD -->
+    <section aria-labelledby="hero-period-label" class="bg-white rounded-2xl p-6 border border-outline shadow-xs space-y-4">
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-100 pb-4">
+        <div>
+          <div class="flex items-center gap-2">
+            <span class="text-xs font-bold text-primary uppercase tracking-wider">CURRENT PAYSLIP</span>
+            <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-800 border border-emerald-200 flex items-center gap-1">
+              <span class="material-symbols-outlined text-[13px]">verified</span>
+              <span>Certified & Disbursed</span>
+            </span>
+          </div>
+          <h3 id="hero-period-label" class="text-lg font-bold text-slate-900 mt-0.5">
+            March 2026 Remuneration Statement
+          </h3>
+        </div>
+
+        <!-- Cycle Switcher for Quick Preview -->
+        <div class="flex items-center gap-2">
+          <label for="select-cycle-view" class="text-xs font-bold text-slate-500">Pay Period:</label>
+          <select id="select-cycle-view" onchange="changePayPeriod(this.value)" class="text-xs font-bold text-slate-900 bg-slate-50 border border-slate-200 rounded-lg px-3 py-1.5 focus:outline-none focus:ring-1 focus:ring-primary">
+            <option value="2026-03" selected>March 2026 (Active Run)</option>
+            <option value="2026-02">February 2026 (Certified)</option>
+            <option value="2026-01">January 2026 (Certified)</option>
+            <option value="2025-12">December 2025 (Certified)</option>
+            <option value="2025-11">November 2025 (Certified)</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Hero Net Pay Highlight Box -->
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4 items-center bg-slate-50 p-5 rounded-xl border border-slate-200">
+        
+        <div class="space-y-1">
+          <span class="text-xs font-bold uppercase tracking-wider text-slate-500">Total Net Remuneration</span>
+          <div class="flex items-baseline gap-1.5">
+            <span class="text-sm font-bold text-primary">NLe</span>
+            <span class="text-3xl font-black text-slate-900 font-mono tracking-tight" id="hero-net-pay">6,960.00</span>
+          </div>
+          <span class="text-xs text-slate-500 block">Direct Net Take-Home Disbursement</span>
+        </div>
+
+        <!-- Breakdown Quick Ticker -->
+        <div class="text-xs space-y-1.5 border-t md:border-t-0 md:border-l border-slate-200 pt-3 md:pt-0 md:pl-5">
+          <div class="flex justify-between text-slate-600">
+            <span>Gross Monthly Salary:</span>
+            <span class="font-mono font-bold text-slate-900" id="hero-gross">NLe 12,000.00</span>
+          </div>
+          <div class="flex justify-between text-slate-600">
+            <span>Statutory Deductions (PAYE & NASSIT):</span>
+            <span class="font-mono font-bold text-amber-700" id="hero-statutory">- NLe 4,020.00</span>
+          </div>
+          <div class="flex justify-between text-slate-600">
+            <span>Advances & Staff Loan Deductions:</span>
+            <span class="font-mono font-bold text-purple-700" id="hero-loan-adv">- NLe 1,260.00</span>
+          </div>
+          <div class="flex justify-between text-slate-600">
+            <span>Duty & Staff Allowances:</span>
+            <span class="font-mono font-bold text-emerald-700" id="hero-allowance">+ NLe 240.00</span>
+          </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="flex flex-col gap-2.5 sm:flex-row md:flex-col justify-center shrink-0">
+          <button type="button" onclick="openOfficialPayslipModal()" class="h-11 px-5 rounded-xl bg-primary hover:bg-primary-dark text-white text-xs font-bold flex items-center justify-center gap-2 transition shadow-sm active:scale-98">
+            <span class="material-symbols-outlined text-[18px]">receipt_long</span>
+            <span>VIEW OFFICIAL PAYSLIP</span>
+          </button>
+          <button type="button" onclick="downloadPayslipPDF()" class="h-10 px-4 rounded-xl border border-slate-300 bg-white hover:bg-slate-50 text-slate-800 text-xs font-bold flex items-center justify-center gap-2 transition shadow-2xs">
+            <span class="material-symbols-outlined text-[18px] text-primary">download</span>
+            <span>DOWNLOAD PDF</span>
+          </button>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- 13. PREVIOUS CERTIFIED PAYSLIPS (HISTORICAL ARCHIVE) -->
+    <section aria-labelledby="history-heading" class="bg-white rounded-2xl p-6 border border-outline shadow-xs space-y-4">
+      
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-100 pb-3">
+        <div>
+          <h3 id="history-heading" class="text-sm font-black text-slate-900 uppercase tracking-wider flex items-center gap-2">
+            <span class="material-symbols-outlined text-[18px] text-primary">history</span>
+            <span>Previous Certified Payslips History</span>
+          </h3>
+          <p class="text-xs text-slate-500">Access, verify, or download any previously certified salary statement.</p>
+        </div>
+
+        <!-- Search & Year Filter -->
+        <div class="flex items-center gap-2 flex-wrap">
+          <div class="relative">
+            <span class="material-symbols-outlined absolute left-2.5 top-2 text-[16px] text-slate-400">search</span>
+            <input type="text" id="history-search" oninput="renderHistoryTable()" placeholder="Search period / ref..." class="pl-8 pr-3 py-1.5 rounded-lg border border-outline text-xs focus:outline-none focus:ring-1 focus:ring-primary w-36 sm:w-44"/>
+          </div>
+
+          <select id="history-year-filter" onchange="renderHistoryTable()" class="text-xs bg-slate-50 border border-outline rounded-lg px-2.5 py-1.5 font-bold text-slate-700 focus:outline-none focus:ring-1 focus:ring-primary">
+            <option value="ALL">All Years</option>
+            <option value="2026" selected>2026</option>
+            <option value="2025">2025</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- History Table Container -->
+      <div class="overflow-x-auto custom-scrollbar">
+        <table class="w-full text-left border-collapse text-xs">
+          <thead>
+            <tr class="bg-slate-50 text-slate-500 font-bold uppercase tracking-wider text-[10px] border-b border-slate-200">
+              <th class="py-2.5 px-4">Pay Period</th>
+              <th class="py-2.5 px-4">Reference Number</th>
+              <th class="py-2.5 px-4">Certification Status</th>
+              <th class="py-2.5 px-4 text-right">Gross Salary</th>
+              <th class="py-2.5 px-4 text-right">Total Deductions</th>
+              <th class="py-2.5 px-4 text-right">Net Take-Home Pay</th>
+              <th class="py-2.5 px-4 text-center">Action</th>
+            </tr>
+          </thead>
+          <tbody id="history-table-body" class="divide-y divide-slate-100 font-medium">
+            <!-- Populated dynamically -->
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Empty Table Indicator -->
+      <div id="history-empty" class="hidden text-center py-8 space-y-2">
+        <span class="material-symbols-outlined text-slate-300 text-[32px]">folder_off</span>
+        <p class="text-xs text-slate-500">No historical payslips found matching this filter.</p>
+      </div>
+
+    </section>
+
+  </main>
+
+  <!-- 10. OFFICIAL INDIVIDUAL PAYSLIP MODAL (PRINTABLE / PDF VOUCHER) -->
+  <div id="official-payslip-modal" class="fixed inset-0 z-50 bg-slate-900/70 backdrop-blur-xs flex items-center justify-center p-3 sm:p-4 hidden">
+    <div class="bg-white rounded-2xl shadow-2xl border border-slate-300 max-w-3xl w-full max-h-[96vh] flex flex-col overflow-hidden animate-in fade-in zoom-in-95 duration-150">
+      
+      <!-- Action Bar (Top Modal Bar) -->
+      <div class="px-6 py-3.5 bg-slate-900 text-white flex items-center justify-between shrink-0 no-print">
+        <div class="flex items-center gap-2">
+          <span class="material-symbols-outlined text-primary text-[22px]">verified</span>
+          <span class="text-xs font-bold uppercase tracking-wider text-white">Official BCF-SL Payslip Statement</span>
+        </div>
+        <div class="flex items-center gap-2">
+          <button type="button" onclick="window.print()" class="h-8 px-3 rounded-lg bg-white/10 hover:bg-white/20 text-white text-xs font-bold flex items-center gap-1.5 transition">
+            <span class="material-symbols-outlined text-[16px]">print</span>
+            <span>Print Payslip</span>
+          </button>
+          <button type="button" onclick="downloadPayslipPDF()" class="h-8 px-3 rounded-lg bg-primary hover:bg-primary-dark text-white text-xs font-bold flex items-center gap-1.5 transition shadow-sm">
+            <span class="material-symbols-outlined text-[16px]">download</span>
+            <span>Download PDF</span>
+          </button>
+          <button type="button" onclick="closeOfficialPayslipModal()" class="w-8 h-8 rounded-lg bg-white/10 hover:bg-white/20 text-white flex items-center justify-center transition ml-2">
+            <span class="material-symbols-outlined text-[18px]">close</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Printable Payslip Voucher Body (COMPACT 1-PAGE DESIGN, REDUCED FONT SIZE) -->
+      <div class="p-3 sm:p-4 overflow-y-auto custom-scrollbar flex-1 bg-white text-slate-900 leading-tight" id="official-payslip-voucher">
+        
+        <!-- Voucher Formal Header (CENTERED AS REQUESTED WITH REDUCED SIZING) -->
+        <div class="border-b-2 border-primary pb-2 mb-2 text-center">
+          <div class="flex flex-col items-center justify-center">
+            
+            <!-- Centered Official BCF-SL Logo (Compact) -->
+            <div class="mb-1 flex items-center justify-center">
+              <img src="../bandama_charity_foundation_logo/bcf_official_logo.png" alt="Bandama Charity Foundation" class="h-9 sm:h-10 w-auto object-contain mx-auto" onerror="this.src='/bcf_official_logo.png'" />
+            </div>
+
+            <!-- Centered Official Statement Titles -->
+            <span class="text-[11px] sm:text-xs font-black uppercase tracking-wider text-primary block leading-none">BANDAMA CHARITY FOUNDATION SIERRA LEONE</span>
+            <span class="text-[9px] text-slate-500 font-medium block mt-0.5 leading-tight">Headquarters: 14 Wilkinson Road, Freetown, Sierra Leone • Statutory Remittance & Certified Payroll Voucher</span>
+            <h2 class="text-xs sm:text-sm font-black text-slate-900 tracking-tight my-1 uppercase leading-none" id="vouch-doc-title">INDIVIDUAL SALARY PAYROLL & REMITTANCE RECEIPT — OFFICER</h2>
+            
+            <!-- Centered Meta Badges (Compact) -->
+            <div class="flex flex-wrap items-center justify-center gap-1.5 text-[10px] font-semibold text-slate-600 mt-0.5">
+              <span class="bg-slate-100 px-2 py-0.5 rounded border border-slate-200">
+                Voucher: <strong class="font-mono text-primary font-bold" id="vouch-receipt-no">BCF-REC-2026-03-001</strong>
+              </span>
+              <span class="bg-slate-100 px-2 py-0.5 rounded border border-slate-200">
+                Period: <strong class="font-bold text-slate-900" id="vouch-period">March 2026</strong>
+              </span>
+              <span class="bg-slate-100 px-2 py-0.5 rounded border border-slate-200">
+                Date: <strong class="font-bold text-slate-900 font-mono" id="vouch-date-prepared">03/2026</strong>
+              </span>
+              <span class="inline-flex items-center gap-0.5 bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded border border-emerald-200 font-bold text-[10px]">
+                <span class="material-symbols-outlined text-[12px]">verified</span> Direct Synced & Certified
+              </span>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- EMPLOYEE INFORMATION (COMPACT GRID) -->
+        <div class="mb-2 bg-slate-50 p-2 rounded-lg border border-slate-200">
+          <div class="text-[9px] uppercase font-bold text-primary tracking-wider mb-1 flex items-center gap-1">
+            <span class="material-symbols-outlined text-[12px]">badge</span>
+            <span>Employee Identification & Remittance Particulars</span>
+          </div>
+
+          <div class="grid grid-cols-2 sm:grid-cols-4 gap-x-2 gap-y-1 text-[10px]">
+            <div>
+              <span class="text-[8px] text-slate-400 font-bold block uppercase leading-none">Employee Name</span>
+              <span class="font-bold text-slate-900 truncate block" id="vouch-name">Albert Joseph Bandama</span>
+            </div>
+            <div>
+              <span class="text-[8px] text-slate-400 font-bold block uppercase leading-none">Employee ID</span>
+              <span class="font-mono font-bold text-primary truncate block" id="vouch-id">BCF-EMP-2026-0001</span>
+            </div>
+            <div>
+              <span class="text-[8px] text-slate-400 font-bold block uppercase leading-none">Department</span>
+              <span class="font-semibold text-slate-800 truncate block" id="vouch-dept">Finance Department</span>
+            </div>
+            <div>
+              <span class="text-[8px] text-slate-400 font-bold block uppercase leading-none">Unit</span>
+              <span class="font-semibold text-slate-800 truncate block" id="vouch-unit">Financial Reporting</span>
+            </div>
+            <div>
+              <span class="text-[8px] text-slate-400 font-bold block uppercase leading-none">Position / Title</span>
+              <span class="font-semibold text-slate-800 truncate block" id="vouch-title">Accounts Officer</span>
+            </div>
+            <div>
+              <span class="text-[8px] text-slate-400 font-bold block uppercase leading-none">Job Level</span>
+              <span class="font-semibold text-slate-800 truncate block" id="vouch-level">Officer</span>
+            </div>
+            <div>
+              <span class="text-[8px] text-slate-400 font-bold block uppercase leading-none">Bank Name</span>
+              <span class="font-semibold text-slate-800 truncate block" id="vouch-bank">Sierra Leone Commercial Bank</span>
+            </div>
+            <div>
+              <span class="text-[8px] text-slate-400 font-bold block uppercase leading-none">Account Number</span>
+              <span class="font-mono font-bold text-slate-800 truncate block" id="vouch-acc">00300123456789</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- PAYROLL COMPUTATION TABLES (A. EARNINGS, B. DEDUCTIONS, C. ALLOWANCES) - COMPACT SPACING -->
+        <div class="space-y-1.5 mb-2">
+
+          <!-- A. EARNINGS TABLE -->
+          <div class="border border-slate-200 rounded-lg overflow-hidden">
+            <div class="bg-slate-100 px-2 py-0.5 text-[9px] font-black text-slate-800 uppercase tracking-wider flex items-center justify-between">
+              <span>A. EARNINGS</span>
+              <span class="text-[8px] text-slate-500 font-mono">Gross Remuneration Base</span>
+            </div>
+            <table class="w-full text-[10px]">
+              <thead class="bg-slate-50 text-slate-500 text-[8px] uppercase font-bold border-b border-slate-200">
+                <tr>
+                  <th class="py-0.5 px-2 text-left">Description</th>
+                  <th class="py-0.5 px-2 text-left">Details</th>
+                  <th class="py-0.5 px-2 text-right">Amount (NLe)</th>
+                  <th class="py-0.5 px-2 text-right">Final (NLe)</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-slate-100">
+                <tr>
+                  <td class="py-0.5 px-2 font-semibold text-slate-800">Basic Salary</td>
+                  <td class="py-0.5 px-2 text-slate-500">Current Monthly Basic</td>
+                  <td class="py-0.5 px-2 text-right font-mono" id="vouch-earn-basic">8,000.00</td>
+                  <td class="py-0.5 px-2 text-right font-mono font-semibold" id="vouch-earn-basic-final">8,000.00</td>
+                </tr>
+                <tr>
+                  <td class="py-0.5 px-2 font-semibold text-slate-800">Salary Increase</td>
+                  <td class="py-0.5 px-2 text-slate-500" id="vouch-earn-inc-pct">50% Merit Adjustment</td>
+                  <td class="py-0.5 px-2 text-right font-mono" id="vouch-earn-inc-amt">4,000.00</td>
+                  <td class="py-0.5 px-2 text-right font-mono font-semibold" id="vouch-earn-inc-final">4,000.00</td>
+                </tr>
+                <tr class="bg-emerald-50/50 font-bold text-slate-900 border-t border-slate-200">
+                  <td class="py-0.5 px-2 text-emerald-900">Gross Monthly Salary</td>
+                  <td class="py-0.5 px-2 text-emerald-800 text-[9px]">Basic + Increase</td>
+                  <td class="py-0.5 px-2 text-right font-mono text-emerald-950" id="vouch-earn-gross">12,000.00</td>
+                  <td class="py-0.5 px-2 text-right font-mono text-emerald-950 font-black" id="vouch-earn-gross-final">12,000.00</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <!-- B. DEDUCTIONS TABLE -->
+          <div class="border border-slate-200 rounded-lg overflow-hidden">
+            <div class="bg-slate-100 px-2 py-0.5 text-[9px] font-black text-slate-800 uppercase tracking-wider flex items-center justify-between">
+              <span>B. STATUTORY & WELFARE DEDUCTIONS</span>
+              <span class="text-[8px] text-amber-700 font-mono">Tax & Loan Offsets</span>
+            </div>
+            <table class="w-full text-[10px]">
+              <thead class="bg-slate-50 text-slate-500 text-[8px] uppercase font-bold border-b border-slate-200">
+                <tr>
+                  <th class="py-0.5 px-2 text-left">Description</th>
+                  <th class="py-0.5 px-2 text-left">Details</th>
+                  <th class="py-0.5 px-2 text-right">Amount (NLe)</th>
+                  <th class="py-0.5 px-2 text-right">Final (NLe)</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-slate-100">
+                <tr>
+                  <td class="py-0.5 px-2 font-semibold text-slate-800">NRA PAYE Statutory Tax</td>
+                  <td class="py-0.5 px-2 text-slate-500" id="vouch-ded-paye-rate">Configured rate (30%)</td>
+                  <td class="py-0.5 px-2 text-right font-mono text-amber-900" id="vouch-ded-paye">3,600.00</td>
+                  <td class="py-0.5 px-2 text-right font-mono font-semibold text-amber-900" id="vouch-ded-paye-final">3,600.00</td>
+                </tr>
+                <tr>
+                  <td class="py-0.5 px-2 font-semibold text-slate-800">Employee NASSIT Pension</td>
+                  <td class="py-0.5 px-2 text-slate-500" id="vouch-ded-nassit-rate">Configured rate (5%)</td>
+                  <td class="py-0.5 px-2 text-right font-mono text-amber-900" id="vouch-ded-nassit">420.00</td>
+                  <td class="py-0.5 px-2 text-right font-mono font-semibold text-amber-900" id="vouch-ded-nassit-final">420.00</td>
+                </tr>
+                <tr>
+                  <td class="py-0.5 px-2 font-semibold text-slate-800">Mid-Month Salary Advance</td>
+                  <td class="py-0.5 px-2 text-slate-500" id="vouch-ded-advance-rate">10% of Net-of-Tax</td>
+                  <td class="py-0.5 px-2 text-right font-mono text-purple-900" id="vouch-ded-advance">840.00</td>
+                  <td class="py-0.5 px-2 text-right font-mono font-semibold text-purple-900" id="vouch-ded-advance-final">840.00</td>
+                </tr>
+                <tr>
+                  <td class="py-0.5 px-2 font-semibold text-slate-800">Staff Loan Repayment</td>
+                  <td class="py-0.5 px-2 text-slate-500" id="vouch-ded-loan-desc">Monthly repayment (Auto-Deduct)</td>
+                  <td class="py-0.5 px-2 text-right font-mono text-purple-900" id="vouch-ded-loan">420.00</td>
+                  <td class="py-0.5 px-2 text-right font-mono font-semibold text-purple-900" id="vouch-ded-loan-final">420.00</td>
+                </tr>
+                <tr class="bg-amber-50/50 font-bold text-amber-950 border-t border-slate-200">
+                  <td class="py-0.5 px-2">Total Deductions</td>
+                  <td class="py-0.5 px-2 text-[9px] text-amber-800">Statutory + Loan + Advance</td>
+                  <td class="py-0.5 px-2 text-right font-mono" id="vouch-ded-total">5,280.00</td>
+                  <td class="py-0.5 px-2 text-right font-mono font-black" id="vouch-ded-total-final">- 5,280.00</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <!-- C. ALLOWANCES TABLE -->
+          <div class="border border-slate-200 rounded-lg overflow-hidden">
+            <div class="bg-slate-100 px-2 py-0.5 text-[9px] font-black text-slate-800 uppercase tracking-wider flex items-center justify-between">
+              <span>C. APPROVED ALLOWANCES</span>
+              <span class="text-[8px] text-emerald-700 font-mono">Merit & Duty Relief</span>
+            </div>
+            <table class="w-full text-[10px]">
+              <thead class="bg-slate-50 text-slate-500 text-[8px] uppercase font-bold border-b border-slate-200">
+                <tr>
+                  <th class="py-0.5 px-2 text-left">Description</th>
+                  <th class="py-0.5 px-2 text-left">Details</th>
+                  <th class="py-0.5 px-2 text-right">Amount (NLe)</th>
+                  <th class="py-0.5 px-2 text-right">Final (NLe)</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-slate-100">
+                <tr>
+                  <td class="py-0.5 px-2 font-semibold text-slate-800">Duty Allowance</td>
+                  <td class="py-0.5 px-2 text-slate-500">2% of Gross Salary</td>
+                  <td class="py-0.5 px-2 text-right font-mono text-emerald-800" id="vouch-allw-duty">240.00</td>
+                  <td class="py-0.5 px-2 text-right font-mono font-semibold text-emerald-800" id="vouch-allw-duty-final">+ 240.00</td>
+                </tr>
+                <tr class="bg-emerald-50/50 font-bold text-emerald-950 border-t border-slate-200">
+                  <td class="py-0.5 px-2">Total Allowances</td>
+                  <td class="py-0.5 px-2 text-[9px] text-emerald-800">Directly Credited to Net</td>
+                  <td class="py-0.5 px-2 text-right font-mono" id="vouch-allw-total">240.00</td>
+                  <td class="py-0.5 px-2 text-right font-mono font-black text-emerald-900" id="vouch-allw-total-final">+ 240.00</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+        </div>
+
+        <!-- TOTAL NET PAY FINAL BANNER (COMPACT) -->
+        <div class="bg-gradient-to-r from-emerald-950 to-primary text-white px-3 py-1.5 rounded-lg flex items-center justify-between mb-2 shadow-xs">
+          <div>
+            <span class="text-[9px] font-bold uppercase tracking-wider text-emerald-200 block">TOTAL NET PAY (FINAL REMUNERATION)</span>
+            <span class="text-[8px] text-emerald-100/80">Approved Formula: Gross + Allowances − PAYE − EE NASSIT − Advance − Loan</span>
+          </div>
+          <div class="flex items-baseline gap-1 bg-white text-emerald-950 px-3 py-1 rounded-md shadow-2xs">
+            <span class="text-[10px] font-bold text-emerald-800">NLe</span>
+            <span class="text-base sm:text-lg font-black font-mono tracking-tight" id="vouch-net-total">6,960.00</span>
+          </div>
+        </div>
+
+        <!-- CERTIFICATION & DUAL SIGN-OFF CONTROL STRIP (COMPACT) -->
+        <div class="grid grid-cols-3 gap-2 text-center border-t border-slate-200 pt-1.5 mb-1.5 text-[9px]">
+          <div class="space-y-0.5">
+            <span class="text-[8px] font-bold text-slate-400 uppercase block">Prepared By</span>
+            <span class="font-bold text-slate-800 block text-[9px]" id="vouch-sign-prepared">Accounts Officer</span>
+            <span class="text-[8px] text-slate-500 block font-mono" id="vouch-date-prep">Date: 03/2026</span>
+          </div>
+          <div class="space-y-0.5 border-x border-slate-200">
+            <span class="text-[8px] font-bold text-slate-400 uppercase block">Reviewed By</span>
+            <span class="font-bold text-slate-800 block text-[9px]" id="vouch-sign-reviewed">Finance Director</span>
+            <span class="text-[8px] text-slate-500 block" id="vouch-date-rev">Dual Signed & Verified</span>
+          </div>
+          <div class="space-y-0.5">
+            <span class="text-[8px] font-bold text-slate-400 uppercase block">Approved By</span>
+            <span class="font-bold text-primary block text-[9px]" id="vouch-sign-approved">Chief Executive Officer</span>
+            <span class="text-[8px] text-slate-500 block" id="vouch-ref-stamp">Ref: PAY-2026-03-BCF</span>
+          </div>
+        </div>
+
+        <!-- 15. CONFIDENTIALITY OFFICIAL FOOTER (COMPACT) -->
+        <div class="text-center pt-1 border-t border-slate-100 text-[9px] text-slate-400 font-medium">
+          Bandama Charity Foundation Sierra Leone — Confidential Payroll Document
+        </div>
+
+      </div>
+
+    </div>
+  </div>
+
+  <!-- TOAST NOTIFICATION -->
+  <div id="toast" class="fixed bottom-6 right-6 z-50 bg-slate-900 text-white px-4 py-3 rounded-xl shadow-xl flex items-center gap-2.5 text-xs font-semibold transform translate-y-16 opacity-0 transition-all duration-300 pointer-events-none no-print">
+    <span class="material-symbols-outlined text-emerald-400 text-[18px]" id="toast-icon">check_circle</span>
+    <span id="toast-message">Notification message</span>
+  </div>
+
+  <!-- JAVASCRIPT LOGIC -->
+  <script>
+    let allStaff = [];
+    let activeEmployee = null;
+    let activePeriod = '2026-03';
+    let currentRole = 'staff';
+    let payrollSettings = {
+      payeRate: 30.0,
+      nassitEmployeeRate: 5.0,
+      nassitEmployerRate: 10.0,
+      dutyAllowanceRate: 2.0,
+      defaultAdvanceRate: 10.0
+    };
+    let staffLoans = [];
+    let payrollCycles = {};
+    let payrollReceipts = {};
+
+    function safeNum(val, fallback = 0) {
+      if (val === null || val === undefined) return fallback;
+      if (typeof val === 'number') return isNaN(val) ? fallback : val;
+      const str = String(val).trim().replace(/[^0-9.-]/g, '');
+      if (!str) return fallback;
+      const n = parseFloat(str);
+      return isNaN(n) ? fallback : n;
+    }
+
+    // DEFAULT HISTORICAL CYCLES
+    const ARCHIVED_PERIODS = [
+      { period: '2026-03', ref: 'PAY-2026-03-BCF', status: 'Certified', year: '2026' },
+      { period: '2026-02', ref: 'PAY-2026-02-BCF', status: 'Certified', year: '2026' },
+      { period: '2026-01', ref: 'PAY-2026-01-BCF', status: 'Certified', year: '2026' },
+      { period: '2025-12', ref: 'PAY-2025-12-BCF', status: 'Certified', year: '2025' },
+      { period: '2025-11', ref: 'PAY-2025-11-BCF', status: 'Certified', year: '2025' }
+    ];
+
+    window.addEventListener('DOMContentLoaded', () => {
+      loadSettings();
+      loadStaff();
+      loadLoans();
+      loadPayrollCycles();
+      populateDeptFilter();
+      checkRoleAndTarget();
+
+      // Ensure select-cycle-view is initialized and synchronized to activePeriod
+      const cycleSelect = document.getElementById('select-cycle-view');
+      if (cycleSelect) {
+        cycleSelect.value = activePeriod;
+        const marchOpt = cycleSelect.querySelector('option[value="2026-03"]');
+        if (marchOpt) {
+          const customMarch = localStorage.getItem('bcf_payroll_period_name');
+          marchOpt.textContent = customMarch ? `${customMarch} (Active Run)` : 'March 2026 (Active Run)';
+        }
+      }
+
+      renderMonthlyFoldersStrip();
+      renderEmployeeCards();
+      renderCurrentPayslip();
+      renderHistoryTable();
+
+      // Check if instructed to auto-open receipt modal
+      if (localStorage.getItem('bcf_auto_open_receipt') === '1') {
+        localStorage.removeItem('bcf_auto_open_receipt');
+        setTimeout(() => {
+          openOfficialPayslipModal();
+        }, 150);
+      }
+    });
+
+    // Cross-tab real-time sync from Staff Payroll & Statutory Schedule
+    window.addEventListener('storage', (e) => {
+      if (
+        e.key === 'bcf_payroll_cycles' ||
+        e.key === 'bcf_payroll_receipts' ||
+        e.key === 'bcf_staff_registry' ||
+        e.key === 'bcf_last_payroll_sync' ||
+        e.key === 'bcf_payroll_period_name' ||
+        e.key === 'bcf_payroll_period_date' ||
+        e.key === 'bcf_payroll_prepared_by' ||
+        e.key === 'bcf_payroll_folders'
+      ) {
+        loadStaff();
+        loadPayrollCycles();
+        renderMonthlyFoldersStrip();
+        renderEmployeeCards();
+        renderCurrentPayslip();
+        renderHistoryTable();
+        showToast('Payroll records & month folders directly synced from Staff Payroll Schedule!', 'sync');
+      }
+    });
+
+    function manualSyncFromPayroll() {
+      loadSettings();
+      loadStaff();
+      loadLoans();
+      loadPayrollCycles();
+      populateDeptFilter();
+      renderMonthlyFoldersStrip();
+      renderEmployeeCards();
+      renderCurrentPayslip();
+      renderHistoryTable();
+      showToast('Successfully synchronized with Staff Payroll Schedule', 'check_circle');
+    }
+
+    function loadSettings() {
+      try {
+        const stored = localStorage.getItem('bcf_payroll_settings');
+        if (stored) payrollSettings = Object.assign({}, payrollSettings, JSON.parse(stored));
+      } catch(e) {}
+    }
+
+    function loadPayrollCycles() {
+      try {
+        payrollCycles = JSON.parse(localStorage.getItem('bcf_payroll_cycles') || '{}');
+      } catch(e) {
+        payrollCycles = {};
+      }
+      try {
+        payrollReceipts = JSON.parse(localStorage.getItem('bcf_payroll_receipts') || '{}');
+      } catch(e) {
+        payrollReceipts = {};
+      }
+    }
+
+    function deduplicateStaffRegistry(staffList) {
+      if (!Array.isArray(staffList) || staffList.length === 0) return staffList;
+      
+      const seenIds = new Set();
+      let hasDuplicates = false;
+
+      // Find highest existing numerical suffix
+      let maxNum = 0;
+      staffList.forEach(s => {
+        if (s && s.employeeId) {
+          const match = String(s.employeeId).match(/(\d+)$/);
+          if (match) {
+            const n = parseInt(match[1], 10);
+            if (!isNaN(n) && n > maxNum) maxNum = n;
+          }
+        }
+      });
+
+      const deduplicated = staffList.map(emp => {
+        if (!emp || typeof emp !== 'object') return emp;
+        const currentId = (emp.employeeId || '').trim();
+
+        if (!currentId || seenIds.has(currentId)) {
+          hasDuplicates = true;
+          maxNum += 1;
+          const prefix = currentId ? currentId.replace(/\d+$/, '') : 'BCF-EMP-2026-';
+          const cleanPrefix = prefix.endsWith('-') ? prefix : `${prefix}-`;
+          const newId = `${cleanPrefix}${String(maxNum).padStart(4, '0')}`;
+          seenIds.add(newId);
+          console.warn(`[BCF-SL Registry] Reassigning duplicate staff ID from "${currentId}" to "${newId}" for "${emp.fullName}".`);
+          return Object.assign({}, emp, { employeeId: newId });
+        } else {
+          seenIds.add(currentId);
+          return emp;
+        }
+      });
+
+      if (hasDuplicates) {
+        try {
+          localStorage.setItem('bcf_staff_registry', JSON.stringify(deduplicated));
+          const currentSeq = parseInt(localStorage.getItem('bcf_seq') || '0', 10);
+          if (maxNum > currentSeq) {
+            localStorage.setItem('bcf_seq', String(maxNum).padStart(4, '0'));
+          }
+        } catch(e) {}
+      }
+
+      return deduplicated;
+    }
+
+    function isStaffActive(emp) {
+      if (!activeEmployee || !emp) return false;
+      if (activeEmployee === emp) return true;
+      const sameId = activeEmployee.employeeId && emp.employeeId && (activeEmployee.employeeId === emp.employeeId);
+      const sameName = (activeEmployee.fullName || '').trim().toLowerCase() === (emp.fullName || '').trim().toLowerCase();
+      if (sameId) {
+        return sameName;
+      }
+      return false;
+    }
+
+    function loadStaff() {
+      try {
+        let stored = JSON.parse(localStorage.getItem('bcf_staff_registry') || '[]');
+        if (!stored || stored.length === 0) {
+          stored = [
+            {
+              employeeId: "BCF-EMP-2026-0001",
+              fullName: "Albert Joseph Bandama",
+              department: "Finance Department",
+              title: "Accounts Officer",
+              unit: "Financial Reporting & Payroll",
+              jobLevel: "Officer",
+              classification: "Permanent",
+              bankName: "Sierra Leone Commercial Bank",
+              accNo: "00300123456789",
+              payBasic: 8000,
+              payInc: 50,
+              payAdvType: 10,
+              payLoan: 420
+            }
+          ];
+          localStorage.setItem('bcf_staff_registry', JSON.stringify(stored));
+        }
+        allStaff = deduplicateStaffRegistry(stored);
+      } catch(e) {
+        allStaff = [];
+      }
+    }
+
+    function loadLoans() {
+      try {
+        staffLoans = JSON.parse(localStorage.getItem('bcf_staff_loans') || '[]');
+      } catch(e) {
+        staffLoans = [];
+      }
+    }
+
+    function populateDeptFilter() {
+      const select = document.getElementById('roster-dept-filter');
+      if (!select) return;
+      const depts = Array.from(new Set(allStaff.map(s => s.department || 'General Administration'))).sort();
+      const currentVal = select.value;
+      select.innerHTML = '<option value="ALL">All Departments</option>' + 
+        depts.map(d => `<option value="${d}">${d}</option>`).join('');
+      if (depts.includes(currentVal)) select.value = currentVal;
+    }
+
+    // ROLE & RBAC MANAGEMENT
+    function checkRoleAndTarget() {
+      const savedRole = localStorage.getItem('bcf_user_role') || 'staff';
+      currentRole = savedRole;
+      const roleSel = document.getElementById('role-select');
+      if (roleSel) roleSel.value = savedRole;
+
+      updateRoleUI();
+
+      // Check if a specific employee was selected from Payroll Schedule
+      const targetEmpId = localStorage.getItem('bcf_selected_payslip_emp');
+      const targetEmpName = localStorage.getItem('bcf_selected_payslip_emp_name');
+      if (targetEmpId && targetEmpName) {
+        activeEmployee = allStaff.find(s => s.employeeId === targetEmpId && (s.fullName || '').trim().toLowerCase() === targetEmpName.trim().toLowerCase());
+      }
+      if (!activeEmployee && targetEmpId) {
+        activeEmployee = allStaff.find(s => s.employeeId === targetEmpId);
+      }
+      // Default to Albert Joseph Bandama or first staff
+      if (!activeEmployee) {
+        activeEmployee = allStaff.find(s => (s.fullName||'').toLowerCase().includes('albert')) || allStaff[0];
+      }
+
+      populateStaffPicker();
+    }
+
+    function changeRole(role) {
+      currentRole = role;
+      localStorage.setItem('bcf_user_role', role);
+      updateRoleUI();
+      showToast(`Switched active view to: ${role.replace('_', ' ').toUpperCase()}`, 'admin_panel_settings');
+    }
+
+    function updateRoleUI() {
+      const icon = document.getElementById('role-icon');
+      if (icon) {
+        icon.textContent = currentRole === 'staff' ? 'person' : 'admin_panel_settings';
+      }
+      const pickerWrap = document.getElementById('admin-staff-selector-wrap');
+      if (pickerWrap) {
+        // Only show top staff selector dropdown if elevated role
+        if (currentRole === 'staff') {
+          pickerWrap.classList.add('hidden');
+        } else {
+          pickerWrap.classList.remove('hidden');
+        }
+      }
+    }
+
+    function populateStaffPicker() {
+      const picker = document.getElementById('staff-picker');
+      if (!picker) return;
+
+      picker.innerHTML = allStaff.map(s => `
+        <option value="${s.employeeId}::${s.fullName}" ${isStaffActive(s) ? 'selected' : ''}>
+          ${s.fullName} (${s.employeeId})
+        </option>
+      `).join('');
+    }
+
+    function switchActiveEmployee(val) {
+      if (!val) return;
+      if (val.includes('::')) {
+        const [empId, ...nameParts] = val.split('::');
+        selectEmployeeCard(empId, nameParts.join('::'));
+      } else {
+        selectEmployeeCard(val);
+      }
+    }
+
+    // SELECT EMPLOYEE CARD (STRICTLY ONLY ONE RECEIPT / CARD ACTIVE AT A TIME)
+    function selectEmployeeCard(empId, empName = '', shouldScroll = true) {
+      let emp = null;
+      if (empName) {
+        emp = allStaff.find(s => s.employeeId === empId && (s.fullName || '').trim().toLowerCase() === empName.trim().toLowerCase());
+        if (!emp) {
+          emp = allStaff.find(s => (s.fullName || '').trim().toLowerCase() === empName.trim().toLowerCase());
+        }
+      }
+      if (!emp) {
+        emp = allStaff.find(s => s.employeeId === empId);
+      }
+      if (emp) {
+        activeEmployee = emp;
+        localStorage.setItem('bcf_selected_payslip_emp', emp.employeeId);
+        localStorage.setItem('bcf_selected_payslip_emp_name', emp.fullName || '');
+        
+        // Update top picker if visible
+        const picker = document.getElementById('staff-picker');
+        if (picker) {
+          picker.value = `${emp.employeeId}::${emp.fullName}`;
+          if (!picker.value) picker.value = emp.employeeId;
+        }
+
+        // Re-render
+        renderEmployeeCards();
+        renderCurrentPayslip();
+        renderHistoryTable();
+
+        if (shouldScroll) {
+          const banner = document.getElementById('welcome-banner-section');
+          if (banner) {
+            banner.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          }
+        }
+        showToast(`Loaded payslip profile for: ${emp.fullName}`, 'person');
+      }
+    }
+
+    // DIRECTLY VIEW RECEIPT MODAL FOR EMPLOYEE CARD
+    function openReceiptForEmployee(empId, empName = '') {
+      selectEmployeeCard(empId, empName, false);
+      openOfficialPayslipModal();
+    }
+
+    // DIRECTLY DOWNLOAD RECEIPT VOUCHER FOR EMPLOYEE CARD
+    function downloadReceiptForEmployee(empId, empName = '') {
+      selectEmployeeCard(empId, empName, false);
+      downloadPayslipPDF(activePeriod);
+    }
+
+    function getPeriodDisplayName(period) {
+      const periodNames = {
+        '2026-03': (localStorage.getItem('bcf_payroll_period_name') || 'March 2026'),
+        '2026-02': 'February 2026',
+        '2026-01': 'January 2026',
+        '2025-12': 'December 2025',
+        '2025-11': 'November 2025'
+      };
+      return periodNames[period] || period;
+    }
+
+    function changePayPeriod(period) {
+      activePeriod = period;
+
+      // Keep dropdown in sync
+      const cycleSelect = document.getElementById('select-cycle-view');
+      if (cycleSelect && cycleSelect.value !== period) {
+        cycleSelect.value = period;
+      }
+
+      // Automatically recalculate and provide all figures
+      renderEmployeeCards();
+      renderCurrentPayslip();
+      renderHistoryTable();
+
+      const periodDisplayName = getPeriodDisplayName(period);
+      showToast(`Automatically updated to ${periodDisplayName} Remuneration Statement`, 'calendar_month');
+    }
+
+    // SALARY & PAYROLL COMPUTATION (DIRECT SYNC WITH SCHEDULE)
+    function computeStaffPayroll(emp, period) {
+      if (!emp) return null;
+      const empId = emp.employeeId;
+
+      // 1. Check if directly saved in bcf_payroll_cycles or bcf_payroll_receipts
+      const cycleRec = (payrollCycles[period] && payrollCycles[period].records && payrollCycles[period].records[empId]) ||
+                       (payrollReceipts && payrollReceipts[`${empId}_${period}`]) ||
+                       (payrollReceipts && payrollReceipts[empId]);
+
+      if (cycleRec && cycleRec.netPay !== undefined && !isNaN(parseFloat(cycleRec.netPay))) {
+        const receiptNo = cycleRec.receiptNo || `BCF-REC-${period.replace(/[^A-Za-z0-9]/g, '')}-${(empId || '0001').split('-').pop()}`;
+        return {
+          basic: safeNum(cycleRec.basic, 8000),
+          incPct: safeNum(cycleRec.incPct, 0),
+          incAmt: safeNum(cycleRec.incAmt, 0) || (safeNum(cycleRec.basic, 8000) * (safeNum(cycleRec.incPct, 0) / 100)),
+          gross: safeNum(cycleRec.gross, 8000),
+          payeRate: safeNum(cycleRec.payeRate, payrollSettings?.payeRate || 30.0),
+          payeAmt: safeNum(cycleRec.payeAmt, 0),
+          netAfterTax: safeNum(cycleRec.netAfterTax, 0),
+          nassitEeRate: safeNum(cycleRec.nassitEeRate, payrollSettings?.nassitEmployeeRate || 5.0),
+          nassitEeAmt: safeNum(cycleRec.nassitEeAmt, 0),
+          nassitErRate: safeNum(cycleRec.nassitErRate, payrollSettings?.nassitEmployerRate || 10.0),
+          nassitErAmt: safeNum(cycleRec.nassitErAmt, 0),
+          advRate: cycleRec.advType === 'custom' ? 'Custom' : safeNum(cycleRec.advType, 0),
+          advanceAmt: safeNum(cycleRec.advanceAmt, 0),
+          loanDeduct: safeNum(cycleRec.loanDeduct, 0),
+          duty: safeNum(cycleRec.dutyAllowance, 0),
+          transport: safeNum(cycleRec.transportAllowance, 0),
+          housing: safeNum(cycleRec.housingAllowance, 0),
+          other: safeNum(cycleRec.otherAllowance, 0),
+          totalAllowances: safeNum(cycleRec.totalAllowances, 0),
+          totalDeductions: safeNum(cycleRec.totalDeductions, 0),
+          netPay: safeNum(cycleRec.netPay, 0),
+          receiptNo: receiptNo,
+          receiptDate: cycleRec.receiptDate || new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' }),
+          isDirectSynced: true
+        };
+      }
+
+      // 2. Fallback: compute dynamically from registry and statutory settings
+      let basic = safeNum(emp.payBasic || emp.basicSalary || emp.basic || emp.salary, 0);
+      if (basic <= 0) {
+        const lvl = ((emp.jobLevel || '') + ' ' + (emp.title || '') + ' ' + (emp.mgmtLevel || '')).toLowerCase();
+        if (lvl.includes('ceo') || lvl.includes('executive') || lvl.includes('board')) basic = 24000;
+        else if (lvl.includes('director')) basic = 18000;
+        else if (lvl.includes('manager') || lvl.includes('lead') || lvl.includes('specialist') || lvl.includes('coordinator')) basic = 12000;
+        else basic = 8500;
+      }
+
+      let incPct = 0;
+      if (emp.payInc !== undefined && emp.payInc !== null && String(emp.payInc).trim() !== '') {
+        incPct = safeNum(emp.payInc, 0);
+      }
+      const incAmt = basic * (incPct / 100.0);
+      const gross = basic + incAmt;
+
+      const payeRate = safeNum(payrollSettings?.payeRate, 30.0);
+      const payeAmt = gross * (payeRate / 100.0);
+      const netAfterTax = Math.max(0, gross - payeAmt);
+
+      const nassitEeRate = safeNum(payrollSettings?.nassitEmployeeRate, 5.0);
+      const nassitEeAmt = gross * (nassitEeRate / 100.0);
+      const nassitErRate = safeNum(payrollSettings?.nassitEmployerRate, 10.0);
+      const nassitErAmt = gross * (nassitErRate / 100.0);
+
+      let advRate = safeNum(emp.payAdvType, 10);
+      let advanceAmt = (advRate > 0) ? (netAfterTax * (advRate / 100.0)) : 0;
+
+      const loan = staffLoans.find(l => l.employeeId === emp.employeeId && l.status === 'ACTIVE' && safeNum(l.balanceRemaining, 0) > 0);
+      let loanDeduct = loan ? Math.min(safeNum(loan.monthlyDeduction, 0), safeNum(loan.balanceRemaining, 0)) : safeNum(emp.payLoan, 0);
+
+      const duty = gross * (safeNum(payrollSettings?.dutyAllowanceRate, 2.0) / 100.0);
+      const totalAllowances = duty;
+      const totalDeductions = payeAmt + nassitEeAmt + advanceAmt + loanDeduct;
+      const netPay = Math.max(0, (gross + totalAllowances) - totalDeductions);
+      const receiptNo = `BCF-REC-${period.replace(/[^A-Za-z0-9]/g, '')}-${(empId || '0001').split('-').pop()}`;
+
+      return {
+        basic,
+        incPct,
+        incAmt,
+        gross,
+        payeRate,
+        payeAmt,
+        netAfterTax,
+        nassitEeRate,
+        nassitEeAmt,
+        nassitErRate,
+        nassitErAmt,
+        advRate,
+        advanceAmt,
+        loanDeduct,
+        duty,
+        housing: 0,
+        other: 0,
+        totalAllowances,
+        totalDeductions,
+        netPay,
+        receiptNo,
+        receiptDate: new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' }),
+        isDirectSynced: false
+      };
+    }
+
+    // RENDER EMPLOYEE CARD LIST (ROSTER)
+    function renderEmployeeCards() {
+      const grid = document.getElementById('employee-cards-grid');
+      const empty = document.getElementById('employee-cards-empty');
+      const badge = document.getElementById('roster-badge-count');
+      if (!grid) return;
+
+      // Access right rule: Staff View Access (Only see His/her Payslip Self-Service Not Others Slip)
+      let authUser = null;
+      try {
+        const rawAuth = sessionStorage.getItem('bcf_sl_auth') || localStorage.getItem('bcf_sl_auth');
+        if (rawAuth) authUser = JSON.parse(rawAuth).user;
+      } catch(e) {}
+
+      const userRole = (authUser?.role || localStorage.getItem('bcf_user_role') || '').toLowerCase();
+      const isElevatedRole =
+        userRole.includes('admin') ||
+        userRole.includes('ceo') ||
+        userRole.includes('director') ||
+        userRole === 'sa' ||
+        userRole === 'fin' ||
+        userRole === 'hr' ||
+        userRole === 'iar';
+
+      let staffPool = allStaff;
+      if (authUser && !isElevatedRole) {
+        const uEmail = (authUser.email || '').toLowerCase();
+        const uId = (authUser.employeeId || '').toLowerCase();
+        const uName = (authUser.name || '').toLowerCase();
+        const uUsername = (authUser.username || '').toLowerCase();
+
+        staffPool = allStaff.filter(emp => {
+          const empId = (emp.employeeId || '').toLowerCase();
+          const empEmail = (emp.email || '').toLowerCase();
+          const empName = (emp.fullName || '').toLowerCase();
+          return (uId && empId === uId) ||
+                 (uEmail && empEmail === uEmail) ||
+                 (uUsername && empId.includes(uUsername)) ||
+                 (uName && empName.includes(uName));
+        });
+
+        if (staffPool.length === 0 && allStaff.length > 0) {
+          staffPool = [{
+            employeeId: authUser.employeeId || 'BCF-ST-001',
+            fullName: authUser.name || 'Staff Member',
+            department: authUser.department || 'Operations',
+            unit: 'Field Operations',
+            title: authUser.position || 'Community Officer',
+            jobLevel: 'Officer',
+            contractType: 'Permanent',
+            bankName: 'Sierra Leone Commercial Bank',
+            accNo: '003-010492-01',
+            baseSalary: 6500,
+            allowances: 1200,
+            nassitNumber: 'N-98234102',
+            tinNumber: 'T-8829103'
+          }];
+        }
+
+        if (activeEmployee && !staffPool.some(s => s.employeeId === activeEmployee.employeeId)) {
+          activeEmployee = staffPool[0];
+          renderCurrentPayslip();
+        }
+
+        // Hide roster search and department filter controls from regular staff
+        const searchInput = document.getElementById('roster-search');
+        if (searchInput && searchInput.parentElement) searchInput.parentElement.classList.add('hidden');
+        const deptFilterElem = document.getElementById('roster-dept-filter');
+        if (deptFilterElem) deptFilterElem.classList.add('hidden');
+      }
+
+      const q = (document.getElementById('roster-search')?.value || '').trim().toLowerCase();
+      const deptFilter = document.getElementById('roster-dept-filter')?.value || 'ALL';
+
+      const filtered = staffPool.filter(emp => {
+        if (deptFilter !== 'ALL' && emp.department !== deptFilter) return false;
+        if (q) {
+          const name = (emp.fullName || '').toLowerCase();
+          const id = (emp.employeeId || '').toLowerCase();
+          const title = (emp.title || '').toLowerCase();
+          const dept = (emp.department || '').toLowerCase();
+          if (!name.includes(q) && !id.includes(q) && !title.includes(q) && !dept.includes(q)) return false;
+        }
+        return true;
+      });
+
+      if (badge) {
+        badge.textContent = isElevatedRole
+          ? `${filtered.length} Staff ${filtered.length === 1 ? 'Member' : 'Members'}`
+          : 'My Personal Payslip';
+      }
+
+      if (filtered.length === 0) {
+        grid.innerHTML = '';
+        if (empty) empty.classList.remove('hidden');
+        return;
+      }
+      if (empty) empty.classList.add('hidden');
+
+      grid.innerHTML = filtered.map(emp => {
+        const isSelected = isStaffActive(emp);
+        const initials = (emp.fullName || 'AB').split(' ').map(w => w[0]).slice(0, 2).join('').toUpperCase();
+        const p = computeStaffPayroll(emp, activePeriod);
+        const safeName = (emp.fullName || '').replace(/'/g, "\\'");
+
+        const cardBorderClass = isSelected 
+          ? 'border-2 border-primary ring-2 ring-primary/20 bg-emerald-50/40 shadow-sm' 
+          : 'border border-slate-200 bg-white hover:border-primary/50 hover:shadow-xs';
+
+        return `
+        <div class="rounded-xl p-4 transition-all duration-150 flex flex-col justify-between ${cardBorderClass}" onclick="selectEmployeeCard('${emp.employeeId}', '${safeName}', true)">
+          
+          <div>
+            <!-- Top row: Avatar, Name, and Status Badge -->
+            <div class="flex items-start justify-between gap-2.5 mb-2.5">
+              <div class="flex items-center gap-2.5 min-w-0">
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-800 to-primary text-white flex items-center justify-center font-black text-sm shrink-0 shadow-2xs">
+                  ${initials}
+                </div>
+                <div class="min-w-0">
+                  <h3 class="text-xs sm:text-sm font-bold text-slate-900 truncate leading-snug">${emp.fullName}</h3>
+                  <span class="text-[11px] font-mono font-semibold text-primary block">${emp.employeeId}</span>
+                </div>
+              </div>
+
+              <div>
+                ${isSelected 
+                  ? '<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-primary text-white shadow-2xs"><span class="material-symbols-outlined text-[12px]">check_circle</span> Active</span>' 
+                  : '<span class="inline-flex items-center gap-0.5 px-2 py-0.5 rounded-full text-[10px] font-semibold bg-slate-100 text-slate-600">Synced</span>'
+                }
+              </div>
+            </div>
+
+            <!-- Position & Department Meta -->
+            <div class="text-[11px] text-slate-600 space-y-0.5 mb-3 bg-slate-50/80 p-2 rounded-lg border border-slate-100">
+              <div class="truncate"><strong class="text-slate-800">${emp.department || 'General Administration'}</strong></div>
+              <div class="text-slate-500 truncate">${emp.title || 'Staff Officer'} • <span class="font-medium text-emerald-800">${emp.jobLevel || 'Officer'}</span></div>
+            </div>
+
+            <!-- Salary Remuneration Highlight Box -->
+            <div class="bg-white p-2.5 rounded-lg border border-slate-200 flex items-center justify-between mb-3 shadow-2xs">
+              <div>
+                <span class="text-[9px] font-bold uppercase tracking-wider text-slate-400 block">Take-Home Net Pay</span>
+                <span class="text-sm sm:text-base font-black font-mono text-emerald-800">NLe ${p.netPay.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+              </div>
+              <div class="text-right">
+                <span class="text-[9px] text-slate-400 block font-medium">Gross Salary</span>
+                <span class="text-xs font-mono font-bold text-slate-700">NLe ${p.gross.toLocaleString('en-US', { minimumFractionDigits: 2 })}</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Bottom Action Buttons: Open Payslip, View Receipt, Download PDF -->
+          <div class="flex items-center gap-1.5 pt-2 border-t border-slate-100" onclick="event.stopPropagation()">
+            <button type="button" onclick="selectEmployeeCard('${emp.employeeId}', '${safeName}', true)" class="flex-1 h-8 rounded-lg bg-emerald-50 hover:bg-emerald-100 text-emerald-900 text-[11px] font-bold inline-flex items-center justify-center gap-1 transition">
+              <span class="material-symbols-outlined text-[15px]">badge</span>
+              <span>Open Payslip</span>
+            </button>
+            <button type="button" onclick="openReceiptForEmployee('${emp.employeeId}', '${safeName}')" title="View Official Centered Receipt" class="h-8 px-2.5 rounded-lg border border-primary text-primary hover:bg-emerald-50 text-[11px] font-bold inline-flex items-center justify-center gap-1 transition">
+              <span class="material-symbols-outlined text-[15px]">receipt_long</span>
+              <span class="hidden xl:inline">Receipt</span>
+            </button>
+            <button type="button" onclick="downloadReceiptForEmployee('${emp.employeeId}', '${safeName}')" title="Download Certified PDF Receipt Voucher" class="h-8 px-2.5 rounded-lg bg-primary hover:bg-primary-dark text-white text-[11px] font-bold inline-flex items-center justify-center gap-1 transition shadow-2xs">
+              <span class="material-symbols-outlined text-[15px]">download</span>
+            </button>
+          </div>
+
+        </div>
+        `;
+      }).join('');
+    }
+
+    // RENDER CURRENT PAYSLIP VIEW
+    function renderCurrentPayslip() {
+      if (!activeEmployee) return;
+
+      const initials = (activeEmployee.fullName || 'AB').split(' ').map(w => w[0]).slice(0, 2).join('').toUpperCase();
+      document.getElementById('staff-avatar').textContent = initials;
+      document.getElementById('staff-badge-id').textContent = activeEmployee.employeeId;
+      document.getElementById('staff-welcome-name').textContent = (activeEmployee.fullName || '').toUpperCase();
+      document.getElementById('staff-welcome-dept').textContent = activeEmployee.department || 'General Administration';
+      document.getElementById('staff-welcome-position').textContent = activeEmployee.title || 'Staff Officer';
+      document.getElementById('staff-welcome-level').textContent = `${activeEmployee.jobLevel || 'Officer'} Level`;
+      document.getElementById('staff-bank-name').textContent = activeEmployee.bankName || 'Sierra Leone Commercial Bank';
+      document.getElementById('staff-bank-acc').textContent = activeEmployee.accNo || '— — —';
+
+      const p = computeStaffPayroll(activeEmployee, activePeriod);
+
+      // Keep select dropdown in sync with activePeriod
+      const cycleSelect = document.getElementById('select-cycle-view');
+      if (cycleSelect && cycleSelect.value !== activePeriod) {
+        cycleSelect.value = activePeriod;
+      }
+
+      // Hero banner label - automatically matches selected Pay Period!
+      const periodDisplayName = getPeriodDisplayName(activePeriod);
+      const heroHeading = document.getElementById('hero-period-label');
+      if (heroHeading) {
+        heroHeading.textContent = `${periodDisplayName} Remuneration Statement`;
+      }
+
+      document.getElementById('hero-net-pay').textContent = p.netPay.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+      document.getElementById('hero-gross').textContent = `NLe ${p.gross.toLocaleString('en-US', { minimumFractionDigits: 2 })}`;
+      document.getElementById('hero-statutory').textContent = `- NLe ${(p.payeAmt + p.nassitEeAmt).toLocaleString('en-US', { minimumFractionDigits: 2 })}`;
+      document.getElementById('hero-loan-adv').textContent = `- NLe ${(p.advanceAmt + p.loanDeduct).toLocaleString('en-US', { minimumFractionDigits: 2 })}`;
+      document.getElementById('hero-allowance').textContent = `+ NLe ${p.totalAllowances.toLocaleString('en-US', { minimumFractionDigits: 2 })}`;
+    }
+
+    // 10. POPULATE & OPEN OFFICIAL BCF-SL PAYSLIP MODAL (WITH CENTERED HEADER)
+    function openOfficialPayslipModal() {
+      if (!activeEmployee) return;
+
+      const p = computeStaffPayroll(activeEmployee, activePeriod);
+      const periodName = getPeriodDisplayName(activePeriod);
+      const typedPeriodDate = (activePeriod === '2026-03')
+        ? (localStorage.getItem('bcf_payroll_period_date') || '03/2026')
+        : (activePeriod.includes('-') ? (activePeriod.split('-')[1] + '/' + activePeriod.split('-')[0]) : '03/2026');
+      const typedPreparedBy = (activePeriod === '2026-03')
+        ? (localStorage.getItem('bcf_payroll_prepared_by') || 'Accounts Officer')
+        : 'Accounts Officer';
+
+      document.getElementById('vouch-doc-title').textContent = `INDIVIDUAL SALARY PAYROLL & REMITTANCE RECEIPT — ${(activeEmployee.jobLevel || 'OFFICER').toUpperCase()}`;
+      document.getElementById('vouch-period').textContent = periodName;
+      document.getElementById('vouch-date-prepared').textContent = typedPeriodDate;
+      document.getElementById('vouch-sign-prepared').textContent = typedPreparedBy;
+      document.getElementById('vouch-date-prep').textContent = `Date: ${typedPeriodDate}`;
+      
+      const receiptNoElem = document.getElementById('vouch-receipt-no');
+      if (receiptNoElem) receiptNoElem.textContent = p.receiptNo;
+
+      // Employee Information
+      document.getElementById('vouch-name').textContent = activeEmployee.fullName;
+      document.getElementById('vouch-id').textContent = activeEmployee.employeeId;
+      document.getElementById('vouch-dept').textContent = activeEmployee.department || 'Finance Department';
+      document.getElementById('vouch-unit').textContent = activeEmployee.unit || 'Financial Operations';
+      document.getElementById('vouch-title').textContent = activeEmployee.title || 'Staff Officer';
+      document.getElementById('vouch-level').textContent = activeEmployee.jobLevel || 'Officer';
+      document.getElementById('vouch-bank').textContent = activeEmployee.bankName || 'Sierra Leone Commercial Bank';
+      document.getElementById('vouch-acc').textContent = activeEmployee.accNo || '—';
+
+      // Section A: Earnings
+      document.getElementById('vouch-earn-basic').textContent = p.basic.toLocaleString('en-US', { minimumFractionDigits: 2 });
+      document.getElementById('vouch-earn-basic-final').textContent = p.basic.toLocaleString('en-US', { minimumFractionDigits: 2 });
+      document.getElementById('vouch-earn-inc-pct').textContent = `${p.incPct}% Approved Merit Increase`;
+      document.getElementById('vouch-earn-inc-amt').textContent = p.incAmt.toLocaleString('en-US', { minimumFractionDigits: 2 });
+      document.getElementById('vouch-earn-inc-final').textContent = p.incAmt.toLocaleString('en-US', { minimumFractionDigits: 2 });
+      document.getElementById('vouch-earn-gross').textContent = p.gross.toLocaleString('en-US', { minimumFractionDigits: 2 });
+      document.getElementById('vouch-earn-gross-final').textContent = p.gross.toLocaleString('en-US', { minimumFractionDigits: 2 });
+
+      // Section B: Deductions
+      document.getElementById('vouch-ded-paye-rate').textContent = `Configured rate (${p.payeRate.toFixed(1)}%)`;
+      document.getElementById('vouch-ded-paye').textContent = p.payeAmt.toLocaleString('en-US', { minimumFractionDigits: 2 });
+      document.getElementById('vouch-ded-paye-final').textContent = p.payeAmt.toLocaleString('en-US', { minimumFractionDigits: 2 });
+
+      document.getElementById('vouch-ded-nassit-rate').textContent = `Configured rate (${p.nassitEeRate.toFixed(1)}%)`;
+      document.getElementById('vouch-ded-nassit').textContent = p.nassitEeAmt.toLocaleString('en-US', { minimumFractionDigits: 2 });
+      document.getElementById('vouch-ded-nassit-final').textContent = p.nassitEeAmt.toLocaleString('en-US', { minimumFractionDigits: 2 });
+
+      document.getElementById('vouch-ded-advance-rate').textContent = typeof p.advRate === 'number' ? `${p.advRate}% of Net-of-Tax` : p.advRate;
+      document.getElementById('vouch-ded-advance').textContent = p.advanceAmt.toLocaleString('en-US', { minimumFractionDigits: 2 });
+      document.getElementById('vouch-ded-advance-final').textContent = p.advanceAmt.toLocaleString('en-US', { minimumFractionDigits: 2 });
+
+      document.getElementById('vouch-ded-loan').textContent = p.loanDeduct.toLocaleString('en-US', { minimumFractionDigits: 2 });
+      document.getElementById('vouch-ded-loan-final').textContent = p.loanDeduct.toLocaleString('en-US', { minimumFractionDigits: 2 });
+
+      document.getElementById('vouch-ded-total').textContent = p.totalDeductions.toLocaleString('en-US', { minimumFractionDigits: 2 });
+      document.getElementById('vouch-ded-total-final').textContent = `- ${p.totalDeductions.toLocaleString('en-US', { minimumFractionDigits: 2 })}`;
+
+      // Section C: Allowances
+      document.getElementById('vouch-allw-duty').textContent = p.totalAllowances.toLocaleString('en-US', { minimumFractionDigits: 2 });
+      document.getElementById('vouch-allw-duty-final').textContent = `+ ${p.totalAllowances.toLocaleString('en-US', { minimumFractionDigits: 2 })}`;
+      document.getElementById('vouch-allw-total').textContent = p.totalAllowances.toLocaleString('en-US', { minimumFractionDigits: 2 });
+      document.getElementById('vouch-allw-total-final').textContent = `+ ${p.totalAllowances.toLocaleString('en-US', { minimumFractionDigits: 2 })}`;
+
+      // Final Net Pay
+      document.getElementById('vouch-net-total').textContent = p.netPay.toLocaleString('en-US', { minimumFractionDigits: 2 });
+
+      document.getElementById('vouch-ref-stamp').textContent = `Ref: PAY-${activePeriod}-BCF`;
+
+      document.getElementById('official-payslip-modal').classList.remove('hidden');
+    }
+
+    function closeOfficialPayslipModal() {
+      document.getElementById('official-payslip-modal').classList.add('hidden');
+    }
+
+    // 13. PREVIOUS CERTIFIED PAYSLIPS TABLE ENGINE
+    function renderHistoryTable() {
+      const tbody = document.getElementById('history-table-body');
+      const empty = document.getElementById('history-empty');
+      if (!tbody || !activeEmployee) return;
+
+      const q = (document.getElementById('history-search')?.value || '').trim().toLowerCase();
+      const y = document.getElementById('history-year-filter')?.value || 'ALL';
+
+      const periods = ARCHIVED_PERIODS.filter(item => {
+        if (y !== 'ALL' && item.year !== y) return false;
+        if (q) {
+          const matchP = item.period.toLowerCase().includes(q);
+          const matchR = item.ref.toLowerCase().includes(q);
+          if (!matchP && !matchR) return false;
+        }
+        return true;
+      });
+
+      if (periods.length === 0) {
+        tbody.innerHTML = '';
+        if (empty) empty.classList.remove('hidden');
+        return;
+      }
+      if (empty) empty.classList.add('hidden');
+
+      const periodNames = {
+        '2026-03': 'March 2026',
+        '2026-02': 'February 2026',
+        '2026-01': 'January 2026',
+        '2025-12': 'December 2025',
+        '2025-11': 'November 2025'
+      };
+
+      tbody.innerHTML = periods.map(item => {
+        const p = computeStaffPayroll(activeEmployee, item.period);
+        const name = periodNames[item.period] || item.period;
+
+        return `
+        <tr class="hover:bg-slate-50 transition border-b border-slate-100">
+          <td class="py-3 px-4 font-bold text-slate-900">${name}</td>
+          <td class="py-3 px-4 font-mono text-primary">${item.ref}</td>
+          <td class="py-3 px-4">
+            <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-800 border border-emerald-200">
+              <span class="material-symbols-outlined text-[12px]">verified</span>
+              <span>${item.status}</span>
+            </span>
+          </td>
+          <td class="py-3 px-4 text-right font-mono text-slate-700">NLe ${p.gross.toLocaleString('en-US', { minimumFractionDigits: 2 })}</td>
+          <td class="py-3 px-4 text-right font-mono text-amber-700">- NLe ${p.totalDeductions.toLocaleString('en-US', { minimumFractionDigits: 2 })}</td>
+          <td class="py-3 px-4 text-right font-mono font-bold text-emerald-800">NLe ${p.netPay.toLocaleString('en-US', { minimumFractionDigits: 2 })}</td>
+          <td class="py-3 px-4 text-center whitespace-nowrap">
+            <div class="flex items-center justify-center gap-1.5">
+              <button type="button" onclick="viewHistoricalPayslip('${item.period}')" class="px-2.5 py-1 rounded bg-slate-100 hover:bg-primary hover:text-white font-bold text-[11px] text-slate-700 transition">
+                View Receipt
+              </button>
+              <button type="button" onclick="downloadPayslipPDF('${item.period}')" class="px-2.5 py-1 rounded border border-slate-200 hover:bg-slate-100 font-bold text-[11px] text-primary flex items-center gap-1 transition">
+                <span class="material-symbols-outlined text-[13px]">download</span>
+                <span>PDF</span>
+              </button>
+            </div>
+          </td>
+        </tr>
+        `;
+      }).join('');
+    }
+
+    function viewHistoricalPayslip(period) {
+      activePeriod = period;
+      renderCurrentPayslip();
+      openOfficialPayslipModal();
+    }
+
+    // DOWNLOAD PDF / PRINT TRIGGER
+    function downloadPayslipPDF(period) {
+      if (period) {
+        activePeriod = period;
+        renderCurrentPayslip();
+      }
+      openOfficialPayslipModal();
+      showToast(`Generating certified PDF voucher for ${activePeriod}...`, 'picture_as_pdf');
+      setTimeout(() => {
+        window.print();
+      }, 400);
+    }
+
+    function navToSchedule() {
+      try {
+        if (window.top && window.top !== window && window.top.location) {
+          window.top.location.href = '/finance/payroll-schedule';
+          return;
+        }
+      } catch(e) {}
+      window.location.href = '../staff_payroll_statutory_schedule/code.html';
+    }
+
+    // TOAST SYSTEM
+    let toastTimer;
+    function showToast(msg, icon = 'check_circle') {
+      const t = document.getElementById('toast');
+      const txt = document.getElementById('toast-message');
+      const ic = document.getElementById('toast-icon');
+      if (!t || !txt) return;
+
+      txt.textContent = msg;
+      if (ic) ic.textContent = icon;
+      t.classList.remove('translate-y-16', 'opacity-0', 'pointer-events-none');
+      t.classList.add('translate-y-0', 'opacity-100');
+
+      clearTimeout(toastTimer);
+      toastTimer = setTimeout(() => {
+        t.classList.add('translate-y-16', 'opacity-0', 'pointer-events-none');
+        t.classList.remove('translate-y-0', 'opacity-100');
+      }, 3500);
+    }
+
+    // ==========================================
+    // MONTHLY PREPARED RECEIPT FOLDERS ENGINE
+    // ==========================================
+    let isFolderGridViewOpen = false;
+
+    function getMonthlyFolders() {
+      const folders = [];
+      const seen = new Set();
+
+      // 1. Active typed period from Schedule
+      const activePeriodName = localStorage.getItem('bcf_payroll_period_name') || 'March 2026';
+      const activePeriodKey = '2026-03';
+      folders.push({
+        period: activePeriodKey,
+        name: activePeriodName,
+        date: localStorage.getItem('bcf_payroll_period_date') || '03/2026',
+        status: 'Active Run',
+        receiptCount: allStaff.length
+      });
+      seen.add(activePeriodKey);
+
+      // 2. From ARCHIVED_PERIODS
+      const defaultNames = {
+        '2026-02': 'February 2026',
+        '2026-01': 'January 2026',
+        '2025-12': 'December 2025',
+        '2025-11': 'November 2025'
+      };
+      ARCHIVED_PERIODS.forEach(p => {
+        if (!seen.has(p.period)) {
+          seen.add(p.period);
+          folders.push({
+            period: p.period,
+            name: defaultNames[p.period] || p.period,
+            date: p.period.includes('-') ? (p.period.split('-')[1] + '/' + p.period.split('-')[0]) : '03/2026',
+            status: p.status || 'Certified',
+            receiptCount: allStaff.length
+          });
+        }
+      });
+
+      // 3. From bcf_payroll_cycles
+      for (let key in payrollCycles) {
+        if (!seen.has(key)) {
+          seen.add(key);
+          const c = payrollCycles[key];
+          folders.push({
+            period: key,
+            name: c.periodName || key,
+            date: c.periodDate || key,
+            status: c.status || 'Archived',
+            receiptCount: Object.keys(c.records || {}).length || allStaff.length
+          });
+        }
+      }
+
+      // 4. From custom created folders (bcf_payroll_folders)
+      try {
+        const customFolders = JSON.parse(localStorage.getItem('bcf_payroll_folders') || '{}');
+        for (let key in customFolders) {
+          if (!seen.has(key)) {
+            seen.add(key);
+            folders.push(customFolders[key]);
+          }
+        }
+      } catch(e) {}
+
+      return folders;
+    }
+
+    function renderMonthlyFoldersStrip() {
+      const strip = document.getElementById('monthly-folders-strip');
+      if (!strip) return;
+
+      const folders = getMonthlyFolders();
+
+      strip.innerHTML = folders.map(f => {
+        const isOpen = f.period === activePeriod;
+        const activeClass = isOpen
+          ? 'bg-[#0D5C3A] text-white border-[#0D5C3A] shadow-xs'
+          : 'bg-white text-slate-700 border-slate-200 hover:border-[#0D5C3A] hover:bg-emerald-50/50';
+
+        const icon = isOpen ? 'folder_open' : 'folder';
+
+        return `
+        <button type="button" onclick="openMonthFolder('${f.period}')" class="shrink-0 px-3 py-1.5 rounded-xl border text-xs font-bold transition-all flex items-center gap-2 ${activeClass}">
+          <span class="material-symbols-outlined text-[17px] ${isOpen ? 'text-white' : 'text-amber-500'}">${icon}</span>
+          <span>${f.name}</span>
+          <span class="text-[10px] px-1.5 py-0.2 rounded-full font-semibold ${isOpen ? 'bg-white/20 text-white' : 'bg-slate-100 text-slate-600'}">
+            ${f.receiptCount || allStaff.length}
+          </span>
+        </button>
+        `;
+      }).join('');
+
+      updateActiveFolderBanner();
+      renderAllFoldersGrid();
+    }
+
+    function updateActiveFolderBanner() {
+      const folderName = getPeriodDisplayName(activePeriod);
+      const titleElem = document.getElementById('active-folder-title');
+      const badgeElem = document.getElementById('active-folder-status-badge');
+      const subElem = document.getElementById('active-folder-subtitle');
+
+      if (titleElem) titleElem.textContent = `Month Folder: ${folderName}`;
+      if (badgeElem) badgeElem.textContent = activePeriod === '2026-03' ? 'Active Run' : 'Certified Archive';
+      if (subElem) {
+        subElem.textContent = `All employee receipts prepared for ${folderName} are archived inside this folder. Click any card below to view or download.`;
+      }
+    }
+
+    function openMonthFolder(period) {
+      changePayPeriod(period);
+      renderMonthlyFoldersStrip();
+    }
+
+    function toggleFolderGridView() {
+      isFolderGridViewOpen = !isFolderGridViewOpen;
+      const wrap = document.getElementById('all-folders-grid-wrapper');
+      const lbl = document.getElementById('label-toggle-folder-view');
+      if (wrap) {
+        wrap.classList.toggle('hidden', !isFolderGridViewOpen);
+      }
+      if (lbl) {
+        lbl.textContent = isFolderGridViewOpen ? 'Hide Folders Grid' : 'Browse All Folders';
+      }
+      if (isFolderGridViewOpen) {
+        renderAllFoldersGrid();
+      }
+    }
+
+    function renderAllFoldersGrid() {
+      const grid = document.getElementById('all-folders-grid');
+      const countLbl = document.getElementById('folders-count-label');
+      if (!grid) return;
+
+      const folders = getMonthlyFolders();
+      if (countLbl) countLbl.textContent = `${folders.length} Month Folders Available`;
+
+      grid.innerHTML = folders.map(f => {
+        const isOpen = f.period === activePeriod;
+        return `
+        <div class="bg-white rounded-xl p-3 border transition-all ${isOpen ? 'border-primary ring-2 ring-primary/20 bg-emerald-50/20' : 'border-slate-200 hover:border-primary'} shadow-2xs flex flex-col justify-between space-y-2">
+          <div class="flex items-start justify-between gap-1.5">
+            <div class="w-8 h-8 rounded-lg ${isOpen ? 'bg-primary text-white' : 'bg-amber-100 text-amber-700'} flex items-center justify-center shrink-0">
+              <span class="material-symbols-outlined text-[18px]">${isOpen ? 'folder_open' : 'folder'}</span>
+            </div>
+            <span class="text-[10px] font-bold px-1.5 py-0.5 rounded ${isOpen ? 'bg-primary text-white' : 'bg-slate-100 text-slate-600'}">
+              ${f.status}
+            </span>
+          </div>
+          <div>
+            <h4 class="text-xs font-bold text-slate-900 truncate">${f.name}</h4>
+            <div class="text-[10px] text-slate-500 font-mono mt-0.5">Ref: ${f.date} • ${f.receiptCount} Receipts</div>
+          </div>
+          <div class="flex items-center gap-1 pt-1.5 border-t border-slate-100">
+            <button type="button" onclick="openMonthFolder('${f.period}')" class="flex-1 h-7 rounded-lg ${isOpen ? 'bg-primary text-white' : 'bg-slate-100 hover:bg-primary hover:text-white text-slate-700'} text-[10px] font-bold inline-flex items-center justify-center gap-1 transition">
+              <span class="material-symbols-outlined text-[13px]">${isOpen ? 'check_circle' : 'folder_open'}</span>
+              <span>${isOpen ? 'Current' : 'Open'}</span>
+            </button>
+            <button type="button" onclick="downloadPayslipPDF('${f.period}')" title="Download certified PDF voucher" class="h-7 px-2 rounded-lg border border-slate-200 hover:bg-slate-100 text-slate-600 text-[10px] font-bold inline-flex items-center justify-center transition">
+              <span class="material-symbols-outlined text-[13px] text-primary">download</span>
+            </button>
+          </div>
+        </div>
+        `;
+      }).join('');
+    }
+
+    function batchDownloadFolderReceipts() {
+      const folderName = getPeriodDisplayName(activePeriod);
+      showToast(`Downloading certified receipt packet for folder: ${folderName}...`, 'download_for_offline');
+      setTimeout(() => {
+        window.print();
+      }, 350);
+    }
+
+    function batchPrintFolderReceipts() {
+      const folderName = getPeriodDisplayName(activePeriod);
+      showToast(`Preparing print receipt vouchers for folder: ${folderName}...`, 'print');
+      setTimeout(() => {
+        window.print();
+      }, 350);
+    }
+
+    function openCreateMonthFolderModal() {
+      document.getElementById('create-month-folder-modal').classList.remove('hidden');
+    }
+
+    function closeCreateMonthFolderModal() {
+      document.getElementById('create-month-folder-modal').classList.add('hidden');
+    }
+
+    function saveNewMonthFolder() {
+      const m = document.getElementById('new-folder-month').value;
+      const y = document.getElementById('new-folder-year').value;
+      const folderName = `${m} ${y}`;
+      
+      const monthMap = {
+        'January': '01', 'February': '02', 'March': '03', 'April': '04',
+        'May': '05', 'June': '06', 'July': '07', 'August': '08',
+        'September': '09', 'October': '10', 'November': '11', 'December': '12'
+      };
+      const periodKey = `${y}-${monthMap[m] || '01'}`;
+
+      let customFolders = {};
+      try {
+        customFolders = JSON.parse(localStorage.getItem('bcf_payroll_folders') || '{}');
+      } catch(e) {}
+
+      customFolders[periodKey] = {
+        period: periodKey,
+        name: folderName,
+        date: `${monthMap[m] || '01'}/${y}`,
+        status: 'Prepared',
+        receiptCount: allStaff.length
+      };
+
+      localStorage.setItem('bcf_payroll_folders', JSON.stringify(customFolders));
+      closeCreateMonthFolderModal();
+
+      // Add to select-cycle-view if not present
+      const sel = document.getElementById('select-cycle-view');
+      if (sel && !sel.querySelector(`option[value="${periodKey}"]`)) {
+        const opt = document.createElement('option');
+        opt.value = periodKey;
+        opt.textContent = `${folderName} (Prepared)`;
+        sel.prepend(opt);
+      }
+
+      openMonthFolder(periodKey);
+      showToast(`Created and opened new month folder: ${folderName}`, 'create_new_folder');
+    }
+  </script>
+  <!-- MODAL: CREATE NEW MONTH FOLDER -->
+  <div id="create-month-folder-modal" class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4 hidden">
+    <div class="bg-white rounded-2xl shadow-2xl border border-slate-200 max-w-md w-full overflow-hidden animate-in fade-in zoom-in-95 duration-150">
+      <div class="px-5 py-4 bg-slate-900 text-white flex items-center justify-between">
+        <div class="flex items-center gap-2">
+          <span class="material-symbols-outlined text-amber-400 text-[22px]">create_new_folder</span>
+          <h3 class="font-bold text-sm">Create New Month Folder</h3>
+        </div>
+        <button type="button" onclick="closeCreateMonthFolderModal()" class="w-8 h-8 rounded-lg bg-white/10 hover:bg-white/20 text-white flex items-center justify-center transition">
+          <span class="material-symbols-outlined text-[18px]">close</span>
+        </button>
+      </div>
+      <div class="p-5 space-y-4 text-xs">
+        <p class="text-slate-500">
+          Create a new monthly receipt folder. Naming convention follows <strong class="text-slate-800 font-semibold">[Month Year]</strong> (e.g. <em>April 2026</em>).
+        </p>
+        <div>
+          <label for="new-folder-month" class="block font-bold text-slate-700 mb-1">Select Month</label>
+          <select id="new-folder-month" class="w-full px-3 py-2 rounded-lg border border-slate-200 text-xs font-semibold text-slate-900 bg-slate-50 focus:outline-none focus:ring-1 focus:ring-primary">
+            <option value="January">January</option>
+            <option value="February">February</option>
+            <option value="March">March</option>
+            <option value="April" selected>April</option>
+            <option value="May">May</option>
+            <option value="June">June</option>
+            <option value="July">July</option>
+            <option value="August">August</option>
+            <option value="September">September</option>
+            <option value="October">October</option>
+            <option value="November">November</option>
+            <option value="December">December</option>
+          </select>
+        </div>
+        <div>
+          <label for="new-folder-year" class="block font-bold text-slate-700 mb-1">Select Year</label>
+          <select id="new-folder-year" class="w-full px-3 py-2 rounded-lg border border-slate-200 text-xs font-semibold text-slate-900 bg-slate-50 focus:outline-none focus:ring-1 focus:ring-primary">
+            <option value="2026" selected>2026</option>
+            <option value="2027">2027</option>
+            <option value="2025">2025</option>
+          </select>
+        </div>
+      </div>
+      <div class="px-5 py-3.5 bg-slate-50 border-t border-slate-200 flex items-center justify-end gap-2">
+        <button type="button" onclick="closeCreateMonthFolderModal()" class="h-8 px-3 rounded-lg border border-slate-300 bg-white hover:bg-slate-100 text-xs font-bold text-slate-700">Cancel</button>
+        <button type="button" onclick="saveNewMonthFolder()" class="h-8 px-4 rounded-lg bg-primary hover:bg-primary-dark text-white text-xs font-bold flex items-center gap-1.5 shadow-2xs">
+          <span class="material-symbols-outlined text-[16px]">folder_open</span>
+          <span>Create & Open Folder</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+</body>
+</html>

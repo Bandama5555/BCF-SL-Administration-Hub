@@ -1,0 +1,824 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover"/>
+  <title>BCF-SL — 11-Stage Partner Engagement &amp; Deal Pipeline</title>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: {
+            primary: "#0037b0",
+            "primary-dark": "#00247d",
+            secondary: "#565e74",
+            tertiary: "#006948",
+            "tertiary-dark": "#004f35",
+            surface: "#f8f9ff",
+            "surface-container": "#eff4ff",
+            "surface-container-high": "#e5eeff",
+            "on-surface": "#0b1c30",
+            "on-surface-variant": "#434655",
+            outline: "#747686",
+            error: "#ba1a1a"
+          },
+          fontFamily: {
+            sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+            body: ['"Inter"', 'sans-serif'],
+            mono: ['"JetBrains Mono"', 'monospace']
+          }
+        }
+      }
+    };
+  </script>
+  <style>
+    body { font-family: 'Inter', sans-serif; background-color: #f8f9ff; }
+    h1, h2, h3, h4, .font-headline { font-family: 'Plus Jakarta Sans', sans-serif; }
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-thumb { background-color: #cbd5e1; border-radius: 4px; }
+    .stage-column { min-width: 320px; width: 320px; }
+    .badge-pill { display: inline-flex; align-items: center; gap: 0.25rem; font-size: 0.7rem; font-weight: 700; padding: 0.15rem 0.5rem; border-radius: 9999px; }
+  </style>
+</head>
+<body class="text-on-surface flex flex-col min-h-screen">
+
+  <!-- TOP INSTITUTIONAL BRAND HEADER -->
+  <header class="bg-surface border-b border-outline/30 sticky top-0 z-40 shadow-xs">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between gap-4">
+      <div class="flex items-center gap-3 min-w-0">
+        <img src="/bcf-logo.jpg" onerror="this.src='../bcf-logo.jpg'; this.onerror=function(){this.src='../../bcf-logo.jpg'}" alt="BCF-SL Logo" class="h-9 w-auto object-contain shrink-0 rounded"/>
+        <div class="flex flex-col min-w-0">
+          <div class="flex items-center gap-2">
+            <span class="font-extrabold text-sm sm:text-base text-primary tracking-tight truncate uppercase leading-none">
+              Bandama Charity Foundation
+            </span>
+            <span class="hidden sm:inline-block px-2 py-0.5 text-[10px] font-extrabold rounded bg-emerald-100 text-emerald-800 border border-emerald-200">
+              SIERRA LEONE
+            </span>
+          </div>
+          <span class="text-[11px] font-semibold text-secondary truncate mt-0.5">
+            Strategic Partnership Engagement Pipeline — 11 Lifecycle Stages
+          </span>
+        </div>
+      </div>
+
+      <!-- Quick Nav & Actions -->
+      <div class="flex items-center gap-2 shrink-0">
+        <a href="../partners_directory/code.html" class="h-9 px-3 rounded-xl border border-slate-300 hover:border-primary/50 bg-white hover:bg-slate-50 text-xs font-bold flex items-center gap-1.5 text-slate-700 shadow-2xs transition active:scale-95" title="View Partner Master Register">
+          <span class="material-symbols-outlined text-[16px]">contacts</span>
+          <span class="hidden md:inline">Master Register</span>
+        </a>
+        <a href="../partner_profile_stripe/code.html" class="h-9 px-3 rounded-xl border border-slate-300 hover:border-primary/50 bg-white hover:bg-slate-50 text-xs font-bold flex items-center gap-1.5 text-slate-700 shadow-2xs transition active:scale-95" title="Partner Master Dossier">
+          <span class="material-symbols-outlined text-[16px]">badge</span>
+          <span class="hidden md:inline">Partner Dossier</span>
+        </a>
+        <a href="../partnership_analytics/code.html" class="h-9 px-3 rounded-xl border border-slate-300 hover:border-primary/50 bg-white hover:bg-slate-50 text-xs font-bold flex items-center gap-1.5 text-slate-700 shadow-2xs transition active:scale-95" title="Strategic Analytics">
+          <span class="material-symbols-outlined text-[16px]">insights</span>
+          <span class="hidden md:inline">Analytics</span>
+        </a>
+        <button onclick="openAddPartnerModal()" class="h-9 px-3.5 rounded-xl bg-primary hover:bg-primary-dark text-white text-xs font-extrabold flex items-center gap-1.5 shadow-sm transition active:scale-95 cursor-pointer">
+          <span class="material-symbols-outlined text-[17px]">add_circle</span>
+          <span>New Partner</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- SUB-NAV BREADCRUMB & METRICS BANNER -->
+  <section class="bg-gradient-to-r from-blue-900 via-indigo-900 to-slate-900 text-white px-4 sm:px-6 py-5 shadow-sm">
+    <div class="max-w-7xl mx-auto flex flex-col md:flex-row md:items-center justify-between gap-4">
+      <div>
+        <div class="flex items-center gap-2 text-xs font-medium text-blue-200 mb-1">
+          <span>Partnerships</span>
+          <span class="material-symbols-outlined text-[12px]">chevron_right</span>
+          <span class="text-white font-semibold">11-Stage Engagement Pipeline</span>
+          <span class="material-symbols-outlined text-[12px]">chevron_right</span>
+          <span class="bg-blue-500/30 text-blue-100 text-[10px] px-2 py-0.5 rounded-full font-mono">BCF-REL Lifecycle</span>
+        </div>
+        <h1 class="text-xl sm:text-2xl font-black tracking-tight text-white flex items-center gap-2">
+          Partner Progression &amp; Onboarding Pipeline
+        </h1>
+        <p class="text-xs text-blue-200/90 max-w-2xl mt-0.5">
+          Standardized progression tracking: <em>Identified &rarr; Contacted &rarr; Assessment &rarr; Due Diligence &rarr; Approval &rarr; Signed Agreement &rarr; Active Partnership</em>.
+        </p>
+      </div>
+
+      <!-- Quick Metrics Strip -->
+      <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 text-center shrink-0">
+        <div class="bg-white/10 backdrop-blur-md rounded-xl p-2.5 border border-white/10 min-w-[105px]">
+          <span class="text-[10px] uppercase font-bold text-blue-200 block">Total Pipeline</span>
+          <span id="metric-total-count" class="text-lg font-black text-white font-mono">0</span>
+          <span class="text-[9px] text-blue-300 block">Institutions</span>
+        </div>
+        <div class="bg-white/10 backdrop-blur-md rounded-xl p-2.5 border border-white/10 min-w-[125px]">
+          <span class="text-[10px] uppercase font-bold text-emerald-300 block">Financial Value</span>
+          <span id="metric-total-value" class="text-lg font-black text-emerald-300 font-mono">NLe 0</span>
+          <span class="text-[9px] text-blue-200 block">Direct &amp; Grants</span>
+        </div>
+        <div class="bg-white/10 backdrop-blur-md rounded-xl p-2.5 border border-white/10 min-w-[105px]">
+          <span class="text-[10px] uppercase font-bold text-amber-300 block">In Due Diligence</span>
+          <span id="metric-dd-count" class="text-lg font-black text-amber-300 font-mono">0</span>
+          <span class="text-[9px] text-blue-200 block">Under Vetting</span>
+        </div>
+        <div class="bg-white/10 backdrop-blur-md rounded-xl p-2.5 border border-white/10 min-w-[105px]">
+          <span class="text-[10px] uppercase font-bold text-cyan-300 block">Active Status</span>
+          <span id="metric-active-count" class="text-lg font-black text-cyan-300 font-mono">0</span>
+          <span class="text-[9px] text-blue-200 block">Fully Operational</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CONTROLS & FILTER BAR -->
+  <div class="bg-white border-b border-slate-200 sticky top-16 z-30 shadow-xs px-4 sm:px-6 py-3">
+    <div class="max-w-7xl mx-auto flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+      <!-- Search & Filters -->
+      <div class="flex flex-wrap items-center gap-2 flex-1">
+        <div class="relative flex-1 min-w-[200px] max-w-xs">
+          <span class="material-symbols-outlined absolute left-3 top-2.5 text-slate-400 text-[18px]">search</span>
+          <input type="text" id="pipeline-search" oninput="renderPipeline()" placeholder="Search partner, code, or contact..." class="w-full pl-9 pr-3 py-2 text-xs rounded-xl border border-slate-200 bg-slate-50 focus:bg-white focus:border-primary focus:outline-hidden transition"/>
+        </div>
+
+        <select id="filter-type" onchange="renderPipeline()" class="py-2 px-3 text-xs rounded-xl border border-slate-200 bg-white font-medium text-slate-700 focus:border-primary focus:outline-hidden">
+          <option value="">All Partner Types</option>
+          <option value="Government Ministry">Government Ministries</option>
+          <option value="UN Agency">UN Agencies</option>
+          <option value="International NGO">International NGOs</option>
+          <option value="National NGO">National NGOs</option>
+          <option value="Commercial Bank">Financial Institutions</option>
+          <option value="Corporate / CSR">Corporate CSR</option>
+        </select>
+
+        <select id="filter-district" onchange="renderPipeline()" class="py-2 px-3 text-xs rounded-xl border border-slate-200 bg-white font-medium text-slate-700 focus:border-primary focus:outline-hidden">
+          <option value="">All Districts</option>
+          <option value="Western Area Urban">Western Area Urban (Freetown)</option>
+          <option value="Western Area Rural">Western Area Rural</option>
+          <option value="Bo">Bo District</option>
+          <option value="Kenema">Kenema District</option>
+          <option value="Bombali">Bombali District (Makeni)</option>
+          <option value="Port Loko">Port Loko District</option>
+          <option value="Kono">Kono District</option>
+          <option value="National Coverage">National Coverage</option>
+        </select>
+
+        <button onclick="resetFilters()" class="text-xs text-slate-500 hover:text-primary font-bold px-2 py-1.5 rounded-lg hover:bg-slate-100 transition">
+          Reset
+        </button>
+      </div>
+
+      <!-- Board View Controls -->
+      <div class="flex items-center gap-2 shrink-0">
+        <span class="text-xs font-bold text-slate-500">View:</span>
+        <div class="inline-flex rounded-xl bg-slate-100 p-0.5 text-xs font-bold">
+          <button id="btn-view-kanban" onclick="switchView('kanban')" class="px-3 py-1.5 rounded-lg bg-white text-primary shadow-xs">Kanban Board</button>
+          <button id="btn-view-list" onclick="switchView('list')" class="px-3 py-1.5 rounded-lg text-slate-600 hover:text-slate-900">Stage Table</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MAIN PIPELINE CONTENT AREA -->
+  <main class="flex-1 max-w-7xl mx-auto w-full px-4 sm:px-6 py-6">
+
+    <!-- KANBAN BOARD CONTAINER -->
+    <div id="kanban-view" class="overflow-x-auto pb-6">
+      <div id="pipeline-board" class="flex gap-4 items-start min-w-max pb-4">
+        <!-- Rendered dynamically by renderPipeline() -->
+      </div>
+    </div>
+
+    <!-- TABLE LIST VIEW (ALTERNATIVE) -->
+    <div id="list-view" class="hidden">
+      <div class="bg-white rounded-2xl border border-slate-200 shadow-xs overflow-hidden">
+        <div class="px-5 py-4 border-b border-slate-200 flex items-center justify-between">
+          <h2 class="text-sm font-bold text-slate-900">All Pipeline Partners &amp; Stage Status</h2>
+          <span id="table-row-count" class="text-xs font-semibold text-slate-500">0 records</span>
+        </div>
+        <div class="overflow-x-auto">
+          <table class="w-full text-left text-xs">
+            <thead class="bg-slate-50 border-b border-slate-200 text-slate-500 font-bold uppercase text-[10px]">
+              <tr>
+                <th class="py-3 px-4">Partner Details</th>
+                <th class="py-3 px-4">Master REL Key</th>
+                <th class="py-3 px-4">Type &amp; District</th>
+                <th class="py-3 px-4">Current Stage</th>
+                <th class="py-3 px-4">Financial Value</th>
+                <th class="py-3 px-4">Due Diligence</th>
+                <th class="py-3 px-4 text-right">Actions</th>
+              </tr>
+            </thead>
+            <tbody id="pipeline-table-body" class="divide-y divide-slate-100">
+              <!-- Dynamically rendered -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- ADVANCE STAGE MODAL -->
+  <div id="modal-advance-stage" class="fixed inset-0 z-50 hidden bg-black/60 backdrop-blur-xs flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl max-w-md w-full shadow-2xl border border-slate-200 overflow-hidden animate-in fade-in zoom-in-95 duration-150">
+      <div class="px-6 py-4 bg-slate-900 text-white flex items-center justify-between">
+        <div class="flex items-center gap-2">
+          <span class="material-symbols-outlined text-amber-400 text-[20px]">trending_flat</span>
+          <h3 class="text-sm font-black tracking-tight">Advance Partnership Stage</h3>
+        </div>
+        <button onclick="closeAdvanceModal()" class="text-slate-400 hover:text-white transition">
+          <span class="material-symbols-outlined text-[20px]">close</span>
+        </button>
+      </div>
+
+      <form id="form-advance-stage" onsubmit="handleAdvanceStageSubmit(event)" class="p-6 space-y-4 text-xs">
+        <input type="hidden" id="advance-partner-id" value=""/>
+        
+        <div>
+          <span class="text-slate-400 text-[10px] uppercase font-bold block">Selected Partner</span>
+          <span id="advance-partner-name" class="text-sm font-bold text-slate-900 block mt-0.5">UNICEF Sierra Leone</span>
+          <span id="advance-partner-current-stage" class="text-[11px] text-primary font-mono block mt-0.5">Current: Initial Meeting</span>
+        </div>
+
+        <div>
+          <label class="block font-bold text-slate-700 mb-1">New Target Stage <span class="text-red-500">*</span></label>
+          <select id="advance-new-stage" required class="w-full p-2.5 rounded-xl border border-slate-200 bg-white font-medium text-slate-900 focus:border-primary focus:outline-hidden">
+            <!-- Populated dynamically -->
+          </select>
+        </div>
+
+        <div>
+          <label class="block font-bold text-slate-700 mb-1">Stage Progression Note / Milestones Achieved <span class="text-red-500">*</span></label>
+          <textarea id="advance-note" rows="3" required placeholder="Describe outcome of meeting, DD findings, or approval clearance that justifies this transition..." class="w-full p-2.5 rounded-xl border border-slate-200 text-slate-900 focus:border-primary focus:outline-hidden"></textarea>
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block font-bold text-slate-700 mb-1">Lead Relationship Officer</label>
+            <input type="text" id="advance-officer" value="Mohamed Bangura" class="w-full p-2.5 rounded-xl border border-slate-200 font-medium text-slate-900 focus:border-primary focus:outline-hidden"/>
+          </div>
+          <div>
+            <label class="block font-bold text-slate-700 mb-1">Next Follow-up Date</label>
+            <input type="date" id="advance-next-date" class="w-full p-2.5 rounded-xl border border-slate-200 font-medium text-slate-900 focus:border-primary focus:outline-hidden"/>
+          </div>
+        </div>
+
+        <div class="pt-2 flex items-center justify-end gap-2 border-t border-slate-100">
+          <button type="button" onclick="closeAdvanceModal()" class="px-4 py-2 rounded-xl border border-slate-200 text-slate-700 font-bold hover:bg-slate-50 transition">Cancel</button>
+          <button type="submit" class="px-4 py-2 rounded-xl bg-primary hover:bg-primary-dark text-white font-bold transition flex items-center gap-1.5 shadow-sm">
+            <span class="material-symbols-outlined text-[16px]">check_circle</span>
+            <span>Confirm Transition</span>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- REGISTER NEW PARTNER MODAL -->
+  <div id="modal-add-partner" class="fixed inset-0 z-50 hidden bg-black/60 backdrop-blur-xs flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl max-w-xl w-full shadow-2xl border border-slate-200 overflow-hidden animate-in fade-in zoom-in-95 duration-150 max-h-[90vh] flex flex-col">
+      <div class="px-6 py-4 bg-primary text-white flex items-center justify-between shrink-0">
+        <div class="flex items-center gap-2">
+          <span class="material-symbols-outlined text-[20px]">add_business</span>
+          <h3 class="text-sm font-black tracking-tight">Register Prospective Partner into Pipeline</h3>
+        </div>
+        <button onclick="closeAddPartnerModal()" class="text-white/80 hover:text-white transition">
+          <span class="material-symbols-outlined text-[20px]">close</span>
+        </button>
+      </div>
+
+      <form id="form-add-partner" onsubmit="handleAddPartnerSubmit(event)" class="p-6 space-y-4 text-xs overflow-y-auto flex-1">
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div class="sm:col-span-2">
+            <label class="block font-bold text-slate-700 mb-1">Organization Official Legal Name <span class="text-red-500">*</span></label>
+            <input type="text" id="new-name" required placeholder="e.g. Save the Children International Sierra Leone" class="w-full p-2.5 rounded-xl border border-slate-200 focus:border-primary focus:outline-hidden"/>
+          </div>
+
+          <div>
+            <label class="block font-bold text-slate-700 mb-1">Partner Type <span class="text-red-500">*</span></label>
+            <select id="new-type" required class="w-full p-2.5 rounded-xl border border-slate-200 bg-white focus:border-primary focus:outline-hidden">
+              <option value="Government Ministry">Government Ministry</option>
+              <option value="UN Agency">UN Agency</option>
+              <option value="International NGO">International NGO</option>
+              <option value="National NGO">National NGO</option>
+              <option value="Commercial Bank">Commercial Bank / Financial</option>
+              <option value="Corporate / CSR">Corporate / CSR</option>
+              <option value="Academic & Research">Academic &amp; Research</option>
+              <option value="Faith-Based Organization">Faith-Based Organization</option>
+              <option value="Philanthropic Foundation">Philanthropic Foundation</option>
+            </select>
+          </div>
+
+          <div>
+            <label class="block font-bold text-slate-700 mb-1">Sierra Leone District Focus <span class="text-red-500">*</span></label>
+            <select id="new-district" required class="w-full p-2.5 rounded-xl border border-slate-200 bg-white focus:border-primary focus:outline-hidden">
+              <option value="Western Area Urban">Western Area Urban (Freetown)</option>
+              <option value="Western Area Rural">Western Area Rural</option>
+              <option value="Bo">Bo District</option>
+              <option value="Kenema">Kenema District</option>
+              <option value="Bombali">Bombali District (Makeni)</option>
+              <option value="Port Loko">Port Loko District</option>
+              <option value="Kono">Kono District</option>
+              <option value="Tonkolili">Tonkolili District</option>
+              <option value="Moyamba">Moyamba District</option>
+              <option value="Kambia">Kambia District</option>
+              <option value="Pujehun">Pujehun District</option>
+              <option value="Bonthe">Bonthe District</option>
+              <option value="Koinadugu">Koinadugu District</option>
+              <option value="Falaba">Falaba District</option>
+              <option value="Karene">Karene District</option>
+              <option value="National Coverage">National Coverage (All 16 Districts)</option>
+            </select>
+          </div>
+
+          <div>
+            <label class="block font-bold text-slate-700 mb-1">Initial Engagement Stage <span class="text-red-500">*</span></label>
+            <select id="new-stage" required class="w-full p-2.5 rounded-xl border border-slate-200 bg-white focus:border-primary focus:outline-hidden">
+              <option value="Identified">1. Identified</option>
+              <option value="Contacted">2. Contacted</option>
+              <option value="Interested">3. Interested</option>
+              <option value="Initial Meeting">4. Initial Meeting</option>
+              <option value="Partner Assessment">5. Partner Assessment</option>
+              <option value="Due Diligence">6. Due Diligence</option>
+              <option value="Negotiation">7. Negotiation</option>
+              <option value="Approval">8. Approval</option>
+              <option value="Agreement">9. Agreement</option>
+              <option value="Active Partnership">10. Active Partnership</option>
+              <option value="Renewal/Closure">11. Renewal/Closure</option>
+            </select>
+          </div>
+
+          <div>
+            <label class="block font-bold text-slate-700 mb-1">Partnership Category</label>
+            <select id="new-category" class="w-full p-2.5 rounded-xl border border-slate-200 bg-white focus:border-primary focus:outline-hidden">
+              <option value="Programme Partnership">Programme Partnership</option>
+              <option value="Funding Partnership">Funding Partnership</option>
+              <option value="Strategic Public Sector">Strategic Public Sector</option>
+              <option value="Technical Partnership">Technical Partnership</option>
+              <option value="Procurement & Supply Chain">Procurement &amp; Supply Chain</option>
+            </select>
+          </div>
+
+          <div>
+            <label class="block font-bold text-slate-700 mb-1">Estimated Financial Value (NLe)</label>
+            <input type="number" id="new-financial-val" value="0" min="0" class="w-full p-2.5 rounded-xl border border-slate-200 focus:border-primary focus:outline-hidden font-mono"/>
+          </div>
+
+          <div>
+            <label class="block font-bold text-slate-700 mb-1">Primary Contact Name</label>
+            <input type="text" id="new-contact" placeholder="e.g. Samuel Kargbo" class="w-full p-2.5 rounded-xl border border-slate-200 focus:border-primary focus:outline-hidden"/>
+          </div>
+
+          <div>
+            <label class="block font-bold text-slate-700 mb-1">Official Contact Email</label>
+            <input type="email" id="new-email" placeholder="contact@partner-org.org" class="w-full p-2.5 rounded-xl border border-slate-200 focus:border-primary focus:outline-hidden"/>
+          </div>
+
+          <div>
+            <label class="block font-bold text-slate-700 mb-1">Official Telephone / WhatsApp</label>
+            <input type="text" id="new-phone" placeholder="+232 76 123 456" class="w-full p-2.5 rounded-xl border border-slate-200 focus:border-primary focus:outline-hidden"/>
+          </div>
+        </div>
+
+        <div class="pt-3 flex items-center justify-end gap-2 border-t border-slate-100 shrink-0">
+          <button type="button" onclick="closeAddPartnerModal()" class="px-4 py-2 rounded-xl border border-slate-200 text-slate-700 font-bold hover:bg-slate-50 transition">Cancel</button>
+          <button type="submit" class="px-4 py-2 rounded-xl bg-primary hover:bg-primary-dark text-white font-bold transition flex items-center gap-1.5 shadow-sm">
+            <span class="material-symbols-outlined text-[16px]">save</span>
+            <span>Enroll Partner</span>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- LOAD SHARED BCF ENGINE -->
+  <script src="../bcf_procurement_shared.js"></script>
+
+  <!-- PIPELINE MANAGEMENT JAVASCRIPT -->
+  <script>
+    const STAGES = [
+      { id: "Identified", label: "1. Identified", desc: "Scouted / Prospective" },
+      { id: "Contacted", label: "2. Contacted", desc: "Outreach & Letters" },
+      { id: "Interested", label: "3. Interested", desc: "Expression of Interest" },
+      { id: "Initial Meeting", label: "4. Initial Meeting", desc: "Exploratory Dialog" },
+      { id: "Partner Assessment", label: "5. Partner Assessment", desc: "Institutional Audit" },
+      { id: "Due Diligence", label: "6. Due Diligence", desc: "5 Pillars & Risk Score" },
+      { id: "Negotiation", label: "7. Negotiation", desc: "MoU Terms & Scope" },
+      { id: "Approval", label: "8. Approval", desc: "Leadership Sign-off" },
+      { id: "Agreement", label: "9. Agreement", desc: "MoU Counter-signed" },
+      { id: "Active Partnership", label: "10. Active Partnership", desc: "Joint Execution" },
+      { id: "Renewal/Closure", label: "11. Renewal/Closure", desc: "Review & Evolution" }
+    ];
+
+    let currentView = 'kanban';
+
+    document.addEventListener('DOMContentLoaded', () => {
+      // Set default next date
+      const today = new Date();
+      today.setDate(today.getDate() + 14);
+      const nextDateEl = document.getElementById('advance-next-date');
+      if (nextDateEl) nextDateEl.value = today.toISOString().split('T')[0];
+
+      // Populate stage dropdown in advance modal
+      const advanceSelect = document.getElementById('advance-new-stage');
+      if (advanceSelect) {
+        advanceSelect.innerHTML = STAGES.map(s => `<option value="${s.id}">${s.label} (${s.desc})</option>`).join('');
+      }
+
+      renderPipeline();
+    });
+
+    function switchView(view) {
+      currentView = view;
+      const kanbanBtn = document.getElementById('btn-view-kanban');
+      const listBtn = document.getElementById('btn-view-list');
+      const kanbanView = document.getElementById('kanban-view');
+      const listView = document.getElementById('list-view');
+
+      if (view === 'kanban') {
+        kanbanBtn.className = "px-3 py-1.5 rounded-lg bg-white text-primary shadow-xs";
+        listBtn.className = "px-3 py-1.5 rounded-lg text-slate-600 hover:text-slate-900";
+        kanbanView.classList.remove('hidden');
+        listView.classList.add('hidden');
+      } else {
+        listBtn.className = "px-3 py-1.5 rounded-lg bg-white text-primary shadow-xs";
+        kanbanBtn.className = "px-3 py-1.5 rounded-lg text-slate-600 hover:text-slate-900";
+        listView.classList.remove('hidden');
+        kanbanView.classList.add('hidden');
+      }
+      renderPipeline();
+    }
+
+    function resetFilters() {
+      document.getElementById('pipeline-search').value = '';
+      document.getElementById('filter-type').value = '';
+      document.getElementById('filter-district').value = '';
+      renderPipeline();
+    }
+
+    function getFilteredPartners() {
+      const partners = BCF_PROCUREMENT.getPartners();
+      const q = (document.getElementById('pipeline-search').value || '').toLowerCase().trim();
+      const typeFilter = document.getElementById('filter-type').value;
+      const districtFilter = document.getElementById('filter-district').value;
+
+      return partners.filter(p => {
+        if (q) {
+          const matchName = (p.name || '').toLowerCase().includes(q);
+          const matchCode = (p.id || '').toLowerCase().includes(q);
+          const matchRel = (p.relId || '').toLowerCase().includes(q);
+          const matchContact = (p.primaryContact || '').toLowerCase().includes(q);
+          if (!matchName && !matchCode && !matchRel && !matchContact) return false;
+        }
+        if (typeFilter && p.type !== typeFilter) return false;
+        if (districtFilter && p.district !== districtFilter) return false;
+        return true;
+      });
+    }
+
+    function renderPipeline() {
+      const partners = getFilteredPartners();
+      const allPartners = BCF_PROCUREMENT.getPartners();
+
+      // Update Header Metrics
+      let totalFinVal = 0;
+      let ddCount = 0;
+      let activeCount = 0;
+
+      allPartners.forEach(p => {
+        totalFinVal += Number(p.financialValue || 0);
+        const stage = p.pipelineStage || (p.partnershipStatus === 'Active' ? 'Active Partnership' : 'Identified');
+        if (stage === 'Due Diligence' || stage === 'Partner Assessment') ddCount++;
+        if (stage === 'Active Partnership' || p.partnershipStatus === 'Active') activeCount++;
+      });
+
+      document.getElementById('metric-total-count').textContent = allPartners.length;
+      document.getElementById('metric-total-value').textContent = BCF_PROCUREMENT.formatCurrency(totalFinVal);
+      document.getElementById('metric-dd-count').textContent = ddCount;
+      document.getElementById('metric-active-count').textContent = activeCount;
+
+      if (currentView === 'kanban') {
+        renderKanban(partners);
+      } else {
+        renderTable(partners);
+      }
+    }
+
+    function renderKanban(partners) {
+      const board = document.getElementById('pipeline-board');
+      board.innerHTML = '';
+
+      STAGES.forEach(stg => {
+        const stagePartners = partners.filter(p => {
+          const pStage = p.pipelineStage || (p.partnershipStatus === 'Active' ? 'Active Partnership' : 'Identified');
+          return pStage === stg.id;
+        });
+
+        const stageTotal = stagePartners.reduce((acc, curr) => acc + Number(curr.financialValue || 0), 0);
+
+        const col = document.createElement('div');
+        col.className = "stage-column bg-slate-100/90 rounded-2xl p-3 border border-slate-200 flex flex-col max-h-[calc(100vh-230px)] shadow-2xs";
+        
+        let headerColorClass = "text-slate-800";
+        let badgeColorClass = "bg-slate-200 text-slate-700";
+        if (stg.id === 'Due Diligence') {
+          headerColorClass = "text-amber-800";
+          badgeColorClass = "bg-amber-100 text-amber-800 border border-amber-300";
+        } else if (stg.id === 'Agreement') {
+          headerColorClass = "text-indigo-800";
+          badgeColorClass = "bg-indigo-100 text-indigo-800 border border-indigo-300";
+        } else if (stg.id === 'Active Partnership') {
+          headerColorClass = "text-emerald-800";
+          badgeColorClass = "bg-emerald-100 text-emerald-800 border border-emerald-300";
+        }
+
+        col.innerHTML = `
+          <!-- Column Header -->
+          <div class="flex items-center justify-between pb-2 mb-2 border-b border-slate-200">
+            <div>
+              <h3 class="font-extrabold text-xs ${headerColorClass}">${stg.label}</h3>
+              <span class="text-[10px] text-slate-400 block">${stg.desc}</span>
+            </div>
+            <span class="text-[11px] font-mono font-bold px-2 py-0.5 rounded-full ${badgeColorClass}">
+              ${stagePartners.length}
+            </span>
+          </div>
+
+          <!-- Stage Total Value -->
+          <div class="text-[10px] text-slate-500 font-mono mb-2 flex items-center justify-between px-1">
+            <span>Commitment:</span>
+            <span class="font-bold text-slate-700">${BCF_PROCUREMENT.formatCurrency(stageTotal)}</span>
+          </div>
+
+          <!-- Cards Scroll Container -->
+          <div class="flex-1 overflow-y-auto space-y-2.5 pr-1" id="cards-container-${stg.id.replace(/\s+/g, '-')}">
+            ${stagePartners.length === 0 ? `
+              <div class="p-6 text-center text-slate-400 text-xs italic bg-white/50 rounded-xl border border-dashed border-slate-200">
+                No partners currently in this stage
+              </div>
+            ` : stagePartners.map(p => buildPartnerCardHtml(p, stg)).join('')}
+          </div>
+        `;
+
+        board.appendChild(col);
+      });
+    }
+
+    function buildPartnerCardHtml(p, stg) {
+      const finVal = Number(p.financialValue || 0);
+      const inKindVal = Number(p.inKindValue || 0);
+      const ddScore = p.dueDiligenceScore ? `${p.dueDiligenceScore}%` : 'Pending';
+
+      return `
+        <div class="bg-white rounded-xl p-3 border border-slate-200 shadow-xs hover:shadow-md hover:border-primary/40 transition flex flex-col gap-2">
+          <!-- Top IDs & Status -->
+          <div class="flex items-start justify-between gap-1">
+            <div>
+              <span class="text-[10px] font-mono font-bold text-primary block leading-none">${p.id}</span>
+              <span class="text-[9px] font-mono text-slate-400 block mt-0.5">${p.relId || 'NO-REL-KEY'}</span>
+            </div>
+            <span class="badge-pill bg-blue-50 text-blue-700 border border-blue-200 text-[9px]">
+              ${p.type || 'Partner'}
+            </span>
+          </div>
+
+          <!-- Partner Name -->
+          <div>
+            <h4 class="font-black text-xs text-slate-900 leading-snug line-clamp-2">${p.name}</h4>
+            <span class="text-[10px] text-slate-500 block mt-0.5 flex items-center gap-1">
+              <span class="material-symbols-outlined text-[13px] text-slate-400">location_on</span>
+              ${p.district || 'Sierra Leone'}
+            </span>
+          </div>
+
+          <!-- Financial Value & DD -->
+          <div class="bg-slate-50 rounded-lg p-2 border border-slate-100 grid grid-cols-2 gap-1 text-[10px]">
+            <div>
+              <span class="text-slate-400 text-[9px] block">Finance Value</span>
+              <span class="font-bold font-mono text-slate-800">${BCF_PROCUREMENT.formatCurrency(finVal)}</span>
+            </div>
+            <div class="text-right">
+              <span class="text-slate-400 text-[9px] block">DD Vetting</span>
+              <span class="font-bold font-mono ${p.dueDiligenceScore >= 70 ? 'text-emerald-700' : 'text-amber-700'}">${ddScore}</span>
+            </div>
+          </div>
+
+          <!-- Contact Focal Point -->
+          ${p.primaryContact ? `
+            <div class="text-[10px] text-slate-600 flex items-center gap-1 truncate">
+              <span class="material-symbols-outlined text-[13px] text-slate-400">person</span>
+              <span class="truncate">${p.primaryContact}</span>
+            </div>
+          ` : ''}
+
+          <!-- Action Buttons -->
+          <div class="pt-1.5 border-t border-slate-100 flex items-center justify-between gap-1">
+            <a href="../partner_profile_stripe/code.html?id=${p.id}" class="text-[10px] font-bold text-slate-600 hover:text-primary flex items-center gap-0.5 px-2 py-1 rounded hover:bg-slate-50 transition" title="View Full Master Dossier">
+              <span class="material-symbols-outlined text-[13px]">visibility</span>
+              <span>Dossier</span>
+            </a>
+
+            <button onclick="openAdvanceModal('${p.id}')" class="text-[10px] font-extrabold bg-primary hover:bg-primary-dark text-white px-2.5 py-1 rounded-lg flex items-center gap-1 shadow-2xs transition active:scale-95 cursor-pointer">
+              <span>Advance</span>
+              <span class="material-symbols-outlined text-[13px]">arrow_forward</span>
+            </button>
+          </div>
+        </div>
+      `;
+    }
+
+    function renderTable(partners) {
+      const tbody = document.getElementById('pipeline-table-body');
+      document.getElementById('table-row-count').textContent = `${partners.length} partner records`;
+      tbody.innerHTML = '';
+
+      if (partners.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="7" class="py-8 text-center text-slate-400">No matching partners found</td></tr>`;
+        return;
+      }
+
+      partners.forEach(p => {
+        const stage = p.pipelineStage || (p.partnershipStatus === 'Active' ? 'Active Partnership' : 'Identified');
+        const finVal = Number(p.financialValue || 0);
+
+        const tr = document.createElement('tr');
+        tr.className = "hover:bg-slate-50 transition";
+        tr.innerHTML = `
+          <td class="py-3 px-4">
+            <span class="font-extrabold text-slate-900 block">${p.name}</span>
+            <span class="text-[10px] text-slate-500 font-mono">${p.id}</span>
+          </td>
+          <td class="py-3 px-4 font-mono text-[11px] text-primary font-bold">
+            ${p.relId || '—'}
+          </td>
+          <td class="py-3 px-4">
+            <span class="text-slate-800 font-medium block">${p.type || '—'}</span>
+            <span class="text-[10px] text-slate-400">${p.district || 'Sierra Leone'}</span>
+          </td>
+          <td class="py-3 px-4">
+            <span class="badge-pill bg-indigo-50 text-indigo-700 border border-indigo-200">
+              ${stage}
+            </span>
+          </td>
+          <td class="py-3 px-4 font-mono font-bold text-slate-900">
+            ${BCF_PROCUREMENT.formatCurrency(finVal)}
+          </td>
+          <td class="py-3 px-4">
+            <span class="badge-pill ${p.dueDiligenceScore >= 70 ? 'bg-emerald-50 text-emerald-700' : 'bg-amber-50 text-amber-700'}">
+              ${p.dueDiligenceScore ? `${p.dueDiligenceScore}%` : 'Pending'}
+            </span>
+          </td>
+          <td class="py-3 px-4 text-right whitespace-nowrap">
+            <div class="flex items-center justify-end gap-1.5">
+              <a href="../partner_profile_stripe/code.html?id=${p.id}" class="px-2 py-1 rounded bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold transition">
+                Dossier
+              </a>
+              <button onclick="openAdvanceModal('${p.id}')" class="px-2.5 py-1 rounded bg-primary hover:bg-primary-dark text-white font-bold transition">
+                Advance &rarr;
+              </button>
+            </div>
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    // ADVANCE STAGE MODAL CONTROLS
+    function openAdvanceModal(partnerId) {
+      const p = BCF_PROCUREMENT.getPartner(partnerId);
+      if (!p) {
+        BCF_PROCUREMENT.showToast('Partner record not found', 'error');
+        return;
+      }
+
+      document.getElementById('advance-partner-id').value = p.id;
+      document.getElementById('advance-partner-name').textContent = p.name;
+      const currentStage = p.pipelineStage || (p.partnershipStatus === 'Active' ? 'Active Partnership' : 'Identified');
+      document.getElementById('advance-partner-current-stage').textContent = `Current Stage: ${currentStage}`;
+
+      // Select next sensible stage
+      const currentIdx = STAGES.findIndex(s => s.id === currentStage);
+      const nextIdx = currentIdx >= 0 && currentIdx < STAGES.length - 1 ? currentIdx + 1 : currentIdx;
+      document.getElementById('advance-new-stage').value = STAGES[nextIdx].id;
+      document.getElementById('advance-note').value = '';
+
+      document.getElementById('modal-advance-stage').classList.remove('hidden');
+    }
+
+    function closeAdvanceModal() {
+      document.getElementById('modal-advance-stage').classList.add('hidden');
+    }
+
+    function handleAdvanceStageSubmit(e) {
+      e.preventDefault();
+      const pId = document.getElementById('advance-partner-id').value;
+      const newStage = document.getElementById('advance-new-stage').value;
+      const note = document.getElementById('advance-note').value;
+      const officer = document.getElementById('advance-officer').value;
+      const nextDate = document.getElementById('advance-next-date').value;
+
+      const p = BCF_PROCUREMENT.getPartner(pId);
+      if (!p) return;
+
+      const oldStage = p.pipelineStage || 'Identified';
+      p.pipelineStage = newStage;
+      if (newStage === 'Active Partnership') {
+        p.partnershipStatus = 'Active';
+      }
+
+      // Save partner
+      BCF_PROCUREMENT.savePartner(p);
+
+      // Log Communication / Progression Record
+      BCF_PROCUREMENT.saveCommunication({
+        partnerId: p.id,
+        direction: 'Internal Note',
+        channel: 'Pipeline Stage Progression',
+        subject: `Stage Advanced: ${oldStage} &rarr; ${newStage}`,
+        summary: note,
+        actionItems: nextDate ? `Next milestone follow-up set for ${nextDate}` : 'Follow-up on stage deliverables',
+        recordedBy: officer
+      });
+
+      // Add to global Audit Trail
+      BCF_PROCUREMENT.addAuditEntry(
+        'Partnership Pipeline',
+        p.relId || p.id,
+        'Stage Advanced',
+        `Partner ${p.name} transitioned from '${oldStage}' to '${newStage}'. Note: ${note}`
+      );
+
+      closeAdvanceModal();
+      BCF_PROCUREMENT.showToast(`Partner advanced to ${newStage} successfully!`, 'success');
+      renderPipeline();
+    }
+
+    // ADD PARTNER MODAL CONTROLS
+    function openAddPartnerModal() {
+      document.getElementById('form-add-partner').reset();
+      document.getElementById('modal-add-partner').classList.remove('hidden');
+    }
+
+    function closeAddPartnerModal() {
+      document.getElementById('modal-add-partner').classList.add('hidden');
+    }
+
+    function handleAddPartnerSubmit(e) {
+      e.preventDefault();
+      const name = document.getElementById('new-name').value.trim();
+      const type = document.getElementById('new-type').value;
+      const district = document.getElementById('new-district').value;
+      const stage = document.getElementById('new-stage').value;
+      const category = document.getElementById('new-category').value;
+      const finVal = Number(document.getElementById('new-financial-val').value || 0);
+      const contact = document.getElementById('new-contact').value.trim();
+      const email = document.getElementById('new-email').value.trim();
+      const phone = document.getElementById('new-phone').value.trim();
+
+      const newPartner = {
+        name,
+        type,
+        district,
+        country: 'Sierra Leone',
+        pipelineStage: stage,
+        partnershipStatus: stage === 'Active Partnership' ? 'Active' : 'Prospective',
+        category,
+        financialValue: finVal,
+        inKindValue: 0,
+        primaryContact: contact,
+        email,
+        telephone: phone,
+        partnershipOfficer: 'Mohamed Bangura (Partnerships Manager)',
+        dueDiligenceScore: stage === 'Active Partnership' ? 85 : 0
+      };
+
+      const saved = BCF_PROCUREMENT.savePartner(newPartner);
+      closeAddPartnerModal();
+      BCF_PROCUREMENT.showToast(`Partner ${saved.name} registered (${saved.id})!`, 'success');
+      renderPipeline();
+
+      // Transmit official registration statement to partner official email address
+      if (saved.email && saved.email.includes('@')) {
+        BCF_PROCUREMENT.showToast(`Transmitting registration statement to ${saved.email}...`, 'info');
+        BCF_PROCUREMENT.sendPartnerRegistrationEmail(saved).then(res => {
+          if (res && res.success) {
+            BCF_PROCUREMENT.showToast(`Registration statement delivered to ${saved.email}!`, 'success');
+          } else {
+            const errStr = (res && res.error) || 'Failed to dispatch email';
+            BCF_PROCUREMENT.showToast(`Email notice: ${errStr}`, 'error');
+            console.warn('Partner email error:', res);
+          }
+        }).catch(err => {
+          BCF_PROCUREMENT.showToast(`Email error: ${err.message}`, 'error');
+          console.warn('Partner email error:', err);
+        });
+      } else {
+        BCF_PROCUREMENT.showToast('Notice: Partner email is missing. Registration saved without email dispatch.', 'warning');
+      }
+    }
+  </script>
+</body>
+</html>

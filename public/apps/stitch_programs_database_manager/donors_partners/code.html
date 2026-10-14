@@ -1,0 +1,714 @@
+<!DOCTYPE html>
+
+<html lang="en"><head><meta charset="utf-8"/><meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" name="viewport"/><link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/><link href="https://fonts.googleapis.com" rel="preconnect"/><link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/><link href="https://fonts.googleapis.com/css2?family=Inter:wght@500;600;700&amp;family=Plus+Jakarta+Sans:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/><style>@layer base{html,body{width:100vw;margin:0;padding:0;}body{overscroll-behavior:none;}.pb-safe{padding-bottom:env(safe-area-inset-bottom,0px);}.pt-safe{padding-top:env(safe-area-inset-top,0px);}main>:first-child{margin-top:0!important;}main>:last-child{margin-bottom:0!important;}}::-webkit-scrollbar{display:none;}</style><script src="https://cdn.tailwindcss.com"></script><script id="tailwind-config">tailwind.config = { darkMode: "class", theme: { extend: { colors: { "primary": "#003820", "on-background": "#131b2e", "surface-container": "#eaedff", "on-error": "#ffffff", "surface-dim": "#d2d9f4", "on-primary-fixed": "#002111", "surface-container-high": "#e2e7ff", "on-error-container": "#93000a", "on-secondary-container": "#663500", "surface-container-low": "#f2f3ff", "on-tertiary": "#ffffff", "on-tertiary-fixed-variant": "#004b73", "on-secondary": "#ffffff", "secondary-container": "#fe932c", "tertiary-container": "#004b74", "on-tertiary-container": "#68bcff", "surface-container-highest": "#dae2fd", "on-surface": "#131b2e", "primary-fixed-dim": "#95d4ac", "primary-fixed": "#b0f1c7", "on-primary-container": "#84c39b", "inverse-surface": "#283044", "tertiary": "#003351", "inverse-primary": "#95d4ac", "outline": "#707971", "on-tertiary-fixed": "#001d31", "secondary-fixed-dim": "#ffb77d", "surface-tint": "#2d6a48", "on-secondary-fixed-variant": "#6e3900", "outline-variant": "#c0c9c0", "secondary": "#904d00", "surface-container-lowest": "#ffffff", "on-primary": "#ffffff", "secondary-fixed": "#ffdcc3", "on-surface-variant": "#404942", "tertiary-fixed": "#cce5ff", "inverse-on-surface": "#eef0ff", "tertiary-fixed-dim": "#93ccff", "error-container": "#ffdad6", "surface-bright": "#faf8ff", "on-primary-fixed-variant": "#0f5132", "surface-variant": "#dae2fd", "surface": "#faf8ff", "on-secondary-fixed": "#2f1500", "error": "#ba1a1a", "background": "#faf8ff", "primary-container": "#0f5132" }, borderRadius: { "DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px" }, spacing: { "unit-sm": "0.75rem", "unit-xl": "1.5rem", "unit-2xl": "2rem", "unit-2xs": "0.25rem", "unit-lg": "1.25rem", "unit-md": "1rem", "screen-margin-tablet": "1.5rem", "screen-margin-mobile": "1rem", "unit-xs": "0.5rem", "card-padding": "1rem", "gutter": "0.75rem" }, fontFamily: { "body-sm": ["Plus Jakarta Sans"], "headline-lg": ["Plus Jakarta Sans"], "label-code": ["Inter"], "label-badge": ["Inter"], "headline-sm": ["Plus Jakarta Sans"], "label-currency": ["Inter"], "body-lg": ["Plus Jakarta Sans"], "headline-md": ["Plus Jakarta Sans"], "display-kpi": ["Plus Jakarta Sans"], "body-md": ["Plus Jakarta Sans"] }, fontSize: { "body-sm": ["12px", { "lineHeight": "18px", "fontWeight": "400" }], "headline-lg": ["24px", { "lineHeight": "32px", "letterSpacing": "-0.01em", "fontWeight": "700" }], "label-code": ["12px", { "lineHeight": "16px", "letterSpacing": "0.04em", "fontWeight": "600" }], "label-badge": ["11px", { "lineHeight": "14px", "letterSpacing": "0.02em", "fontWeight": "700" }], "headline-sm": ["16px", { "lineHeight": "24px", "fontWeight": "600" }], "label-currency": ["13px", { "lineHeight": "18px", "fontWeight": "600" }], "body-lg": ["16px", { "lineHeight": "24px", "fontWeight": "400" }], "headline-md": ["20px", { "lineHeight": "28px", "fontWeight": "600" }], "display-kpi": ["30px", { "lineHeight": "36px", "letterSpacing": "-0.02em", "fontWeight": "700" }], "body-md": ["14px", { "lineHeight": "20px", "fontWeight": "400" }] } } } };</script></head><body class="bg-surface font-body-md text-body-md text-on-surface flex flex-col min-h-screen antialiased"><header class="fixed top-0 w-full z-50 bg-surface/90 backdrop-blur-xl shadow-[0_1px_8px_rgba(0,0,0,0.04)] pt-safe"><div class="h-16 px-screen-margin-mobile flex items-center justify-between gap-unit-xs"><div class="flex items-center gap-unit-xs min-w-0 flex-1"><img alt="Bandama Charity Foundation Logo" class="h-8 w-auto object-contain shrink-0 rounded-md" src="/bcf_official_logo.png" onerror="this.onerror=null; this.src='bcf_official_logo.png';"/><div class="flex flex-col min-w-0"><span class="font-label-badge text-label-badge text-primary uppercase truncate tracking-wider">Bandama Foundation SL</span><span class="font-headline-sm text-headline-sm text-on-surface truncate">Donors</span></div></div><div class="flex items-center gap-unit-xs shrink-0"><button aria-label="Notifications" class="relative w-11 h-11 flex items-center justify-center rounded-full hover:bg-surface-container-high transition-colors focus:outline-none" type="button"><span class="material-symbols-outlined text-on-surface-variant text-[22px]">notifications</span><span class="absolute top-2.5 right-2.5 w-2 h-2 bg-secondary-container rounded-full ring-2 ring-surface"></span></button><button aria-label="Program Director Profile" class="w-11 h-11 flex items-center justify-center rounded-full hover:opacity-90 transition-opacity focus:outline-none" type="button"><img alt="Profile" class="w-8 h-8 rounded-full object-cover shadow-[0_1px_4px_rgba(0,0,0,0.08)]" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDjW1ZDwKnrX70owVvwOQ9581Rawq5dUecY2bdaPWrJgSaU27zKGrBN2usmHKjFMugDmGyf0LZsD7hBGiewI7D8TnJxPU1V3kAe_rEqNuRPUUAyejbdjs8sd22e199aSgZ-NB78EbUpRusoG7W0GgjM592eMHwI7ZFzfW9AtrI3ryekLPFDRV-NRSXrBBPwtDlNZ8HbpSyubIYyd9tGNdJU25hSViublxo5qINFMC8_NqfMVqaK5Bo"/></button></div></div></header><main class="flex flex-col relative w-full pt-16 pb-24 bg-surface min-h-screen px-screen-margin-mobile"><div class="flex flex-col w-full pb-8">
+<!-- Top Insight & Partnership Health Banner -->
+<div class="flex flex-col bg-surface-container-lowest rounded-xl shadow-sm overflow-hidden mb-unit-md">
+<div class="p-card-padding flex items-start justify-between gap-unit-xs">
+<div class="flex items-center gap-unit-xs">
+<div class="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
+<span class="material-symbols-outlined text-primary text-[24px]">handshake</span>
+</div>
+<div class="flex flex-col min-w-0">
+<span class="font-label-badge text-label-badge uppercase tracking-wider text-primary">Strategic Alliances</span>
+<h2 class="font-headline-sm text-headline-sm text-on-surface truncate">8 Institutional Donors</h2>
+</div>
+</div>
+<div class="flex items-center gap-1 bg-surface-container px-unit-xs py-1 rounded-full shrink-0">
+<span class="w-2 h-2 rounded-full bg-primary-container animate-pulse"></span>
+<span class="font-label-badge text-label-badge text-primary-container">100% On-Track</span>
+</div>
+</div>
+<!-- Quick Stats Metric Strip -->
+<div class="grid grid-cols-3 gap-unit-2xs px-card-padding pb-card-padding pt-1">
+<div class="flex flex-col bg-surface-container-low rounded-lg p-unit-xs">
+<span class="font-body-sm text-body-sm text-on-surface-variant">Allocated Total</span>
+<span class="font-label-currency text-label-currency text-primary mt-0.5" id="dp-kpi-total">SLE 4.85M</span>
+</div>
+<div class="flex flex-col bg-surface-container-low rounded-lg p-unit-xs">
+<span class="font-body-sm text-body-sm text-on-surface-variant">Active Grants</span>
+<span class="font-label-currency text-label-currency text-on-surface mt-0.5" id="dp-kpi-grants">14 Projects</span>
+</div>
+<div class="flex flex-col bg-surface-container-low rounded-lg p-unit-xs">
+<span class="font-body-sm text-body-sm text-on-surface-variant">Audit Compliance</span>
+<span class="font-label-currency text-label-currency text-secondary mt-0.5" id="dp-kpi-compliance">100%</span>
+</div>
+</div>
+</div>
+<!-- Search & Filter Controls -->
+<div class="flex flex-col gap-unit-xs mb-unit-md">
+<div class="relative w-full">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-outline text-[20px]">search</span>
+<input class="w-full bg-surface-container-lowest rounded-xl pl-10 pr-10 py-3 font-body-md text-body-md text-on-surface placeholder:text-outline focus:outline-none focus:bg-surface-container-high transition-colors shadow-sm" id="partnerSearchInput" placeholder="Search partner, grant code, or ministry..." type="text"/>
+<button class="hidden absolute right-3 top-1/2 -translate-y-1/2 text-outline hover:text-on-surface p-1" id="clearSearchBtn">
+<span class="material-symbols-outlined text-[18px]">close</span>
+</button>
+</div>
+<!-- Filter Category Chips -->
+<div class="flex items-center gap-unit-xs overflow-x-auto pb-1 scrollbar-none" id="filterContainer">
+<button class="filter-chip active shrink-0 px-3 py-1.5 rounded-full bg-primary text-on-primary font-label-code text-label-code shadow-sm" data-category="all">
+        All Partners (8)
+      </button>
+<button class="filter-chip shrink-0 px-3 py-1.5 rounded-full bg-surface-container-low text-on-surface-variant font-label-code text-label-code hover:bg-surface-container transition-colors" data-category="bilateral">
+        Bilateral &amp; Multilateral
+      </button>
+<button class="filter-chip shrink-0 px-3 py-1.5 rounded-full bg-surface-container-low text-on-surface-variant font-label-code text-label-code hover:bg-surface-container transition-colors" data-category="government">
+        Gov &amp; Statutory
+      </button>
+<button class="filter-chip shrink-0 px-3 py-1.5 rounded-full bg-surface-container-low text-on-surface-variant font-label-code text-label-code hover:bg-surface-container transition-colors" data-category="private">
+        Private &amp; Tech
+      </button>
+</div>
+</div>
+<!-- Compliance & Directorate Liaison Banner -->
+<div class="bg-primary rounded-xl p-card-padding text-on-primary shadow-sm mb-unit-md relative overflow-hidden">
+<div class="flex flex-col relative z-10 gap-unit-xs">
+<div class="flex items-center justify-between">
+<span class="font-label-badge text-label-badge uppercase tracking-wider text-primary-fixed-dim">Quarterly Governance</span>
+<span class="flex items-center gap-1 text-primary-fixed text-label-badge font-label-badge">
+<span class="material-symbols-outlined text-[14px]">verified</span> MOU Compliant
+        </span>
+</div>
+<h3 class="font-headline-sm text-headline-sm text-white">Programs Directorate Liaison</h3>
+<p class="font-body-sm text-body-sm text-surface-container-highest">
+        Lead Focal: Dr. Sorie Mansaray (<span class="font-semibold">Bandama Secretariat, Freetown</span>). All Q1 donor data verifications passed with zero audit qualifications.
+      </p>
+<div class="flex items-center gap-unit-xs pt-1">
+<button class="flex items-center justify-center gap-1.5 bg-surface-container-lowest text-primary px-3 py-2 rounded-lg font-label-code text-label-code font-semibold shadow-sm hover:bg-primary-fixed transition-colors" id="downloadDossierBtn">
+<span class="material-symbols-outlined text-[18px]">download</span> Dossier
+        </button>
+<button class="flex items-center justify-center gap-1.5 bg-primary-container text-on-primary-container px-3 py-2 rounded-lg font-label-code text-label-code font-semibold shadow-sm hover:opacity-95 transition-opacity" id="sendReportBtn">
+<span class="material-symbols-outlined text-[18px]">send</span> Send M&amp;E Report
+        </button>
+</div>
+</div>
+</div>
+<!-- Partners List -->
+<div class="flex flex-col gap-unit-sm" id="partnerList">
+<!-- 1. Catholic Relief Services (CRS) -->
+<div class="partner-card flex flex-col bg-surface-container-lowest rounded-xl p-card-padding shadow-sm gap-unit-xs" data-category="bilateral" data-programs="BCF-H01,BCF-A03,BCF-SJ05,BCF-EP08">
+<div class="flex items-start justify-between gap-unit-xs">
+<div class="flex items-center gap-unit-xs">
+<div class="w-12 h-12 rounded-xl bg-surface-container flex items-center justify-center shrink-0 overflow-hidden shadow-sm">
+<img class="w-full h-full object-cover" data-alt="Catholic Relief Services official field cooperation emblem and humanitarian outreach in West Africa with green and blue tones" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBB9bp1-QBXH5nnPQNg8ZMji4nOAteBbPgh10FnbqqdQmaUFgogBTtTfCcJuSvq3HVqmLndbfUjGXH1uKaDNhu0Tsrz93mR1bi65ytdrKMEU3OudYIBpht9LEE-djzAbvTBWdFAfSpq71iSpzq98zTpYAQr98Pq88jo-KL_Ax462SSaNpwqaEb16wkC7YitRPU4AmGauuIcA9YGhjp50VmJGHRHhUNM0Y8_TpmNLjUmym9jdnTIX4Y"/>
+</div>
+<div class="flex flex-col min-w-0">
+<h4 class="font-headline-sm text-headline-sm text-on-surface truncate">Catholic Relief Services</h4>
+<span class="font-body-sm text-body-sm text-on-surface-variant">Bilateral Grantee • Co-Funding Principal</span>
+</div>
+</div>
+<span class="px-2 py-0.5 rounded-full bg-surface-container text-primary font-label-badge text-label-badge uppercase">Tier 1</span>
+</div>
+<div class="flex flex-wrap gap-1.5 pt-1">
+<span class="bg-surface-container-low text-on-surface px-2 py-1 rounded-md font-label-code text-label-code">BCF-H01 (Health)</span>
+<span class="bg-surface-container-low text-on-surface px-2 py-1 rounded-md font-label-code text-label-code">BCF-A03 (Agri)</span>
+<span class="bg-surface-container-low text-on-surface px-2 py-1 rounded-md font-label-code text-label-code">BCF-SJ05 (Justice)</span>
+<span class="bg-surface-container-low text-on-surface px-2 py-1 rounded-md font-label-code text-label-code">BCF-EP08 (Empowerment)</span>
+</div>
+<div class="bg-surface-container-low rounded-lg p-unit-xs flex items-center justify-between text-on-surface">
+<div class="flex flex-col">
+<span class="font-body-sm text-body-sm text-on-surface-variant">Active Grant Impact</span>
+<span class="font-label-currency text-label-currency text-primary" data-grant-value>SLE 1,840,000</span>
+</div>
+<div class="flex flex-col items-end">
+<span class="font-body-sm text-body-sm text-on-surface-variant">MOU Expiry</span>
+<span class="font-label-code text-label-code text-on-surface">Nov 2026</span>
+</div>
+</div>
+<div class="flex items-center justify-between pt-1 text-on-surface-variant">
+<span class="flex items-center gap-1 font-body-sm text-body-sm text-primary">
+<span class="material-symbols-outlined text-[16px]">verified</span> Audit Clear: 100% on-track
+        </span>
+<button class="expand-btn text-primary hover:text-primary-container p-1 flex items-center gap-0.5 font-label-code text-label-code">
+<span>Portal</span>
+<span class="material-symbols-outlined text-[16px]">chevron_right</span>
+</button>
+</div>
+</div>
+<!-- 2. World Vision Sierra Leone -->
+<div class="partner-card flex flex-col bg-surface-container-lowest rounded-xl p-card-padding shadow-sm gap-unit-xs" data-category="bilateral" data-programs="BCF-H01,BCF-AR07,BCF-EP08">
+<div class="flex items-start justify-between gap-unit-xs">
+<div class="flex items-center gap-unit-xs">
+<div class="w-12 h-12 rounded-xl bg-surface-container flex items-center justify-center shrink-0 overflow-hidden shadow-sm">
+<img class="w-full h-full object-cover" data-alt="World Vision Sierra Leone community support initiative in Kono and Kenema districts warm orange and white corporate tone" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDy-Zr2jFFDjbEfKWr_AQmcGdwDxd2ovQ9EhRvtntIdS3gByWHV9GweZaMp0swLwHz7QYr7SactY0fWRFKFdMTDkg2YpQeiHSXtrwOK658jrKN6yJ8Y-t1s618awuLlW7Ow2ZljZuoJYrKKkU1dFy3shcYhYsMLAaYiA_4UZR_ACHuCod_c4SEqSstv2Txn6t0xtfhwhqSZFBMMtB8UxYOLK3DAxozL9P-4sJ-kYI-UlekLdCu6nYQ"/>
+</div>
+<div class="flex flex-col min-w-0">
+<h4 class="font-headline-sm text-headline-sm text-on-surface truncate">World Vision Sierra Leone</h4>
+<span class="font-body-sm text-body-sm text-on-surface-variant">Humanitarian NGO • Program Co-Sponsor</span>
+</div>
+</div>
+<span class="px-2 py-0.5 rounded-full bg-secondary-fixed text-on-secondary-fixed-variant font-label-badge text-label-badge uppercase">Active</span>
+</div>
+<div class="flex flex-wrap gap-1.5 pt-1">
+<span class="bg-surface-container-low text-on-surface px-2 py-1 rounded-md font-label-code text-label-code">BCF-H01 (Health)</span>
+<span class="bg-surface-container-low text-on-surface px-2 py-1 rounded-md font-label-code text-label-code">BCF-AR07 (Rehab)</span>
+<span class="bg-surface-container-low text-on-surface px-2 py-1 rounded-md font-label-code text-label-code">BCF-EP08 (Empowerment)</span>
+</div>
+<div class="bg-surface-container-low rounded-lg p-unit-xs flex items-center justify-between text-on-surface">
+<div class="flex flex-col">
+<span class="font-body-sm text-body-sm text-on-surface-variant">Active Grant Impact</span>
+<span class="font-label-currency text-label-currency text-primary" data-grant-value>SLE 920,000</span>
+</div>
+<div class="flex flex-col items-end">
+<span class="font-body-sm text-body-sm text-on-surface-variant">Upcoming Audit</span>
+<span class="font-label-code text-label-code text-on-surface">May 12, 2025</span>
+</div>
+</div>
+<div class="flex items-center justify-between pt-1 text-on-surface-variant">
+<span class="flex items-center gap-1 font-body-sm text-body-sm text-primary">
+<span class="material-symbols-outlined text-[16px]">check_circle</span> Field verified
+        </span>
+<button class="expand-btn text-primary hover:text-primary-container p-1 flex items-center gap-0.5 font-label-code text-label-code">
+<span>Portal</span>
+<span class="material-symbols-outlined text-[16px]">chevron_right</span>
+</button>
+</div>
+</div>
+<!-- 3. UK Aid / FCDO -->
+<div class="partner-card flex flex-col bg-surface-container-lowest rounded-xl p-card-padding shadow-sm gap-unit-xs" data-category="bilateral" data-programs="BCF-E02,BCF-EP08">
+<div class="flex items-start justify-between gap-unit-xs">
+<div class="flex items-center gap-unit-xs">
+<div class="w-12 h-12 rounded-xl bg-surface-container flex items-center justify-center shrink-0 overflow-hidden shadow-sm">
+<img class="w-full h-full object-cover" data-alt="UK Aid Foreign Commonwealth and Development Office bilateral partnership emblem official blue and red styling in Freetown" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD6VWjFadzGfpnRJpKREAi3B9KzBSb2JWyer7O3KVTDiE2q_k40pCqq52O-ed69s0aE8q9vcgvONDZtUJQB7Zr0x6WMXMIM7hzxFae5JrfZCsg1DxvSlvBMDMbx0z8RjmhXO2Moo2RhnjqwOlktwREhoYtcYzRmhiQPLrckG4GsQvhxm22Tni7WJyDPCFr4QRDy8MwZPmmu2qCeGHjqMKbHE9hBKRDxU05LXOMomUgO6wzF5Ptm-xI"/>
+</div>
+<div class="flex flex-col min-w-0">
+<h4 class="font-headline-sm text-headline-sm text-on-surface truncate">UK Aid / FCDO</h4>
+<span class="font-body-sm text-body-sm text-on-surface-variant">Bilateral Development Agency</span>
+</div>
+</div>
+<span class="px-2 py-0.5 rounded-full bg-tertiary-fixed text-on-tertiary-fixed-variant font-label-badge text-label-badge uppercase">Bilateral</span>
+</div>
+<div class="flex flex-wrap gap-1.5 pt-1">
+<span class="bg-surface-container-low text-on-surface px-2 py-1 rounded-md font-label-code text-label-code">BCF-E02 (Education)</span>
+<span class="bg-surface-container-low text-on-surface px-2 py-1 rounded-md font-label-code text-label-code">BCF-EP08 (Youth)</span>
+</div>
+<div class="bg-surface-container-low rounded-lg p-unit-xs flex items-center justify-between text-on-surface">
+<div class="flex flex-col">
+<span class="font-body-sm text-body-sm text-on-surface-variant">Direct Disbursement</span>
+<span class="font-label-currency text-label-currency text-primary" data-grant-value>SLE 750,000</span>
+</div>
+<div class="flex flex-col items-end">
+<span class="font-body-sm text-body-sm text-on-surface-variant">M&amp;E Schedule</span>
+<span class="font-label-code text-label-code text-on-surface">Monthly Bi-sync</span>
+</div>
+</div>
+<div class="flex items-center justify-between pt-1 text-on-surface-variant">
+<span class="flex items-center gap-1 font-body-sm text-body-sm text-primary">
+<span class="material-symbols-outlined text-[16px]">verified_user</span> Full Statutory Compliance
+        </span>
+<button class="expand-btn text-primary hover:text-primary-container p-1 flex items-center gap-0.5 font-label-code text-label-code">
+<span>Portal</span>
+<span class="material-symbols-outlined text-[16px]">chevron_right</span>
+</button>
+</div>
+</div>
+<!-- 4. EPA & HRMO -->
+<div class="partner-card flex flex-col bg-surface-container-lowest rounded-xl p-card-padding shadow-sm gap-unit-xs" data-category="government" data-programs="BCF-CC04">
+<div class="flex items-start justify-between gap-unit-xs">
+<div class="flex items-center gap-unit-xs">
+<div class="w-12 h-12 rounded-xl bg-surface-container flex items-center justify-center shrink-0 overflow-hidden shadow-sm">
+<img class="w-full h-full object-cover" data-alt="Sierra Leone Environment Protection Agency sustainable forestry and ecological conservation landscape drone shot green natural tones" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBSOLtKmmfltJ9aPHl8F7cUZKlVfEumiRQCLLQIRLw5Sf9zbngVZoFCs2TMnHplC6KJbh-vQEvyGpU2kecYWp-stRH5ldWzQAWbzxiLE36ZhsHrh0H2jQMC8soGQ65t37EDCdgnbrH4p4ct-o9wWqJenpm9Ii-WlVmvPYsdpxvK77IGdJj9xFGm2NV-pM7kxBuI7NtsZG1FQUO_pVovnctk35DXLhJeMe9lCIj_6a80WF4YtjLxhFo"/>
+</div>
+<div class="flex flex-col min-w-0">
+<h4 class="font-headline-sm text-headline-sm text-on-surface truncate">EPA &amp; HRMO</h4>
+<span class="font-body-sm text-body-sm text-on-surface-variant">Environmental Authority &amp; Civil Service</span>
+</div>
+</div>
+<span class="px-2 py-0.5 rounded-full bg-surface-container text-primary font-label-badge text-label-badge uppercase">Statutory</span>
+</div>
+<div class="flex flex-wrap gap-1.5 pt-1">
+<span class="bg-surface-container-low text-on-surface px-2 py-1 rounded-md font-label-code text-label-code">BCF-CC04 (Green Earth Climate)</span>
+</div>
+<div class="bg-surface-container-low rounded-lg p-unit-xs flex items-center justify-between text-on-surface">
+<div class="flex flex-col">
+<span class="font-body-sm text-body-sm text-on-surface-variant">Climate Action Fund</span>
+<span class="font-label-currency text-label-currency text-primary" data-grant-value>SLE 410,000</span>
+</div>
+<div class="flex flex-col items-end">
+<span class="font-body-sm text-body-sm text-on-surface-variant">Afforestation Sites</span>
+<span class="font-label-code text-label-code text-on-surface">12 Chiefdoms</span>
+</div>
+</div>
+<div class="flex items-center justify-between pt-1 text-on-surface-variant">
+<span class="flex items-center gap-1 font-body-sm text-body-sm text-primary">
+<span class="material-symbols-outlined text-[16px]">spa</span> Carbon Audit Verified
+        </span>
+<button class="expand-btn text-primary hover:text-primary-container p-1 flex items-center gap-0.5 font-label-code text-label-code">
+<span>Portal</span>
+<span class="material-symbols-outlined text-[16px]">chevron_right</span>
+</button>
+</div>
+</div>
+<!-- 5. Innovate SL & Orange Sierra Leone -->
+<div class="partner-card flex flex-col bg-surface-container-lowest rounded-xl p-card-padding shadow-sm gap-unit-xs" data-category="private" data-programs="BCF-I06">
+<div class="flex items-start justify-between gap-unit-xs">
+<div class="flex items-center gap-unit-xs">
+<div class="w-12 h-12 rounded-xl bg-surface-container flex items-center justify-center shrink-0 overflow-hidden shadow-sm">
+<img class="w-full h-full object-cover" data-alt="Innovate SL and telecommunication digital hub modern tech laboratory in West Africa with students coding on laptops" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAlVzZF4YzE5IKmNiyaXmbnLUrE1XMhtoVPKDq8llKJY1_4Dzqy4IOHevWGF630-U63FHdQdn-6FA99LFmghc3gc3b6X7yBT2oItX9JQifBDm0x1TURqfb0FLLibUSV-C2AhC1DqgPNfh8lyUhvvXWyqHA-WaimjpVaQHH8xyz5pD0zSVQ11TjCuTWJTbXL0Wt3qwgnhbp3Z9rZvtlq5HIaEO0_DxelOjJN98GfWaIeLLqbePfLmTU"/>
+</div>
+<div class="flex flex-col min-w-0">
+<h4 class="font-headline-sm text-headline-sm text-on-surface truncate">Innovate SL &amp; Orange SL</h4>
+<span class="font-body-sm text-body-sm text-on-surface-variant">Tech Ecosystem &amp; Telecom CSR</span>
+</div>
+</div>
+<span class="px-2 py-0.5 rounded-full bg-secondary-container/20 text-secondary-container font-label-badge text-label-badge uppercase">Tech CSR</span>
+</div>
+<div class="flex flex-wrap gap-1.5 pt-1">
+<span class="bg-surface-container-low text-on-surface px-2 py-1 rounded-md font-label-code text-label-code">BCF-I06 (Innovation Lab &amp; Skills)</span>
+</div>
+<div class="bg-surface-container-low rounded-lg p-unit-xs flex items-center justify-between text-on-surface">
+<div class="flex flex-col">
+<span class="font-body-sm text-body-sm text-on-surface-variant">Digital Lab Seed</span>
+<span class="font-label-currency text-label-currency text-primary" data-grant-value>SLE 320,000</span>
+</div>
+<div class="flex flex-col items-end">
+<span class="font-body-sm text-body-sm text-on-surface-variant">Tech Labs Deployed</span>
+<span class="font-label-code text-label-code text-on-surface">2 Centers (Bo &amp; FT)</span>
+</div>
+</div>
+<div class="flex items-center justify-between pt-1 text-on-surface-variant">
+<span class="flex items-center gap-1 font-body-sm text-body-sm text-primary">
+<span class="material-symbols-outlined text-[16px]">devices</span> 450 Youth Trained
+        </span>
+<button class="expand-btn text-primary hover:text-primary-container p-1 flex items-center gap-0.5 font-label-code text-label-code">
+<span>Portal</span>
+<span class="material-symbols-outlined text-[16px]">chevron_right</span>
+</button>
+</div>
+</div>
+<!-- 6. Ministry of Health and Sanitation (MoHS) -->
+<div class="partner-card flex flex-col bg-surface-container-lowest rounded-xl p-card-padding shadow-sm gap-unit-xs" data-category="government" data-programs="BCF-AR07">
+<div class="flex items-start justify-between gap-unit-xs">
+<div class="flex items-center gap-unit-xs">
+<div class="w-12 h-12 rounded-xl bg-surface-container flex items-center justify-center shrink-0 overflow-hidden shadow-sm">
+<img class="w-full h-full object-cover" data-alt="Sierra Leone Ministry of Health medical professionals delivering rehabilitation medical care in healthcare center" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDVR0lzC-zuIQam1L5HH_RwEfwxnYVfD3mjFQ581Zqw3WXTlF3ER0_m9pdZw9b9UxR6HIlOishEB4mquQ0Dh1C9LrI3_6neUYpU6WDfrL1vBUSGH1mJk89PHmhpn5YOcvd5xZr3UVzBYTAiNget29dB1MTjw_CM1k8rKXh0-2GwC4Y_McbEAcMxr3r6kC_NwJXfWRIOd-4QimY2x8DwGs9DOuXxkgBumqFxyQoCtZenaEDJC6n9ETM"/>
+</div>
+<div class="flex flex-col min-w-0">
+<h4 class="font-headline-sm text-headline-sm text-on-surface truncate">Ministry of Health (MoHS)</h4>
+<span class="font-body-sm text-body-sm text-on-surface-variant">Government Line Ministry</span>
+</div>
+</div>
+<span class="px-2 py-0.5 rounded-full bg-surface-container text-primary font-label-badge text-label-badge uppercase">MOU Signed</span>
+</div>
+<div class="flex flex-wrap gap-1.5 pt-1">
+<span class="bg-surface-container-low text-on-surface px-2 py-1 rounded-md font-label-code text-label-code">BCF-AR07 (Restore Hope Recovery)</span>
+</div>
+<div class="bg-surface-container-low rounded-lg p-unit-xs flex items-center justify-between text-on-surface">
+<div class="flex flex-col">
+<span class="font-body-sm text-body-sm text-on-surface-variant">Clinical Subsidy</span>
+<span class="font-label-currency text-label-currency text-primary" data-grant-value>SLE 280,000</span>
+</div>
+<div class="flex flex-col items-end">
+<span class="font-body-sm text-body-sm text-on-surface-variant">Specialists Attached</span>
+<span class="font-label-code text-label-code text-on-surface">6 Officers</span>
+</div>
+</div>
+<div class="flex items-center justify-between pt-1 text-on-surface-variant">
+<span class="flex items-center gap-1 font-body-sm text-body-sm text-primary">
+<span class="material-symbols-outlined text-[16px]">medical_services</span> Clinical Protocols Active
+        </span>
+<button class="expand-btn text-primary hover:text-primary-container p-1 flex items-center gap-0.5 font-label-code text-label-code">
+<span>Portal</span>
+<span class="material-symbols-outlined text-[16px]">chevron_right</span>
+</button>
+</div>
+</div>
+<!-- 7. Ministry of Social Welfare -->
+<div class="partner-card flex flex-col bg-surface-container-lowest rounded-xl p-card-padding shadow-sm gap-unit-xs" data-category="government" data-programs="BCF-SJ05">
+<div class="flex items-start justify-between gap-unit-xs">
+<div class="flex items-center gap-unit-xs">
+<div class="w-12 h-12 rounded-xl bg-surface-container flex items-center justify-center shrink-0 overflow-hidden shadow-sm">
+<img class="w-full h-full object-cover" data-alt="Social welfare community dialogue meeting in Sierra Leone with traditional leaders and social workers supporting civil rights" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD9XMz-LuA2EM3n_kfLNwCcPdA44crg6hO7NPhFjR6p55dBf-5_Sl5AMRSxG4NNa7cv-0S9l6D_sB-gx2M8wgqDmaNZjpIDvJ-lIurmkrbWeKivf-EbU9toe3QBV_SDWh4gNK3znTJw9EWf_hZlc1USxTTOkYiIm5V37Tr535USK6_ct3j-TYj0pxxp4KtJbKt5ojk97E3xEzsaDowQBogPjFQGD1j0qHKLOqPbG3vBOcAIt6R6-zk"/>
+</div>
+<div class="flex flex-col min-w-0">
+<h4 class="font-headline-sm text-headline-sm text-on-surface truncate">Ministry of Social Welfare</h4>
+<span class="font-body-sm text-body-sm text-on-surface-variant">Statutory Human Rights Oversight</span>
+</div>
+</div>
+<span class="px-2 py-0.5 rounded-full bg-surface-container text-primary font-label-badge text-label-badge uppercase">MOU Signed</span>
+</div>
+<div class="flex flex-wrap gap-1.5 pt-1">
+<span class="bg-surface-container-low text-on-surface px-2 py-1 rounded-md font-label-code text-label-code">BCF-SJ05 (Rights &amp; Dignity Initiative)</span>
+</div>
+<div class="bg-surface-container-low rounded-lg p-unit-xs flex items-center justify-between text-on-surface">
+<div class="flex flex-col">
+<span class="font-body-sm text-body-sm text-on-surface-variant">Legal Aid Subsidy</span>
+<span class="font-label-currency text-label-currency text-primary" data-grant-value>SLE 195,000</span>
+</div>
+<div class="flex flex-col items-end">
+<span class="font-body-sm text-body-sm text-on-surface-variant">Casework Reach</span>
+<span class="font-label-code text-label-code text-on-surface">310 Cases</span>
+</div>
+</div>
+<div class="flex items-center justify-between pt-1 text-on-surface-variant">
+<span class="flex items-center gap-1 font-body-sm text-body-sm text-primary">
+<span class="material-symbols-outlined text-[16px]">balance</span> Legal Framework Aligned
+        </span>
+<button class="expand-btn text-primary hover:text-primary-container p-1 flex items-center gap-0.5 font-label-code text-label-code">
+<span>Portal</span>
+<span class="material-symbols-outlined text-[16px]">chevron_right</span>
+</button>
+</div>
+</div>
+<!-- 8. Tropical Agriculture Partners -->
+<div class="partner-card flex flex-col bg-surface-container-lowest rounded-xl p-card-padding shadow-sm gap-unit-xs" data-category="private" data-programs="BCF-A03">
+<div class="flex items-start justify-between gap-unit-xs">
+<div class="flex items-center gap-unit-xs">
+<div class="w-12 h-12 rounded-xl bg-surface-container flex items-center justify-center shrink-0 overflow-hidden shadow-sm">
+<img class="w-full h-full object-cover" data-alt="West African sustainable tropical agriculture farm harvest of cassava and rice with farmers inspecting yields under sunny sky" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDnLPDvfgtGqjLuIopQWnaA2PKu7p2417Q-WwHmiDdfSGynwurU-0bXyfmPNqfP9xjg1Oa7V-jYCdxtK0xsZ3ceqkDfW501bEUgiiD2ErCz-3xdDzThbS2851QO9J6Fz3xmD8mlySiaNAX6RXK3y6FIMTy1p2V08QWzHv5CLIUyEtE1QgB1X-f2qZMHJj_AWx8RALgRHF6gDlPSs2BaYjDJvSUSWHOBBgecTgU7rOAz8c6u6LcLyDk"/>
+</div>
+<div class="flex flex-col min-w-0">
+<h4 class="font-headline-sm text-headline-sm text-on-surface truncate">Tropical Agriculture Partners</h4>
+<span class="font-body-sm text-body-sm text-on-surface-variant">Agronomy Consortium</span>
+</div>
+</div>
+<span class="px-2 py-0.5 rounded-full bg-surface-container text-primary font-label-badge text-label-badge uppercase">Agri Grant</span>
+</div>
+<div class="flex flex-wrap gap-1.5 pt-1">
+<span class="bg-surface-container-low text-on-surface px-2 py-1 rounded-md font-label-code text-label-code">BCF-A03 (Grow Green Project)</span>
+</div>
+<div class="bg-surface-container-low rounded-lg p-unit-xs flex items-center justify-between text-on-surface">
+<div class="flex flex-col">
+<span class="font-body-sm text-body-sm text-on-surface-variant">Agronomy Seed Grants</span>
+<span class="font-label-currency text-label-currency text-primary" data-grant-value>SLE 125,000</span>
+</div>
+<div class="flex flex-col items-end">
+<span class="font-body-sm text-body-sm text-on-surface-variant">Farmer Cooperatives</span>
+<span class="font-label-code text-label-code text-on-surface">18 Active</span>
+</div>
+</div>
+<div class="flex items-center justify-between pt-1 text-on-surface-variant">
+<span class="flex items-center gap-1 font-body-sm text-body-sm text-primary">
+<span class="material-symbols-outlined text-[16px]">energy_savings_leaf</span> Food Security Impact High
+        </span>
+<button class="expand-btn text-primary hover:text-primary-container p-1 flex items-center gap-0.5 font-label-code text-label-code">
+<span>Portal</span>
+<span class="material-symbols-outlined text-[16px]">chevron_right</span>
+</button>
+</div>
+</div>
+</div>
+
+<!-- Giving Analytics Live Feed Section -->
+<div class="mt-unit-md flex flex-col gap-unit-xs" id="giving-analytics-section">
+  <!-- Section Header -->
+  <div class="flex items-center justify-between mb-1">
+    <div class="flex items-center gap-2">
+      <span class="material-symbols-outlined text-primary text-[20px]">insights</span>
+      <span class="font-headline-sm text-headline-sm text-on-surface">Giving Analytics Live Feed</span>
+    </div>
+    <span class="flex items-center gap-1 font-label-badge text-label-badge text-primary bg-primary/10 px-2 py-0.5 rounded-full">
+      <span class="w-1.5 h-1.5 rounded-full bg-primary animate-pulse"></span>
+      Auto-Sync
+    </span>
+  </div>
+  <!-- KPI Row -->
+  <div class="grid grid-cols-2 gap-unit-xs">
+    <div class="bg-surface-container-lowest rounded-xl p-card-padding shadow-sm flex flex-col gap-1">
+      <span class="font-body-sm text-body-sm text-on-surface-variant">Total Funds Tracked</span>
+      <span class="font-headline-md text-headline-md text-primary" id="ga-total-raised">NLe 0.00</span>
+      <span class="font-body-sm text-body-sm text-on-surface-variant" id="ga-contributions">0 Contributions</span>
+    </div>
+    <div class="bg-surface-container-lowest rounded-xl p-card-padding shadow-sm flex flex-col gap-1">
+      <span class="font-body-sm text-body-sm text-on-surface-variant">Avg. Gift Value</span>
+      <span class="font-headline-md text-headline-md text-on-surface" id="ga-avg-gift">NLe 0.00</span>
+      <span class="font-body-sm text-body-sm text-on-surface-variant">Per Contribution</span>
+    </div>
+    <div class="bg-surface-container-lowest rounded-xl p-card-padding shadow-sm flex flex-col gap-1">
+      <span class="font-body-sm text-body-sm text-on-surface-variant">Audit Verified</span>
+      <span class="font-headline-md text-headline-md text-primary" id="ga-verified-pct">100%</span>
+      <span class="font-body-sm text-body-sm text-on-surface-variant" id="ga-verified-count">0 Dossiers</span>
+    </div>
+    <div class="bg-surface-container-lowest rounded-xl p-card-padding shadow-sm flex flex-col gap-1">
+      <span class="font-body-sm text-body-sm text-on-surface-variant">In-Kind Valuation</span>
+      <span class="font-headline-md text-headline-md text-on-surface" id="ga-inkind-val">NLe 0.00</span>
+      <span class="font-body-sm text-body-sm text-on-surface-variant" id="ga-inkind-count">0 Shipments</span>
+    </div>
+  </div>
+
+  <!-- Recent Donations Stream -->
+  <div class="bg-surface-container-lowest rounded-xl p-card-padding shadow-sm">
+    <div class="flex items-center justify-between pb-2 border-b border-outline-variant mb-unit-xs">
+      <span class="font-headline-sm text-headline-sm text-on-surface">Recent Intake Activity</span>
+      <a href="../../stitch_donor_database_log/giving_analytics_reports/code.html" class="font-label-code text-label-code text-primary flex items-center gap-0.5 hover:underline">
+        Full Report
+        <span class="material-symbols-outlined text-[14px]">arrow_forward</span>
+      </a>
+    </div>
+    <div class="flex flex-col gap-unit-xs" id="ga-recent-stream">
+      <div class="font-body-sm text-body-sm text-on-surface-variant text-center py-2">Loading donations...</div>
+    </div>
+  </div>
+
+  <!-- Programmatic Allocation -->
+  <div class="bg-surface-container-lowest rounded-xl p-card-padding shadow-sm">
+    <div class="flex items-center justify-between pb-2 border-b border-outline-variant mb-unit-xs">
+      <span class="font-headline-sm text-headline-sm text-on-surface">Grant Allocation by Program</span>
+    </div>
+    <div class="flex flex-col gap-2" id="ga-allocation-bars">
+      <div class="font-body-sm text-body-sm text-on-surface-variant text-center py-2">Loading allocations...</div>
+    </div>
+  </div>
+
+  <div class="font-body-sm text-body-sm text-on-surface-variant text-center pb-1" id="ga-sync-label">Synced from Giving Analytics</div>
+</div>
+
+<!-- Interactive Feedback Toast -->
+<div class="fixed bottom-20 left-1/2 -translate-x-1/2 z-50 bg-primary text-on-primary px-4 py-2.5 rounded-full shadow-lg flex items-center gap-2 transition-all duration-300 opacity-0 pointer-events-none translate-y-2" id="actionToast">
+<span class="material-symbols-outlined text-[20px] text-primary-fixed">task_alt</span>
+<span class="font-body-sm text-body-sm font-medium" id="toastMessage">Action completed successfully</span>
+</div>
+</div>
+<script>
+  // === GIVING ANALYTICS SYNC ===
+  const GA_PROGRAM_TARGETS = {
+    'BCF-H01': { title: 'Maternal & Child Health Outreach', target: 600000 },
+    'BCF-E02': { title: 'Primary School Literacy & Tech Kits', target: 300000 },
+    'BCF-I06': { title: 'Youth Digital Coding Hub', target: 400000 },
+    'BCF-A03': { title: 'Kono Smallholder Agro-Cooperative', target: 250000 },
+    'BCF-CC04': { title: 'Coastal Mangrove Bio-Shield', target: 200000 },
+    'BCF-SJ05': { title: 'Community Legal Defense & GBV', target: 150000 },
+    'BCF-AR07': { title: 'Kush Detox & Rehabilitation', target: 350000 },
+    'BCF-EP08': { title: 'Women Micro-Grant Enterprise', target: 200000 }
+  };
+
+  function fmt(n) {
+    return n.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  }
+
+  function syncGivingAnalytics() {
+    let donations = [];
+    try {
+      const stored = localStorage.getItem('bcf_donorlog_donations');
+      if (stored) donations = JSON.parse(stored);
+    } catch(e) {}
+
+    // Use fallback data if nothing in localStorage (mirrors giving_analytics_reports defaults)
+    if (!donations || donations.length === 0) {
+      donations = [
+        { id: 'DON-2025-001', orgName: 'Sierra Leone Commercial Bank CSR Trust', itemType: 'Money', estimatedValue: '350,000.00', status: 'Verified', programCode: 'BCF-H01' },
+        { id: 'DON-2025-002', orgName: 'UNICEF Sierra Leone Country Office', itemType: 'In-Kind', estimatedValue: '220,000.00', status: 'Verified', programCode: 'BCF-H01' },
+        { id: 'DON-2025-003', orgName: 'Google.org & USAID Tech Equity Fund', itemType: 'Money', estimatedValue: '280,000.00', status: 'Verified', programCode: 'BCF-I06' },
+        { id: 'DON-2025-004', orgName: 'Dr. Mohamed S. Bangura Diaspora Endowment', itemType: 'Money', estimatedValue: '180,000.00', status: 'Verified', programCode: 'BCF-E02' }
+      ];
+    }
+
+    let totalRaised = 0, inkindVal = 0, inkindCount = 0, verifiedCount = 0;
+    const progTotals = {};
+
+    donations.forEach(d => {
+      const val = parseFloat(String(d.estimatedValue || d.moneyAmount || 0).replace(/[^0-9.-]/g, '')) || 0;
+      totalRaised += val;
+      if (d.itemType === 'In-Kind') { inkindVal += val; inkindCount++; }
+      if (d.status === 'Verified') verifiedCount++;
+      const code = d.programCode || 'BCF-H01';
+      progTotals[code] = (progTotals[code] || 0) + val;
+    });
+
+    const totalCount = donations.length;
+    const avgGift = totalCount > 0 ? (totalRaised / totalCount) : 0;
+    const verifiedPct = totalCount > 0 ? ((verifiedCount / totalCount) * 100).toFixed(0) : '100';
+
+    // Update KPI strip at top
+    const kpiTotal = document.getElementById('dp-kpi-total');
+    const kpiGrants = document.getElementById('dp-kpi-grants');
+    const kpiCompliance = document.getElementById('dp-kpi-compliance');
+    if (kpiTotal) kpiTotal.textContent = 'NLe ' + (totalRaised >= 1000000 ? (totalRaised/1000000).toFixed(2)+'M' : (totalRaised/1000).toFixed(1)+'K');
+    if (kpiGrants) kpiGrants.textContent = Object.keys(progTotals).length + ' Program Grants';
+    if (kpiCompliance) kpiCompliance.textContent = verifiedPct + '% Verified';
+
+    // === UPDATE EACH PARTNER CARD'S GRANT VALUE ===
+    document.querySelectorAll('.partner-card[data-programs]').forEach(card => {
+      const codes = card.getAttribute('data-programs').split(',').map(c => c.trim());
+      const cardTotal = codes.reduce((sum, code) => sum + (progTotals[code] || 0), 0);
+      const valueEl = card.querySelector('[data-grant-value]');
+      if (valueEl && cardTotal > 0) {
+        const newText = 'SLE ' + cardTotal.toLocaleString('en-US');
+        if (valueEl.textContent !== newText) {
+          valueEl.textContent = newText;
+          // Flash highlight on update
+          valueEl.style.transition = 'color 0.3s';
+          valueEl.style.color = 'var(--color-secondary-container, #fe932c)';
+          setTimeout(() => { valueEl.style.color = ''; }, 1200);
+        }
+      }
+    });
+
+    // Update feed KPIs
+    const el = id => document.getElementById(id);
+    if (el('ga-total-raised')) el('ga-total-raised').textContent = 'NLe ' + fmt(totalRaised);
+    if (el('ga-contributions')) el('ga-contributions').textContent = totalCount + ' Registered Contributions';
+    if (el('ga-avg-gift')) el('ga-avg-gift').textContent = 'NLe ' + fmt(avgGift);
+    if (el('ga-verified-pct')) el('ga-verified-pct').textContent = verifiedPct + '%';
+    if (el('ga-verified-count')) el('ga-verified-count').textContent = verifiedCount + ' Audit Verified Dossiers';
+    if (el('ga-inkind-val')) el('ga-inkind-val').textContent = 'NLe ' + fmt(inkindVal);
+    if (el('ga-inkind-count')) el('ga-inkind-count').textContent = inkindCount + ' In-Kind Shipments';
+
+    // Render recent donations stream
+    const stream = el('ga-recent-stream');
+    if (stream) {
+      if (donations.length === 0) {
+        stream.innerHTML = '<div class="font-body-sm text-body-sm text-on-surface-variant text-center py-2">No donations recorded yet.</div>';
+      } else {
+        stream.innerHTML = donations.slice(0, 4).map(d => `
+          <div class="flex items-center justify-between p-unit-xs bg-surface-container-low rounded-lg">
+            <div class="flex flex-col min-w-0 pr-2">
+              <span class="font-label-code text-label-code text-on-surface truncate">${d.orgName || 'Donor'}</span>
+              <span class="font-body-sm text-body-sm text-on-surface-variant font-mono">${d.id || ''} &bull; ${d.programCode || 'BCF-H01'}</span>
+            </div>
+            <div class="flex flex-col items-end shrink-0">
+              <span class="font-label-currency text-label-currency text-primary">NLe ${d.estimatedValue || '0.00'}</span>
+              <span class="font-body-sm text-body-sm text-on-surface-variant">&#10003; ${d.status || 'Verified'}</span>
+            </div>
+          </div>
+        `).join('');
+      }
+    }
+
+    // Render allocation progress bars
+    const bars = el('ga-allocation-bars');
+    if (bars) {
+      bars.innerHTML = Object.entries(GA_PROGRAM_TARGETS).map(([code, meta]) => {
+        const raised = progTotals[code] || 0;
+        const pct = Math.min(100, Math.round((raised / meta.target) * 100));
+        return `
+          <div class="flex flex-col gap-0.5">
+            <div class="flex items-center justify-between">
+              <span class="font-label-code text-label-code text-on-surface truncate" title="${meta.title}">
+                <span class="text-primary">${code}</span> ${meta.title}
+              </span>
+              <span class="font-label-currency text-label-currency text-primary shrink-0 ml-2">${pct}%</span>
+            </div>
+            <div class="w-full bg-surface-container-high h-1.5 rounded-full overflow-hidden">
+              <div class="h-full rounded-full transition-all duration-500 ${pct >= 70 ? 'bg-primary' : 'bg-primary/50'}" style="width:${pct}%"></div>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    // Sync timestamp
+    const syncLabel = el('ga-sync-label');
+    if (syncLabel) syncLabel.textContent = 'Synced from Giving Analytics · ' + new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+  }
+
+  // Listen for updates from Giving Analytics module
+  try {
+    const gaChannel = new BroadcastChannel('bcf_programs_sync_channel');
+    gaChannel.onmessage = (event) => {
+      if (event.data && (event.data.type === 'DONATION_RECORDED' || event.data.type === 'GIVING_ANALYTICS_UPDATED')) {
+        syncGivingAnalytics();
+      }
+    };
+  } catch(e) {}
+
+  window.addEventListener('storage', (e) => {
+    if (e.key === 'bcf_donorlog_donations') {
+      syncGivingAnalytics();
+    }
+  });
+
+  document.addEventListener('DOMContentLoaded', syncGivingAnalytics);
+  // === END GIVING ANALYTICS SYNC ===
+</script>
+<script>
+  (function() {
+    const searchInput = document.getElementById('partnerSearchInput');
+    const clearBtn = document.getElementById('clearSearchBtn');
+    const filterContainer = document.getElementById('filterContainer');
+    const partnerCards = document.querySelectorAll('.partner-card');
+    const toast = document.getElementById('actionToast');
+    const toastMsg = document.getElementById('toastMessage');
+    const downloadBtn = document.getElementById('downloadDossierBtn');
+    const sendReportBtn = document.getElementById('sendReportBtn');
+    const expandButtons = document.querySelectorAll('.expand-btn');
+
+    let currentCategory = 'all';
+    let currentQuery = '';
+
+    function showToast(message) {
+      if (!toast || !toastMsg) return;
+      toastMsg.textContent = message;
+      toast.classList.remove('opacity-0', 'pointer-events-none', 'translate-y-2');
+      toast.classList.add('opacity-100', 'translate-y-0');
+      setTimeout(() => {
+        toast.classList.remove('opacity-100', 'translate-y-0');
+        toast.classList.add('opacity-0', 'pointer-events-none', 'translate-y-2');
+      }, 3000);
+    }
+
+    function filterCards() {
+      partnerCards.forEach(card => {
+        const text = card.textContent.toLowerCase();
+        const category = card.getAttribute('data-category');
+        const matchesCategory = (currentCategory === 'all' || category === currentCategory);
+        const matchesQuery = text.includes(currentQuery);
+
+        if (matchesCategory && matchesQuery) {
+          card.style.display = 'flex';
+        } else {
+          card.style.display = 'none';
+        }
+      });
+    }
+
+    if (searchInput) {
+      searchInput.addEventListener('input', (e) => {
+        currentQuery = e.target.value.toLowerCase().trim();
+        if (currentQuery.length > 0) {
+          clearBtn.classList.remove('hidden');
+        } else {
+          clearBtn.classList.add('hidden');
+        }
+        filterCards();
+      });
+    }
+
+    if (clearBtn) {
+      clearBtn.addEventListener('click', () => {
+        searchInput.value = '';
+        currentQuery = '';
+        clearBtn.classList.add('hidden');
+        filterCards();
+      });
+    }
+
+    if (filterContainer) {
+      filterContainer.addEventListener('click', (e) => {
+        const targetBtn = e.target.closest('.filter-chip');
+        if (!targetBtn) return;
+
+        filterContainer.querySelectorAll('.filter-chip').forEach(btn => {
+          btn.classList.remove('active', 'bg-primary', 'text-on-primary', 'shadow-sm');
+          btn.classList.add('bg-surface-container-low', 'text-on-surface-variant');
+        });
+
+        targetBtn.classList.add('active', 'bg-primary', 'text-on-primary', 'shadow-sm');
+        targetBtn.classList.remove('bg-surface-container-low', 'text-on-surface-variant');
+
+        currentCategory = targetBtn.getAttribute('data-category');
+        filterCards();
+      });
+    }
+
+    if (downloadBtn) {
+      downloadBtn.addEventListener('click', () => {
+        showToast('Downloading Q1 Donor Impact Dossier (PDF)...');
+      });
+    }
+
+    if (sendReportBtn) {
+      sendReportBtn.addEventListener('click', () => {
+        showToast('Transmitting verified M&E report to all 8 partners...');
+      });
+    }
+
+    expandButtons.forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        const card = e.target.closest('.partner-card');
+        const title = card ? card.querySelector('h4').textContent : 'Partner';
+        showToast('Accessing secure portal for ' + title);
+      });
+    });
+  })();
+</script></main><nav class="fixed bottom-0 w-full z-50 pb-safe bg-surface/90 backdrop-blur-xl shadow-[0_-2px_12px_rgba(0,0,0,0.05)]" data-active-classes="text-primary-container font-headline-sm font-semibold"><div class="flex items-center justify-around h-16 px-unit-xs"><a class="flex flex-col items-center justify-center gap-0.5 min-w-[64px] h-11 text-on-surface-variant hover:text-on-surface transition-colors" data-path="programs" href="#" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;"><span class="material-symbols-outlined text-[22px]">folder_managed</span><span class="font-label-code text-label-code">Programs</span></a><a class="flex flex-col items-center justify-center gap-0.5 min-w-[64px] h-11 text-on-surface-variant hover:text-on-surface transition-colors" data-path="finances" href="#" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;"><span class="material-symbols-outlined text-[22px]">payments</span><span class="font-label-code text-label-code">Finances</span></a><a class="flex flex-col items-center justify-center gap-0.5 min-w-[64px] h-11 text-on-surface-variant hover:text-on-surface transition-colors" data-path="performance"  onclick="window.top.location.href='/programs/performance-evaluation'; return false;" style="cursor:pointer"><span class="material-symbols-outlined text-[22px]">monitoring</span><span class="font-label-code text-label-code">Performance</span></a><a aria-current="page" class="flex flex-col items-center justify-center gap-0.5 min-w-[64px] h-11 transition-colors text-primary-container font-headline-sm font-semibold" data-path="donors" href="#" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;"><span class="material-symbols-outlined text-[22px]">corporate_fare</span><span class="font-label-code text-label-code">Donors</span></a></div></nav></body></html>

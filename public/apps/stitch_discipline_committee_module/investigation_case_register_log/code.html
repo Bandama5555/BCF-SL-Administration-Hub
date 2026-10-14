@@ -1,0 +1,503 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover"/>
+  <title>Investigation Case Register Log — BCF-SL</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: { extend: {
+        colors: {
+          primary: '#003820',
+          'primary-dark': '#002515',
+          'primary-light': '#E8F5EE',
+          'primary-container': '#0D5C3A',
+          surface: '#f8fafc', 'surface-card': '#ffffff', outline: '#e2e8f0'
+        },
+        fontFamily: { sans: ['"Plus Jakarta Sans"','sans-serif'], display: ['"Plus Jakarta Sans"','sans-serif'] }
+      }}
+    };
+  </script>
+  <style type="text/tailwindcss">
+    body { overscroll-behavior-y: none; }
+    ::-webkit-scrollbar { width: 5px; height: 5px; } 
+    ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 3px; }
+    @keyframes fadeUp { from { opacity:0; transform:translateY(10px); } to { opacity:1; transform:translateY(0); } }
+    .fade-up { animation: fadeUp .3s ease-out; }
+    .highlight { background-color: #fef08a; transition: background-color 2s; }
+  </style>
+</head>
+<body class="bg-slate-50 text-slate-800 min-h-screen font-sans">
+
+<!-- HEADER WITH ROLE ACCESS CONTROL -->
+<header class="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-slate-200 shadow-sm px-4 sm:px-6 py-3">
+  <div class="max-w-7xl mx-auto flex items-center justify-between gap-3">
+    <div class="flex items-center gap-3">
+      <img alt="Bandama Charity Foundation Logo" class="h-10 w-auto object-contain shrink-0 rounded-md" src="/bcf_official_logo.png" onerror="this.onerror=null; this.src='bcf_official_logo.png';"/>
+      <div>
+        <div class="flex items-center gap-2">
+          <h1 class="text-base sm:text-lg font-black text-slate-900 tracking-tight">Investigation Case Register Log</h1>
+        </div>
+        <p class="text-xs text-slate-500 font-medium">Bandama Charity Foundation Sierra Leone &bull; Safeguarding</p>
+      </div>
+    </div>
+    <div class="flex items-center gap-2 shrink-0">
+      <a href="../accused_suspect_profile/code.html" class="h-9 px-3.5 rounded-lg bg-primary hover:bg-primary-container text-white text-xs font-bold inline-flex items-center gap-1.5 transition shadow-sm">
+        <span class="material-symbols-outlined text-[16px]">person_add</span> Register Suspect
+      </a>
+      <div class="hidden sm:flex items-center gap-1.5 bg-slate-100 border border-slate-200 rounded-lg px-2.5 py-1">
+        <span class="material-symbols-outlined text-[16px] text-slate-600" id="role-icon">lock</span>
+        <select id="user-role-select" onchange="onRoleDropdownChange(this.value)" class="bg-transparent text-xs font-bold text-slate-800 outline-none cursor-pointer">
+          <option value="staff">Staff (No Access)</option>
+          <option value="investigator">🔒 Investigator (Full Access)</option>
+          <option value="safeguarding">🔒 Safeguarding Focal Point (Full Access)</option>
+          <option value="ed">🔒 Executive Director (View Access)</option>
+        </select>
+      </div>
+    </div>
+  </div>
+</header>
+
+<main class="flex-1 max-w-7xl mx-auto px-4 sm:px-6 py-5 space-y-5 pb-20 relative">
+
+  <!-- Access Denied Overlay -->
+  <div id="access-denied" class="absolute inset-0 z-30 bg-slate-50/90 backdrop-blur flex flex-col items-center justify-center fade-up min-h-[60vh]">
+    <span class="material-symbols-outlined text-[64px] text-slate-400 mb-4">gpp_bad</span>
+    <h2 class="text-xl font-black font-display text-slate-800">Access Restricted</h2>
+    <p class="text-sm text-slate-500 mt-2 max-w-md text-center">Consistent with the confidentiality principle in the PSEA Policy, this Case Log is strictly restricted.</p>
+    <button onclick="document.getElementById('user-role-select').value='investigator'; onRoleDropdownChange('investigator');" class="mt-6 px-6 py-2.5 bg-primary hover:bg-primary-container text-white text-sm font-bold rounded-xl shadow-sm transition">
+      Login as Investigator
+    </button>
+  </div>
+
+  <div id="authorized-content" class="hidden space-y-6">
+    <!-- Filters & Stats -->
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-4 fade-up">
+      <div class="md:col-span-1 bg-white p-4 rounded-xl border border-slate-200 shadow-sm flex items-center justify-between">
+        <div>
+          <div class="text-[10px] font-bold text-slate-500 uppercase">Total Cases</div>
+          <div class="text-2xl font-black text-slate-800 font-display" id="stat-total">0</div>
+        </div>
+        <div class="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center"><span class="material-symbols-outlined text-primary">folder_open</span></div>
+      </div>
+      <div class="md:col-span-1 bg-white p-4 rounded-xl border border-slate-200 shadow-sm flex items-center justify-between">
+        <div>
+          <div class="text-[10px] font-bold text-amber-600 uppercase">Under Investigation</div>
+          <div class="text-2xl font-black text-amber-700 font-display" id="stat-active">0</div>
+        </div>
+        <div class="w-10 h-10 rounded-full bg-amber-50 flex items-center justify-center"><span class="material-symbols-outlined text-amber-600">hourglass_empty</span></div>
+      </div>
+      <div class="md:col-span-2 bg-white p-4 rounded-xl border border-slate-200 shadow-sm flex items-center gap-3">
+        <span class="material-symbols-outlined text-slate-400">search</span>
+        <input type="text" id="search-input" oninput="renderTable()" placeholder="Search by Case ID, Suspect Name, or Category..." class="w-full text-sm outline-none text-slate-800 bg-transparent placeholder-slate-400"/>
+      </div>
+    </div>
+
+    <!-- CASES TABLE -->
+    <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden fade-up">
+      <div class="flex items-center justify-between px-5 py-4 border-b border-slate-100">
+        <h3 class="text-sm font-bold text-slate-900">Master Investigation Log</h3>
+        <button onclick="renderTable()" class="text-slate-400 hover:text-slate-600"><span class="material-symbols-outlined text-[18px]">refresh</span></button>
+      </div>
+      <div class="overflow-x-auto">
+        <table class="w-full text-xs whitespace-nowrap">
+          <thead class="bg-slate-50 border-b border-slate-100">
+            <tr>
+              <th class="px-4 py-3 text-left font-bold text-slate-500 uppercase tracking-wide">Case ID</th>
+              <th class="px-4 py-3 text-left font-bold text-slate-500 uppercase tracking-wide">Date Logged</th>
+              <th class="px-4 py-3 text-left font-bold text-slate-500 uppercase tracking-wide">Accused / Suspect</th>
+              <th class="px-4 py-3 text-left font-bold text-slate-500 uppercase tracking-wide">Category</th>
+              <th class="px-4 py-3 text-left font-bold text-slate-500 uppercase tracking-wide">Status</th>
+              <th class="px-4 py-3 text-left font-bold text-slate-500 uppercase tracking-wide">Confidentiality</th>
+              <th class="px-4 py-3 text-right font-bold text-slate-500 uppercase tracking-wide">Actions</th>
+            </tr>
+          </thead>
+          <tbody id="cases-tbody" class="divide-y divide-slate-100">
+            <!-- JS Rendered -->
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</main>
+
+<!-- BOTTOM NAV -->
+<nav class="fixed bottom-0 w-full z-40 bg-white border-t border-slate-200 shadow-lg sm:hidden">
+  <div class="max-w-md mx-auto flex items-center justify-around h-14 text-[10px] font-bold">
+    <a href="../disciplinary_committee_profile/code.html" class="flex flex-col items-center gap-0.5 text-slate-400">
+      <span class="material-symbols-outlined text-[22px]">gavel</span><span>Committee</span>
+    </a>
+    <a href="../accused_suspect_profile/code.html" class="flex flex-col items-center gap-0.5 text-slate-400">
+      <span class="material-symbols-outlined text-[22px]">person_alert</span><span>Accused</span>
+    </a>
+    <a href="code.html" class="flex flex-col items-center gap-0.5 text-slate-800">
+      <span class="material-symbols-outlined text-[22px]">manage_search</span><span>Cases</span>
+    </a>
+  </div>
+</nav>
+
+<!-- ══════════ CASE DETAIL PANEL ══════════ -->
+<div id="case-backdrop" class="fixed inset-0 z-50 bg-black/40 backdrop-blur-sm hidden" onclick="closeCaseView()"></div>
+
+<aside id="case-panel" class="fixed top-0 right-0 z-50 h-full w-full max-w-sm bg-white shadow-2xl flex flex-col hidden overflow-y-auto">
+
+  <!-- Header -->
+  <div class="px-5 py-4 flex items-center justify-between border-b border-slate-100 sticky top-0 bg-white z-10">
+    <div class="flex items-center gap-3">
+      <div id="cv-avatar" class="w-11 h-11 rounded-full bg-primary/10 text-primary flex items-center justify-center font-bold text-lg shrink-0"></div>
+      <div>
+        <div id="cv-name" class="font-black text-slate-900 text-sm leading-tight"></div>
+        <div id="cv-caseid" class="text-[11px] font-mono text-slate-500 mt-0.5"></div>
+      </div>
+    </div>
+    <button onclick="closeCaseView()" class="w-8 h-8 rounded-full hover:bg-slate-100 flex items-center justify-center transition">
+      <span class="material-symbols-outlined text-slate-500 text-[18px]">close</span>
+    </button>
+  </div>
+
+  <!-- Status badges -->
+  <div class="px-5 pt-4 pb-2 flex items-center gap-2 flex-wrap">
+    <span id="cv-status" class="px-3 py-1 rounded-full text-xs font-bold"></span>
+    <span id="cv-conf" class="px-3 py-1 rounded-full text-xs font-bold bg-red-50 text-red-700"></span>
+  </div>
+
+  <!-- Detail sections -->
+  <div class="px-5 pb-6 flex-1">
+
+    <div class="text-[10px] font-black uppercase tracking-widest text-slate-400 mt-3 mb-2">Accused / Suspect</div>
+    <div class="divide-y divide-slate-100 rounded-xl border border-slate-100 overflow-hidden">
+      <div class="flex justify-between px-4 py-3 bg-slate-50/60"><span class="text-slate-500 text-xs">Full Name</span><span id="cv-fullname" class="font-semibold text-slate-800 text-xs text-right"></span></div>
+      <div class="flex justify-between px-4 py-3"><span class="text-slate-500 text-xs">Gender</span><span id="cv-gender" class="font-semibold text-slate-800 text-xs"></span></div>
+      <div class="flex justify-between px-4 py-3 bg-slate-50/60"><span class="text-slate-500 text-xs">Position / Title</span><span id="cv-position" class="font-semibold text-slate-800 text-xs text-right max-w-[55%]"></span></div>
+      <div class="flex justify-between px-4 py-3"><span class="text-slate-500 text-xs">Department</span><span id="cv-dept" class="font-semibold text-slate-800 text-xs text-right max-w-[55%]"></span></div>
+      <div class="flex justify-between px-4 py-3 bg-slate-50/60"><span class="text-slate-500 text-xs">Employment Status</span><span id="cv-empstatus" class="font-semibold text-slate-800 text-xs"></span></div>
+      <div class="flex justify-between px-4 py-3"><span class="text-slate-500 text-xs">Supervisor</span><span id="cv-supervisor" class="font-semibold text-slate-800 text-xs text-right"></span></div>
+      <div class="flex justify-between px-4 py-3 bg-slate-50/60"><span class="text-slate-500 text-xs">Relationship to Complainant</span><span id="cv-relationship" class="font-semibold text-slate-800 text-xs text-right"></span></div>
+    </div>
+
+    <div class="text-[10px] font-black uppercase tracking-widest text-slate-400 mt-5 mb-2">Case Details</div>
+    <div class="divide-y divide-slate-100 rounded-xl border border-slate-100 overflow-hidden">
+      <div class="flex justify-between px-4 py-3 bg-slate-50/60"><span class="text-slate-500 text-xs">Case ID</span><span id="cv-caseid2" class="font-mono text-[11px] text-slate-800 font-bold"></span></div>
+      <div class="flex justify-between px-4 py-3"><span class="text-slate-500 text-xs">Allegation Category</span><span id="cv-category" class="font-semibold text-slate-800 text-xs text-right"></span></div>
+      <div class="flex justify-between px-4 py-3 bg-slate-50/60"><span class="text-slate-500 text-xs">Date of Allegation</span><span id="cv-date-allegation" class="font-semibold text-slate-800 text-xs"></span></div>
+      <div class="flex justify-between px-4 py-3"><span class="text-slate-500 text-xs">Date Closed</span><span id="cv-date-closed" class="font-semibold text-slate-800 text-xs"></span></div>
+      <div class="flex justify-between px-4 py-3 bg-slate-50/60"><span class="text-slate-500 text-xs">Interim Measures</span><span id="cv-interim" class="font-semibold text-slate-800 text-xs text-right"></span></div>
+      <div class="flex justify-between px-4 py-3"><span class="text-slate-500 text-xs">Corrective Action</span><span id="cv-corrective" class="font-semibold text-slate-800 text-xs text-right"></span></div>
+      <div class="flex justify-between px-4 py-3 bg-slate-50/60"><span class="text-slate-500 text-xs">Prior Disciplinary History</span><span id="cv-prior" class="font-semibold text-slate-800 text-xs"></span></div>
+      <div class="flex justify-between px-4 py-3"><span class="text-slate-500 text-xs">Current Status</span><span id="cv-casestatus" class="font-semibold text-slate-800 text-xs"></span></div>
+    </div>
+
+    <div class="text-[10px] font-black uppercase tracking-widest text-slate-400 mt-5 mb-2">Registration</div>
+    <div class="divide-y divide-slate-100 rounded-xl border border-slate-100 overflow-hidden">
+      <div class="flex justify-between px-4 py-3 bg-slate-50/60"><span class="text-slate-500 text-xs">Record ID</span><span id="cv-id" class="font-mono text-[11px] text-slate-600"></span></div>
+      <div class="flex justify-between px-4 py-3"><span class="text-slate-500 text-xs">Registered On</span><span id="cv-registered" class="font-semibold text-slate-800 text-xs"></span></div>
+    </div>
+
+  </div>
+
+  <!-- Footer -->
+  <div class="px-5 py-4 border-t border-slate-100 bg-slate-50 flex flex-col gap-2">
+    <button id="cv-edit-btn" class="flex items-center justify-center gap-2 w-full py-2.5 rounded-xl bg-primary text-white text-xs font-bold hover:opacity-90 transition">
+      <span class="material-symbols-outlined text-[15px]">edit</span> Edit Case Status
+    </button>
+    <button onclick="closeCaseView()" class="flex items-center justify-center gap-2 w-full py-2.5 rounded-xl border border-slate-200 text-xs font-bold text-slate-700 hover:bg-white transition">
+      <span class="material-symbols-outlined text-[15px]">close</span> Close
+    </button>
+  </div>
+</aside>
+
+<script>
+  let currentRole = 'staff';
+  const STORE_KEY = 'bcf_accused_suspects';
+
+  function onRoleDropdownChange(val) {
+    currentRole = val;
+    const denied = document.getElementById('access-denied');
+    const content = document.getElementById('authorized-content');
+
+    if (val === 'staff') {
+      denied.classList.remove('hidden');
+      content.classList.add('hidden');
+    } else {
+      denied.classList.add('hidden');
+      content.classList.remove('hidden');
+      renderTable();
+      highlightLinkedCase();
+    }
+  }
+
+  function getRecords() {
+    try { return JSON.parse(localStorage.getItem(STORE_KEY)) || []; } catch { return []; }
+  }
+
+  const STATUS_COLORS = {
+    'Under Investigation': 'bg-amber-100 text-amber-800',
+    'Interim Measures Applied': 'bg-blue-100 text-blue-800',
+    'Investigation Concluded': 'bg-indigo-100 text-indigo-800',
+    'Substantiated': 'bg-red-100 text-red-800',
+    'Unsubstantiated': 'bg-emerald-100 text-emerald-800',
+    'Inconclusive': 'bg-slate-200 text-slate-700',
+    'Open': 'bg-orange-100 text-orange-800'
+  };
+
+  function renderTable() {
+    const allRecords = getRecords();
+    const query = document.getElementById('search-input').value.toLowerCase();
+    const tbody = document.getElementById('cases-tbody');
+    
+    // Stats
+    document.getElementById('stat-total').textContent = allRecords.length;
+    document.getElementById('stat-active').textContent = allRecords.filter(r => r.caseStatus === 'Under Investigation' || r.caseStatus === 'Open').length;
+
+    const filtered = allRecords.filter(r => 
+      (r.caseId || '').toLowerCase().includes(query) || 
+      (r.name || '').toLowerCase().includes(query) || 
+      (r.category || '').toLowerCase().includes(query)
+    );
+
+    if (filtered.length === 0) {
+      tbody.innerHTML = '<tr id="empty-row"><td colspan="7" class="px-4 py-8 text-center text-slate-400">No matching cases found.</td></tr>';
+      return;
+    }
+
+    tbody.innerHTML = filtered.map(r => `
+      <tr class="hover:bg-slate-50 transition cursor-pointer" id="row-${r.caseId}" onclick="openCaseView('${r.id}')">
+        <td class="px-4 py-3 font-mono font-bold text-slate-900">${r.caseId}</td>
+        <td class="px-4 py-3 text-slate-500 font-mono">${r.dateAllegation || '—'}</td>
+        <td class="px-4 py-3">
+          <div class="font-semibold text-slate-900">${r.name}</div>
+          <div class="text-[10px] text-slate-500">${r.position || 'Unknown Role'}</div>
+        </td>
+        <td class="px-4 py-3 text-slate-700">${r.category}</td>
+        <td class="px-4 py-3">
+          <span class="px-2 py-0.5 rounded text-[10px] font-bold ${STATUS_COLORS[r.caseStatus] || 'bg-slate-100 text-slate-700'}">${r.caseStatus}</span>
+        </td>
+        <td class="px-4 py-3">
+          <span class="flex items-center gap-1 text-[10px] font-bold ${r.confidentiality === 'Restricted' ? 'text-red-600' : 'text-slate-600'}">
+            <span class="material-symbols-outlined text-[14px]">lock</span> ${r.confidentiality}
+          </span>
+        </td>
+        <td class="px-4 py-3 text-right">
+          <div class="flex items-center justify-end gap-1.5" onclick="event.stopPropagation()">
+            <button onclick="openCaseView('${r.id}')" class="px-3 py-1 bg-primary/10 hover:bg-primary/20 text-primary text-[10px] font-bold rounded shadow-sm transition">View</button>
+            <button onclick="openUpdateModal('${r.id}')" class="px-3 py-1 bg-slate-100 hover:bg-slate-200 text-slate-700 text-[10px] font-bold rounded shadow-sm transition">Edit</button>
+            <button onclick="deleteCase('${r.id}')" class="px-3 py-1 bg-red-50 hover:bg-red-100 text-red-600 text-[10px] font-bold rounded shadow-sm transition">Delete</button>
+          </div>
+        </td>
+      </tr>
+    `).join('');
+  }
+
+  function highlightLinkedCase() {
+    const params = new URLSearchParams(window.location.search);
+    const targetCase = params.get('case');
+    if (targetCase) {
+      const row = document.getElementById('row-' + targetCase);
+      if (row) {
+        row.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        row.classList.add('highlight');
+        setTimeout(() => row.classList.remove('highlight'), 2000);
+      }
+    }
+  }
+
+  // --- UPDATE AND DELETE LOGIC ---
+  let currentUpdateId = null;
+
+  function deleteCase(id) {
+    if (!confirm('Are you sure you want to permanently delete this confidential case record? This action cannot be undone.')) return;
+    
+    let records = getRecords();
+    records = records.filter(r => r.id !== id);
+    localStorage.setItem(STORE_KEY, JSON.stringify(records));
+    
+    renderTable();
+    
+    const t = document.getElementById('toast');
+    document.querySelector('#toast span:last-child').textContent = 'Case deleted successfully';
+    t.classList.remove('opacity-0','pointer-events-none','-translate-y-2');
+    t.classList.add('opacity-100','translate-y-0');
+    setTimeout(() => {
+      t.classList.add('opacity-0','pointer-events-none','-translate-y-2');
+      t.classList.remove('opacity-100','translate-y-0');
+    }, 3000);
+
+    try { new BroadcastChannel('bcf_investigation_channel').postMessage({ type: 'ACCUSED_UPDATED' }); } catch {}
+  }
+
+  function openUpdateModal(id) {
+    const records = getRecords();
+    const record = records.find(r => r.id === id);
+    if (!record) return;
+
+    currentUpdateId = id;
+    document.getElementById('modal-case-id').textContent = record.caseId;
+    document.getElementById('modal-accused').textContent = record.name;
+    document.getElementById('modal-status').value = record.caseStatus || '';
+    document.getElementById('modal-date-closed').value = record.dateClosed || '';
+    
+    document.getElementById('update-modal').classList.remove('hidden');
+    document.getElementById('update-modal').classList.add('flex');
+  }
+
+  function closeUpdateModal() {
+    document.getElementById('update-modal').classList.add('hidden');
+    document.getElementById('update-modal').classList.remove('flex');
+    currentUpdateId = null;
+  }
+
+  function saveUpdate(e) {
+    e.preventDefault();
+    if (!currentUpdateId) return;
+
+    const records = getRecords();
+    const idx = records.findIndex(r => r.id === currentUpdateId);
+    if (idx === -1) return;
+
+    records[idx].caseStatus = document.getElementById('modal-status').value;
+    records[idx].dateClosed = document.getElementById('modal-date-closed').value;
+
+    localStorage.setItem(STORE_KEY, JSON.stringify(records));
+    
+    closeUpdateModal();
+    renderTable();
+    
+    // Show toast
+    const t = document.getElementById('toast');
+    document.querySelector('#toast span:last-child').textContent = 'Case updated successfully';
+    t.classList.remove('opacity-0','pointer-events-none','-translate-y-2');
+    t.classList.add('opacity-100','translate-y-0');
+    setTimeout(() => {
+      t.classList.add('opacity-0','pointer-events-none','-translate-y-2');
+      t.classList.remove('opacity-100','translate-y-0');
+    }, 3000);
+
+    try { new BroadcastChannel('bcf_investigation_channel').postMessage({ type: 'ACCUSED_UPDATED' }); } catch {}
+  }
+
+  document.addEventListener('DOMContentLoaded', () => {
+    // Add modal HTML to body
+    const modalHtml = `
+    <!-- UPDATE MODAL -->
+    <div id="update-modal" class="fixed inset-0 z-50 bg-slate-900/50 backdrop-blur-sm hidden items-center justify-center p-4">
+      <div class="bg-white rounded-2xl shadow-xl w-full max-w-md overflow-hidden fade-up">
+        <div class="px-5 py-4 border-b border-slate-100 flex items-center justify-between bg-slate-50">
+          <h3 class="font-bold text-slate-900 font-display flex items-center gap-2">
+            <span class="material-symbols-outlined text-slate-500 text-[20px]">edit_document</span> Update Case Status
+          </h3>
+          <button onclick="closeUpdateModal()" class="text-slate-400 hover:text-slate-600 transition"><span class="material-symbols-outlined text-[20px]">close</span></button>
+        </div>
+        <form onsubmit="saveUpdate(event)" class="p-5 space-y-4">
+          <div class="bg-slate-50 p-3 rounded-lg border border-slate-100">
+            <div class="text-[10px] font-bold text-slate-500 uppercase">Case ID</div>
+            <div class="font-mono text-sm font-bold text-slate-800" id="modal-case-id"></div>
+            <div class="text-[10px] font-bold text-slate-500 uppercase mt-2">Accused/Suspect</div>
+            <div class="text-sm font-bold text-slate-800" id="modal-accused"></div>
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-slate-600 mb-1 uppercase">Case Status</label>
+            <select id="modal-status" class="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm text-slate-800 bg-white focus:outline-none focus:ring-2 focus:ring-slate-500" required>
+              <option value="Under Investigation">Under Investigation</option>
+              <option value="Interim Measures Applied">Interim Measures Applied</option>
+              <option value="Investigation Concluded">Investigation Concluded</option>
+              <option value="Substantiated">Substantiated</option>
+              <option value="Unsubstantiated">Unsubstantiated</option>
+              <option value="Inconclusive">Inconclusive</option>
+              <option value="Open">Open</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-slate-600 mb-1 uppercase">Date Closed</label>
+            <input type="date" id="modal-date-closed" class="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm text-slate-800 bg-white focus:outline-none focus:ring-2 focus:ring-slate-500"/>
+          </div>
+          <div class="flex justify-end gap-2 pt-2">
+            <button type="button" onclick="closeUpdateModal()" class="px-4 py-2 text-sm font-bold text-slate-600 hover:bg-slate-100 rounded-xl transition">Cancel</button>
+            <button type="submit" class="px-4 py-2 bg-primary hover:bg-primary-container text-white text-sm font-bold rounded-xl shadow-sm transition">Save Changes</button>
+          </div>
+        </form>
+      </div>
+    </div>
+    
+    <!-- TOAST -->
+    <div id="toast" class="fixed bottom-16 left-1/2 -translate-x-1/2 z-50 flex items-center gap-2 bg-emerald-600 text-white px-4 py-2.5 rounded-full shadow-xl text-xs font-bold opacity-0 pointer-events-none transition-all duration-300 -translate-y-2">
+      <span class="material-symbols-outlined text-white text-[17px]">check_circle</span>
+      <span>Case updated successfully</span>
+    </div>
+    `;
+    document.body.insertAdjacentHTML('beforeend', modalHtml);
+    onRoleDropdownChange('staff');
+  });
+
+  function fmtDate(d) {
+    if (!d) return '—';
+    try { return new Date(d).toLocaleDateString('en-GB', { day:'2-digit', month:'short', year:'numeric' }); } catch { return d; }
+  }
+
+  function openCaseView(id) {
+    const r = getRecords().find(x => x.id === id);
+    if (!r) return;
+
+    document.getElementById('cv-avatar').textContent    = (r.name || '?').charAt(0).toUpperCase();
+    document.getElementById('cv-name').textContent      = r.name    || '—';
+    document.getElementById('cv-caseid').textContent    = r.caseId  || '—';
+
+    const statusBadge = document.getElementById('cv-status');
+    statusBadge.textContent = r.caseStatus || '—';
+    statusBadge.className = 'px-3 py-1 rounded-full text-xs font-bold ' + (STATUS_COLORS[r.caseStatus] || 'bg-slate-100 text-slate-700');
+
+    const confBadge = document.getElementById('cv-conf');
+    confBadge.textContent = r.confidentiality || '—';
+    confBadge.className = 'px-3 py-1 rounded-full text-xs font-bold ' + (r.confidentiality === 'Restricted' ? 'bg-red-50 text-red-700' : 'bg-slate-100 text-slate-700');
+
+    // Accused fields
+    document.getElementById('cv-fullname').textContent     = r.name         || '—';
+    document.getElementById('cv-gender').textContent       = r.gender       || '—';
+    document.getElementById('cv-position').textContent     = r.position     || '—';
+    document.getElementById('cv-dept').textContent         = r.dept || r.department || '—';
+    document.getElementById('cv-empstatus').textContent    = r.status       || '—';
+    document.getElementById('cv-supervisor').textContent   = r.supervisor   || '—';
+    document.getElementById('cv-relationship').textContent = r.relationship || '—';
+
+    // Case fields
+    document.getElementById('cv-caseid2').textContent       = r.caseId          || '—';
+    document.getElementById('cv-category').textContent      = r.category        || '—';
+    document.getElementById('cv-date-allegation').textContent = fmtDate(r.dateAllegation);
+    document.getElementById('cv-date-closed').textContent   = fmtDate(r.dateClosed);
+    document.getElementById('cv-interim').textContent       = r.interim || r.interimMeasures || '—';
+    document.getElementById('cv-corrective').textContent    = r.corrective || r.correctiveAction || '—';
+    document.getElementById('cv-prior').textContent         = r.prior || r.priorHistory || '—';
+    document.getElementById('cv-casestatus').textContent    = r.caseStatus      || '—';
+
+    // Registration
+    document.getElementById('cv-id').textContent           = r.id             || '—';
+    document.getElementById('cv-registered').textContent   = fmtDate(r.registeredAt);
+
+    // Edit button wires to existing modal
+    document.getElementById('cv-edit-btn').onclick = () => { closeCaseView(); openUpdateModal(id); };
+
+    const panel = document.getElementById('case-panel');
+    panel.classList.remove('hidden');
+    panel.scrollTop = 0;
+    document.getElementById('case-backdrop').classList.remove('hidden');
+    document.body.style.overflow = 'hidden';
+  }
+
+  function closeCaseView() {
+    document.getElementById('case-panel').classList.add('hidden');
+    document.getElementById('case-backdrop').classList.add('hidden');
+    document.body.style.overflow = '';
+  }
+
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') closeCaseView(); });
+  window.addEventListener('storage', e => { if (e.key === STORE_KEY && currentRole !== 'staff') renderTable(); });
+  try {
+    new BroadcastChannel('bcf_investigation_channel').onmessage = (e) => {
+      if (e.data.type === 'ACCUSED_UPDATED' && currentRole !== 'staff') renderTable();
+    };
+  } catch {}
+</script>
+</body>
+</html>

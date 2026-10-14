@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover"/>
+  <title>Disciplinary Committee Registration Log — BCF-SL</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: { extend: {
+        colors: {
+          primary: '#003820',
+          'primary-dark': '#002515',
+          'primary-light': '#E8F5EE',
+          'primary-container': '#0D5C3A',
+          surface: '#f8fafc', 'surface-card': '#ffffff', outline: '#e2e8f0'
+        },
+        fontFamily: { sans: ['"Plus Jakarta Sans"','sans-serif'], display: ['"Plus Jakarta Sans"','sans-serif'] }
+      }}
+    };
+  </script>
+  <style type="text/tailwindcss">
+    body { overscroll-behavior-y: none; }
+    ::-webkit-scrollbar { width: 5px; } ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 3px; }
+    @keyframes fadeUp { from { opacity:0; transform:translateY(10px); } to { opacity:1; transform:translateY(0); } }
+    .fade-up { animation: fadeUp .3s ease-out; }
+    .form-label { @apply block text-xs font-bold text-slate-600 mb-1 uppercase tracking-wide; }
+    .form-input { @apply w-full border border-slate-200 rounded-lg px-3 py-2.5 text-sm text-slate-800 bg-white focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent transition; }
+    .section-header { @apply flex items-center gap-2 mb-4 pb-2 border-b border-slate-200; }
+  </style>
+</head>
+<body class="bg-slate-50 text-slate-800 min-h-screen font-sans">
+
+<!-- HEADER -->
+<header class="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-slate-200 shadow-sm px-4 sm:px-6 py-3">
+  <div class="max-w-7xl mx-auto flex items-center justify-between gap-3">
+    <div class="flex items-center gap-3">
+      <img alt="Bandama Charity Foundation Logo" class="h-10 w-auto object-contain shrink-0 rounded-md" src="/bcf_official_logo.png" onerror="this.onerror=null; this.src='bcf_official_logo.png';"/>
+      <div>
+        <div class="flex items-center gap-2">
+          <h1 class="text-base sm:text-lg font-black text-slate-900 tracking-tight">Disciplinary Committee Registration Log</h1>
+        </div>
+        <p class="text-xs text-slate-500 font-medium">Bandama Charity Foundation Sierra Leone &bull; Discipline</p>
+      </div>
+    </div>
+    <div class="flex items-center gap-2 shrink-0">
+      <a href="../disciplinary_committee_profile/code.html" class="h-9 px-3.5 rounded-lg bg-primary hover:bg-primary-container text-white text-xs font-bold inline-flex items-center gap-1.5 transition shadow-sm">
+        <span class="material-symbols-outlined text-[16px]">badge</span> Committee Profile
+      </a>
+      <a href="../committee_registration_log/code.html" class="flex items-center gap-1.5 px-3 py-1.5 border border-slate-200 hover:bg-slate-50 text-slate-700 text-xs font-bold rounded-lg transition">
+        <span class="material-symbols-outlined text-[15px]">groups</span> Regular Committee
+      </a>
+    </div>
+  </div>
+</header>
+
+<main class="flex-1 max-w-7xl mx-auto px-4 sm:px-6 py-5 space-y-5 pb-20">
+
+  <!-- Page Title Banner -->
+  <div class="bg-gradient-to-r from-primary via-primary-container to-primary rounded-2xl p-5 text-white shadow-md fade-up">
+    <div class="flex items-start justify-between gap-4">
+      <div>
+        <div class="flex items-center gap-2 mb-1">
+          <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+          <span class="text-[10px] font-bold uppercase tracking-widest text-red-200">Discipline · Committee Management</span>
+        </div>
+        <h2 class="text-lg font-black font-display">Register Disciplinary Committee Member</h2>
+        <p class="text-xs text-red-200 mt-0.5">Records for members serving on investigative or disciplinary panels.</p>
+      </div>
+      <div class="shrink-0 w-11 h-11 rounded-xl bg-white/10 flex items-center justify-center border border-white/20">
+        <span class="material-symbols-outlined text-[22px]">admin_panel_settings</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- REGISTRATION FORM -->
+  <form id="committeeForm" class="space-y-5 fade-up" onsubmit="handleSubmit(event)">
+
+    <!-- Section: Member Identity -->
+    <div class="bg-white rounded-xl border border-slate-200 p-5 shadow-sm border-t-4 border-t-primary">
+      <div class="section-header">
+        <div class="w-7 h-7 rounded-lg bg-primary/10 flex items-center justify-center">
+          <span class="material-symbols-outlined text-primary text-[16px]">person</span>
+        </div>
+        <h3 class="text-sm font-bold text-slate-900">Member Identity</h3>
+      </div>
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div>
+          <label class="form-label">Full Name *</label>
+          <input type="text" id="cm-name" class="form-input" placeholder="e.g. Dr. Sorie Mansaray" required/>
+        </div>
+        <div>
+          <label class="form-label">Position / Title *</label>
+          <input type="text" id="cm-position" class="form-input" placeholder="e.g. Safeguarding Lead" required/>
+        </div>
+        <div>
+          <label class="form-label">Job Level *</label>
+          <select id="cm-job-level" class="form-input" required>
+            <option value="">— Select Job Level —</option>
+            <option>Executive Member</option>
+            <option>Director</option>
+            <option>Manager</option>
+            <option>Assistant Manager</option>
+            <option>Officer</option>
+          </select>
+        </div>
+        <div>
+          <label class="form-label">Management Level *</label>
+          <select id="cm-mgmt-level" class="form-input" required>
+            <option value="">— Select Management Level —</option>
+            <option>Non-Management</option>
+            <option>Team Lead</option>
+            <option>Middle Management</option>
+            <option>Senior Management</option>
+            <option>Executive / C-Suite</option>
+          </select>
+        </div>
+        <div class="sm:col-span-2">
+          <label class="form-label">Department *</label>
+          <select id="cm-department" class="form-input" required>
+            <option value="">— Select Department —</option>
+            <option>Finance</option>
+            <option>Health &amp; Safety</option>
+            <option>Human Resource Management</option>
+            <option>Programs</option>
+            <option>Procurement</option>
+            <option>Information and Technology</option>
+            <option>Internal Risk and Audits</option>
+            <option>Legal &amp; Communication</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <!-- Section: Committee Assignment -->
+    <div class="bg-white rounded-xl border border-slate-200 p-5 shadow-sm">
+      <div class="section-header">
+        <div class="w-7 h-7 rounded-lg bg-primary/10 flex items-center justify-center">
+          <span class="material-symbols-outlined text-primary text-[16px]">account_tree</span>
+        </div>
+        <h3 class="text-sm font-bold text-slate-900">Committee Assignment</h3>
+      </div>
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div>
+          <label class="form-label">Committee Designation *</label>
+          <select id="cm-designation" class="form-input" required>
+            <option value="">— Select Designation —</option>
+            <option>Chairman</option>
+            <option>Vice Chairman</option>
+            <option>Member</option>
+          </select>
+        </div>
+        <div>
+          <label class="form-label">Committee Type *</label>
+          <select id="cm-type" class="form-input" required>
+            <option value="">— Select Committee Type —</option>
+            <option>Planning Committee</option>
+            <option>Technical Committee</option>
+            <option>Subject Matter Committee</option>
+            <option>Audit Subcommittee</option>
+            <option>Human Resources Subcommittee</option>
+            <option>Capacity Building Subcommittee</option>
+            <option>Finance Subcommittee</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <!-- Submit -->
+    <div class="flex items-center justify-end gap-3">
+      <button type="button" onclick="clearForm()" class="px-5 py-2.5 border border-slate-200 rounded-xl text-sm font-bold text-slate-600 hover:bg-slate-50 transition">Clear</button>
+      <button type="submit" class="flex items-center gap-2 px-6 py-2.5 bg-primary hover:bg-primary-container text-white text-sm font-bold rounded-xl transition shadow-sm">
+        <span class="material-symbols-outlined text-[17px]">save</span> Register Member
+      </button>
+    </div>
+  </form>
+
+  <!-- REGISTERED MEMBERS TABLE -->
+  <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden fade-up">
+    <div class="flex items-center justify-between px-5 py-4 border-b border-slate-100">
+      <div class="flex items-center gap-2">
+        <span class="material-symbols-outlined text-primary text-[20px]">table_view</span>
+        <h3 class="text-sm font-bold text-slate-900">Registered Disciplinary Members</h3>
+        <span id="member-count-badge" class="text-[10px] font-black px-2 py-0.5 rounded-full bg-primary/10 text-primary">0 Members</span>
+      </div>
+      <button onclick="window.location.href='../disciplinary_committee_profile/code.html'" class="flex items-center gap-1 text-xs font-bold text-primary hover:underline">
+        View Full Profile <span class="material-symbols-outlined text-[14px]">arrow_forward</span>
+      </button>
+    </div>
+    <div class="overflow-x-auto">
+      <table class="w-full text-xs">
+        <thead class="bg-slate-50 border-b border-slate-100">
+          <tr>
+            <th class="px-4 py-3 text-left font-bold text-slate-500 uppercase tracking-wide">Name</th>
+            <th class="px-4 py-3 text-left font-bold text-slate-500 uppercase tracking-wide">Position</th>
+            <th class="px-4 py-3 text-left font-bold text-slate-500 uppercase tracking-wide">Job Level</th>
+            <th class="px-4 py-3 text-left font-bold text-slate-500 uppercase tracking-wide">Designation</th>
+            <th class="px-4 py-3 text-left font-bold text-slate-500 uppercase tracking-wide">Committee Type</th>
+            <th class="px-4 py-3 text-left font-bold text-slate-500 uppercase tracking-wide">Action</th>
+          </tr>
+        </thead>
+        <tbody id="members-tbody" class="divide-y divide-slate-100">
+          <tr id="empty-row"><td colspan="6" class="px-4 py-8 text-center text-slate-400">No members registered yet.</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</main>
+
+<!-- TOAST -->
+<div id="toast" class="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 flex items-center gap-2 bg-slate-900 text-white px-4 py-2.5 rounded-full shadow-xl text-xs font-bold opacity-0 pointer-events-none transition-all duration-300 -translate-y-2">
+  <span class="material-symbols-outlined text-emerald-400 text-[17px]">check_circle</span>
+  <span id="toast-msg">Saved</span>
+</div>
+
+<!-- BOTTOM NAV -->
+<nav class="fixed bottom-0 w-full z-40 bg-white border-t border-slate-200 shadow-lg">
+  <div class="max-w-md mx-auto flex items-center justify-around h-14 text-[10px] font-bold">
+    <a href="../committee_registration_log/code.html" class="flex flex-col items-center gap-0.5 text-slate-400 hover:text-blue-900 transition">
+      <span class="material-symbols-outlined text-[22px]">group_add</span><span>Register</span>
+    </a>
+    <a href="../committee_profile/code.html" class="flex flex-col items-center gap-0.5 text-slate-400 hover:text-blue-900 transition">
+      <span class="material-symbols-outlined text-[22px]">badge</span><span>Profile</span>
+    </a>
+    <a href="code.html" class="flex flex-col items-center gap-0.5 text-red-900">
+      <span class="material-symbols-outlined text-[22px]">gavel</span><span>Disciplinary</span>
+    </a>
+    <a href="../accused_suspect_profile/code.html" class="flex flex-col items-center gap-0.5 text-slate-400 hover:text-red-900 transition">
+      <span class="material-symbols-outlined text-[22px]">person_alert</span><span>Accused</span>
+    </a>
+    <a href="../investigation_case_register_log/code.html" class="flex flex-col items-center gap-0.5 text-slate-400 hover:text-red-900 transition">
+      <span class="material-symbols-outlined text-[22px]">manage_search</span><span>Cases</span>
+    </a>
+  </div>
+</nav>
+
+<script>
+  const STORE_KEY = 'bcf_disciplinary_committee_members';
+
+  function getMembers() {
+    try { return JSON.parse(localStorage.getItem(STORE_KEY)) || []; } catch { return []; }
+  }
+  function saveMembers(arr) {
+    localStorage.setItem(STORE_KEY, JSON.stringify(arr));
+  }
+
+  function showToast(msg) {
+    const t = document.getElementById('toast');
+    document.getElementById('toast-msg').textContent = msg;
+    t.classList.remove('opacity-0','pointer-events-none','-translate-y-2');
+    t.classList.add('opacity-100','translate-y-0');
+    setTimeout(() => {
+      t.classList.add('opacity-0','pointer-events-none','-translate-y-2');
+      t.classList.remove('opacity-100','translate-y-0');
+    }, 3000);
+  }
+
+  function clearForm() {
+    document.getElementById('committeeForm').reset();
+  }
+
+  function handleSubmit(e) {
+    e.preventDefault();
+    const member = {
+      id: 'DCM-' + Date.now(),
+      name: document.getElementById('cm-name').value.trim(),
+      position: document.getElementById('cm-position').value.trim(),
+      jobLevel: document.getElementById('cm-job-level').value,
+      mgmtLevel: document.getElementById('cm-mgmt-level').value,
+      designation: document.getElementById('cm-designation').value,
+      type: document.getElementById('cm-type').value,
+      registeredAt: new Date().toISOString()
+    };
+    const members = getMembers();
+    members.unshift(member);
+    saveMembers(members);
+    clearForm();
+    renderTable();
+    showToast('Member registered successfully!');
+    try { new BroadcastChannel('bcf_disciplinary_channel').postMessage({ type: 'COMMITTEE_UPDATED' }); } catch {}
+  }
+
+  function deleteMember(id) {
+    if (!confirm('Remove this member from the register?')) return;
+    saveMembers(getMembers().filter(m => m.id !== id));
+    renderTable();
+    showToast('Member removed.');
+    try { new BroadcastChannel('bcf_disciplinary_channel').postMessage({ type: 'COMMITTEE_UPDATED' }); } catch {}
+  }
+
+  const DESIGNATION_COLORS = { Chairman: 'bg-red-100 text-red-800', 'Vice Chairman': 'bg-rose-100 text-rose-800', Member: 'bg-slate-100 text-slate-700' };
+
+  function renderTable() {
+    const members = getMembers();
+    const tbody = document.getElementById('members-tbody');
+    document.getElementById('member-count-badge').textContent = members.length + ' Members';
+    if (members.length === 0) {
+      tbody.innerHTML = '<tr id="empty-row"><td colspan="6" class="px-4 py-8 text-center text-slate-400">No members registered yet.</td></tr>';
+      return;
+    }
+    tbody.innerHTML = members.map(m => `
+      <tr class="hover:bg-slate-50 transition">
+        <td class="px-4 py-3 font-semibold text-slate-900">${m.name}</td>
+        <td class="px-4 py-3 text-slate-600">${m.position}</td>
+        <td class="px-4 py-3 text-slate-500">${m.jobLevel}</td>
+        <td class="px-4 py-3">
+          <span class="px-2 py-0.5 rounded-full text-[10px] font-bold ${DESIGNATION_COLORS[m.designation] || 'bg-slate-100 text-slate-700'}">${m.designation}</span>
+        </td>
+        <td class="px-4 py-3 text-slate-600">${m.type}</td>
+        <td class="px-4 py-3">
+          <button onclick="deleteMember('${m.id}')" class="text-red-500 hover:text-red-700 p-1 rounded transition" title="Remove">
+            <span class="material-symbols-outlined text-[16px]">delete</span>
+          </button>
+        </td>
+      </tr>
+    `).join('');
+  }
+
+  document.addEventListener('DOMContentLoaded', renderTable);
+  window.addEventListener('storage', e => { if (e.key === STORE_KEY) renderTable(); });
+</script>
+</body>
+</html>

@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+
+<html lang="en"><head><meta charset="utf-8"/><meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" name="viewport"/><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/><link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/><style>@layer base{html,body{width:100%;margin:0;padding:0;background-color:#f8f9ff;}body{overscroll-behavior-y:none;-webkit-tap-highlight-color:transparent;}.pb-safe{padding-bottom:env(safe-area-inset-bottom,0px);}.pt-safe{padding-top:env(safe-area-inset-top,0px);}main>:first-child{margin-top:0!important;}main>:last-child{margin-bottom:0!important;}}::-webkit-scrollbar{display:none;}</style><script src="https://cdn.tailwindcss.com"></script><script id="tailwind-config">tailwind.config = { darkMode: 'class', theme: { extend: { colors: { 'surface-container-highest': '#d5e3fc', 'surface-container': '#e6eeff', 'on-primary-fixed-variant': '#005232', 'on-secondary-fixed-variant': '#3f465c', 'secondary': '#565e74', 'surface': '#f8f9ff', 'surface-variant': '#d5e3fc', 'on-error-container': '#93000a', 'outline': '#707971', 'primary-container': '#0d5c3a', 'surface-container-lowest': '#ffffff', 'background': '#f8f9ff', 'on-secondary': '#ffffff', 'primary-fixed': '#a9f3c5', 'surface-tint': '#226b47', 'secondary-fixed-dim': '#bec6e0', 'on-tertiary-fixed': '#2f1500', 'inverse-on-surface': '#eaf1ff', 'surface-dim': '#ccdbf3', 'tertiary-fixed-dim': '#ffb77d', 'on-primary-fixed': '#002111', 'inverse-primary': '#8ed6aa', 'on-primary': '#ffffff', 'on-surface': '#0d1c2e', 'on-secondary-fixed': '#131b2e', 'surface-container-low': '#eff4ff', 'on-tertiary-container': '#ffb273', 'outline-variant': '#bfc9c0', 'tertiary': '#5a2e00', 'surface-container-high': '#dce9ff', 'tertiary-fixed': '#ffdcc3', 'primary': '#004328', 'on-tertiary-fixed-variant': '#6e3900', 'on-surface-variant': '#404942', 'secondary-fixed': '#dae2fd', 'surface-bright': '#f8f9ff', 'on-tertiary': '#ffffff', 'on-error': '#ffffff', 'inverse-surface': '#233144', 'tertiary-container': '#7c4100', 'secondary-container': '#dae2fd', 'error': '#ba1a1a', 'on-background': '#0d1c2e', 'error-container': '#ffdad6', 'primary-fixed-dim': '#8ed6aa', 'on-primary-container': '#8ad2a7', 'on-secondary-container': '#5c647a' }, borderRadius: { 'DEFAULT': '0.125rem', 'lg': '0.25rem', 'xl': '0.5rem', 'full': '0.75rem' }, spacing: { 'space-sm': '0.5rem', 'space-2xs': '0.125rem', 'space-xl': '1.5rem', 'card-padding-compact': '0.75rem', 'space-md': '0.75rem', 'gutter-mobile': '0.75rem', 'gutter-desktop': '1.5rem', 'space-lg': '1.25rem', 'card-padding-default': '1.25rem', 'space-xs': '0.25rem', 'space-base': '1rem', 'space-2xl': '2rem', 'space-3xl': '3rem' }, fontFamily: { 'display-lg': ['Inter'], 'currency-display': ['Inter'], 'title-lg': ['Inter'], 'body-sm': ['Inter'], 'tabular-ledger': ['Inter'], 'label-lg': ['Inter'], 'body-lg': ['Inter'], 'currency-md': ['Inter'], 'title-md': ['Inter'], 'label-md': ['Inter'], 'headline-md': ['Inter'], 'label-sm': ['Inter'], 'headline-lg': ['Inter'], 'body-md': ['Inter'] }, fontSize: { 'display-lg': ['32px', { lineHeight: '40px', letterSpacing: '-0.02em', fontWeight: '700' }], 'currency-display': ['28px', { lineHeight: '32px', letterSpacing: '-0.02em', fontWeight: '700' }], 'title-lg': ['18px', { lineHeight: '24px', letterSpacing: '-0.005em', fontWeight: '600' }], 'body-sm': ['13px', { lineHeight: '18px', letterSpacing: '0.005em', fontWeight: '400' }], 'tabular-ledger': ['13px', { lineHeight: '18px', letterSpacing: '0em', fontWeight: '500' }], 'label-lg': ['13px', { lineHeight: '16px', letterSpacing: '0.01em', fontWeight: '600' }], 'body-lg': ['15px', { lineHeight: '22px', letterSpacing: '0em', fontWeight: '400' }], 'currency-md': ['16px', { lineHeight: '20px', letterSpacing: '-0.01em', fontWeight: '600' }], 'title-md': ['16px', { lineHeight: '24px', letterSpacing: '0em', fontWeight: '600' }], 'label-md': ['12px', { lineHeight: '16px', letterSpacing: '0.02em', fontWeight: '500' }], 'headline-md': ['20px', { lineHeight: '28px', letterSpacing: '-0.01em', fontWeight: '600' }], 'label-sm': ['11px', { lineHeight: '14px', letterSpacing: '0.04em', fontWeight: '600' }], 'headline-lg': ['24px', { lineHeight: '32px', letterSpacing: '-0.015em', fontWeight: '600' }], 'body-md': ['14px', { lineHeight: '20px', letterSpacing: '0em', fontWeight: '400' }] } } } }</script><style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head><body class="bg-surface font-body-md text-body-md text-on-surface min-h-screen flex flex-col antialiased selection:bg-primary selection:text-on-primary"><header class="fixed top-0 inset-x-0 z-50 bg-surface/90 backdrop-blur-xl shadow-[0_1px_8px_rgba(13,28,46,0.04)] pt-safe"><div class="h-16 px-gutter-mobile flex items-center justify-between gap-space-sm"><div class="flex items-center gap-space-xs min-w-0 flex-1"><img alt="Bandama Charity Foundation Logo" class="h-8 w-auto object-contain shrink-0" src="../bandama_charity_foundation_logo/bcf_official_logo.png" onerror="this.onerror=null; this.src='/bcf_official_logo.png';"/><div class="flex flex-col min-w-0"><div class="flex items-center gap-space-xs"><span class="font-label-md text-label-md text-primary truncate tracking-tight uppercase">BCF</span><span class="px-space-xs py-space-2xs rounded bg-surface-container-high text-on-surface-variant font-label-sm text-label-sm">SLE</span></div><h1 class="font-title-md text-title-md text-on-surface truncate leading-none">Treasury</h1></div></div><div class="flex items-center gap-space-xs shrink-0"><button aria-label="Notifications" class="relative w-11 h-11 flex items-center justify-center rounded-xl bg-surface-container-low text-on-surface hover:bg-surface-container transition-colors" type="button"><span class="material-symbols-outlined text-[20px]">notifications</span><span class="absolute top-2 right-2 w-2 h-2 rounded-full bg-error ring-2 ring-surface"></span></button><div class="flex items-center gap-space-xs pl-space-xs"><div class="relative flex items-center"><img alt="Profile" class="w-8 h-8 rounded-full object-cover shrink-0 ring-1 ring-outline-variant" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD162K4KtincPTik7LnoU9QwUpSiho7afLo7POYhmtaARMQ3zMQBXUkQ4FhPbiNV7NtRo-KKWk4pPOYhxCyc38DifjsExRkGykZoSTEs9A058kwW2mUk2FHcRCJO98rPfOzNqXQKpOpGZaDcYirnTTy5mxWCrDcEtHLv9bhdplvKyFf_pALPCu9xm3nxTnFcFsD8Q7BsEf-go0_fVwyIFl4mUp-tTZSMtVHq1PRe0ebxdARAuXFq2Rr"/><span class="absolute -bottom-1 -right-1 w-2.5 h-2.5 rounded-full bg-primary ring-2 ring-surface" title="Active"></span></div><div class="hidden xs:flex flex-col"><span class="font-label-sm text-label-sm text-on-surface-variant leading-tight">Finance Dir</span></div></div></div></div></header><main class="flex-1 flex flex-col relative w-full pt-16 pb-24 bg-surface px-gutter-mobile"><div class="flex flex-col w-full space-y-space-md">
+<!-- Executive Live Bank Integration Banner -->
+<div class="w-full bg-surface-container-lowest rounded-xl p-card-padding-compact shadow-sm flex flex-col space-y-space-xs">
+<div class="flex items-center justify-between gap-space-xs">
+<div class="flex items-center gap-space-xs min-w-0">
+<div class="w-7 h-7 rounded bg-primary text-on-primary flex items-center justify-center shrink-0 shadow-sm">
+<span class="material-symbols-outlined text-[16px]">account_balance</span>
+</div>
+<div class="flex flex-col min-w-0">
+<span class="font-label-sm text-label-sm text-secondary truncate uppercase tracking-wider">SLCB Direct Settlement Link</span>
+<span class="font-title-md text-title-md text-on-surface truncate">Sierra Leone Commercial Bank</span>
+</div>
+</div>
+<div class="flex items-center gap-space-2xs shrink-0 bg-primary-fixed text-on-primary-fixed px-space-xs py-space-2xs rounded-full">
+<span class="w-1.5 h-1.5 rounded-full bg-primary animate-pulse"></span>
+<span class="font-label-sm text-label-sm">LIVE SYNCED</span>
+</div>
+</div>
+<div class="flex items-center justify-between pt-space-xs bg-surface-container-low px-space-sm py-space-xs rounded">
+<div class="flex items-center gap-space-xs min-w-0">
+<span class="font-label-md text-label-md text-secondary">Acc:</span>
+<span class="font-tabular-ledger text-tabular-ledger text-on-surface font-semibold tracking-tight truncate">#004-10294-81</span>
+</div>
+<div class="flex items-center gap-space-2xs text-secondary shrink-0">
+<span class="material-symbols-outlined text-[14px]">schedule</span>
+<span class="font-label-sm text-label-sm">Verified 09:42 GMT</span>
+</div>
+</div>
+</div>
+<!-- Real-time Executive Notification Banner -->
+<div class="w-full bg-surface-container-high rounded-xl p-space-sm shadow-sm flex items-start gap-space-sm">
+<div class="w-6 h-6 rounded-full bg-primary-container text-on-primary-container flex items-center justify-center shrink-0 mt-space-2xs">
+<span class="material-symbols-outlined text-[14px]">bolt</span>
+</div>
+<div class="flex-1 min-w-0">
+<div class="flex items-center justify-between gap-space-xs">
+<span class="font-label-md text-label-md text-primary font-bold tracking-tight">Recent Inflow Alert</span>
+<span class="font-label-sm text-label-sm text-secondary">2m ago</span>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface mt-space-2xs leading-snug">
+<span class="font-semibold text-primary">Global Fund NLe 2,400,000</span> credited. Automated alert &amp; ledger logs dispatched to <span class="text-secondary">CEO, Finance Dir, Internal Audit, HR Dir &amp; Admin</span>.
+      </p>
+</div>
+</div>
+<!-- Executive Balance Formula Module -->
+<div class="w-full bg-primary text-on-primary rounded-xl p-card-padding-default shadow-md relative overflow-hidden">
+<div class="absolute -right-4 -bottom-4 w-28 h-28 rounded-full bg-primary-container/20 pointer-events-none"></div>
+<div class="flex items-center justify-between gap-space-xs mb-space-xs">
+<span class="font-label-sm text-label-sm uppercase tracking-widest text-primary-fixed">Statutory Governance Formula</span>
+<span class="material-symbols-outlined text-[18px] text-primary-fixed opacity-80">verified_user</span>
+</div>
+<div class="flex flex-wrap items-baseline gap-space-2xs font-display-lg text-display-lg leading-tight tracking-tight text-on-primary">
+<span class="text-primary-fixed font-bold">Balance</span>
+<span class="text-on-primary/60 text-[20px] font-light">=</span>
+<span class="text-[16px] text-surface font-medium">Donor Inflows</span>
+<span class="text-on-primary/60 text-[20px] font-light">−</span>
+<span class="text-[16px] text-tertiary-fixed font-medium">Expenditure</span>
+</div>
+<div class="mt-space-sm pt-space-xs bg-primary-container/40 rounded px-space-sm py-space-xs flex items-center justify-between">
+<span class="font-label-sm text-label-sm text-on-primary/90">Institutional Ledger Integrity: Fully Balanced</span>
+<span class="material-symbols-outlined text-[16px] text-primary-fixed">check_circle</span>
+</div>
+</div>
+<!-- 3 Primary Stat KPI Cards -->
+<div class="flex flex-col space-y-space-sm">
+<!-- Primary KPI: Account Balance -->
+<div class="w-full bg-surface-container-lowest rounded-xl p-card-padding-default shadow-sm relative">
+<div class="w-1.5 h-8 bg-primary rounded-full absolute left-3 top-5"></div>
+<div class="pl-space-sm flex flex-col space-y-space-2xs">
+<div class="flex items-center justify-between">
+<span class="font-label-md text-label-md text-secondary">BCF Treasury Net Liquidity</span>
+<span class="bg-surface-container text-primary font-label-sm text-label-sm px-space-xs py-space-2xs rounded flex items-center gap-space-2xs">
+<span class="material-symbols-outlined text-[12px]">security</span> Bank Matched
+          </span>
+</div>
+<div class="flex items-baseline gap-space-xs mt-space-2xs">
+<span class="font-currency-display text-currency-display text-on-surface tracking-tight">NLe 8,450,200</span>
+<span class="font-label-md text-label-md text-secondary">SLE</span>
+</div>
+<div class="flex items-center justify-between pt-space-xs mt-space-xs">
+<span class="font-body-sm text-body-sm text-secondary">Sierra Leone Commercial Bank</span>
+<span class="font-tabular-ledger text-tabular-ledger text-primary font-semibold">100% Reconciled</span>
+</div>
+</div>
+</div>
+<!-- KPI Grid (2 Cards) -->
+<div class="grid grid-cols-2 gap-space-sm">
+<!-- Total Donor Funds Received -->
+<div class="bg-surface-container-lowest rounded-xl p-card-padding-compact shadow-sm flex flex-col justify-between space-y-space-xs">
+<div class="flex items-center justify-between">
+<span class="font-label-sm text-label-sm text-secondary truncate">Total Inflows</span>
+<span class="material-symbols-outlined text-[16px] text-primary">trending_up</span>
+</div>
+<div>
+<span class="font-currency-md text-currency-md text-on-surface tracking-tight block">NLe 14.80M</span>
+<span class="font-label-sm text-label-sm text-primary flex items-center gap-space-2xs mt-space-2xs">
+<span class="material-symbols-outlined text-[12px]">arrow_upward</span> +18.4% YTD
+          </span>
+</div>
+<div class="w-full bg-surface-container-high rounded-full h-1.5 overflow-hidden">
+<div class="bg-primary h-full w-[78%] rounded-full"></div>
+</div>
+</div>
+<!-- Total Operational & Program Spend -->
+<div class="bg-surface-container-lowest rounded-xl p-card-padding-compact shadow-sm flex flex-col justify-between space-y-space-xs">
+<div class="flex items-center justify-between">
+<span class="font-label-sm text-label-sm text-secondary truncate">Disbursed Spend</span>
+<span class="material-symbols-outlined text-[16px] text-secondary">trending_flat</span>
+</div>
+<div>
+<span class="font-currency-md text-currency-md text-on-surface tracking-tight block">NLe 6.35M</span>
+<span class="font-label-sm text-label-sm text-secondary flex items-center gap-space-2xs mt-space-2xs">
+            42.9% Allocation
+          </span>
+</div>
+<div class="w-full bg-surface-container-high rounded-full h-1.5 overflow-hidden">
+<div class="bg-secondary h-full w-[43%] rounded-full"></div>
+</div>
+</div>
+</div>
+</div>
+<!-- Quick Access Executive Governance Grid -->
+<div class="w-full flex flex-col space-y-space-xs">
+<div class="flex items-center justify-between px-space-2xs">
+<span class="font-title-md text-title-md text-on-surface">Executive Actions</span>
+<span class="font-label-sm text-label-sm text-primary uppercase font-bold tracking-wider">Tier 1 Controls</span>
+</div>
+<div class="grid grid-cols-2 gap-space-xs">
+<button class="w-full text-left bg-surface-container-lowest hover:bg-surface-container-low transition-colors rounded-xl p-space-sm shadow-sm flex items-center gap-space-xs" type="button">
+<div class="w-8 h-8 rounded-lg bg-surface-container flex items-center justify-center text-primary shrink-0">
+<span class="material-symbols-outlined text-[18px]">sync_alt</span>
+</div>
+<div class="flex flex-col min-w-0">
+<span class="font-label-md text-label-md text-on-surface truncate font-semibold">Reconcile Bank</span>
+<span class="font-label-sm text-label-sm text-secondary truncate">SLCB Auto-Audit</span>
+</div>
+</button>
+<button class="w-full text-left bg-surface-container-lowest hover:bg-surface-container-low transition-colors rounded-xl p-space-sm shadow-sm flex items-center gap-space-xs" type="button">
+<div class="w-8 h-8 rounded-lg bg-surface-container flex items-center justify-center text-primary shrink-0">
+<span class="material-symbols-outlined text-[18px]">price_check</span>
+</div>
+<div class="flex flex-col min-w-0">
+<span class="font-label-md text-label-md text-on-surface truncate font-semibold">Disburse Loan</span>
+<span class="font-label-sm text-label-sm text-secondary truncate">3 Staff Pending</span>
+</div>
+</button>
+<button class="w-full text-left bg-surface-container-lowest hover:bg-surface-container-low transition-colors rounded-xl p-space-sm shadow-sm flex items-center gap-space-xs" type="button">
+<div class="w-8 h-8 rounded-lg bg-surface-container flex items-center justify-center text-secondary shrink-0">
+<span class="material-symbols-outlined text-[18px]">verified</span>
+</div>
+<div class="flex flex-col min-w-0">
+<span class="font-label-md text-label-md text-on-surface truncate font-semibold">Payroll Audit</span>
+<span class="font-label-sm text-label-sm text-secondary truncate">NASSIT / NRA</span>
+</div>
+</button>
+<button class="w-full text-left bg-surface-container-lowest hover:bg-surface-container-low transition-colors rounded-xl p-space-sm shadow-sm flex items-center gap-space-xs" type="button">
+<div class="w-8 h-8 rounded-lg bg-surface-container flex items-center justify-center text-secondary shrink-0">
+<span class="material-symbols-outlined text-[18px]">download</span>
+</div>
+<div class="flex flex-col min-w-0">
+<span class="font-label-md text-label-md text-on-surface truncate font-semibold">M&amp;E Report</span>
+<span class="font-label-sm text-label-sm text-secondary truncate">PDF / Board Deck</span>
+</div>
+</button>
+</div>
+</div>
+<!-- Donor Fund Breakdown & Transaction Visual Card -->
+<div class="w-full bg-surface-container-lowest rounded-xl p-card-padding-compact shadow-sm flex flex-col space-y-space-sm">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-space-xs">
+<span class="font-title-md text-title-md text-on-surface">Institutional Portfolio</span>
+<span class="bg-surface-container px-space-xs py-space-2xs rounded font-label-sm text-label-sm text-secondary">FY 2025</span>
+</div>
+<button class="font-label-md text-label-md text-primary font-semibold hover:underline" type="button">View All</button>
+</div>
+<!-- Inline Funding Allocation Sparkline -->
+<div class="w-full flex flex-col space-y-space-2xs bg-surface-container-low p-space-xs rounded-lg">
+<div class="flex justify-between items-center text-secondary font-label-sm text-label-sm">
+<span>Global Fund (51%)</span>
+<span>USAID (30%)</span>
+<span>UK Aid (19%)</span>
+</div>
+<div class="w-full h-3 flex rounded-full overflow-hidden">
+<div class="bg-primary h-full w-[51%]" title="Global Fund"></div>
+<div class="bg-surface-tint h-full w-[30%]" title="USAID"></div>
+<div class="bg-secondary h-full w-[19%]" title="UK Aid"></div>
+</div>
+</div>
+<!-- Active Field Deployment Photo Feature -->
+<div class="relative w-full h-32 rounded-lg overflow-hidden flex items-end p-space-sm">
+<img class="absolute inset-0 w-full h-full object-cover" data-alt="Sierra Leone local community healthcare field program staff in high-visibility medical vests reviewing medication distribution records with local partners in Freetown, soft natural tropical lighting, high dynamic range editorial documentary photography." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAeThAt3K_miWDhBZTadib94aCVsTvcic33Gk9odkYPMqJVl6dGe46UhxallVme9PqYuGnD0Yy_lvraPJPI52GLSybIN641OCILnVnyT24-tQe9tXzkDiq7e84ZLvoASW6-IHjwF7GEUtARzi-xgRnSBRfkTWe93RAElayFSPpIwyxxnROFFnFW7LgAr4wzSvlQYhgdHQK_Pj7JFKkGYWZFBdWcEIp7-fAeh6LaFCcedf5xMpDuhaEa"/>
+<div class="absolute inset-0 bg-gradient-to-t from-on-surface/90 via-on-surface/40 to-transparent"></div>
+<div class="relative z-10 flex items-center justify-between w-full text-on-primary">
+<div class="flex flex-col min-w-0">
+<span class="font-label-sm text-label-sm uppercase tracking-wider text-primary-fixed">Active Disbursement Field</span>
+<span class="font-title-md text-title-md font-semibold truncate">Kenema Maternal Health Initiative</span>
+</div>
+<span class="bg-primary text-on-primary font-label-sm text-label-sm px-space-xs py-space-2xs rounded shrink-0">NLe 1.8M Active</span>
+</div>
+</div>
+</div>
+<!-- Recent Inflows & Expenditures Breakdown List -->
+<div class="w-full bg-surface-container-lowest rounded-xl p-card-padding-compact shadow-sm flex flex-col space-y-space-sm">
+<div class="flex items-center justify-between">
+<span class="font-title-md text-title-md text-on-surface">Recent Treasury Movements</span>
+<span class="font-label-sm text-label-sm text-secondary">Verified Ledgers</span>
+</div>
+<div class="flex flex-col space-y-space-xs">
+<!-- Item 1: Global Fund Inflow -->
+<div class="flex items-center justify-between p-space-xs rounded-lg hover:bg-surface-container-low transition-colors">
+<div class="flex items-center gap-space-sm min-w-0">
+<div class="w-9 h-9 rounded-lg bg-surface-container flex items-center justify-center text-primary shrink-0">
+<span class="material-symbols-outlined text-[18px]">south_east</span>
+</div>
+<div class="flex flex-col min-w-0">
+<span class="font-label-lg text-label-lg text-on-surface truncate">The Global Fund</span>
+<span class="font-body-sm text-body-sm text-secondary truncate">Tranche 3 • Malaria Vector Control</span>
+<span class="font-label-sm text-label-sm text-outline font-mono truncate">0x9F4B...81D2</span>
+</div>
+</div>
+<div class="flex flex-col items-end shrink-0 pl-space-xs">
+<span class="font-currency-md text-currency-md text-primary">+NLe 2,400,000</span>
+<span class="font-label-sm text-label-sm text-secondary">Today, 09:14</span>
+<span class="bg-surface-container-high text-primary font-label-sm text-label-sm px-space-2xs rounded">Credited</span>
+</div>
+</div>
+<!-- Item 2: USAID Inflow -->
+<div class="flex items-center justify-between p-space-xs rounded-lg hover:bg-surface-container-low transition-colors">
+<div class="flex items-center gap-space-sm min-w-0">
+<div class="w-9 h-9 rounded-lg bg-surface-container flex items-center justify-center text-primary shrink-0">
+<span class="material-symbols-outlined text-[18px]">south_east</span>
+</div>
+<div class="flex flex-col min-w-0">
+<span class="font-label-lg text-label-lg text-on-surface truncate">USAID West Africa</span>
+<span class="font-body-sm text-body-sm text-secondary truncate">Direct Program Grant #SL-04</span>
+<span class="font-label-sm text-label-sm text-outline font-mono truncate">0x4E1A...C380</span>
+</div>
+</div>
+<div class="flex flex-col items-end shrink-0 pl-space-xs">
+<span class="font-currency-md text-currency-md text-primary">+NLe 5,200,000</span>
+<span class="font-label-sm text-label-sm text-secondary">18 Oct 2025</span>
+<span class="bg-surface-container-high text-primary font-label-sm text-label-sm px-space-2xs rounded">Audited</span>
+</div>
+</div>
+<!-- Item 3: Operational Spend Outflow -->
+<div class="flex items-center justify-between p-space-xs rounded-lg hover:bg-surface-container-low transition-colors">
+<div class="flex items-center gap-space-sm min-w-0">
+<div class="w-9 h-9 rounded-lg bg-error-container/40 flex items-center justify-center text-error shrink-0">
+<span class="material-symbols-outlined text-[18px]">north_east</span>
+</div>
+<div class="flex flex-col min-w-0">
+<span class="font-label-lg text-label-lg text-on-surface truncate">Executive Payroll Batch</span>
+<span class="font-body-sm text-body-sm text-secondary truncate">NASSIT &amp; NRA Inclusive Remittance</span>
+<span class="font-label-sm text-label-sm text-outline font-mono truncate">0x7B29...FF01</span>
+</div>
+</div>
+<div class="flex flex-col items-end shrink-0 pl-space-xs">
+<span class="font-currency-md text-currency-md text-error">-NLe 820,400</span>
+<span class="font-label-sm text-label-sm text-secondary">16 Oct 2025</span>
+<span class="bg-surface-container text-secondary font-label-sm text-label-sm px-space-2xs rounded">Statutory Disbursed</span>
+</div>
+</div>
+<!-- Item 4: UK Aid Foreign Grant Inflow -->
+<div class="flex items-center justify-between p-space-xs rounded-lg hover:bg-surface-container-low transition-colors">
+<div class="flex items-center gap-space-sm min-w-0">
+<div class="w-9 h-9 rounded-lg bg-surface-container flex items-center justify-center text-primary shrink-0">
+<span class="material-symbols-outlined text-[18px]">south_east</span>
+</div>
+<div class="flex flex-col min-w-0">
+<span class="font-label-lg text-label-lg text-on-surface truncate">UK Aid / FCDO</span>
+<span class="font-body-sm text-body-sm text-secondary truncate">Community Education Grant</span>
+<span class="font-label-sm text-label-sm text-outline font-mono truncate">0x118C...99AA</span>
+</div>
+</div>
+<div class="flex flex-col items-end shrink-0 pl-space-xs">
+<span class="font-currency-md text-currency-md text-primary">+NLe 3,100,000</span>
+<span class="font-label-sm text-label-sm text-secondary">12 Oct 2025</span>
+<span class="bg-surface-container-high text-primary font-label-sm text-label-sm px-space-2xs rounded">Audited</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Executive RBAC Security Badge Footer -->
+<div class="w-full bg-surface-container rounded-xl p-space-sm shadow-sm flex items-center gap-space-sm">
+<div class="w-8 h-8 rounded-full bg-surface-container-highest flex items-center justify-center text-on-surface shrink-0">
+<span class="material-symbols-outlined text-[18px]">admin_panel_settings</span>
+</div>
+<div class="flex flex-col min-w-0 flex-1">
+<div class="flex items-center gap-space-xs">
+<span class="font-label-md text-label-md text-on-surface font-semibold truncate">Finance Director Authorization</span>
+<span class="w-2 h-2 rounded-full bg-primary shrink-0"></span>
+</div>
+<span class="font-body-sm text-body-sm text-secondary truncate">Active Session: Tier 1 Clearance • Dual-Signoff Protocol Active with CEO</span>
+</div>
+<span class="material-symbols-outlined text-[18px] text-secondary shrink-0">lock</span>
+</div>
+</div>
+<script>
+  // Simple micro-interaction for executive quick action cards
+  document.querySelectorAll('button').forEach(btn => {
+    btn.addEventListener('click', function() {
+      this.classList.add('scale-[0.98]');
+      setTimeout(() => {
+        this.classList.remove('scale-[0.98]');
+      }, 100);
+    });
+  });
+</script></main><nav class="fixed bottom-0 inset-x-0 z-50 pb-safe bg-surface/90 backdrop-blur-xl shadow-[0_-1px_12px_rgba(13,28,46,0.05)]" data-active-classes="text-primary font-bold"><div class="flex items-center justify-around h-16 px-space-xs"><a aria-current="page" class="flex flex-col items-center justify-center flex-1 h-full py-space-xs transition-colors text-primary font-bold" data-path="treasury"  onclick="window.top.location.href='/finance/executive-treasury-bank-balance'; return false;" style="cursor:pointer"><span class="material-symbols-outlined text-[22px]">account_balance</span><span class="font-label-sm text-label-sm mt-space-2xs">Treasury</span></a><a class="flex flex-col items-center justify-center flex-1 h-full py-space-xs text-on-surface-variant hover:text-on-surface transition-colors" data-path="donors" href="#" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;"><span class="material-symbols-outlined text-[22px]">volunteer_activism</span><span class="font-label-sm text-label-sm mt-space-2xs">Donors</span></a><a class="flex flex-col items-center justify-center flex-1 h-full py-space-xs text-on-surface-variant hover:text-on-surface transition-colors" data-path="programs" href="#" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;"><span class="material-symbols-outlined text-[22px]">pie_chart</span><span class="font-label-sm text-label-sm mt-space-2xs">Programs</span></a><a class="flex flex-col items-center justify-center flex-1 h-full py-space-xs text-on-surface-variant hover:text-on-surface transition-colors" data-path="payroll"  onclick="window.top.location.href='/finance/staff-payroll-statutory-schedule'; return false;" style="cursor:pointer"><span class="material-symbols-outlined text-[22px]">payments</span><span class="font-label-sm text-label-sm mt-space-2xs">Payroll</span></a><a class="flex flex-col items-center justify-center flex-1 h-full py-space-xs text-on-surface-variant hover:text-on-surface transition-colors" data-path="loans" href="#" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;"><span class="material-symbols-outlined text-[22px]">credit_score</span><span class="font-label-sm text-label-sm mt-space-2xs">Loans</span></a></div></nav></body></html>

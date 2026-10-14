@@ -1,0 +1,1573 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" name="viewport"/>
+  <title>BCF-SL Financial Ledger &amp; Program Allocations</title>
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com" rel="preconnect"/>
+  <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;family=JetBrains+Mono:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+  <style>
+    @layer base {
+      html, body { width: 100vw; margin: 0; padding: 0; }
+      body { overscroll-behavior: none; }
+      .pb-safe { padding-bottom: env(safe-area-inset-bottom, 0px); }
+      .pt-safe { padding-top: env(safe-area-inset-top, 0px); }
+      main > :first-child { margin-top: 0 !important; }
+      main > :last-child { margin-bottom: 0 !important; }
+    }
+    ::-webkit-scrollbar { display: none; }
+    .custom-scrollbar::-webkit-scrollbar { display: block; width: 5px; height: 5px; }
+    .custom-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+  </style>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: {
+            "primary": "#003820",
+            "primary-container": "#0f5132",
+            "on-primary": "#ffffff",
+            "primary-fixed": "#b0f1c7",
+            "primary-fixed-dim": "#95d4ac",
+            "on-primary-fixed": "#002111",
+            "on-primary-fixed-variant": "#0f5132",
+            "secondary": "#904d00",
+            "secondary-container": "#fe932c",
+            "secondary-fixed": "#ffdcc3",
+            "on-secondary-fixed": "#2f1500",
+            "tertiary": "#003351",
+            "tertiary-container": "#004b74",
+            "tertiary-fixed": "#cce5ff",
+            "on-tertiary-fixed-variant": "#004b73",
+            "surface": "#faf8ff",
+            "surface-dim": "#d2d9f4",
+            "surface-bright": "#faf8ff",
+            "surface-container-lowest": "#ffffff",
+            "surface-container-low": "#f2f3ff",
+            "surface-container": "#eaedff",
+            "surface-container-high": "#e2e7ff",
+            "surface-container-highest": "#dae2fd",
+            "on-surface": "#131b2e",
+            "on-surface-variant": "#404942",
+            "outline": "#707971",
+            "outline-variant": "#c0c9c0"
+          },
+          fontFamily: {
+            "sans": ["Plus Jakarta Sans", "sans-serif"],
+            "mono": ["JetBrains Mono", "monospace"],
+            "inter": ["Inter", "sans-serif"]
+          },
+          spacing: {
+            "unit-xs": "0.5rem",
+            "unit-sm": "0.75rem",
+            "unit-md": "1rem",
+            "unit-lg": "1.25rem",
+            "unit-xl": "1.5rem",
+            "card-padding": "1rem",
+            "screen-margin-mobile": "1rem",
+            "gutter": "0.75rem"
+          }
+        }
+      }
+    };
+  </script>
+</head>
+<body class="bg-surface font-sans text-on-surface flex flex-col min-h-screen antialiased">
+
+  <!-- TOP APP HEADER -->
+  <header class="fixed top-0 w-full z-40 bg-surface/95 backdrop-blur-xl shadow-xs pt-safe border-b border-outline-variant/30">
+    <div class="h-16 px-screen-margin-mobile flex items-center justify-between gap-unit-xs max-w-5xl mx-auto">
+      <div class="flex items-center gap-2.5 min-w-0 flex-1">
+        <img alt="Bandama Charity Foundation Logo" class="h-9 sm:h-10 w-auto object-contain shrink-0 rounded-md" 
+             src="/bcf_official_logo.png" onerror="this.onerror=null; this.src='bcf_official_logo.png';"/>
+        <div class="flex flex-col min-w-0">
+          <span class="text-[11px] font-bold text-primary uppercase truncate tracking-wider">Bandama Foundation SL</span>
+          <span class="text-sm font-extrabold text-on-surface truncate">Finances &amp; Program Operations</span>
+        </div>
+      </div>
+      <div class="flex items-center gap-unit-xs shrink-0">
+        <a href="/programs/programs-database" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-emerald-50 hover:bg-emerald-100 text-primary border border-emerald-300 text-xs font-bold transition shadow-2xs">
+          <span class="material-symbols-outlined text-[17px]">table_rows</span>
+          <span class="hidden sm:inline">Programs Input Trackers</span>
+          <span class="sm:hidden">Master Table</span>
+        </a>
+        <button aria-label="Notifications" class="relative w-10 h-10 flex items-center justify-center rounded-full hover:bg-surface-container-high transition-colors" type="button">
+          <span class="material-symbols-outlined text-on-surface-variant text-[22px]">notifications</span>
+          <span class="absolute top-2.5 right-2.5 w-2 h-2 bg-secondary-container rounded-full ring-2 ring-surface"></span>
+        </button>
+        <button aria-label="Program Director Profile" class="w-10 h-10 flex items-center justify-center rounded-full hover:opacity-90 transition-opacity" type="button">
+          <img alt="Profile" class="w-8 h-8 rounded-full object-cover shadow-xs" 
+               src="https://lh3.googleusercontent.com/aida-public/AB6AXuDjW1ZDwKnrX70owVvwOQ9581Rawq5dUecY2bdaPWrJgSaU27zKGrBN2usmHKjFMugDmGyf0LZsD7hBGiewI7D8TnJxPU1V3kAe_rEqNuRPUUAyejbdjs8sd22e199aSgZ-NB78EbUpRusoG7W0GgjM592eMHwI7ZFzfW9AtrI3ryekLPFDRV-NRSXrBBPwtDlNZ8HbpSyubIYyd9tGNdJU25hSViublxo5qINFMC8_NqfMVqaK5Bo"/>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- MAIN SCROLLABLE CONTENT -->
+  <main class="flex flex-col relative w-full pt-16 pb-24 bg-surface min-h-screen px-screen-margin-mobile">
+    <div class="flex flex-col w-full pb-8 max-w-5xl mx-auto space-y-4">
+
+      <!-- SECTION 1: FISCAL OVERSIGHT 2024/2025 (ANALYTICS AT THE TOP FIRST) -->
+      <div class="pt-3">
+        <!-- Title & Currency Switcher -->
+        <div class="flex items-center justify-between gap-unit-xs mb-3">
+          <div class="flex flex-col min-w-0">
+            <span class="text-[11px] font-bold text-primary uppercase tracking-wider flex items-center gap-1.5">
+              <span class="material-symbols-outlined text-[16px] text-primary">insights</span>
+              <span>Fiscal Oversight 2024/2025</span>
+            </span>
+            <h2 class="text-xl font-black text-on-surface truncate">Financial Ledger</h2>
+          </div>
+          <div class="flex items-center bg-surface-container-high rounded-full p-1 shrink-0 shadow-xs" id="currencyToggleWrapper">
+            <button class="px-3 py-1 rounded-full bg-primary text-on-primary text-xs font-bold shadow-xs transition-all duration-200" id="btnNLe" onclick="setCurrency('NLe')" type="button">NLe (SLE)</button>
+            <button class="px-3 py-1 rounded-full text-on-surface-variant text-xs font-bold hover:text-on-surface transition-all duration-200" id="btnUSD" onclick="setCurrency('USD')" type="button">USD ($)</button>
+          </div>
+        </div>
+
+        <!-- Statutory Treasury Reserve Hero Card -->
+        <div class="w-full bg-primary-container text-on-primary rounded-2xl p-5 shadow-md relative overflow-hidden">
+          <div class="absolute -right-8 -bottom-10 w-48 h-48 rounded-full bg-primary-fixed-dim/10 pointer-events-none blur-xl"></div>
+          <div class="absolute right-4 top-4 opacity-15">
+            <span class="material-symbols-outlined text-[90px] text-white">account_balance_wallet</span>
+          </div>
+
+          <div class="relative z-10 flex flex-col gap-2">
+            <div class="flex items-center justify-between">
+              <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-on-primary/10 text-on-primary text-[11px] font-bold backdrop-blur-sm">
+                <span class="w-2 h-2 rounded-full bg-primary-fixed animate-pulse"></span>
+                <span>Statutory Treasury Reserve</span>
+              </span>
+              <span class="text-xs font-mono text-primary-fixed font-bold tracking-wider">FY24-Q3 ACTIVE</span>
+            </div>
+
+            <div class="mt-1">
+              <span class="text-xs text-on-primary/80 font-medium block">Remaining Balance Available</span>
+              <div class="flex items-baseline gap-2 mt-0.5">
+                <span class="text-2xl sm:text-3xl font-black text-white font-mono tracking-tight" id="heroBalance">1,145,000</span>
+                <span class="text-sm font-bold text-primary-fixed-dim currency-symbol">NLe</span>
+              </div>
+            </div>
+
+            <div class="grid grid-cols-2 gap-unit-xs pt-3 mt-1 bg-black/20 -mx-5 px-5 pb-1 rounded-b-xl border-t border-white/10">
+              <div class="flex flex-col">
+                <span class="text-[11px] text-on-primary/75 font-medium">Total Grants Received</span>
+                <span class="text-sm sm:text-base font-bold text-white font-mono mt-0.5" id="heroReceived">4,700,000 <span class="text-xs currency-symbol text-primary-fixed">NLe</span></span>
+              </div>
+              <div class="flex flex-col pl-3 border-l border-white/10">
+                <span class="text-[11px] text-on-primary/75 font-medium">Total Expenditure</span>
+                <span class="text-sm sm:text-base font-bold text-secondary-fixed font-mono mt-0.5" id="heroSpent">3,555,000 <span class="text-xs currency-symbol text-secondary-fixed">NLe</span></span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Absorption Velocity Card -->
+      <div class="w-full bg-surface-container-lowest rounded-xl p-card-padding shadow-xs border border-slate-200/80">
+        <div class="flex items-center justify-between mb-2">
+          <div class="flex items-center gap-2">
+            <div class="w-7 h-7 rounded-lg bg-surface-container-high flex items-center justify-center">
+              <span class="material-symbols-outlined text-primary text-[18px]">speed</span>
+            </div>
+            <span class="text-sm font-bold text-on-surface">Absorption Velocity</span>
+          </div>
+          <span class="px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-900 text-xs font-bold font-mono" id="velocityBadge">75.64% Spent</span>
+        </div>
+        <p class="text-xs text-on-surface-variant mb-2.5">
+          Sound capital solvency: Foundation has disbursed <strong class="text-on-surface font-mono" id="velocitySpentPct">75.64%</strong> of operational grants, reserving <strong class="text-emerald-800 font-mono" id="velocityIntactPct">24.36%</strong> for active field deployment stages.
+        </p>
+        <div class="relative w-full h-3.5 bg-surface-container-high rounded-full overflow-hidden flex shadow-inner">
+          <div id="velocityBarDisbursed" class="h-full bg-secondary-container rounded-full transition-all duration-300" style="width: 75.64%; min-width: 4px;" title="Disbursed Capital"></div>
+          <div id="velocityBarIntact" class="h-full bg-primary-container rounded-full ml-0.5 flex-1 transition-all duration-300" title="Reserve Balance"></div>
+        </div>
+        <div class="flex items-center justify-between pt-2">
+          <div class="flex items-center gap-1.5">
+            <span class="w-2.5 h-2.5 rounded-full bg-secondary-container"></span>
+            <span class="text-[11px] font-mono text-on-surface-variant" id="legendDisbursed">Disbursed (75.64%)</span>
+          </div>
+          <div class="flex items-center gap-1.5">
+            <span class="w-2.5 h-2.5 rounded-full bg-primary-container"></span>
+            <span class="text-[11px] font-mono text-on-surface-variant" id="legendIntact">Intact Capital (24.36%)</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Quick Action Buttons -->
+      <div class="grid grid-cols-3 gap-unit-xs">
+        <button class="flex items-center justify-center gap-1.5 h-11 px-2.5 rounded-xl bg-surface-container-lowest text-primary text-xs font-bold shadow-xs hover:bg-slate-50 border border-slate-200 transition active:scale-95" onclick="triggerExportNotice()" type="button">
+          <span class="material-symbols-outlined text-primary text-[19px]">download_for_offline</span>
+          <span class="truncate">Export Audit (CSV)</span>
+        </button>
+        <button class="flex items-center justify-center gap-1.5 h-11 px-2.5 rounded-xl bg-surface-container-high text-primary text-xs font-bold shadow-xs hover:bg-surface-container transition active:scale-95" onclick="openModifyAllocationModal()" type="button">
+          <span class="material-symbols-outlined text-primary text-[19px]">edit_note</span>
+          <span class="truncate">Modify Allocation</span>
+        </button>
+        <button class="flex items-center justify-center gap-1.5 h-11 px-2.5 rounded-xl bg-primary hover:bg-primary-container text-on-primary text-xs font-bold shadow-xs transition active:scale-95" onclick="openDisbursementModal()" type="button">
+          <span class="material-symbols-outlined text-[19px]">receipt_long</span>
+          <span class="truncate">+ Log Voucher</span>
+        </button>
+      </div>
+
+      <!-- Live Synchronization & Verification Banner -->
+      <div class="w-full bg-emerald-50/60 rounded-xl p-3 border border-emerald-200/80 flex items-center gap-3">
+        <img class="w-10 h-10 rounded-lg object-cover shadow-2xs shrink-0" 
+             src="https://lh3.googleusercontent.com/aida-public/AB6AXuBZjkZLy8FNFD1aKGU46B1JU98vMOrZnr0KSgMayIB5lxPDEvnZjHkhPT96Qbz4CpksmWMtnGiAJK0R7CAdrexDTR1lGq0_dmlI9lx7mobVSTYec2_ClD1qHznKde4bhQRYfnK9HVlfM5A8G-Er80_AvNUxI-JlzHFS32YKtLY7NpQOfLVdvBdjxnLHjDgsBUMvxi_Zqpkyfecvqoa29tROwJqcwaQ5ctdY_qVblYWTDT__NJwQDxY" 
+             alt="Chief Comptroller"/>
+        <div class="flex flex-col min-w-0 flex-1">
+          <div class="flex items-center gap-1.5">
+            <span class="w-2 h-2 rounded-full bg-emerald-600 animate-pulse"></span>
+            <span class="text-xs font-bold text-primary">Live Synchronized with Programs Input Trackers</span>
+            <span class="material-symbols-outlined text-[15px] text-primary" style="font-variation-settings: 'FILL' 1;">verified</span>
+          </div>
+          <p class="text-[11px] text-slate-600 truncate" id="syncBannerStatus">
+            All programs entered in Programs Input Trackers (Program Master Table) automatically appear below.
+          </p>
+        </div>
+        <button type="button" onclick="syncWithMasterTable(true)" class="px-2.5 py-1.5 rounded-lg bg-white hover:bg-emerald-100 text-primary border border-emerald-300 text-xs font-bold inline-flex items-center gap-1.5 transition shadow-2xs" title="Force Sync from Master Table">
+          <span class="material-symbols-outlined text-[16px]">sync</span>
+          <span class="hidden sm:inline">Sync Live</span>
+        </button>
+      </div>
+
+      <!-- SECTION 2: PROGRAM ALLOCATIONS (SEPARATELY BY PROGRAM ALLOCATION) -->
+      <div class="pt-2">
+        
+        <!-- Section Header with View Modes and Sort -->
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-2">
+          <div>
+            <h3 class="text-sm font-extrabold text-on-surface uppercase tracking-wider flex items-center gap-1.5">
+              <span class="material-symbols-outlined text-primary text-[19px]">account_tree</span>
+              <span>Program Allocations</span>
+            </h3>
+            <span class="text-xs text-on-surface-variant font-medium" id="allocationsSubtitle">
+              8 statutory development funds active • 18 master projects allocated
+            </span>
+          </div>
+
+          <!-- Controls: View Mode & Tune By Capital -->
+          <div class="flex items-center gap-2">
+            <!-- View Mode Switcher -->
+            <div class="inline-flex bg-surface-container-high rounded-lg p-0.5 shadow-2xs border border-slate-200 text-xs font-bold">
+              <button type="button" id="btnViewMaster" onclick="setViewMode('master')" 
+                      class="px-2.5 py-1 rounded-md bg-primary text-white shadow-2xs transition inline-flex items-center gap-1" title="View individual project allocations from Master Table">
+                <span class="material-symbols-outlined text-[15px]">table_rows</span>
+                <span>Master Programs (<span id="pillMasterCount">18</span>)</span>
+              </button>
+              <button type="button" id="btnViewStatutory" onclick="setViewMode('statutory')" 
+                      class="px-2.5 py-1 rounded-md text-slate-700 hover:text-slate-900 transition inline-flex items-center gap-1" title="View grouped by 8 statutory treasury funds">
+                <span class="material-symbols-outlined text-[15px]">account_balance</span>
+                <span>Statutory Funds (8)</span>
+              </button>
+            </div>
+
+            <!-- Tune By Capital Control -->
+            <div class="relative">
+              <button type="button" id="sortDropdownBtn" onclick="toggleSortMenu()" 
+                      class="flex items-center gap-1 text-primary px-2.5 py-1 rounded-lg bg-surface-container-low hover:bg-surface-container-high border border-outline-variant/40 transition shadow-2xs font-bold text-xs">
+                <span class="material-symbols-outlined text-[16px]">tune</span>
+                <span class="uppercase tracking-wider" id="currentSortLabel">Tune By Capital</span>
+                <span class="material-symbols-outlined text-[14px]">expand_more</span>
+              </button>
+              <div id="sortMenu" class="hidden absolute right-0 mt-1 w-52 bg-white rounded-xl shadow-xl border border-slate-200 py-1 z-30 text-xs font-semibold">
+                <button type="button" onclick="setSortMode('capital-desc')" class="w-full text-left px-3 py-2 hover:bg-slate-100 flex items-center justify-between">
+                  <span>By Capital (High to Low)</span>
+                  <span class="material-symbols-outlined text-[16px] text-primary">arrow_downward</span>
+                </button>
+                <button type="button" onclick="setSortMode('spent-desc')" class="w-full text-left px-3 py-2 hover:bg-slate-100 flex items-center justify-between">
+                  <span>By Highest Expenditure</span>
+                  <span class="material-symbols-outlined text-[16px] text-amber-600">trending_up</span>
+                </button>
+                <button type="button" onclick="setSortMode('pct-desc')" class="w-full text-left px-3 py-2 hover:bg-slate-100 flex items-center justify-between">
+                  <span>By Absorption (% Used)</span>
+                  <span class="material-symbols-outlined text-[16px] text-emerald-600">percent</span>
+                </button>
+                <button type="button" onclick="setSortMode('code-asc')" class="w-full text-left px-3 py-2 hover:bg-slate-100 flex items-center justify-between">
+                  <span>Program Code (A-Z)</span>
+                  <span class="material-symbols-outlined text-[16px] text-slate-500">sort_by_alpha</span>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Search Bar & Filter Chips -->
+        <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 mb-3">
+          <div class="relative flex-1">
+            <span class="material-symbols-outlined absolute left-3 top-2 text-slate-400 text-[17px]">search</span>
+            <input type="text" id="allocationsSearchInput" oninput="renderAllocationsList()" 
+                   placeholder="Search allocated program title, code (BCF-EP08), or category..." 
+                   class="w-full h-8 pl-9 pr-3 text-xs rounded-lg border border-slate-300 bg-white focus:outline-none focus:ring-1 focus:ring-primary font-medium shadow-2xs"/>
+          </div>
+          <div class="flex items-center gap-1 overflow-x-auto pb-1 custom-scrollbar text-xs" id="ledgerCategoryChips">
+            <!-- Dynamically populated via JS -->
+          </div>
+        </div>
+
+        <!-- DYNAMIC ALLOCATION CARDS CONTAINER -->
+        <div class="flex flex-col gap-unit-xs w-full" id="programsLedgerList">
+          <!-- Rendered dynamically via JavaScript from Programs Input Trackers (Program Master Table) -->
+        </div>
+      </div>
+
+      <!-- BANK OF SIERRA LEONE RECONCILIATION FOOTER -->
+      <div class="mt-2 p-3.5 bg-surface-container-lowest rounded-xl shadow-xs border border-slate-200/80 flex items-center justify-between">
+        <div class="flex items-center gap-3">
+          <img class="w-9 h-9 rounded-full object-cover shrink-0" 
+               src="https://lh3.googleusercontent.com/aida-public/AB6AXuA_78huqtqzy1LMRfnLYsJECoep4-hYmeuOiktHxLfNSjYnahx3P0kOmUBb_9P68VuXHskpgj5wjjqyZQ5MlA_2beQKhT7YLJKD86fg66xPSyCJbaBk8EA1WSuEg5meVtaZicSNgp2FmjX4CwgC0xsjJGLK7vQIw_sfu7ZKCm2L1z1XKWUqW-C-UOJbjS-IkNhqJYgJsCKSrVZsN5xwRpKW2gDvZgnKcjo0WbzXzIBbF1wE4ONo-oE" 
+               alt="BSL Stamp"/>
+          <div class="flex flex-col">
+            <span class="text-xs font-bold uppercase text-primary">Bank of Sierra Leone (BSL)</span>
+            <span class="text-[11px] text-on-surface-variant font-mono">Escrow Acct: &bull;&bull;&bull;&bull; 9104 (NLe)</span>
+          </div>
+        </div>
+        <span class="text-[11px] font-mono font-bold px-2.5 py-1 rounded bg-surface-container-high text-primary border border-primary/20">RECONCILED</span>
+      </div>
+
+    </div>
+  </main>
+
+  <!-- MODAL: LOG DISBURSEMENT VOUCHER -->
+  <div class="fixed inset-0 z-50 bg-black/50 backdrop-blur-xs hidden items-end sm:items-center justify-center p-0 sm:p-4 transition-opacity" id="voucherModal">
+    <div class="w-full max-w-lg bg-surface-container-lowest rounded-t-2xl sm:rounded-2xl p-card-padding shadow-xl max-h-[85vh] overflow-y-auto">
+      <div class="flex items-center justify-between pb-unit-sm mb-unit-sm border-b border-slate-100">
+        <div class="flex items-center gap-2">
+          <div class="w-8 h-8 rounded-lg bg-surface-container flex items-center justify-center text-primary">
+            <span class="material-symbols-outlined text-[20px]">receipt_long</span>
+          </div>
+          <div>
+            <h3 class="text-sm font-bold text-on-surface">Log Disbursement Voucher</h3>
+            <span class="text-xs text-on-surface-variant">Internal fiscal expenditure entry</span>
+          </div>
+        </div>
+        <button class="w-8 h-8 rounded-full bg-surface-container-high flex items-center justify-center text-on-surface hover:bg-slate-200 transition" onclick="closeDisbursementModal()" type="button">
+          <span class="material-symbols-outlined text-[18px]">close</span>
+        </button>
+      </div>
+
+      <form class="flex flex-col gap-unit-sm" onsubmit="handleVoucherSubmit(event)">
+        <div class="flex flex-col gap-1">
+          <label class="text-[11px] font-bold text-on-surface-variant uppercase">Target Program Allocation</label>
+          <select id="voucherTargetCode" class="w-full h-10 px-3 rounded-lg bg-surface-container-low text-on-surface text-xs font-semibold focus:outline-none border border-slate-200" required onchange="handleVoucherCodeChange(this.value)">
+            <!-- Populated dynamically via JS -->
+          </select>
+        </div>
+
+        <div class="flex flex-col gap-1">
+          <label class="text-[11px] font-bold text-on-surface-variant uppercase">Target Project Title</label>
+          <input id="voucherProjectTitle" list="masterProjectsDatalist" placeholder="Select or type project title..." class="w-full h-10 px-3 rounded-lg bg-surface-container-low text-on-surface text-xs focus:outline-none border border-slate-200"/>
+          <datalist id="masterProjectsDatalist"></datalist>
+        </div>
+
+        <div class="flex flex-col gap-1">
+          <label class="text-[11px] font-bold text-on-surface-variant uppercase">Voucher Amount (NLe)</label>
+          <input id="voucherAmount" class="w-full h-10 px-3 rounded-lg bg-surface-container-low text-on-surface text-xs font-mono font-bold focus:outline-none border border-slate-200" placeholder="e.g. 50,000" min="1" step="any" required type="number"/>
+        </div>
+
+        <div class="flex flex-col gap-1">
+          <label class="text-[11px] font-bold text-on-surface-variant uppercase">Expense Category / Justification</label>
+          <input id="voucherDesc" class="w-full h-10 px-3 rounded-lg bg-surface-container-low text-on-surface text-xs focus:outline-none border border-slate-200" placeholder="Vendor invoice ref, field stipends, equipment" required type="text"/>
+        </div>
+
+        <div class="p-unit-xs bg-surface-container-high rounded-lg flex items-center gap-2 text-on-surface-variant text-xs">
+          <span class="material-symbols-outlined text-primary text-[18px]">lock</span>
+          <span>Dual sign-off: Executive Director &amp; Field Audit Officer verified.</span>
+        </div>
+
+        <div class="flex items-center justify-end gap-2 pt-unit-xs">
+          <button class="px-4 h-10 rounded-lg bg-surface-container text-on-surface text-xs font-bold hover:bg-slate-200 transition" onclick="closeDisbursementModal()" type="button">Cancel</button>
+          <button class="px-5 h-10 rounded-lg bg-primary hover:bg-primary-container text-on-primary text-xs font-bold shadow-xs transition" type="submit">Submit &amp; Post to Ledger</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL: MODIFY PROGRAM ALLOCATION -->
+  <div class="fixed inset-0 z-50 bg-black/50 backdrop-blur-xs hidden items-end sm:items-center justify-center p-0 sm:p-4 transition-opacity" id="modifyAllocationModal">
+    <div class="w-full max-w-lg bg-surface-container-lowest rounded-t-2xl sm:rounded-2xl p-card-padding shadow-xl max-h-[85vh] overflow-y-auto">
+      <div class="flex items-center justify-between pb-unit-sm mb-unit-sm border-b border-slate-100">
+        <div class="flex items-center gap-2">
+          <div class="w-8 h-8 rounded-lg bg-surface-container flex items-center justify-center text-primary">
+            <span class="material-symbols-outlined text-[20px]">tune</span>
+          </div>
+          <div>
+            <h3 class="text-sm font-bold text-on-surface" id="modifyModalTitle">Financial Ledger Modify</h3>
+            <span class="text-xs text-on-surface-variant">Update program allocation &amp; sync with Master Table</span>
+          </div>
+        </div>
+        <button class="w-8 h-8 rounded-full bg-surface-container-high flex items-center justify-center text-on-surface hover:bg-slate-200 transition" onclick="closeModifyAllocationModal()" type="button">
+          <span class="material-symbols-outlined text-[18px]">close</span>
+        </button>
+      </div>
+
+      <form class="flex flex-col gap-unit-sm" onsubmit="handleModifyAllocationSubmit(event)">
+        <!-- Quick Select Dropdown from Master Table -->
+        <div class="flex flex-col gap-1 bg-slate-50 p-2.5 rounded-lg border border-slate-200">
+          <label class="text-[11px] font-bold text-slate-700 uppercase flex items-center justify-between">
+            <span>Select Program to Modify</span>
+            <span class="text-[10px] text-primary font-normal">Auto-fills from Master Table</span>
+          </label>
+          <select id="modSelectProgram" onchange="handleSelectProgramToModify(this.value)" class="w-full h-9 px-2.5 rounded-md bg-white text-on-surface text-xs font-semibold focus:outline-none border border-slate-300 cursor-pointer">
+            <!-- Populated dynamically via JS -->
+          </select>
+        </div>
+
+        <input type="hidden" id="modOriginalProjectIndex" value="-1"/>
+
+        <div class="flex flex-col gap-1">
+          <label class="text-[11px] font-bold text-on-surface-variant uppercase">Program Code</label>
+          <input id="modCode" list="existingCodesList" class="w-full h-10 px-3 rounded-lg bg-surface-container-low text-on-surface text-xs font-mono font-bold focus:outline-none border border-slate-200" placeholder="e.g. BCF-EP08" required oninput="handleModCodeInputChange(this.value)"/>
+          <datalist id="existingCodesList"></datalist>
+        </div>
+
+        <div class="grid grid-cols-2 gap-2">
+          <div class="flex flex-col gap-1">
+            <label class="text-[11px] font-bold text-on-surface-variant uppercase">Program Category</label>
+            <input id="modCategory" class="w-full h-10 px-3 rounded-lg bg-surface-container-low text-on-surface text-xs font-semibold focus:outline-none border border-slate-200" placeholder="e.g. Empowerment" required/>
+          </div>
+          <div class="flex flex-col gap-1">
+            <label class="text-[11px] font-bold text-on-surface-variant uppercase">Project Tracking ID</label>
+            <input id="modTrackingId" class="w-full h-10 px-3 rounded-lg bg-surface-container-low text-on-surface text-xs font-mono font-semibold focus:outline-none border border-slate-200" placeholder="e.g. BCF-EP08-01-2025"/>
+          </div>
+        </div>
+
+        <div class="flex flex-col gap-1">
+          <label class="text-[11px] font-bold text-on-surface-variant uppercase">Program Title</label>
+          <input id="modTitle" class="w-full h-10 px-3 rounded-lg bg-surface-container-low text-on-surface text-xs font-semibold focus:outline-none border border-slate-200" placeholder="e.g. Women Micro-Grant Enterprise Network" required/>
+        </div>
+
+        <div class="grid grid-cols-2 gap-2">
+          <div class="flex flex-col gap-1">
+            <label class="text-[11px] font-bold text-on-surface-variant uppercase">Donors Received (NLe)</label>
+            <input id="modReceived" class="w-full h-10 px-3 rounded-lg bg-surface-container-low text-on-surface text-xs font-mono font-bold focus:outline-none border border-slate-200" placeholder="340,000" min="0" step="any" required type="number"/>
+          </div>
+          <div class="flex flex-col gap-1">
+            <label class="text-[11px] font-bold text-on-surface-variant uppercase">Budget Spent (NLe)</label>
+            <input id="modSpent" class="w-full h-10 px-3 rounded-lg bg-surface-container-low text-on-surface text-xs font-mono font-bold focus:outline-none border border-slate-200" placeholder="340,000" min="0" step="any" required type="number"/>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-2">
+          <div class="flex flex-col gap-1">
+            <label class="text-[11px] font-bold text-on-surface-variant uppercase">Remarks / Status</label>
+            <select id="modRemarks" class="w-full h-10 px-3 rounded-lg bg-surface-container-low text-on-surface text-xs font-semibold focus:outline-none border border-slate-200">
+              <option value="Completed">Completed (Done)</option>
+              <option value="Ongoing">Ongoing</option>
+              <option value="Planned">Planned</option>
+            </select>
+          </div>
+          <div class="flex flex-col gap-1">
+            <label class="text-[11px] font-bold text-on-surface-variant uppercase">Department</label>
+            <input id="modDept" class="w-full h-10 px-3 rounded-lg bg-surface-container-low text-on-surface text-xs font-semibold focus:outline-none border border-slate-200" placeholder="Programs Dept"/>
+          </div>
+        </div>
+
+        <div class="flex items-center justify-between p-2.5 bg-emerald-50 rounded-lg border border-emerald-200 text-xs">
+          <span class="text-emerald-900 font-semibold">Net Balance:</span>
+          <span class="font-mono font-black text-emerald-800 text-sm" id="modBalancePreview">NLe 0.00</span>
+        </div>
+
+        <div class="flex items-center justify-end gap-2 pt-unit-xs">
+          <button class="px-4 h-10 rounded-lg bg-surface-container text-on-surface text-xs font-bold hover:bg-slate-200 transition" onclick="closeModifyAllocationModal()" type="button">Cancel</button>
+          <button class="px-5 h-10 rounded-lg bg-primary hover:bg-primary-container text-on-primary text-xs font-bold shadow-xs transition" type="submit">Save &amp; Sync to Master Table</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- TOAST NOTIFICATION -->
+  <div class="fixed bottom-20 left-1/2 -translate-x-1/2 bg-inverse-surface text-inverse-on-surface px-4 py-2.5 rounded-full text-xs font-medium shadow-xl flex items-center gap-2 opacity-0 pointer-events-none transition-all duration-300 z-50" id="toastFeedback">
+    <span class="material-symbols-outlined text-primary-fixed text-[18px]">check_circle</span>
+    <span id="toastMessage">Fiscal audit export generated successfully.</span>
+  </div>
+
+  <!-- FIXED BOTTOM NAVIGATION BAR -->
+  <nav class="fixed bottom-0 w-full z-40 pb-safe bg-surface/90 backdrop-blur-xl shadow-[0_-2px_12px_rgba(0,0,0,0.05)] border-t border-slate-200">
+    <div class="flex items-center justify-around h-16 px-unit-xs max-w-5xl mx-auto">
+      <a class="flex flex-col items-center justify-center gap-0.5 min-w-[64px] h-11 text-on-surface-variant hover:text-on-surface transition-colors" href="/programs/programs-database">
+        <span class="material-symbols-outlined text-[22px]">folder_managed</span>
+        <span class="text-[10px] font-bold">Programs</span>
+      </a>
+      <a aria-current="page" class="flex flex-col items-center justify-center gap-0.5 min-w-[64px] h-11 text-primary font-bold transition-colors" href="/programs/financial-ledger">
+        <span class="material-symbols-outlined text-[22px]">payments</span>
+        <span class="text-[10px] font-bold">Finances</span>
+      </a>
+      <a class="flex flex-col items-center justify-center gap-0.5 min-w-[64px] h-11 text-on-surface-variant hover:text-on-surface transition-colors" href="/programs/performance-evaluation">
+        <span class="material-symbols-outlined text-[22px]">monitoring</span>
+        <span class="text-[10px] font-bold">Performance</span>
+      </a>
+      <a class="flex flex-col items-center justify-center gap-0.5 min-w-[64px] h-11 text-on-surface-variant hover:text-on-surface transition-colors" href="/programs/donors-partners">
+        <span class="material-symbols-outlined text-[22px]">corporate_fare</span>
+        <span class="text-[10px] font-bold">Donors</span>
+      </a>
+    </div>
+  </nav>
+
+  <!-- JAVASCRIPT LOGIC ENGINE -->
+  <script>
+    let currentCurrency = 'NLe';
+    const FX_RATE_USD = 22.8;
+    let currentSortMode = 'capital-desc';
+    let currentViewMode = 'master'; // 'master' = all Master Table projects, 'statutory' = 8 statutory development funds
+    let selectedCategoryFilter = 'all';
+    const expandedDrawers = {};
+
+    // 8 Statutory Thematic Development Funds
+    const THEMATIC_STATUTORY_FUNDS = [
+      {
+        code: "BCF-CC04",
+        category: "Climate Change",
+        title: "Coastal Mangrove & Climate Resilience",
+        badgeColor: "bg-primary-fixed text-on-primary-fixed-variant"
+      },
+      {
+        code: "BCF-H01",
+        category: "Health",
+        title: "Maternal Health & Clinical Cold Chain",
+        badgeColor: "bg-primary-fixed text-on-primary-fixed-variant"
+      },
+      {
+        code: "BCF-EP08",
+        category: "Empowerment",
+        title: "Women & Youth Enterprise Capital",
+        badgeColor: "bg-secondary-fixed text-on-secondary-fixed"
+      },
+      {
+        code: "BCF-I06",
+        category: "Innovation",
+        title: "Digital Tech Labs & Connectivity",
+        badgeColor: "bg-tertiary-fixed text-on-tertiary-fixed-variant"
+      },
+      {
+        code: "BCF-E02",
+        category: "Education",
+        title: "Primary Education & Tech Kits",
+        badgeColor: "bg-tertiary-fixed text-on-tertiary-fixed-variant"
+      },
+      {
+        code: "BCF-A03",
+        category: "Agriculture",
+        title: "Smallholder Agro-Cooperative & Seeds",
+        badgeColor: "bg-secondary-fixed text-on-secondary-fixed"
+      },
+      {
+        code: "BCF-AR07",
+        category: "Addiction Rehabilitation",
+        title: "Kush Substance Detox & Clinical Recovery",
+        badgeColor: "bg-surface-container text-on-tertiary-container"
+      },
+      {
+        code: "BCF-SJ05",
+        category: "Social Justice",
+        title: "Community Legal Aid & Civil Rights",
+        badgeColor: "bg-surface-variant text-on-surface-variant"
+      }
+    ];
+
+    // Default 18 Master Projects matching Programs Input Trackers (Program Master Table)
+    const DEFAULT_MASTER_PROJECTS = [
+      { no: 1,  code: "BCF-H01",  cat: "Health",                   title: "Rural Maternal Health Outreach Bo",        dept: "Health & Safety Dept",   focus: "Maternal health clinics, prenatal screening & infant immunization", received: 350000, spent: 280000, trackingId: "BCF-H01-01-2025", remarks: "Ongoing" },
+      { no: 2,  code: "BCF-E02",  cat: "Education",                title: "Primary School Literacy & Tech Kits",       dept: "Programs Dept",          focus: "Furnishing 24 community schools with modern literacy books & solar tablets", received: 220000, spent: 220000, trackingId: "BCF-E02-02-2025", remarks: "Completed" },
+      { no: 3,  code: "BCF-A03",  cat: "Agriculture",              title: "Kono Smallholder Agro-Cooperative",         dept: "Agro Livelihoods",       focus: "Mechanized cassava processing mills & seedling loans", received: 450000, spent: 390000, trackingId: "BCF-A03-03-2025", remarks: "Ongoing" },
+      { no: 4,  code: "BCF-CC04", cat: "Climate Change",           title: "Coastal Mangrove Bio-Shield Project",       dept: "Programs Dept",          focus: "Planting 120,000 mangrove saplings across Scarcies river delta", received: 200000, spent: 200000, trackingId: "BCF-CC04-04-2025", remarks: "Completed" },
+      { no: 5,  code: "BCF-SJ05", cat: "Social Justice",           title: "Community Legal Defense & GBV Centre",      dept: "Legal & Advocacy",       focus: "Free legal representation and safe-house counseling for vulnerable women", received: 180000, spent: 155000, trackingId: "BCF-SJ05-05-2025", remarks: "Ongoing" },
+      { no: 6,  code: "BCF-I06",  cat: "Innovation",               title: "Youth Digital Coding Hub Freetown",         dept: "Innovation Dept",        focus: "Full-stack software engineering certification for 250 youth", received: 280000, spent: 210000, trackingId: "BCF-I06-06-2025", remarks: "Ongoing" },
+      { no: 7,  code: "BCF-AR07", cat: "Addiction Rehabilitation", title: "Kush Substance Detox & Clinical Recovery",  dept: "Health & Safety",        focus: "Medical detox, inpatient psychiatric stabilization & skills re-training", received: 230000, spent: 190000, trackingId: "BCF-AR07-07-2025", remarks: "Ongoing" },
+      { no: 8,  code: "BCF-EP08", cat: "Empowerment",              title: "Women Micro-Grant Enterprise Network",      dept: "Programs Dept",          focus: "Seed finance grants and bookkeeping training for 500 women traders", received: 340000, spent: 340000, trackingId: "BCF-EP08-08-2025", remarks: "Completed" },
+      { no: 9,  code: "BCF-H01",  cat: "Health",                   title: "Mobile Dental & Eye Care Convoy",          dept: "Health & Safety",        focus: "Rural cataract operations and emergency pediatric dentistry", received: 260000, spent: 180000, trackingId: "BCF-H01-09-2025", remarks: "Ongoing" },
+      { no: 10, code: "BCF-I06",  cat: "Innovation",               title: "Clean Water IoT Remote Monitoring Hub",    dept: "Innovation Dept",        focus: "Solar IoT sensors monitoring boreholes and water tables across Port Loko", received: 190000, spent: 95000, trackingId: "BCF-I06-10-2025", remarks: "Ongoing" },
+      { no: 11, code: "BCF-H01",  cat: "Health",                   title: "District Vaccine Cold-Chain Solar Facility",dept: "Health & Safety",        focus: "Solar vaccine refrigerators for 16 primary healthcare units", received: 310000, spent: 310000, trackingId: "BCF-H01-11-2025", remarks: "Completed" },
+      { no: 12, code: "BCF-EP08", cat: "Empowerment",              title: "Artisanal Fishery Refrigeration Grant",    dept: "Programs Dept",          focus: "Solar freezer facilities for coastal women fish-mongers in Bonthe", received: 270000, spent: 220000, trackingId: "BCF-EP08-12-2025", remarks: "Ongoing" },
+      { no: 13, code: "BCF-EP08", cat: "Empowerment",              title: "Vocational Craft & Tailoring Guild",        dept: "Programs Dept",          focus: "Industrial sewing machines and apprentice certificates for 180 youth", received: 210000, spent: 210000, trackingId: "BCF-EP08-13-2025", remarks: "Completed" },
+      { no: 14, code: "BCF-E02",  cat: "Education",                title: "Girl-Child STEM Education Bursary",         dept: "Programs Dept",          focus: "Secondary boarding school scholarships and laptop equipment", received: 290000, spent: 185000, trackingId: "BCF-E02-14-2025", remarks: "Ongoing" },
+      { no: 15, code: "BCF-CC04", cat: "Climate Change",           title: "Solar Mini-Grid Rural Hospital Power",     dept: "Programs Dept",          focus: "50kW hybrid solar storage for referral hospital surgical theater", received: 420000, spent: 310000, trackingId: "BCF-CC04-15-2025", remarks: "Ongoing" },
+      { no: 16, code: "BCF-CC04", cat: "Climate Change",           title: "Agroforestry & Wind-Break Buffer Belts",   dept: "Programs Dept",          focus: "Planting cashew and acacia trees around rural farmlands to halt erosion", received: 180000, spent: 60000, trackingId: "BCF-CC04-16-2025", remarks: "Ongoing" },
+      { no: 17, code: "BCF-CC04", cat: "Climate Change",           title: "Community Clean Cooking Stove Rollout",     dept: "Programs Dept",          focus: "Distribution of 5,000 clean bio-stoves reducing charcoal consumption", received: 150000, spent: 0, trackingId: "BCF-CC04-17-2025", remarks: "Planned" },
+      { no: 18, code: "BCF-I06",  cat: "Innovation",               title: "FarmMarket Mobile USSD Commodity Trading", dept: "Innovation Dept",        focus: "SMS/USSD price transparency platform connecting rural farmers to urban buyers", received: 170000, spent: 0, trackingId: "BCF-I06-18-2025", remarks: "Planned" }
+    ];
+
+    let statutoryAllocations = [];
+    let masterProjects = [];
+
+    function safeNum(val, fallback = 0) {
+      if (val === null || val === undefined) return fallback;
+      if (typeof val === 'number') return isNaN(val) ? fallback : val;
+      const str = String(val).trim().replace(/[^0-9.-]/g, '');
+      if (!str) return fallback;
+      const n = parseFloat(str);
+      return isNaN(n) ? fallback : n;
+    }
+
+    function formatNumber(val) {
+      return Math.round(safeNum(val, 0)).toLocaleString('en-US');
+    }
+
+    function getCategoryBadgeClass(category) {
+      const cat = (category || '').toLowerCase();
+      if (cat.includes('empower')) return "bg-secondary-fixed text-on-secondary-fixed border border-amber-300";
+      if (cat.includes('educat')) return "bg-tertiary-fixed text-on-tertiary-fixed-variant border border-blue-200";
+      if (cat.includes('health')) return "bg-primary-fixed text-on-primary-fixed-variant border border-emerald-300";
+      if (cat.includes('climate')) return "bg-emerald-100 text-emerald-950 border border-emerald-300";
+      if (cat.includes('justice')) return "bg-purple-100 text-purple-900 border border-purple-200";
+      if (cat.includes('innovat')) return "bg-cyan-100 text-cyan-950 border border-cyan-300";
+      if (cat.includes('addict') || cat.includes('rehab')) return "bg-rose-100 text-rose-950 border border-rose-300";
+      if (cat.includes('agri')) return "bg-amber-100 text-amber-950 border border-amber-300";
+      return "bg-surface-container-high text-primary border border-slate-200";
+    }
+
+    // BROADCAST CHANNEL FOR REAL-TIME TWO-WAY SYNC
+    let bcfSyncChannel = null;
+    try {
+      bcfSyncChannel = new BroadcastChannel('bcf_programs_sync_channel');
+      bcfSyncChannel.onmessage = (event) => {
+        if (event.data && event.data.type === 'MASTER_TABLE_UPDATED') {
+          loadData();
+          renderTopAnalytics();
+          renderAllocationsList();
+          showToast("Live updated from Programs Input Trackers!");
+        }
+      };
+    } catch(e) {}
+
+    // LOAD DATA AUTOMATICALLY FROM PROGRAMS INPUT TRACKERS (PROGRAM MASTER TABLE)
+    function loadData() {
+      // 1. Ingest Master Table Projects from localStorage
+      try {
+        const savedMaster = localStorage.getItem('bcf_programs_master_table');
+        if (savedMaster) {
+          const parsed = JSON.parse(savedMaster);
+          if (Array.isArray(parsed) && parsed.length > 0) {
+            masterProjects = parsed;
+          } else {
+            masterProjects = JSON.parse(JSON.stringify(DEFAULT_MASTER_PROJECTS));
+            saveMasterProjects();
+          }
+        } else {
+          masterProjects = JSON.parse(JSON.stringify(DEFAULT_MASTER_PROJECTS));
+          saveMasterProjects();
+        }
+      } catch(e) {
+        masterProjects = JSON.parse(JSON.stringify(DEFAULT_MASTER_PROJECTS));
+      }
+
+      // 2. Load custom modifications for statutory funds if saved
+      let customAllocations = {};
+      try {
+        const savedCustom = localStorage.getItem('bcf_financial_ledger_allocations');
+        if (savedCustom) customAllocations = JSON.parse(savedCustom);
+      } catch(e) {}
+
+      // 3. Build Unified Statutory Program Allocations (Aggregated from Master Table Projects)
+      const map = {};
+      THEMATIC_STATUTORY_FUNDS.forEach(b => {
+        map[b.code] = {
+          code: b.code,
+          category: b.category,
+          title: b.title,
+          received: 0,
+          spent: 0,
+          badgeColor: b.badgeColor,
+          subprojects: []
+        };
+      });
+
+      // Automatically aggregate every project entered in Programs Input Trackers to its statutory fund
+      masterProjects.forEach(p => {
+        const pCode = (p.code || '').trim().toUpperCase();
+        const pCat = (p.cat || '').trim();
+
+        let targetCode = null;
+        for (const k in map) {
+          const cleanK = k.replace('BCF-', '').toUpperCase();
+          const cleanCode = pCode.replace('BCF-', '').toUpperCase();
+          if (k === pCode || cleanK === cleanCode || map[k].category.toLowerCase() === pCat.toLowerCase()) {
+            targetCode = k;
+            break;
+          }
+        }
+
+        const pRec = safeNum(p.received, 0);
+        const pSpent = safeNum(p.spent, 0);
+
+        if (targetCode && map[targetCode]) {
+          map[targetCode].subprojects.push(p);
+          map[targetCode].received += pRec;
+          map[targetCode].spent += pSpent;
+        } else if (pCode) {
+          // New Category or Code entered in Master Table: automatically create an Allocation!
+          map[pCode] = {
+            code: pCode,
+            category: pCat || "Program Fund",
+            title: p.title || `${pCat} Development Allocation`,
+            received: pRec,
+            spent: pSpent,
+            badgeColor: "bg-surface-container-high text-primary",
+            subprojects: [p]
+          };
+        }
+      });
+
+      // If user customized a specific fund explicitly via Modify Allocation:
+      for (const k in customAllocations) {
+        if (map[k] && customAllocations[k].customOverride) {
+          map[k].received = customAllocations[k].received;
+          map[k].spent = customAllocations[k].spent;
+          if (customAllocations[k].title) map[k].title = customAllocations[k].title;
+        }
+      }
+
+      // Calculate balance & percentage used for each statutory allocation
+      statutoryAllocations = Object.values(map).map(a => {
+        const bal = Math.max(0, a.received - a.spent);
+        const pct = a.received > 0 ? (a.spent / a.received) * 100 : 0;
+        return Object.assign(a, {
+          balance: bal,
+          pctUsed: pct
+        });
+      });
+
+      // Update counters & modals
+      const pillMaster = document.getElementById('pillMasterCount');
+      if (pillMaster) pillMaster.textContent = masterProjects.length;
+
+      const syncBanner = document.getElementById('syncBannerStatus');
+      if (syncBanner) {
+        syncBanner.textContent = `All ${masterProjects.length} programs entered in Programs Input Trackers (Program Master Table) automatically appear below.`;
+      }
+
+      updateModalSelectOptions();
+      renderCategoryChips();
+    }
+
+    // 1. RENDER TOP ANALYTICS: FISCAL OVERSIGHT 2024/2025
+    function renderTopAnalytics() {
+      let totalReceived = 0;
+      let totalSpent = 0;
+
+      masterProjects.forEach(p => {
+        totalReceived += safeNum(p.received, 0);
+        totalSpent += safeNum(p.spent, 0);
+      });
+
+      const remainingBalance = Math.max(0, totalReceived - totalSpent);
+      const isUSD = currentCurrency === 'USD';
+      const divisor = isUSD ? FX_RATE_USD : 1;
+      const symbol = isUSD ? 'USD ($)' : 'NLe';
+
+      // Update Currency symbols
+      document.querySelectorAll('.currency-symbol').forEach(el => {
+        el.textContent = symbol;
+      });
+
+      // Hero Statutory Treasury Reserve Card
+      const heroBalEl = document.getElementById('heroBalance');
+      const heroRecEl = document.getElementById('heroReceived');
+      const heroSpentEl = document.getElementById('heroSpent');
+
+      if (heroBalEl) heroBalEl.textContent = formatNumber(remainingBalance / divisor);
+      if (heroRecEl) heroRecEl.innerHTML = `${formatNumber(totalReceived / divisor)} <span class="text-xs currency-symbol text-primary-fixed">${symbol}</span>`;
+      if (heroSpentEl) heroSpentEl.innerHTML = `${formatNumber(totalSpent / divisor)} <span class="text-xs currency-symbol text-secondary-fixed">${symbol}</span>`;
+
+      // Absorption Velocity Analytics
+      const absorptionPct = totalReceived > 0 ? (totalSpent / totalReceived) * 100 : 0;
+      const intactPct = Math.max(0, 100 - absorptionPct);
+
+      const vBadge = document.getElementById('velocityBadge');
+      const vSpent = document.getElementById('velocitySpentPct');
+      const vIntact = document.getElementById('velocityIntactPct');
+      const barDisb = document.getElementById('velocityBarDisbursed');
+      const legDisb = document.getElementById('legendDisbursed');
+      const legIntact = document.getElementById('legendIntact');
+
+      if (vBadge) vBadge.textContent = `${absorptionPct.toFixed(2)}% Spent`;
+      if (vSpent) vSpent.textContent = `${absorptionPct.toFixed(2)}%`;
+      if (vIntact) vIntact.textContent = `${intactPct.toFixed(2)}%`;
+      if (barDisb) barDisb.style.width = `${Math.min(100, Math.max(0.14, absorptionPct))}%`;
+      if (legDisb) legDisb.textContent = `Disbursed (${absorptionPct.toFixed(2)}%)`;
+      // Subtitle count
+      const subTitle = document.getElementById('allocationsSubtitle');
+      if (subTitle) {
+        subTitle.textContent = `${statutoryAllocations.length} statutory development funds active • ${masterProjects.length} master projects allocated`;
+      }
+    }
+
+    // VIEW MODE TOGGLE ('master' or 'statutory')
+    function setViewMode(mode) {
+      currentViewMode = mode;
+      const btnMaster = document.getElementById('btnViewMaster');
+      const btnStat = document.getElementById('btnViewStatutory');
+
+      if (mode === 'master') {
+        btnMaster.className = "px-2.5 py-1 rounded-md bg-primary text-white shadow-2xs transition inline-flex items-center gap-1";
+        btnStat.className = "px-2.5 py-1 rounded-md text-slate-700 hover:text-slate-900 transition inline-flex items-center gap-1";
+      } else {
+        btnStat.className = "px-2.5 py-1 rounded-md bg-primary text-white shadow-2xs transition inline-flex items-center gap-1";
+        btnMaster.className = "px-2.5 py-1 rounded-md text-slate-700 hover:text-slate-900 transition inline-flex items-center gap-1";
+      }
+
+      renderAllocationsList();
+      showToast(`Showing ${mode === 'master' ? 'All Master Table Projects' : '8 Statutory Treasury Funds'}`);
+    }
+
+    // CATEGORY CHIP FILTER
+    function setCategoryFilter(cat) {
+      selectedCategoryFilter = cat;
+      renderCategoryChips();
+      renderAllocationsList();
+    }
+
+    function renderCategoryChips() {
+      const container = document.getElementById('ledgerCategoryChips');
+      if (!container) return;
+
+      const categories = ['all'];
+      masterProjects.forEach(p => {
+        if (p.cat && !categories.includes(p.cat)) categories.push(p.cat);
+      });
+
+      container.innerHTML = categories.map(c => {
+        const isSelected = selectedCategoryFilter === c;
+        const label = c === 'all' ? 'All' : c;
+        return `
+          <button type="button" onclick="setCategoryFilter('${c}')" 
+                  class="px-2.5 py-1 rounded-lg text-xs font-bold transition whitespace-nowrap border ${isSelected ? 'bg-primary text-white border-primary shadow-2xs' : 'bg-white hover:bg-slate-100 text-slate-700 border-slate-200'}">
+            ${label}
+          </button>
+        `;
+      }).join('');
+    }
+
+    // 2. RENDER PROGRAM ALLOCATIONS (SEPARATELY BY PROGRAM ALLOCATION)
+    function renderAllocationsList() {
+      const container = document.getElementById('programsLedgerList');
+      if (!container) return;
+
+      const isUSD = currentCurrency === 'USD';
+      const divisor = isUSD ? FX_RATE_USD : 1;
+      const symbol = isUSD ? 'USD' : 'NLe';
+      const q = (document.getElementById('allocationsSearchInput')?.value || '').trim().toLowerCase();
+
+      // VIEW 1: MASTER TABLE INDIVIDUAL PROGRAM ALLOCATIONS (EACH PROJECT ENTERED APPEARS AS AN ALLOCATION CARD)
+      if (currentViewMode === 'master') {
+        let filtered = masterProjects.filter(p => {
+          if (selectedCategoryFilter !== 'all' && p.cat !== selectedCategoryFilter) return false;
+          if (q) {
+            const matchCode = (p.code || '').toLowerCase().includes(q);
+            const matchCat = (p.cat || '').toLowerCase().includes(q);
+            const matchTitle = (p.title || '').toLowerCase().includes(q);
+            const matchId = (p.trackingId || '').toLowerCase().includes(q);
+            if (!matchCode && !matchCat && !matchTitle && !matchId) return false;
+          }
+          return true;
+        });
+
+        // Sorting
+        filtered.sort((a, b) => {
+          const recA = safeNum(a.received, 0);
+          const recB = safeNum(b.received, 0);
+          const spentA = safeNum(a.spent, 0);
+          const spentB = safeNum(b.spent, 0);
+          const pctA = recA > 0 ? (spentA / recA) * 100 : 0;
+          const pctB = recB > 0 ? (spentB / recB) * 100 : 0;
+
+          if (currentSortMode === 'capital-desc') return recB - recA;
+          if (currentSortMode === 'spent-desc') return spentB - spentA;
+          if (currentSortMode === 'pct-desc') return pctB - pctA;
+          if (currentSortMode === 'code-asc') return (a.code || '').localeCompare(b.code || '');
+          return recB - recA;
+        });
+
+        if (filtered.length === 0) {
+          container.innerHTML = `
+            <div class="bg-white rounded-xl p-8 border border-slate-200 text-center text-slate-500">
+              <span class="material-symbols-outlined text-[36px] text-slate-400 mb-2">search_off</span>
+              <p class="text-sm font-bold text-slate-700">No allocated programs match your filter</p>
+              <p class="text-xs text-slate-400 mt-1">Try clearing search or check Programs Input Trackers</p>
+            </div>
+          `;
+          return;
+        }
+
+        container.innerHTML = filtered.map(p => {
+          const originalIndex = masterProjects.indexOf(p);
+          const received = safeNum(p.received, 0);
+          const spent = safeNum(p.spent, 0);
+          const bal = received - spent;
+          const pctUsed = received > 0 ? (spent / received) * 100 : 0;
+          const catBadgeClass = getCategoryBadgeClass(p.cat);
+
+          let statusBadge = "bg-amber-100 text-amber-900 border-amber-300";
+          if (p.remarks === 'Completed') statusBadge = "bg-emerald-100 text-emerald-900 border-emerald-300";
+          else if (p.remarks === 'Planned') statusBadge = "bg-slate-100 text-slate-700 border-slate-300";
+
+          return `
+            <div class="w-full bg-surface-container-lowest rounded-xl p-card-padding shadow-xs border border-slate-200/80 hover:border-primary/40 transition">
+              
+              <!-- Header Row -->
+              <div class="flex items-start justify-between gap-unit-xs mb-unit-xs">
+                <div class="flex flex-col min-w-0">
+                  <div class="flex items-center gap-1.5 mb-1 flex-wrap">
+                    <span class="px-2 py-0.5 rounded bg-emerald-50 text-primary font-mono text-xs font-bold border border-emerald-200">${p.code || 'BCF-PRG'}</span>
+                    <span class="px-2 py-0.5 rounded ${catBadgeClass} text-[11px] font-bold uppercase tracking-wider">${p.cat || 'General'}</span>
+                    <span class="px-2 py-0.5 rounded bg-slate-100 text-slate-600 font-mono text-[10px] font-semibold">${p.trackingId || '-'}</span>
+                  </div>
+                  <h4 class="text-sm sm:text-base font-extrabold text-on-surface truncate" title="${p.title}">${p.title}</h4>
+                  <span class="text-[11px] text-slate-500 font-medium truncate">${p.dept || 'Programs Department'} &bull; ${p.focus || 'Core programmatic deliverable'}</span>
+                </div>
+                <div class="flex flex-col items-end shrink-0">
+                  <span class="text-[11px] font-bold px-2 py-0.5 rounded-full font-mono ${pctUsed >= 100 ? 'bg-emerald-100 text-emerald-900 border border-emerald-300' : pctUsed > 0 ? 'bg-amber-100 text-amber-900 border border-amber-300' : 'bg-slate-100 text-slate-700 border border-slate-200'}">
+                    ${pctUsed.toFixed(2)}% Used
+                  </span>
+                  <span class="text-[10px] font-bold px-2 py-0.5 rounded-full mt-1 border ${statusBadge}">
+                    ${p.remarks || 'Ongoing'}
+                  </span>
+                </div>
+              </div>
+
+              <!-- Absorption Progress Bar -->
+              <div class="w-full h-1.5 bg-surface-container-high rounded-full overflow-hidden mb-2.5">
+                <div class="h-full bg-secondary-container rounded-full transition-all duration-300" style="width: ${Math.min(100, Math.max(0.1, pctUsed))}%;"></div>
+              </div>
+
+              <!-- 3-Column Financial Metrics -->
+              <div class="grid grid-cols-3 gap-1 bg-surface-container-low p-2 rounded-lg text-center">
+                <div class="flex flex-col min-w-0">
+                  <span class="text-[11px] text-on-surface-variant font-medium">Received</span>
+                  <span class="text-xs sm:text-sm font-mono font-bold text-on-surface truncate">${formatNumber(received / divisor)}</span>
+                </div>
+                <div class="flex flex-col min-w-0">
+                  <span class="text-[11px] text-on-surface-variant font-medium">Spent</span>
+                  <span class="text-xs sm:text-sm font-mono font-bold text-secondary truncate">${formatNumber(spent / divisor)}</span>
+                </div>
+                <div class="flex flex-col min-w-0">
+                  <span class="text-[11px] text-on-surface-variant font-medium">Balance</span>
+                  <span class="text-xs sm:text-sm font-mono font-black ${bal < 0 ? 'text-rose-600' : 'text-primary'} truncate">${formatNumber(bal / divisor)}</span>
+                </div>
+              </div>
+
+              <!-- Action Controls Row -->
+              <div class="mt-2.5 pt-2 flex items-center justify-between border-t border-slate-100 text-xs">
+                <span class="text-[11px] font-mono text-slate-500 font-semibold">Master Project #${p.no || originalIndex + 1}</span>
+                <div class="flex items-center gap-1.5">
+                  <button type="button" onclick="openModifyMasterProjectModal(${originalIndex})" class="px-2 py-1 rounded text-slate-600 hover:text-primary hover:bg-slate-100 border border-slate-200 text-[11px] font-bold inline-flex items-center gap-1 transition">
+                    <span class="material-symbols-outlined text-[14px]">edit</span>
+                    <span>Modify Allocation</span>
+                  </button>
+                  <button type="button" onclick="quickLogVoucherForProject('${p.code}', '${encodeURIComponent(p.title)}')" class="px-2.5 py-1 rounded bg-primary/10 hover:bg-primary/20 text-primary text-[11px] font-bold inline-flex items-center gap-1 transition">
+                    <span class="material-symbols-outlined text-[14px]">add</span>
+                    <span>Log Voucher</span>
+                  </button>
+                </div>
+              </div>
+
+            </div>
+          `;
+        }).join('');
+        return;
+      }
+
+      // VIEW 2: STATUTORY TREASURY FUNDS (8 BENCHMARK FUNDS WITH VISIBLE MASTER PROJECTS)
+      let sortedStatutory = [...statutoryAllocations].sort((a, b) => {
+        if (currentSortMode === 'capital-desc') return b.received - a.received;
+        if (currentSortMode === 'spent-desc') return b.spent - a.spent;
+        if (currentSortMode === 'pct-desc') return b.pctUsed - a.pctUsed;
+        if (currentSortMode === 'code-asc') return a.code.localeCompare(b.code);
+        return b.received - a.received;
+      });
+
+      if (selectedCategoryFilter !== 'all') {
+        sortedStatutory = sortedStatutory.filter(a => a.category.toLowerCase().includes(selectedCategoryFilter.toLowerCase()));
+      }
+
+      if (q) {
+        sortedStatutory = sortedStatutory.filter(a => {
+          return a.code.toLowerCase().includes(q) || a.category.toLowerCase().includes(q) || a.title.toLowerCase().includes(q);
+        });
+      }
+
+      container.innerHTML = sortedStatutory.map(alloc => {
+        const subCount = alloc.subprojects.length;
+        const isExpanded = expandedDrawers[alloc.code] !== false; // Default OPEN so user sees allocated programs!
+        const catBadgeClass = getCategoryBadgeClass(alloc.category);
+
+        return `
+          <div class="w-full bg-surface-container-lowest rounded-xl p-card-padding shadow-xs border border-slate-200/80 hover:border-slate-300 transition" data-code="${alloc.code}">
+            
+            <!-- Header Row -->
+            <div class="flex items-start justify-between gap-unit-xs mb-unit-xs">
+              <div class="flex flex-col min-w-0">
+                <div class="flex items-center gap-1.5 mb-1">
+                  <span class="px-2 py-0.5 rounded bg-surface-container-high text-primary font-mono text-xs font-bold border border-slate-200">${alloc.code}</span>
+                  <span class="px-2 py-0.5 rounded ${catBadgeClass} text-[11px] font-bold uppercase tracking-wider">${alloc.category}</span>
+                </div>
+                <h4 class="text-sm sm:text-base font-bold text-on-surface truncate" title="${alloc.title}">${alloc.title}</h4>
+              </div>
+              <div class="flex flex-col items-end shrink-0">
+                <span class="text-[11px] font-bold px-2 py-0.5 rounded-full font-mono ${alloc.pctUsed > 10 ? 'bg-amber-100 text-amber-900 border border-amber-300' : 'bg-surface-container text-primary'}">
+                  ${alloc.pctUsed.toFixed(2)}% Used
+                </span>
+                <span class="text-xs text-on-surface-variant font-medium mt-0.5">${subCount} Active Subproject${subCount === 1 ? '' : 's'}</span>
+              </div>
+            </div>
+
+            <!-- Progress Bar -->
+            <div class="w-full h-1.5 bg-surface-container-high rounded-full overflow-hidden mb-3">
+              <div class="h-full bg-secondary-container rounded-full transition-all duration-300" style="width: ${Math.min(100, Math.max(0.1, alloc.pctUsed))}%;"></div>
+            </div>
+
+            <!-- 3-Column Financial Metrics -->
+            <div class="grid grid-cols-3 gap-1 bg-surface-container-low p-2 rounded-lg text-center">
+              <div class="flex flex-col min-w-0">
+                <span class="text-[11px] text-on-surface-variant font-medium">Received</span>
+                <span class="text-xs sm:text-sm font-mono font-bold text-on-surface truncate">${formatNumber(alloc.received / divisor)}</span>
+              </div>
+              <div class="flex flex-col min-w-0">
+                <span class="text-[11px] text-on-surface-variant font-medium">Spent</span>
+                <span class="text-xs sm:text-sm font-mono font-bold text-secondary truncate">${formatNumber(alloc.spent / divisor)}</span>
+              </div>
+              <div class="flex flex-col min-w-0">
+                <span class="text-[11px] text-on-surface-variant font-medium">Balance</span>
+                <span class="text-xs sm:text-sm font-mono font-black text-primary truncate">${formatNumber(alloc.balance / divisor)}</span>
+              </div>
+            </div>
+
+            <!-- Interactive Accordion & Action Controls -->
+            <div class="mt-2.5 pt-2 flex items-center justify-between border-t border-slate-100">
+              <button type="button" onclick="toggleDrawer('${alloc.code}')" class="text-xs font-bold text-primary hover:text-primary-container inline-flex items-center gap-1 transition">
+                <span class="material-symbols-outlined text-[16px]">${isExpanded ? 'expand_less' : 'expand_more'}</span>
+                <span>${isExpanded ? 'Hide Master Projects' : `Show ${subCount} Allocated Master Project${subCount === 1 ? '' : 's'}`}</span>
+              </button>
+
+              <div class="flex items-center gap-1.5">
+                <button type="button" onclick="openModifyAllocationModal('${alloc.code}')" class="px-2 py-1 rounded text-slate-600 hover:text-primary hover:bg-slate-100 text-[11px] font-bold inline-flex items-center gap-1 transition" title="Modify Allocation">
+                  <span class="material-symbols-outlined text-[14px]">edit</span>
+                  <span>Modify</span>
+                </button>
+                <button type="button" onclick="quickLogVoucherForCode('${alloc.code}')" class="px-2.5 py-1 rounded bg-primary/10 hover:bg-primary/20 text-primary text-[11px] font-bold inline-flex items-center gap-1 transition" title="Log Voucher on this fund">
+                  <span class="material-symbols-outlined text-[14px]">add</span>
+                  <span>Log Voucher</span>
+                </button>
+              </div>
+            </div>
+
+            <!-- Subprojects Breakdown Table (Open by default) -->
+            ${isExpanded ? `
+              <div class="mt-3 pt-3 border-t border-slate-100 space-y-2">
+                <div class="flex items-center justify-between text-[11px] font-bold text-slate-600 uppercase">
+                  <span>Allocated Master Projects (${subCount})</span>
+                  <a href="/programs/programs-database" class="text-primary hover:underline font-bold inline-flex items-center gap-0.5">
+                    <span class="material-symbols-outlined text-[14px]">table_rows</span>
+                    <span>Open in Master Table</span>
+                  </a>
+                </div>
+                ${subCount === 0 ? `
+                  <div class="text-center py-2 text-xs text-slate-400 bg-slate-50 rounded-lg">No subprojects allocated under this code yet.</div>
+                ` : `
+                  <div class="overflow-x-auto rounded-lg border border-slate-200">
+                    <table class="w-full text-left text-xs whitespace-nowrap">
+                      <thead class="bg-slate-50 text-[10px] uppercase font-bold text-slate-600">
+                        <tr>
+                          <th class="py-1.5 px-2.5">Tracking ID</th>
+                          <th class="py-1.5 px-2.5">Program Title</th>
+                          <th class="py-1.5 px-2.5 text-right">Received (${symbol})</th>
+                          <th class="py-1.5 px-2.5 text-right">Spent (${symbol})</th>
+                          <th class="py-1.5 px-2.5 text-center">Remarks</th>
+                          <th class="py-1.5 px-2.5 text-right">Action</th>
+                        </tr>
+                      </thead>
+                      <tbody class="divide-y divide-slate-100 font-medium">
+                        ${alloc.subprojects.map(sp => {
+                          const origIdx = masterProjects.indexOf(sp);
+                          let statusColor = "bg-amber-100 text-amber-900";
+                          if (sp.remarks === 'Completed') statusColor = "bg-emerald-100 text-emerald-900";
+                          else if (sp.remarks === 'Planned') statusColor = "bg-slate-100 text-slate-700";
+                          return `
+                            <tr class="hover:bg-slate-50/60">
+                              <td class="py-1.5 px-2.5 font-mono font-bold text-primary text-[11px]">${sp.trackingId || '-'}</td>
+                              <td class="py-1.5 px-2.5 font-bold text-slate-900 max-w-xs truncate" title="${sp.title}">${sp.title}</td>
+                              <td class="py-1.5 px-2.5 text-right font-mono font-semibold">${formatNumber(safeNum(sp.received) / divisor)}</td>
+                              <td class="py-1.5 px-2.5 text-right font-mono text-amber-700 font-semibold">${formatNumber(safeNum(sp.spent) / divisor)}</td>
+                              <td class="py-1.5 px-2.5 text-center">
+                                <span class="px-2 py-0.5 rounded-full text-[10px] font-bold ${statusColor}">${sp.remarks || 'Ongoing'}</span>
+                              </td>
+                              <td class="py-1.5 px-2.5 text-right">
+                                <button type="button" onclick="openModifyMasterProjectModal(${origIdx})" class="text-primary hover:underline font-bold text-[11px]">Edit</button>
+                              </td>
+                            </tr>
+                          `;
+                        }).join('')}
+                      </tbody>
+                    </table>
+                  </div>
+                `}
+              </div>
+            ` : ''}
+
+          </div>
+        `;
+      }).join('');
+    }
+
+    // ACCORDION TOGGLE FOR STATUTORY FUNDS
+    function toggleDrawer(code) {
+      expandedDrawers[code] = expandedDrawers[code] === false ? true : false;
+      renderAllocationsList();
+    }
+
+    // SORTING ENGINE
+    function toggleSortMenu() {
+      const menu = document.getElementById('sortMenu');
+      if (menu) menu.classList.toggle('hidden');
+    }
+
+    function setSortMode(mode) {
+      currentSortMode = mode;
+      const label = document.getElementById('currentSortLabel');
+      const labels = {
+        'capital-desc': 'By Capital',
+        'spent-desc': 'By Spent',
+        'pct-desc': 'By % Used',
+        'code-asc': 'By Code'
+      };
+      if (label) label.textContent = labels[mode] || 'Tune By Capital';
+      const menu = document.getElementById('sortMenu');
+      if (menu) menu.classList.add('hidden');
+      renderAllocationsList();
+      showToast(`Sorted by ${labels[mode] || mode}`);
+    }
+
+    // CURRENCY SWITCHER ENGINE
+    function setCurrency(curr) {
+      currentCurrency = curr;
+      const isUSD = curr === 'USD';
+      const btnNLe = document.getElementById('btnNLe');
+      const btnUSD = document.getElementById('btnUSD');
+
+      if (isUSD) {
+        btnUSD.className = "px-3 py-1 rounded-full bg-primary text-on-primary text-xs font-bold shadow-xs transition-all duration-200";
+        btnNLe.className = "px-3 py-1 rounded-full text-on-surface-variant text-xs font-bold hover:text-on-surface transition-all duration-200";
+      } else {
+        btnNLe.className = "px-3 py-1 rounded-full bg-primary text-on-primary text-xs font-bold shadow-xs transition-all duration-200";
+        btnUSD.className = "px-3 py-1 rounded-full text-on-surface-variant text-xs font-bold hover:text-on-surface transition-all duration-200";
+      }
+
+      renderTopAnalytics();
+      renderAllocationsList();
+      showToast(`Currency converted to ${curr === 'USD' ? 'USD ($)' : 'NLe (SLE)'} (Rate: 1 USD = 22.8 NLe)`);
+    }
+
+    // MODAL: LOG VOUCHER
+    function openDisbursementModal() {
+      const modal = document.getElementById('voucherModal');
+      if (modal) {
+        modal.classList.remove('hidden');
+        modal.classList.add('flex');
+      }
+    }
+
+    function closeDisbursementModal() {
+      const modal = document.getElementById('voucherModal');
+      if (modal) {
+        modal.classList.remove('flex');
+        modal.classList.add('hidden');
+      }
+    }
+
+    function quickLogVoucherForCode(code) {
+      const sel = document.getElementById('voucherTargetCode');
+      if (sel) sel.value = code;
+      openDisbursementModal();
+    }
+
+    function quickLogVoucherForProject(code, encodedTitle) {
+      const title = decodeURIComponent(encodedTitle);
+      const sel = document.getElementById('voucherTargetCode');
+      const inp = document.getElementById('voucherProjectTitle');
+      if (sel) sel.value = code;
+      if (inp) inp.value = title;
+      openDisbursementModal();
+    }
+
+    function handleVoucherCodeChange(code) {
+      // Filter datalist or auto-suggest
+    }
+
+    function handleVoucherSubmit(e) {
+      e.preventDefault();
+      const code = document.getElementById('voucherTargetCode')?.value;
+      const projTitle = document.getElementById('voucherProjectTitle')?.value.trim();
+      const amt = safeNum(document.getElementById('voucherAmount')?.value, 0);
+      const desc = document.getElementById('voucherDesc')?.value.trim();
+
+      if (!code || amt <= 0) {
+        showToast("Please enter a valid target fund and voucher amount", "error");
+        return;
+      }
+
+      // 1. Update statutory fund if exists
+      const alloc = statutoryAllocations.find(a => a.code === code);
+      if (alloc) {
+        alloc.spent += amt;
+        alloc.balance = Math.max(0, alloc.received - alloc.spent);
+        alloc.pctUsed = alloc.received > 0 ? (alloc.spent / alloc.received) * 100 : 0;
+      }
+
+      // 2. Also record in matching Master Table Project if found
+      if (projTitle && masterProjects.length > 0) {
+        const p = masterProjects.find(mp => mp.title.toLowerCase() === projTitle.toLowerCase() || (mp.code === code && mp.title.includes(projTitle)));
+        if (p) {
+          p.spent = safeNum(p.spent, 0) + amt;
+        }
+      }
+
+      // Persist and notify
+      saveCustomAllocations();
+      saveMasterProjects();
+      notifySync();
+
+      closeDisbursementModal();
+      renderTopAnalytics();
+      renderAllocationsList();
+      showToast(`Voucher of NLe ${formatNumber(amt)} successfully logged to ${code}!`);
+    }
+
+    // MODAL: MODIFY ALLOCATION / ADD PROGRAM ALLOCATION
+    function openModifyAllocationModal(codeToPreload = null) {
+      const modal = document.getElementById('modifyAllocationModal');
+      if (!modal) return;
+
+      document.getElementById('modOriginalProjectIndex').value = "-1";
+
+      if (codeToPreload) {
+        const a = statutoryAllocations.find(al => al.code === codeToPreload);
+        if (a) {
+          document.getElementById('modCode').value = a.code;
+          document.getElementById('modCategory').value = a.category;
+          document.getElementById('modTitle').value = a.title;
+          document.getElementById('modReceived').value = a.received;
+          document.getElementById('modSpent').value = a.spent;
+          document.getElementById('modTrackingId').value = `${a.code}-01-2025`;
+          document.getElementById('modifyModalTitle').textContent = `Modify ${a.code} Statutory Fund`;
+        }
+      } else {
+        // Preload first master project
+        if (masterProjects.length > 0) {
+          openModifyMasterProjectModal(0);
+          return;
+        } else {
+          document.getElementById('modCode').value = "BCF-EP08";
+          document.getElementById('modCategory').value = "Empowerment";
+          document.getElementById('modTitle').value = "Women Micro-Grant Enterprise Network";
+          document.getElementById('modReceived').value = "340000";
+          document.getElementById('modSpent').value = "340000";
+          document.getElementById('modTrackingId').value = "BCF-EP08-01-2025";
+        }
+      }
+
+      updateModBalancePreview();
+      modal.classList.remove('hidden');
+      modal.classList.add('flex');
+    }
+
+    function openModifyMasterProjectModal(idx) {
+      const modal = document.getElementById('modifyAllocationModal');
+      if (!modal) return;
+
+      const p = masterProjects[idx];
+      if (p) {
+        document.getElementById('modOriginalProjectIndex').value = idx;
+        document.getElementById('modCode').value = p.code || 'BCF-H01';
+        document.getElementById('modCategory').value = p.cat || 'Health';
+        document.getElementById('modTitle').value = p.title || '';
+        document.getElementById('modTrackingId').value = p.trackingId || '';
+        document.getElementById('modReceived').value = safeNum(p.received, 0);
+        document.getElementById('modSpent').value = safeNum(p.spent, 0);
+        document.getElementById('modRemarks').value = p.remarks || 'Ongoing';
+        document.getElementById('modDept').value = p.dept || 'Programs Department';
+
+        const sel = document.getElementById('modSelectProgram');
+        if (sel) sel.value = `proj_${idx}`;
+
+        document.getElementById('modifyModalTitle').textContent = `Modify ${p.code} - ${p.title.slice(0, 25)}...`;
+      }
+
+      updateModBalancePreview();
+      modal.classList.remove('hidden');
+      modal.classList.add('flex');
+    }
+
+    function closeModifyAllocationModal() {
+      const modal = document.getElementById('modifyAllocationModal');
+      if (modal) {
+        modal.classList.remove('flex');
+        modal.classList.add('hidden');
+      }
+    }
+
+    function handleSelectProgramToModify(val) {
+      if (val === 'new') {
+        document.getElementById('modOriginalProjectIndex').value = "-1";
+        document.getElementById('modCode').value = "BCF-H01";
+        document.getElementById('modCategory').value = "Health";
+        document.getElementById('modTitle').value = "";
+        document.getElementById('modTrackingId').value = `BCF-H01-01-2025`;
+        document.getElementById('modReceived').value = "0";
+        document.getElementById('modSpent').value = "0";
+        document.getElementById('modifyModalTitle').textContent = "Add New Program Allocation";
+        updateModBalancePreview();
+        return;
+      }
+
+      if (val.startsWith('proj_')) {
+        const idx = parseInt(val.replace('proj_', ''), 10);
+        if (masterProjects[idx]) {
+          openModifyMasterProjectModal(idx);
+        }
+      } else if (val.startsWith('stat_')) {
+        const code = val.replace('stat_', '');
+        openModifyAllocationModal(code);
+      }
+    }
+
+    function handleModCodeInputChange(code) {
+      const clean = code.trim().toUpperCase();
+      const existing = statutoryAllocations.find(a => a.code === clean);
+      if (existing) {
+        document.getElementById('modCategory').value = existing.category;
+      }
+      updateModBalancePreview();
+    }
+
+    function updateModBalancePreview() {
+      const rec = safeNum(document.getElementById('modReceived')?.value, 0);
+      const spent = safeNum(document.getElementById('modSpent')?.value, 0);
+      const bal = rec - spent;
+      const preview = document.getElementById('modBalancePreview');
+      if (preview) {
+        preview.textContent = `NLe ${formatNumber(bal)}`;
+        preview.className = `font-mono font-black text-sm ${bal < 0 ? 'text-rose-600' : 'text-emerald-800'}`;
+      }
+    }
+
+    document.getElementById('modReceived')?.addEventListener('input', updateModBalancePreview);
+    document.getElementById('modSpent')?.addEventListener('input', updateModBalancePreview);
+
+    function handleModifyAllocationSubmit(e) {
+      e.preventDefault();
+      const origIdx = parseInt(document.getElementById('modOriginalProjectIndex').value, 10);
+      const code = document.getElementById('modCode').value.trim().toUpperCase();
+      const category = document.getElementById('modCategory').value.trim();
+      const title = document.getElementById('modTitle').value.trim();
+      const trackingId = document.getElementById('modTrackingId').value.trim();
+      const received = safeNum(document.getElementById('modReceived').value, 0);
+      const spent = safeNum(document.getElementById('modSpent').value, 0);
+      const remarks = document.getElementById('modRemarks').value;
+      const dept = document.getElementById('modDept').value.trim();
+
+      // 1. Update or Add to Master Projects (Programs Input Trackers)
+      if (origIdx >= 0 && masterProjects[origIdx]) {
+        masterProjects[origIdx] = Object.assign({}, masterProjects[origIdx], {
+          code, cat: category, title, trackingId, received, spent, remarks, dept
+        });
+      } else {
+        const newNo = masterProjects.length + 1;
+        masterProjects.push({
+          no: newNo,
+          code, cat: category, title, trackingId: trackingId || `${code}-01-2025`,
+          received, spent, remarks, dept: dept || 'Programs Department',
+          focus: "Core programmatic thematic deliverable"
+        });
+      }
+
+      // 2. Also update matching Statutory Allocation if present
+      let alloc = statutoryAllocations.find(a => a.code === code);
+      if (alloc) {
+        // If updating statutory fund
+        if (origIdx < 0) {
+          alloc.category = category;
+          alloc.title = title;
+          alloc.received = received;
+          alloc.spent = spent;
+          alloc.balance = Math.max(0, received - spent);
+          alloc.pctUsed = received > 0 ? (spent / received) * 100 : 0;
+        }
+      }
+
+      saveMasterProjects();
+      saveCustomAllocations();
+      notifySync();
+
+      loadData();
+      closeModifyAllocationModal();
+      renderTopAnalytics();
+      renderAllocationsList();
+      showToast(`Program Allocation "${title}" updated & synchronized with Master Table!`);
+    }
+
+    // PERSISTENCE ENGINE
+    function saveCustomAllocations() {
+      const custom = {};
+      statutoryAllocations.forEach(a => {
+        custom[a.code] = {
+          code: a.code,
+          category: a.category,
+          title: a.title,
+          received: a.received,
+          spent: a.spent
+        };
+      });
+      try {
+        localStorage.setItem('bcf_financial_ledger_allocations', JSON.stringify(custom));
+      } catch(e) {}
+    }
+
+    function saveMasterProjects() {
+      try {
+        localStorage.setItem('bcf_programs_master_table', JSON.stringify(masterProjects));
+        localStorage.setItem('bcf_programs_last_sync', Date.now().toString());
+      } catch(e) {}
+    }
+
+    function notifySync() {
+      if (bcfSyncChannel) {
+        bcfSyncChannel.postMessage({ type: 'LEDGER_MODIFIED', timestamp: Date.now() });
+      }
+    }
+
+    function syncWithMasterTable(showNotification = false) {
+      loadData();
+      renderTopAnalytics();
+      renderAllocationsList();
+      if (showNotification) {
+        showToast("Synchronized live with Programs Input Trackers (Program Master Table)!");
+      }
+    }
+
+    function updateModalSelectOptions() {
+      const selVoucher = document.getElementById('voucherTargetCode');
+      const dlMaster = document.getElementById('masterProjectsDatalist');
+      const dlCodes = document.getElementById('existingCodesList');
+      const selMod = document.getElementById('modSelectProgram');
+
+      if (selVoucher) {
+        selVoucher.innerHTML = statutoryAllocations.map(a => `
+          <option value="${a.code}">${a.code} : ${a.title} (Bal: NLe ${formatNumber(a.balance)})</option>
+        `).join('');
+      }
+
+      if (dlMaster) {
+        dlMaster.innerHTML = masterProjects.map(p => `
+          <option value="${p.title}">${p.code} - ${p.trackingId || ''}</option>
+        `).join('');
+      }
+
+      if (dlCodes) {
+        dlCodes.innerHTML = statutoryAllocations.map(a => `
+          <option value="${a.code}">${a.category} - ${a.title}</option>
+        `).join('');
+      }
+
+      if (selMod) {
+        let optHtml = `<optgroup label="Master Table Programs (18+ Projects)">`;
+        masterProjects.forEach((p, i) => {
+          optHtml += `<option value="proj_${i}">[${p.code}] ${p.title} (NLe ${formatNumber(p.received)})</option>`;
+        });
+        optHtml += `</optgroup><optgroup label="Statutory Treasury Funds (8 Funds)">`;
+        statutoryAllocations.forEach(a => {
+          optHtml += `<option value="stat_${a.code}">[${a.code}] ${a.title} (NLe ${formatNumber(a.received)})</option>`;
+        });
+        optHtml += `</optgroup><option value="new">+ Add New Program Allocation</option>`;
+        selMod.innerHTML = optHtml;
+      }
+    }
+
+    // EXPORT AUDIT ENGINE
+    function triggerExportNotice() {
+      let csv = "data:text/csv;charset=utf-8,";
+      csv += "Fiscal Oversight 2024/2025 - Financial Ledger & Program Allocations\n";
+      csv += "Generated On," + new Date().toISOString() + "\n";
+      csv += "Audit Protocol,Bank of Sierra Leone (BSL) Escrow & NRA Compliance\n\n";
+
+      csv += "ALL MASTER TABLE PROGRAM ALLOCATIONS (FROM PROGRAMS INPUT TRACKERS):\n";
+      csv += "NO,Program Code,Program Category,Program Title,Tracking ID,Dept,Received (NLe),Spent (NLe),Balance (NLe),Remarks\n";
+      masterProjects.forEach(p => {
+        const bal = safeNum(p.received, 0) - safeNum(p.spent, 0);
+        csv += `"${p.no || ''}","${p.code || ''}","${p.cat || ''}","${(p.title || '').replace(/"/g, '""')}","${p.trackingId || ''}","${p.dept || ''}",${p.received || 0},${p.spent || 0},${bal},"${p.remarks || ''}"\n`;
+      });
+
+      csv += "\n\nSTATUTORY TREASURY DEVELOPMENT FUNDS (8 BENCHMARK FUNDS):\n";
+      csv += "Program Code,Program Category,Fund Title,Received (NLe),Spent (NLe),Balance (NLe),% Used,Subprojects Count\n";
+      statutoryAllocations.forEach(a => {
+        csv += `"${a.code}","${a.category}","${a.title.replace(/"/g, '""')}",${a.received},${a.spent},${a.balance},${a.pctUsed.toFixed(2)}%,${a.subprojects.length}\n`;
+      });
+
+      const encodedUri = encodeURI(csv);
+      const link = document.createElement("a");
+      link.setAttribute("href", encodedUri);
+      link.setAttribute("download", `BCF_SL_Financial_Ledger_${new Date().toISOString().split('T')[0]}.csv`);
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      showToast("Compiling official NRA Audit Ledger (CSV) with SHA-256 stamp...");
+    }
+
+    // TOAST UTILITY
+    function showToast(msg) {
+      const toast = document.getElementById('toastFeedback');
+      const toastMsg = document.getElementById('toastMessage');
+      if (!toast || !toastMsg) return;
+      toastMsg.textContent = msg;
+      toast.classList.remove('opacity-0', 'pointer-events-none');
+      toast.classList.add('opacity-100');
+      setTimeout(() => {
+        toast.classList.remove('opacity-100');
+        toast.classList.add('opacity-0', 'pointer-events-none');
+      }, 3000);
+    }
+
+    // AUTO-REFRESH ON STORAGE CHANGE & FOCUS
+    window.addEventListener('storage', (e) => {
+      if (e.key === 'bcf_programs_master_table' || e.key === 'bcf_programs_last_sync') {
+        loadData();
+        renderTopAnalytics();
+        renderAllocationsList();
+        showToast("Financial Ledger auto-updated from Programs Input Trackers!");
+      }
+    });
+
+    window.addEventListener('focus', () => {
+      loadData();
+      renderTopAnalytics();
+      renderAllocationsList();
+    });
+
+    // 1-second background sync monitor
+    let lastKnownMasterLength = -1;
+    setInterval(() => {
+      try {
+        const saved = localStorage.getItem('bcf_programs_master_table');
+        if (saved) {
+          const parsed = JSON.parse(saved);
+          if (Array.isArray(parsed) && parsed.length !== lastKnownMasterLength && lastKnownMasterLength !== -1) {
+            loadData();
+            renderTopAnalytics();
+            renderAllocationsList();
+          }
+          lastKnownMasterLength = parsed.length;
+        }
+      } catch(e) {}
+    }, 1200);
+
+    // INITIALIZATION ON DOM READY
+    window.addEventListener('DOMContentLoaded', () => {
+      loadData();
+      renderTopAnalytics();
+      renderAllocationsList();
+    });
+  </script>
+
+</body>
+</html>

@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+<title>Staff Sign In — BCF-SL Learning Portal</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin=""/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="../learning_db.js?v=20261010_smtp_live_v3"></script>
+<script>
+  tailwind.config = {
+    theme: {
+      extend: {
+        fontFamily: {
+          sans: ['Inter', 'sans-serif'],
+          display: ['Plus Jakarta Sans', 'sans-serif']
+        },
+        colors: {
+          brand: {
+            navy: '#00164e',
+            deep: '#00236f',
+            blue: '#0051d5',
+            cobalt: '#2563eb',
+            surface: '#f8f9ff'
+          }
+        }
+      }
+    }
+  }
+</script>
+<style>
+  *, *::before, *::after { box-sizing: border-box; }
+  ::-webkit-scrollbar { display: none; }
+  .bg-portal {
+    background: radial-gradient(circle at 15% 20%, rgba(37, 99, 235, 0.25) 0%, transparent 45%),
+                radial-gradient(circle at 85% 80%, rgba(0, 81, 213, 0.3) 0%, transparent 50%),
+                linear-gradient(135deg, #00164e 0%, #00236f 40%, #0051d5 85%, #1d4ed8 100%);
+  }
+  .glass-card {
+    background: rgba(255, 255, 255, 0.96);
+    backdrop-filter: blur(16px);
+    box-shadow: 0 24px 60px -12px rgba(0, 22, 78, 0.45);
+  }
+  .input-ring:focus-within {
+    border-color: #0051d5;
+    box-shadow: 0 0 0 3px rgba(0, 81, 213, 0.15);
+  }
+  .fade-in { animation: fadeIn .35s ease both; }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+</style>
+</head>
+<body class="bg-portal font-sans text-slate-800 min-h-screen flex items-center justify-center p-4">
+
+<div class="w-full max-w-md flex flex-col gap-5 fade-in my-8">
+
+  <!-- Institutional Crest & Branding Header -->
+  <div class="flex flex-col items-center text-center gap-2.5">
+    <div class="w-16 h-16 rounded-2xl bg-white/15 backdrop-blur-md border border-white/30 flex items-center justify-center shadow-lg text-white ring-4 ring-white/10">
+      <span class="material-symbols-outlined text-3xl">school</span>
+    </div>
+    <div>
+      <div class="flex items-center justify-center gap-2">
+        <span class="font-display font-black text-2xl text-white tracking-tight">BCF<span class="text-sky-300">.SL</span></span>
+        <span class="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold uppercase tracking-wider bg-white/20 text-white border border-white/25">LMS Portal</span>
+      </div>
+      <p class="text-xs text-blue-100/90 font-medium mt-1">Staff Learning & Professional Development Portal</p>
+      <p class="text-[11px] text-blue-200/70">Coursera · Udemy · Microsoft Learn · BCF Academy</p>
+    </div>
+  </div>
+
+  <!-- Sign-in Card -->
+  <div class="glass-card rounded-3xl p-6 sm:p-8 border border-white/40 flex flex-col gap-5">
+    
+    <div>
+      <h2 class="font-display font-extrabold text-xl text-slate-900 tracking-tight">Welcome Back</h2>
+      <p class="text-xs text-slate-500 mt-1">Sign in with your staff credentials to access your semester course allocation.</p>
+    </div>
+
+    <!-- Error Alert -->
+    <div id="error-alert" class="hidden rounded-xl bg-rose-50 border border-rose-200 p-3 text-xs font-semibold text-rose-800 flex items-center gap-2">
+      <span class="material-symbols-outlined text-lg text-rose-600 shrink-0">error</span>
+      <span id="error-text">Invalid username or password.</span>
+    </div>
+
+    <!-- Sign In Form -->
+    <form id="login-form" onsubmit="handleLoginSubmit(event)" class="flex flex-col gap-4">
+      
+      <!-- Username -->
+      <div class="flex flex-col gap-1.5">
+        <label for="username" class="text-xs font-bold text-slate-700">Staff Username</label>
+        <div class="relative input-ring rounded-xl border border-slate-300 bg-slate-50/70 transition-all">
+          <span class="material-symbols-outlined absolute left-3.5 top-3 text-slate-400 text-lg">person</span>
+          <input type="text" id="username" required placeholder="e.g. sbangura" autocomplete="username" class="w-full h-11 pl-10 pr-3.5 rounded-xl bg-transparent text-xs font-semibold text-slate-900 focus:outline-none"/>
+        </div>
+      </div>
+
+      <!-- Password -->
+      <div class="flex flex-col gap-1.5">
+        <div class="flex items-center justify-between">
+          <label for="password" class="text-xs font-bold text-slate-700">Password</label>
+          <button type="button" onclick="openResetPasswordModal()" class="text-[11px] text-blue-600 font-bold hover:underline">Change / Reset Password?</button>
+        </div>
+        <div class="relative input-ring rounded-xl border border-slate-300 bg-slate-50/70 transition-all">
+          <span class="material-symbols-outlined absolute left-3.5 top-3 text-slate-400 text-lg">lock</span>
+          <input type="password" id="password" required placeholder="••••••••••••" autocomplete="current-password" class="w-full h-11 pl-10 pr-10 rounded-xl bg-transparent text-xs font-mono font-bold text-slate-900 focus:outline-none"/>
+          <button type="button" onclick="togglePassVisibility()" class="absolute right-3 top-3 text-slate-400 hover:text-slate-700">
+            <span class="material-symbols-outlined text-lg" id="eye-icon">visibility</span>
+          </button>
+        </div>
+      </div>
+
+      <button type="submit" id="btn-submit" class="w-full h-12 rounded-xl bg-gradient-to-r from-blue-700 to-indigo-700 hover:from-blue-800 hover:to-indigo-800 text-white font-bold text-xs flex items-center justify-center gap-2 shadow-md hover:shadow-lg transition-all active:scale-[0.99] mt-1">
+        <span class="material-symbols-outlined text-lg">login</span>
+        <span id="btn-text">Sign In to Learning Portal</span>
+      </button>
+
+    </form>
+
+    <!-- Quick Demo Accounts One-Click Switcher -->
+    <div class="pt-4 border-t border-slate-200/80 flex flex-col gap-2.5">
+      <div class="flex items-center justify-between">
+        <span class="text-[11px] font-bold uppercase tracking-wider text-slate-400">Quick Test Profiles</span>
+        <span class="text-[10px] font-bold text-blue-700 bg-blue-50 px-2 py-0.5 rounded-full">1-Click Sign In</span>
+      </div>
+      <div class="grid grid-cols-2 gap-2 text-left" id="demo-buttons">
+        <button type="button" onclick="quickFill('abandama', 'Password123!')" class="col-span-2 p-2.5 rounded-xl border border-blue-200 bg-blue-50/80 hover:bg-blue-100 hover:border-blue-400 transition-all text-left group">
+          <div class="flex items-center justify-between">
+            <div class="font-bold text-xs text-blue-950 group-hover:text-blue-700 truncate">Albert Joseph Bandama (CEO)</div>
+            <span class="text-[10px] font-bold text-blue-700 bg-white px-2 py-0.5 rounded border border-blue-200">abandama</span>
+          </div>
+          <div class="text-[10.5px] text-blue-700/80 truncate">Executive Management · albertjosephhassanbandama@gmail.com</div>
+        </button>
+        <button type="button" onclick="quickFill('sbangura', 'Password123!')" class="p-2.5 rounded-xl border border-slate-200 bg-slate-50 hover:bg-blue-50 hover:border-blue-300 transition-all text-left group">
+          <div class="font-bold text-xs text-slate-800 group-hover:text-blue-700 truncate">Sahr Bangura</div>
+          <div class="text-[10.5px] text-slate-500 truncate">Programmes (1/2 slots)</div>
+        </button>
+        <button type="button" onclick="quickFill('asesay', 'Password123!')" class="p-2.5 rounded-xl border border-slate-200 bg-slate-50 hover:bg-blue-50 hover:border-blue-300 transition-all text-left group">
+          <div class="font-bold text-xs text-slate-800 group-hover:text-blue-700 truncate">Aminata Sesay</div>
+          <div class="text-[10.5px] text-slate-500 truncate">ICT (2/2 slots locked)</div>
+        </button>
+        <button type="button" onclick="quickFill('mkamara', 'Password123!')" class="p-2.5 rounded-xl border border-slate-200 bg-slate-50 hover:bg-blue-50 hover:border-blue-300 transition-all text-left group">
+          <div class="font-bold text-xs text-slate-800 group-hover:text-blue-700 truncate">Mohamed Kamara</div>
+          <div class="text-[10.5px] text-slate-500 truncate">Finance (Req. pending)</div>
+        </button>
+        <button type="button" onclick="quickFill('fturay', 'Password123!')" class="p-2.5 rounded-xl border border-slate-200 bg-slate-50 hover:bg-blue-50 hover:border-blue-300 transition-all text-left group">
+          <div class="font-bold text-xs text-slate-800 group-hover:text-blue-700 truncate">Fatima Turay</div>
+          <div class="text-[10.5px] text-slate-500 truncate">Manager (Cert. audit)</div>
+        </button>
+      </div>
+    </div>
+
+    <!-- Governance Shortcut -->
+    <div class="p-3 rounded-xl bg-blue-50/70 border border-blue-100 text-center flex items-center justify-between text-xs">
+      <span class="text-slate-600 font-medium">HR Learning Administrator?</span>
+      <a href="/learning/admin-provisioning" target="_top" class="font-bold text-blue-700 hover:underline flex items-center gap-1">
+        <span>Open Governance</span>
+        <span class="material-symbols-outlined text-sm">arrow_forward</span>
+      </a>
+    </div>
+
+  </div>
+
+  <p class="text-center text-[11px] text-white/60">
+    © 2026 Bandama Charity Foundation Sierra Leone · Enterprise LMS
+  </p>
+
+</div>
+
+<!-- Modal for Staff Self-Service Password Reset / Change -->
+<div id="reset-password-modal" class="hidden fixed inset-0 z-50 bg-slate-950/70 backdrop-blur-md flex items-center justify-center p-4">
+  <div class="glass-card rounded-3xl max-w-md w-full p-6 sm:p-7 shadow-2xl border border-white/50 flex flex-col gap-4 fade-in">
+    <div class="flex items-center justify-between pb-3 border-b border-slate-100">
+      <div class="flex items-center gap-2.5">
+        <div class="w-10 h-10 rounded-xl bg-blue-100 text-blue-800 flex items-center justify-center">
+          <span class="material-symbols-outlined text-xl">lock_reset</span>
+        </div>
+        <div>
+          <h3 class="font-display font-extrabold text-base text-slate-900">Change / Reset Password</h3>
+          <p class="text-[11px] text-slate-500">Staff self-service credentials update</p>
+        </div>
+      </div>
+      <button type="button" onclick="closeResetPasswordModal()" class="w-8 h-8 rounded-full hover:bg-slate-100 flex items-center justify-center text-slate-400">
+        <span class="material-symbols-outlined text-lg">close</span>
+      </button>
+    </div>
+
+    <div id="reset-error-alert" class="hidden rounded-xl bg-rose-50 border border-rose-200 p-3 text-xs font-semibold text-rose-800 flex items-center gap-2">
+      <span class="material-symbols-outlined text-lg text-rose-600 shrink-0">error</span>
+      <span id="reset-error-text">Account not found.</span>
+    </div>
+
+    <div id="reset-success-alert" class="hidden rounded-xl bg-emerald-50 border border-emerald-200 p-3 text-xs font-semibold text-emerald-800 flex items-center gap-2">
+      <span class="material-symbols-outlined text-lg text-emerald-600 shrink-0">check_circle</span>
+      <span id="reset-success-text">Password updated successfully!</span>
+    </div>
+
+    <form id="reset-form" onsubmit="handleStaffResetSubmit(event)" class="flex flex-col gap-3.5">
+      <div class="flex flex-col gap-1">
+        <label for="reset-ident" class="text-xs font-bold text-slate-700">Staff Username or Employee ID</label>
+        <div class="relative input-ring rounded-xl border border-slate-300 bg-slate-50/70">
+          <span class="material-symbols-outlined absolute left-3 top-2.5 text-slate-400 text-base">badge</span>
+          <input type="text" id="reset-ident" required placeholder="e.g. sbangura or BCF-EMP-2027-0001" class="w-full h-10 pl-9 pr-3 rounded-xl bg-transparent text-xs font-semibold text-slate-900 focus:outline-none"/>
+        </div>
+      </div>
+
+      <div class="flex flex-col gap-1">
+        <label for="reset-email" class="text-xs font-bold text-slate-700">Official Work Email Address</label>
+        <div class="relative input-ring rounded-xl border border-slate-300 bg-slate-50/70">
+          <span class="material-symbols-outlined absolute left-3 top-2.5 text-slate-400 text-base">mail</span>
+          <input type="email" id="reset-email" required placeholder="e.g. s.bangura@bcf.sl" class="w-full h-10 pl-9 pr-3 rounded-xl bg-transparent text-xs font-semibold text-slate-900 focus:outline-none"/>
+        </div>
+        <span class="text-[10px] text-slate-400">Must match the email address registered on your staff file.</span>
+      </div>
+
+      <div class="flex flex-col gap-1">
+        <label for="reset-new-pass" class="text-xs font-bold text-slate-700">New Password</label>
+        <div class="relative input-ring rounded-xl border border-slate-300 bg-slate-50/70">
+          <span class="material-symbols-outlined absolute left-3 top-2.5 text-slate-400 text-base">lock</span>
+          <input type="password" id="reset-new-pass" required minlength="6" placeholder="At least 6 characters" class="w-full h-10 pl-9 pr-9 rounded-xl bg-transparent text-xs font-mono font-bold text-slate-900 focus:outline-none"/>
+          <button type="button" onclick="togglePassField('reset-new-pass', 'reset-eye-1')" class="absolute right-2.5 top-2.5 text-slate-400 hover:text-slate-600">
+            <span class="material-symbols-outlined text-base" id="reset-eye-1">visibility</span>
+          </button>
+        </div>
+      </div>
+
+      <div class="flex flex-col gap-1">
+        <label for="reset-conf-pass" class="text-xs font-bold text-slate-700">Confirm New Password</label>
+        <div class="relative input-ring rounded-xl border border-slate-300 bg-slate-50/70">
+          <span class="material-symbols-outlined absolute left-3 top-2.5 text-slate-400 text-base">lock</span>
+          <input type="password" id="reset-conf-pass" required minlength="6" placeholder="Re-enter new password" class="w-full h-10 pl-9 pr-9 rounded-xl bg-transparent text-xs font-mono font-bold text-slate-900 focus:outline-none"/>
+          <button type="button" onclick="togglePassField('reset-conf-pass', 'reset-eye-2')" class="absolute right-2.5 top-2.5 text-slate-400 hover:text-slate-600">
+            <span class="material-symbols-outlined text-base" id="reset-eye-2">visibility</span>
+          </button>
+        </div>
+      </div>
+
+      <div class="flex items-center gap-2 pt-2">
+        <button type="button" onclick="closeResetPasswordModal()" class="flex-1 h-11 rounded-xl border border-slate-300 bg-white hover:bg-slate-100 font-bold text-xs text-slate-700 transition">
+          Cancel
+        </button>
+        <button type="submit" id="btn-reset-submit" class="flex-1 h-11 rounded-xl bg-blue-700 hover:bg-blue-800 text-white font-bold text-xs flex items-center justify-center gap-1.5 transition shadow-sm">
+          <span>Update Password</span>
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script>
+  function togglePassVisibility() {
+    const inp = document.getElementById('password');
+    const ico = document.getElementById('eye-icon');
+    if (inp.type === 'password') {
+      inp.type = 'text';
+      ico.textContent = 'visibility_off';
+    } else {
+      inp.type = 'password';
+      ico.textContent = 'visibility';
+    }
+  }
+
+  function togglePassField(inputId, iconId) {
+    const inp = document.getElementById(inputId);
+    const ico = document.getElementById(iconId);
+    if (!inp || !ico) return;
+    if (inp.type === 'password') {
+      inp.type = 'text';
+      ico.textContent = 'visibility_off';
+    } else {
+      inp.type = 'password';
+      ico.textContent = 'visibility';
+    }
+  }
+
+  function openResetPasswordModal() {
+    document.getElementById('reset-form').reset();
+    document.getElementById('reset-error-alert').classList.add('hidden');
+    document.getElementById('reset-success-alert').classList.add('hidden');
+    // Pre-fill username if already typed in main form
+    const curUser = document.getElementById('username').value.trim();
+    if (curUser) document.getElementById('reset-ident').value = curUser;
+    document.getElementById('reset-password-modal').classList.remove('hidden');
+    document.getElementById('reset-password-modal').classList.add('flex');
+  }
+
+  function closeResetPasswordModal() {
+    const m = document.getElementById('reset-password-modal');
+    if (m) {
+      m.classList.add('hidden');
+      m.classList.remove('flex');
+    }
+  }
+
+  function handleStaffResetSubmit(e) {
+    e.preventDefault();
+    const ident = document.getElementById('reset-ident').value.trim();
+    const email = document.getElementById('reset-email').value.trim().toLowerCase();
+    const newPass = document.getElementById('reset-new-pass').value;
+    const confPass = document.getElementById('reset-conf-pass').value;
+
+    const errBox = document.getElementById('reset-error-alert');
+    const errText = document.getElementById('reset-error-text');
+    const succBox = document.getElementById('reset-success-alert');
+    const succText = document.getElementById('reset-success-text');
+
+    errBox.classList.add('hidden');
+    succBox.classList.add('hidden');
+
+    if (newPass !== confPass) {
+      errText.textContent = 'New passwords do not match. Please re-enter.';
+      errBox.classList.remove('hidden');
+      return;
+    }
+
+    if (newPass.length < 6) {
+      errText.textContent = 'Password must be at least 6 characters.';
+      errBox.classList.remove('hidden');
+      return;
+    }
+
+    const accounts = getLearningAccounts();
+    const matched = accounts.find(a =>
+      (a.employeeId && a.employeeId.toLowerCase() === ident.toLowerCase()) ||
+      (a.username && a.username.toLowerCase() === ident.toLowerCase())
+    );
+
+    if (!matched) {
+      errText.textContent = 'No matching staff account found for this Username or ID.';
+      errBox.classList.remove('hidden');
+      return;
+    }
+
+    if (!matched.employeeEmail || matched.employeeEmail.trim().toLowerCase() !== email) {
+      errText.textContent = `The email address does not match our staff records for ${matched.employeeName}.`;
+      errBox.classList.remove('hidden');
+      return;
+    }
+
+    const res = updateStaffPassword(matched.employeeId, null, newPass, 'Staff Self-Service');
+    if (res.success) {
+      succText.textContent = 'Password successfully updated! Confirmation email dispatched to your work address.';
+      succBox.classList.remove('hidden');
+      // Prepopulate login form
+      document.getElementById('username').value = matched.username;
+      document.getElementById('password').value = newPass;
+
+      setTimeout(() => {
+        closeResetPasswordModal();
+      }, 1500);
+    } else {
+      errText.textContent = res.message || 'Failed to update password.';
+      errBox.classList.remove('hidden');
+    }
+  }
+
+  function quickFill(user, pass) {
+    document.getElementById('username').value = user;
+    document.getElementById('password').value = pass;
+    document.getElementById('btn-submit').click();
+  }
+
+  function showError(msg) {
+    const box = document.getElementById('error-alert');
+    document.getElementById('error-text').textContent = msg;
+    box.classList.remove('hidden');
+  }
+
+  function handleLoginSubmit(e) {
+    e.preventDefault();
+    const user = document.getElementById('username').value.trim().toLowerCase();
+    const pass = document.getElementById('password').value;
+
+    if (!user || !pass) {
+      showError('Please enter both your staff username and password.');
+      return;
+    }
+
+    const accounts = getLearningAccounts();
+    const matched = accounts.find(a =>
+      (a.username && a.username.toLowerCase() === user) &&
+      (a.password === pass)
+    );
+
+    if (!matched) {
+      showError('Invalid username or password. Check credentials or contact HR Learning Governance.');
+      return;
+    }
+
+    if (matched.isActive === false) {
+      showError('This staff account has been suspended. Please contact HR Learning Governance.');
+      return;
+    }
+
+    // Activate session
+    setCurrentEmployee(matched.employeeId);
+
+    // Enforce regular staff session mode
+    if (!isHRAdmin(matched)) {
+      sessionStorage.setItem('bcf_staff_only_session', 'true');
+    } else {
+      sessionStorage.removeItem('bcf_staff_only_session');
+    }
+
+    // Button animation
+    const btnText = document.getElementById('btn-text');
+    btnText.textContent = `Signing in as ${matched.employeeName.split(' ')[0]}…`;
+    document.getElementById('btn-submit').disabled = true;
+
+    setTimeout(() => {
+      try {
+        if (window.top && window.top !== window && window.top.location) {
+          window.top.location.href = '/learning/course-allocation';
+          return;
+        }
+      } catch (err) {}
+      window.location.href = '../catalog_course_allocation/code.html';
+    }, 400);
+  }
+</script>
+</body>
+</html>

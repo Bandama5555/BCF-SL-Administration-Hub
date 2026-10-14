@@ -1,0 +1,1289 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover"/>
+    <title>Employee Directory & Analytics - BCF-SL</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="../bcf_mongo_bridge.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: "#16a34a",
+                        "primary-dark": "#15803d",
+                        secondary: "#2563eb",
+                        tertiary: "#9333ea",
+                        surface: "#ffffff",
+                        "surface-container": "#f8fafc",
+                        "surface-low": "#eff6ff",
+                        "on-surface": "#0f172a",
+                        "on-surface-variant": "#475569",
+                        outline: "#e2e8f0",
+                        error: "#dc2626"
+                    },
+                    fontFamily: { sans: ['Calibri', 'Inter', 'sans-serif'] }
+                }
+            }
+        }
+    </script>
+    <style>
+        body { font-size: 11pt; overscroll-behavior-y: none; }
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-thumb { background-color: #cbd5e1; border-radius: 3px; }
+        @keyframes fadeInUp { from { opacity:0; transform:translateY(8px); } to { opacity:1; transform:translateY(0); } }
+        .fade-in { animation: fadeInUp 0.25s ease-out; }
+        .stat-card { transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); }
+        .stat-card:hover { transform: translateY(-2px); box-shadow: 0 10px 20px -5px rgba(0,0,0,0.08); }
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            20%, 60% { transform: translateX(-6px); }
+            40%, 80% { transform: translateX(6px); }
+        }
+        .shake { animation: shake 0.35s ease-in-out; }
+    </style>
+</head>
+<body class="bg-[#f1f5f9] text-on-surface flex flex-col min-h-screen font-sans">
+
+<!-- HEADER WITH ROLE ACCESS CONTROL & CREDENTIAL AUTHENTICATION -->
+<header class="bg-surface border-b border-outline shadow-sm z-40 sticky top-0">
+    <div class="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between gap-4">
+        <!-- Logo & Title -->
+        <div class="flex items-center gap-4">
+            <img src="../bcf-logo.png" onerror="this.src='/bcf-logo.jpg'" alt="BCF-SL Logo" class="h-10 w-auto object-contain"/>
+            <div class="hidden sm:block">
+                <h1 class="font-bold text-lg text-primary leading-tight">BANDAMA CHARITY FOUNDATION SIERRA LEONE</h1>
+                <p class="text-[9pt] font-semibold text-secondary">Save Lives <span class="text-tertiary px-1">|</span> Empowering Communities Through Services</p>
+            </div>
+        </div>
+
+        <!-- Action Buttons (Governed by System Access Rights) -->
+        <div class="flex items-center gap-2 sm:gap-3">
+            <!-- Employee Profiles Button (Super Admin, HR Director, CEO, Finance, Audit, Staff) -->
+            <a id="btn-employee-profiles" href="../employee_profile_detail/code.html" 
+                class="h-9 px-3 sm:px-4 rounded-lg border border-outline bg-surface hover:bg-surface-container font-semibold text-xs sm:text-sm inline-flex items-center gap-1.5 transition shadow-sm">
+                <span class="material-symbols-outlined text-[18px] text-secondary">badge</span>
+                <span class="hidden md:inline">Employee Profiles</span>
+            </a>
+
+            <!-- Register Staff Button (Full Access: Super Admin & HR Director only) -->
+            <a id="btn-register-staff" href="../register_staff_auto_id/code.html" 
+                class="h-9 px-3 sm:px-4 bg-primary text-white rounded-lg font-bold text-xs sm:text-sm inline-flex items-center gap-1.5 hover:bg-primary-dark shadow transition">
+                <span class="material-symbols-outlined text-[18px]">person_add</span>
+                <span class="hidden md:inline">Register Staff</span>
+            </a>
+        </div>
+    </div>
+</header>
+
+<!-- PERMISSION BANNER -->
+
+<!-- SEQUENTIAL WORKFLOW NAVIGATION BAR -->
+<div class="bg-surface border-b border-outline px-4 py-2 text-xs font-bold shadow-2xs">
+    <div class="max-w-7xl mx-auto flex items-center justify-between">
+        <a href="../../employees" onclick="navToApp('/employees', '../../employees', event)" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-slate-300 hover:bg-slate-100 text-slate-700 transition">
+            <span>← Back to Employees</span>
+        </a>
+        <span class="text-slate-300 font-bold">|</span>
+        <a href="../employee_profile_detail/code.html" onclick="navToApp('/employees/employee-profile', '../employee_profile_detail/code.html', event)" class="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg bg-primary hover:bg-primary-dark text-white shadow-2xs transition">
+            <span>Next →</span>
+        </a>
+    </div>
+</div>
+
+
+<div class="max-w-7xl mx-auto w-full px-4 py-6 flex flex-col gap-6">
+
+    <!-- PAGE TITLE & DATE -->
+    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+        <div>
+            <h2 class="text-2xl sm:text-3xl font-extrabold text-on-surface tracking-tight">Employee Directory & Analytics</h2>
+            <p class="text-on-surface-variant text-sm mt-0.5">Real-time organizational analytics and staff registry</p>
+        </div>
+        <div class="flex items-center gap-2 self-start sm:self-auto bg-surface border border-outline px-3 py-1.5 rounded-lg shadow-sm text-xs font-semibold text-on-surface-variant">
+            <span class="material-symbols-outlined text-[18px] text-primary">calendar_today</span>
+            <span id="current-date"></span>
+        </div>
+    </div>
+
+    <!-- ==================== ANALYTICS AT THE TOP ==================== -->
+    <div class="bg-surface border border-outline rounded-2xl p-5 shadow-sm flex flex-col gap-6">
+        <div class="flex items-center justify-between border-b border-outline pb-3">
+            <div class="flex items-center gap-2.5">
+                <span class="material-symbols-outlined text-primary text-2xl">analytics</span>
+                <h3 class="font-bold text-base sm:text-lg text-on-surface">Workforce Analytics</h3>
+            </div>
+            <span id="stat-total-badge" class="px-3 py-1 bg-primary/10 text-primary font-bold text-xs rounded-full">0 Total Staff</span>
+        </div>
+
+        <!-- STAT CARDS ROW -->
+        <div id="stat-cards" class="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-3">
+            <!-- Populated by JS -->
+        </div>
+
+        <!-- CHARTS GRID -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 pt-2">
+            <div class="bg-slate-50 border border-outline rounded-xl p-4 flex flex-col">
+                <div class="flex items-center justify-between mb-2">
+                    <h4 class="font-bold text-xs text-on-surface-variant uppercase tracking-wider">By Department</h4>
+                    <span class="material-symbols-outlined text-gray-400 text-[18px]">domain</span>
+                </div>
+                <div class="h-48 relative">
+                    <canvas id="chart-dept"></canvas>
+                </div>
+            </div>
+
+            <div class="bg-slate-50 border border-outline rounded-xl p-4 flex flex-col">
+                <div class="flex items-center justify-between mb-2">
+                    <h4 class="font-bold text-xs text-on-surface-variant uppercase tracking-wider">By Classification</h4>
+                    <span class="material-symbols-outlined text-gray-400 text-[18px]">pie_chart</span>
+                </div>
+                <div class="h-48 relative">
+                    <canvas id="chart-class"></canvas>
+                </div>
+            </div>
+
+            <div class="bg-slate-50 border border-outline rounded-xl p-4 flex flex-col">
+                <div class="flex items-center justify-between mb-2">
+                    <h4 class="font-bold text-xs text-on-surface-variant uppercase tracking-wider">By Management Level</h4>
+                    <span class="material-symbols-outlined text-gray-400 text-[18px]">stairs</span>
+                </div>
+                <div class="h-48 relative">
+                    <canvas id="chart-mgmt"></canvas>
+                </div>
+            </div>
+
+            <div class="bg-slate-50 border border-outline rounded-xl p-4 flex flex-col">
+                <div class="flex items-center justify-between mb-2">
+                    <h4 class="font-bold text-xs text-on-surface-variant uppercase tracking-wider">By Job Level</h4>
+                    <span class="material-symbols-outlined text-gray-400 text-[18px]">bar_chart</span>
+                </div>
+                <div class="h-48 relative">
+                    <canvas id="chart-job"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ==================== EMPLOYEE DIRECTORY SECTION ==================== -->
+    <div id="dir-main-card" class="bg-surface border border-outline rounded-2xl shadow-sm overflow-hidden flex flex-col">
+        
+        <!-- SECTION TITLE & SEARCH CONTROLS -->
+        <div class="p-5 border-b border-outline bg-surface flex flex-col gap-4">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                <div>
+                    <h3 class="font-bold text-lg text-on-surface flex items-center gap-2">
+                        <span class="material-symbols-outlined text-secondary">people</span>
+                        Employee Directory
+                    </h3>
+                    <p class="text-xs text-on-surface-variant">Showing filtered registered staff members</p>
+                </div>
+                <span id="results-count" class="text-xs font-semibold text-on-surface-variant bg-slate-100 px-3 py-1 rounded-full self-start sm:self-auto">
+                    Loading staff...
+                </span>
+            </div>
+
+            <!-- SEARCH & FILTER TOOLBAR -->
+            <div class="bg-slate-50 border border-outline rounded-xl p-4 flex flex-col gap-3">
+                <!-- ROW 1: Name Search with dedicated Search Button -->
+                <div class="flex flex-col sm:flex-row gap-2">
+                    <div class="relative flex-1">
+                        <span class="material-symbols-outlined absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400 text-[20px]">search</span>
+                        <input type="text" id="search-name" placeholder="Name Search (type full name and click Search or press Enter)..." 
+                            class="w-full h-11 pl-10 pr-4 rounded-lg bg-surface border border-outline text-sm outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition font-medium"
+                            onkeydown="if(event.key==='Enter') applyFilters()">
+                    </div>
+                    <button onclick="applyFilters()" class="h-11 px-6 bg-primary text-white rounded-lg font-bold text-sm flex items-center justify-center gap-2 hover:bg-primary-dark transition shadow-sm shrink-0">
+                        <span class="material-symbols-outlined text-[18px]">search</span>
+                        <span>Search</span>
+                    </button>
+                    <button onclick="resetFilters()" class="h-11 px-4 bg-surface hover:bg-slate-200 border border-outline text-on-surface-variant rounded-lg font-semibold text-sm flex items-center justify-center gap-1.5 transition shrink-0">
+                        <span class="material-symbols-outlined text-[18px]">restart_alt</span>
+                        <span>Reset</span>
+                    </button>
+                </div>
+
+                <!-- ROW 2: Dropdown Filters (Departments, Classification, Management Level, Job Level) -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2.5">
+                    <!-- Departments Filter -->
+                    <div class="flex flex-col gap-1">
+                        <label class="text-[10pt] font-semibold text-on-surface-variant flex items-center gap-1">
+                            <span class="material-symbols-outlined text-[14px]">domain</span> Department
+                        </label>
+                        <select id="filter-dept" onchange="applyFilters()" class="h-10 px-3 rounded-lg bg-surface border border-outline text-xs sm:text-sm outline-none focus:border-primary focus:ring-1 focus:ring-primary font-medium">
+                            <option value="">All Departments</option>
+                            <option>Executive Management</option>
+                            <option>Finance Department</option>
+                            <option>Health & Safety Department</option>
+                            <option>Human Resources Management Department</option>
+                            <option>Information Technology (IT) Department</option>
+                            <option>Internal Risk & Audits Department</option>
+                            <option>Legal & Communication Department</option>
+                            <option>Procurement Department</option>
+                            <option>Programs Department</option>
+                        </select>
+                    </div>
+
+                    <!-- Classification Filter -->
+                    <div class="flex flex-col gap-1">
+                        <label class="text-[10pt] font-semibold text-on-surface-variant flex items-center gap-1">
+                            <span class="material-symbols-outlined text-[14px]">category</span> Classification
+                        </label>
+                        <select id="filter-class" onchange="applyFilters()" class="h-10 px-3 rounded-lg bg-surface border border-outline text-xs sm:text-sm outline-none focus:border-primary focus:ring-1 focus:ring-primary font-medium">
+                            <option value="">All Classifications</option>
+                            <option>Permanent</option>
+                            <option>Fixed-Term Contract</option>
+                            <option>Part-Time</option>
+                            <option>Casual</option>
+                            <option>Consultant</option>
+                            <option>Volunteer</option>
+                            <option>Intern</option>
+                        </select>
+                    </div>
+
+                    <!-- Management Level Filter -->
+                    <div class="flex flex-col gap-1">
+                        <label class="text-[10pt] font-semibold text-on-surface-variant flex items-center gap-1">
+                            <span class="material-symbols-outlined text-[14px]">stairs</span> Management Level
+                        </label>
+                        <select id="filter-mgmt" onchange="applyFilters()" class="h-10 px-3 rounded-lg bg-surface border border-outline text-xs sm:text-sm outline-none focus:border-primary focus:ring-1 focus:ring-primary font-medium">
+                            <option value="">All Management Levels</option>
+                            <option>Governing Board</option>
+                            <option>Board of Trustees</option>
+                            <option>Board of Directors</option>
+                            <option>Top Management</option>
+                            <option>Middle Management</option>
+                            <option>Lower Management</option>
+                            <option>Employee</option>
+                            <option>Volunteer</option>
+                            <option>Intern</option>
+                        </select>
+                    </div>
+
+                    <!-- Job Level Filter -->
+                    <div class="flex flex-col gap-1">
+                        <label class="text-[10pt] font-semibold text-on-surface-variant flex items-center gap-1">
+                            <span class="material-symbols-outlined text-[14px]">military_tech</span> Job Level
+                        </label>
+                        <select id="filter-level" onchange="applyFilters()" class="h-10 px-3 rounded-lg bg-surface border border-outline text-xs sm:text-sm outline-none focus:border-primary focus:ring-1 focus:ring-primary font-medium">
+                            <option value="">All Job Levels</option>
+                            <option>Executive</option>
+                            <option>Director</option>
+                            <option>Manager</option>
+                            <option>Assistant Manager</option>
+                            <option>Officer</option>
+                            <option>Assistant</option>
+                            <option>Support Staff</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- TABLE WITH SPECIFIC REQUESTED FIELDS ONLY -->
+        <!-- Fields: Full Name, Employee ID, Department, Classification, Phone, Email, Actions -->
+        <div class="overflow-x-auto">
+            <table class="w-full text-left text-sm border-collapse">
+                <thead class="bg-slate-100 text-slate-700 uppercase tracking-wider text-[11px] font-bold border-b border-outline">
+                    <tr>
+                        <th class="px-5 py-3.5 whitespace-nowrap">Full Name</th>
+                        <th class="px-5 py-3.5 whitespace-nowrap">Employee ID</th>
+                        <th class="px-5 py-3.5 whitespace-nowrap">Department</th>
+                        <th class="px-5 py-3.5 whitespace-nowrap">Classification</th>
+                        <th class="px-5 py-3.5 whitespace-nowrap">Phone</th>
+                        <th class="px-5 py-3.5 whitespace-nowrap">Email</th>
+                        <th class="px-5 py-3.5 text-right whitespace-nowrap">Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="dir-table-body" class="divide-y divide-outline">
+                    <!-- Populated dynamically by JS -->
+                </tbody>
+            </table>
+        </div>
+
+        <!-- EMPTY STATE -->
+        <div id="dir-empty" class="hidden py-16 text-center text-on-surface-variant">
+            <span class="material-symbols-outlined text-6xl text-slate-300 block mb-2">person_search</span>
+            <p class="font-bold text-base text-on-surface">No staff records match your criteria.</p>
+            <p class="text-xs text-on-surface-variant mt-1 mb-4">Try clearing filters or search terms.</p>
+            <button onclick="resetFilters()" class="px-4 py-2 bg-primary text-white rounded-lg text-xs font-bold hover:bg-primary-dark transition">
+                Reset All Filters
+            </button>
+        </div>
+    </div>
+
+    <!-- ==================== STATIC PROFILE VIEW (STATIC IN-PAGE DOSSIER, NO MODAL BACKDROP) ==================== -->
+    <div id="static-profile-view" class="hidden flex-col gap-6 bg-surface border border-outline rounded-2xl p-5 sm:p-7 shadow-sm">
+        <!-- Top Action Bar -->
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-outline">
+            <div class="flex items-center gap-3">
+                <button onclick="backToDirectory()" class="h-10 px-4 rounded-xl border border-outline hover:bg-slate-100 text-slate-700 font-bold text-xs flex items-center gap-2 transition cursor-pointer shadow-2xs">
+                    <span class="material-symbols-outlined text-[18px]">arrow_back</span>
+                    <span>Back to Directory</span>
+                </button>
+                <div class="h-6 w-px bg-slate-200 hidden sm:block"></div>
+                <div>
+                    <span class="text-[10px] uppercase font-bold text-on-surface-variant tracking-wider block">Official Staff Dossier</span>
+                    <h2 id="sp-name-header" class="font-extrabold text-lg text-on-surface leading-tight">Employee Details</h2>
+                </div>
+            </div>
+            <div class="flex items-center gap-2 flex-wrap">
+                <button onclick="printStaticProfile()" class="h-10 px-4 rounded-xl border border-outline hover:bg-slate-100 text-slate-700 font-bold text-xs flex items-center gap-1.5 transition cursor-pointer">
+                    <span class="material-symbols-outlined text-[18px]">print</span>
+                    <span>Print Profile</span>
+                </button>
+                <button onclick="backToDirectory()" class="h-10 px-5 rounded-xl bg-primary text-white font-bold text-xs hover:bg-primary-dark transition shadow-sm cursor-pointer">
+                    Done / Close
+                </button>
+            </div>
+        </div>
+
+        <!-- Header Banner Card with Avatar & Badges -->
+        <div class="bg-gradient-to-r from-emerald-600 via-teal-700 to-blue-800 rounded-2xl p-6 text-white shadow-md flex flex-col md:flex-row md:items-center gap-5 justify-between">
+            <div class="flex items-center gap-4">
+                <div class="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl bg-white/20 backdrop-blur-xs flex items-center justify-center font-black text-2xl sm:text-3xl border-2 border-white/30 shrink-0 overflow-hidden shadow-inner" id="sp-avatar-box">
+                    <span id="sp-avatar-char">?</span>
+                </div>
+                <div>
+                    <div class="flex items-center gap-2 flex-wrap">
+                        <h3 id="sp-fullname" class="text-xl sm:text-2xl font-black text-white tracking-tight">Staff Member</h3>
+                        <span id="sp-status-badge" class="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold bg-emerald-100 text-emerald-800 border border-emerald-200">Active</span>
+                    </div>
+                    <p id="sp-title" class="text-xs sm:text-sm text-emerald-100 font-semibold mt-0.5">BCF-SL Personnel</p>
+                    <div class="flex items-center gap-2 mt-2 flex-wrap text-xs">
+                        <span class="bg-white/15 px-2.5 py-0.5 rounded-lg font-mono font-bold text-white tracking-wider" id="sp-empid-pill">BCF-SL-1001</span>
+                        <span class="bg-white/15 px-2.5 py-0.5 rounded-lg font-semibold text-white" id="sp-dept-pill">Department</span>
+                        <span class="bg-white/15 px-2.5 py-0.5 rounded-lg font-semibold text-white" id="sp-class-pill">Classification</span>
+                    </div>
+                </div>
+            </div>
+            <div class="flex md:flex-col items-center md:items-end justify-between border-t md:border-t-0 pt-3 md:pt-0 border-white/20">
+                <span class="text-[10px] uppercase font-bold text-white/70">Bandama Charity Foundation</span>
+                <span class="text-xs font-mono font-bold text-white/90">Sierra Leone Operations</span>
+            </div>
+        </div>
+
+        <!-- The 6 Requested Cards (Static, Crisp, Interactive) -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3.5">
+            <!-- 1. Full Name -->
+            <div class="bg-slate-50 border border-outline rounded-xl p-4 flex items-center gap-3.5 shadow-2xs">
+                <div class="w-11 h-11 rounded-xl bg-blue-50 text-secondary flex items-center justify-center shrink-0">
+                    <span class="material-symbols-outlined text-[24px]">person</span>
+                </div>
+                <div class="flex-1 min-w-0">
+                    <span class="text-[10px] uppercase font-bold text-on-surface-variant tracking-wider block">Full Name</span>
+                    <span id="sp-val-name" class="font-extrabold text-sm sm:text-base text-on-surface truncate block">-</span>
+                </div>
+            </div>
+
+            <!-- 2. Employee ID -->
+            <div class="bg-slate-50 border border-outline rounded-xl p-4 flex items-center gap-3.5 shadow-2xs">
+                <div class="w-11 h-11 rounded-xl bg-purple-50 text-tertiary flex items-center justify-center shrink-0">
+                    <span class="material-symbols-outlined text-[24px]">badge</span>
+                </div>
+                <div class="flex-1 min-w-0">
+                    <span class="text-[10px] uppercase font-bold text-on-surface-variant tracking-wider block">Employee ID</span>
+                    <span id="sp-val-id" class="font-mono font-bold text-sm text-secondary truncate block">-</span>
+                </div>
+            </div>
+
+            <!-- 3. Department -->
+            <div class="bg-slate-50 border border-outline rounded-xl p-4 flex items-center gap-3.5 shadow-2xs">
+                <div class="w-11 h-11 rounded-xl bg-emerald-50 text-primary flex items-center justify-center shrink-0">
+                    <span class="material-symbols-outlined text-[24px]">domain</span>
+                </div>
+                <div class="flex-1 min-w-0">
+                    <span class="text-[10px] uppercase font-bold text-on-surface-variant tracking-wider block">Department</span>
+                    <span id="sp-val-dept" class="font-semibold text-sm text-on-surface truncate block">-</span>
+                </div>
+            </div>
+
+            <!-- 4. Classification -->
+            <div class="bg-slate-50 border border-outline rounded-xl p-4 flex items-center gap-3.5 shadow-2xs">
+                <div class="w-11 h-11 rounded-xl bg-amber-50 text-amber-700 flex items-center justify-center shrink-0">
+                    <span class="material-symbols-outlined text-[24px]">category</span>
+                </div>
+                <div class="flex-1 min-w-0">
+                    <span class="text-[10px] uppercase font-bold text-on-surface-variant tracking-wider block">Classification</span>
+                    <span id="sp-val-class" class="font-semibold text-sm text-on-surface truncate block">-</span>
+                </div>
+            </div>
+
+            <!-- 5. Phone -->
+            <div class="bg-slate-50 border border-outline rounded-xl p-4 flex items-center gap-3.5 shadow-2xs">
+                <div class="w-11 h-11 rounded-xl bg-sky-50 text-sky-700 flex items-center justify-center shrink-0">
+                    <span class="material-symbols-outlined text-[24px]">call</span>
+                </div>
+                <div class="flex-1 min-w-0">
+                    <span class="text-[10px] uppercase font-bold text-on-surface-variant tracking-wider block">Official Phone</span>
+                    <a id="sp-val-phone" href="#" class="font-semibold text-sm text-on-surface hover:text-primary truncate block">-</a>
+                </div>
+            </div>
+
+            <!-- 6. Email -->
+            <div class="bg-slate-50 border border-outline rounded-xl p-4 flex items-center gap-3.5 shadow-2xs">
+                <div class="w-11 h-11 rounded-xl bg-indigo-50 text-indigo-700 flex items-center justify-center shrink-0">
+                    <span class="material-symbols-outlined text-[24px]">mail</span>
+                </div>
+                <div class="flex-1 min-w-0">
+                    <span class="text-[10px] uppercase font-bold text-on-surface-variant tracking-wider block">Official Email</span>
+                    <a id="sp-val-email" href="#" class="font-semibold text-sm text-on-surface hover:text-secondary truncate block">-</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Additional Static Particulars -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <!-- Position & Organisation Details -->
+            <div class="bg-white border border-outline rounded-xl p-4 flex flex-col gap-2.5">
+                <div class="flex items-center gap-2 text-primary font-bold text-xs uppercase tracking-wider pb-2 border-b border-outline">
+                    <span class="material-symbols-outlined text-[16px]">corporate_fare</span>
+                    <span>Organisational Placement</span>
+                </div>
+                <div class="grid grid-cols-2 gap-3 text-xs">
+                    <div>
+                        <span class="text-slate-500 text-[10px] uppercase font-semibold block">Designation / Title</span>
+                        <span id="sp-val-title" class="font-bold text-slate-800">-</span>
+                    </div>
+                    <div>
+                        <span class="text-slate-500 text-[10px] uppercase font-semibold block">Unit / Section</span>
+                        <span id="sp-val-unit" class="font-bold text-slate-800">-</span>
+                    </div>
+                    <div>
+                        <span class="text-slate-500 text-[10px] uppercase font-semibold block">Management Level</span>
+                        <span id="sp-val-mgmt" class="font-bold text-slate-800">-</span>
+                    </div>
+                    <div>
+                        <span class="text-slate-500 text-[10px] uppercase font-semibold block">Job Level</span>
+                        <span id="sp-val-job" class="font-bold text-slate-800">-</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Work Location & Engagement -->
+            <div class="bg-white border border-outline rounded-xl p-4 flex flex-col gap-2.5">
+                <div class="flex items-center gap-2 text-secondary font-bold text-xs uppercase tracking-wider pb-2 border-b border-outline">
+                    <span class="material-symbols-outlined text-[16px]">location_on</span>
+                    <span>Work Location &amp; Engagement</span>
+                </div>
+                <div class="grid grid-cols-2 gap-3 text-xs">
+                    <div>
+                        <span class="text-slate-500 text-[10px] uppercase font-semibold block">Duty Station</span>
+                        <span id="sp-val-location" class="font-bold text-slate-800">-</span>
+                    </div>
+                    <div>
+                        <span class="text-slate-500 text-[10px] uppercase font-semibold block">Reports To</span>
+                        <span id="sp-val-reports" class="font-bold text-slate-800">-</span>
+                    </div>
+                    <div>
+                        <span class="text-slate-500 text-[10px] uppercase font-semibold block">Employment Date</span>
+                        <span id="sp-val-empdate" class="font-mono font-bold text-slate-800">-</span>
+                    </div>
+                    <div>
+                        <span class="text-slate-500 text-[10px] uppercase font-semibold block">Registry Status</span>
+                        <span id="sp-val-status" class="font-bold text-emerald-700">Active Record</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Static Footer with Actions -->
+        <div class="pt-4 border-t border-outline flex flex-col sm:flex-row items-center justify-between gap-3">
+            <a id="sp-full-profile-link" href="../employee_profile_detail/code.html" onclick="navToApp('/employees/employee-profile', '../employee_profile_detail/code.html', event)" class="text-xs font-bold text-primary hover:underline flex items-center gap-1">
+                <span class="material-symbols-outlined text-[16px]">open_in_new</span>
+                <span>Open in Full Employee Profile Management System</span>
+            </a>
+            <div class="flex items-center gap-2 self-end sm:self-auto">
+                <button onclick="printStaticProfile()" class="px-4 py-2 border border-outline bg-white hover:bg-slate-100 text-on-surface-variant font-bold text-xs rounded-xl flex items-center gap-1.5 transition">
+                    <span class="material-symbols-outlined text-[16px]">print</span>
+                    <span>Print Official Summary</span>
+                </button>
+                <button onclick="backToDirectory()" class="px-6 py-2 bg-primary text-white font-bold text-xs rounded-xl hover:bg-primary-dark transition shadow-sm">
+                    Close &amp; Back to Directory
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ==================== VIEW EMPLOYEE MODAL (FALLBACK DIALOG) ==================== -->
+<div id="view-modal" class="fixed inset-0 z-50 hidden bg-slate-900/40 flex items-center justify-center p-4">
+    <div class="bg-surface rounded-2xl border border-outline shadow-2xl max-w-lg w-full overflow-hidden flex flex-col">
+        <!-- Header -->
+        <div class="p-5 border-b border-outline flex items-center justify-between bg-slate-50">
+            <div class="flex items-center gap-3">
+                <div class="w-11 h-11 rounded-full bg-primary/10 text-primary flex items-center justify-center font-extrabold text-base" id="m-avatar">?</div>
+                <div>
+                    <h3 class="font-extrabold text-base text-on-surface" id="m-header-name">Employee Details</h3>
+                    <p class="text-xs text-on-surface-variant font-mono" id="m-header-id"></p>
+                </div>
+            </div>
+            <button onclick="closeViewModal()" class="w-8 h-8 rounded-full hover:bg-slate-200 text-slate-500 flex items-center justify-center transition">
+                <span class="material-symbols-outlined text-[20px]">close</span>
+            </button>
+        </div>
+
+        <!-- Body: ONLY Full Name, Employee ID, Department, Classification, Phone, Email -->
+        <div class="p-6 flex flex-col gap-3.5">
+            <!-- 1. Full Name -->
+            <div class="bg-slate-50 border border-outline rounded-xl p-3.5 flex items-center gap-3.5">
+                <div class="w-10 h-10 rounded-lg bg-blue-50 text-secondary flex items-center justify-center shrink-0">
+                    <span class="material-symbols-outlined text-[22px]">person</span>
+                </div>
+                <div class="flex-1 min-w-0">
+                    <span class="text-[10px] uppercase font-bold text-on-surface-variant tracking-wider block">Full Name</span>
+                    <span id="m-name" class="font-extrabold text-base text-on-surface truncate block">-</span>
+                </div>
+            </div>
+
+            <!-- 2. Employee ID -->
+            <div class="bg-slate-50 border border-outline rounded-xl p-3.5 flex items-center gap-3.5">
+                <div class="w-10 h-10 rounded-lg bg-purple-50 text-tertiary flex items-center justify-center shrink-0">
+                    <span class="material-symbols-outlined text-[22px]">badge</span>
+                </div>
+                <div class="flex-1 min-w-0">
+                    <span class="text-[10px] uppercase font-bold text-on-surface-variant tracking-wider block">Employee ID</span>
+                    <span id="m-id" class="font-mono font-bold text-sm text-secondary truncate block">-</span>
+                </div>
+            </div>
+
+            <!-- 3. Department -->
+            <div class="bg-slate-50 border border-outline rounded-xl p-3.5 flex items-center gap-3.5">
+                <div class="w-10 h-10 rounded-lg bg-emerald-50 text-primary flex items-center justify-center shrink-0">
+                    <span class="material-symbols-outlined text-[22px]">domain</span>
+                </div>
+                <div class="flex-1 min-w-0">
+                    <span class="text-[10px] uppercase font-bold text-on-surface-variant tracking-wider block">Department</span>
+                    <span id="m-dept" class="font-semibold text-sm text-on-surface truncate block">-</span>
+                </div>
+            </div>
+
+            <!-- 4. Classification -->
+            <div class="bg-slate-50 border border-outline rounded-xl p-3.5 flex items-center gap-3.5">
+                <div class="w-10 h-10 rounded-lg bg-amber-50 text-amber-700 flex items-center justify-center shrink-0">
+                    <span class="material-symbols-outlined text-[22px]">category</span>
+                </div>
+                <div class="flex-1 min-w-0">
+                    <span class="text-[10px] uppercase font-bold text-on-surface-variant tracking-wider block">Classification</span>
+                    <span id="m-class" class="font-semibold text-sm text-on-surface truncate block">-</span>
+                </div>
+            </div>
+
+            <!-- 5. Phone -->
+            <div class="bg-slate-50 border border-outline rounded-xl p-3.5 flex items-center gap-3.5">
+                <div class="w-10 h-10 rounded-lg bg-sky-50 text-sky-700 flex items-center justify-center shrink-0">
+                    <span class="material-symbols-outlined text-[22px]">call</span>
+                </div>
+                <div class="flex-1 min-w-0">
+                    <span class="text-[10px] uppercase font-bold text-on-surface-variant tracking-wider block">Phone</span>
+                    <a id="m-phone" href="#" class="font-semibold text-sm text-on-surface hover:text-primary truncate block">-</a>
+                </div>
+            </div>
+
+            <!-- 6. Email -->
+            <div class="bg-slate-50 border border-outline rounded-xl p-3.5 flex items-center gap-3.5">
+                <div class="w-10 h-10 rounded-lg bg-indigo-50 text-indigo-700 flex items-center justify-center shrink-0">
+                    <span class="material-symbols-outlined text-[22px]">mail</span>
+                </div>
+                <div class="flex-1 min-w-0">
+                    <span class="text-[10px] uppercase font-bold text-on-surface-variant tracking-wider block">Email</span>
+                    <a id="m-email" href="#" class="font-semibold text-sm text-on-surface hover:text-secondary truncate block">-</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="p-4 border-t border-outline bg-slate-50 flex items-center justify-between">
+            <button onclick="printCurrentEmployee()" class="px-4 py-2 border border-outline bg-white hover:bg-slate-100 text-on-surface-variant font-bold text-xs rounded-lg flex items-center gap-1.5 transition">
+                <span class="material-symbols-outlined text-[16px]">print</span>
+                <span>Print</span>
+            </button>
+            <button onclick="closeViewModal()" class="px-6 py-2 bg-primary text-white font-bold text-xs rounded-lg hover:bg-primary-dark transition shadow-sm">
+                Close
+            </button>
+        </div>
+    </div>
+</div>
+
+<script>
+    let registry = JSON.parse(localStorage.getItem('bcf_staff_registry') || '[]');
+    let filteredRegistry = [];
+    let charts = {};
+    let activeEmployee = null;
+    let activeClassFilter = 'ALL';
+
+    // RBAC ROLES DEFINITION
+    const ROLES = {
+        'staff': {
+            name: 'Staff',
+            level: 'Staff View',
+            canRegister: false,
+            canViewProfiles: true
+        },
+        'super_admin': {
+            name: 'Super Admin',
+            level: 'Full Access',
+            canRegister: true,
+            canViewProfiles: true
+        },
+        'hr_director': {
+            name: 'HR Director',
+            level: 'Full Access',
+            canRegister: true,
+            canViewProfiles: true
+        },
+        'ceo': {
+            name: 'CEO',
+            level: 'View Access',
+            canRegister: false,
+            canViewProfiles: true
+        },
+        'finance_director': {
+            name: 'Finance Director',
+            level: 'View Access',
+            canRegister: false,
+            canViewProfiles: true
+        },
+        'audit_director': {
+            name: 'Internal Risk & Audits Director',
+            level: 'View Access',
+            canRegister: false,
+            canViewProfiles: true
+        }
+    };
+
+    function getEffectiveSystemRole() {
+        let auth = null;
+        try {
+            if (typeof window !== 'undefined' && window.parent && window.parent !== window) {
+                const raw = window.parent.sessionStorage.getItem('bcf_sl_auth') || window.parent.localStorage.getItem('bcf_sl_auth');
+                if (raw) auth = typeof raw === 'string' ? JSON.parse(raw) : raw;
+            }
+        } catch (_) {}
+        if (!auth) {
+            try {
+                const raw = sessionStorage.getItem('bcf_sl_auth') || localStorage.getItem('bcf_sl_auth');
+                if (raw) auth = typeof raw === 'string' ? JSON.parse(raw) : raw;
+            } catch (_) {}
+        }
+        const user = auth && auth.user ? auth.user : auth;
+        if (!user) {
+            const savedRole = localStorage.getItem('bcf_user_role');
+            if (savedRole && ROLES[savedRole.toLowerCase()]) return savedRole.toLowerCase();
+            return 'staff';
+        }
+        const r = (user.role || '').toUpperCase();
+        const u = (user.username || '').toLowerCase();
+        const em = (user.email || '').toLowerCase();
+        const name = (user.name || '').toLowerCase();
+        const id = (user.employeeId || '').toUpperCase();
+
+        if (r === 'SA' || r === 'SUPER ADMIN' || r === 'SUPER ADMINISTRATOR' || u === 'admin' || u === 'abandama' || em === 'admin@bcfsl.org' || em === 'admin@bcf-sl.org' || name.includes('bandama') || id === 'BCF-PTE-2026-0001') {
+            return 'super_admin';
+        }
+        if (r === 'HR' || r === 'HR DIRECTOR' || u === 'hr_director') {
+            return 'hr_director';
+        }
+        if (r === 'CEO' || u === 'ceo_user') {
+            return 'ceo';
+        }
+        if (r === 'FIN' || r === 'FINANCE' || u === 'fin_director') {
+            return 'finance_director';
+        }
+        if (r === 'IAR' || r === 'INTERNAL AUDIT' || u === 'iar_director') {
+            return 'audit_director';
+        }
+        return 'staff';
+    }
+
+    let activeRole = getEffectiveSystemRole();
+
+    function applyRole(roleKey) {
+        activeRole = roleKey || getEffectiveSystemRole();
+        const config = ROLES[activeRole] || ROLES['super_admin'];
+
+        // Automatically govern action buttons visibility based on system RBAC rights
+        const btnReg = document.getElementById('btn-register-staff');
+        if(btnReg) {
+            btnReg.style.display = config.canRegister ? 'inline-flex' : 'none';
+        }
+
+        const btnProf = document.getElementById('btn-employee-profiles');
+        if(btnProf) {
+            btnProf.style.display = config.canViewProfiles ? 'inline-flex' : 'none';
+        }
+    }
+
+    // Real-time synchronization when parent Next.js session updates
+    window.addEventListener('message', function(e) {
+        if (e.data && e.data.type === 'BCF_AUTH_SYNC') {
+            applyRole(getEffectiveSystemRole());
+        }
+    });
+
+    function resetToStaff() {
+        applyRole('staff');
+    }
+
+    // Classification Colors & Badges
+    const clsBadges = {
+        'Permanent': 'bg-blue-50 text-blue-700 border-blue-200',
+        'Fixed-Term Contract': 'bg-purple-50 text-purple-700 border-purple-200',
+        'Part-Time': 'bg-orange-50 text-orange-700 border-orange-200',
+        'Casual': 'bg-yellow-50 text-yellow-800 border-yellow-200',
+        'Consultant': 'bg-cyan-50 text-cyan-700 border-cyan-200',
+        'Volunteer': 'bg-emerald-50 text-emerald-700 border-emerald-200',
+        'Intern': 'bg-pink-50 text-pink-700 border-pink-200'
+    };
+
+    // STAT CARDS (Top Analytics) & INTERACTIVE BUTTON FILTERING
+    function buildStatCards() {
+        const total = registry.length;
+        const totalBadge = document.getElementById('stat-total-badge');
+        if (totalBadge) totalBadge.textContent = total + ' Total Staff';
+
+        const cls = ['Permanent','Fixed-Term Contract','Part-Time','Casual','Consultant','Volunteer','Intern'];
+        const clsIcons = {
+            'Permanent': 'badge',
+            'Fixed-Term Contract': 'contract',
+            'Part-Time': 'schedule',
+            'Casual': 'hourglass_bottom',
+            'Consultant': 'person_pin',
+            'Volunteer': 'volunteer_activism',
+            'Intern': 'school'
+        };
+        const clsColors = {
+            'total': '#16a34a',
+            'Permanent': '#2563eb',
+            'Fixed-Term Contract': '#9333ea',
+            'Part-Time': '#ea580c',
+            'Casual': '#ca8a04',
+            'Consultant': '#0891b2',
+            'Volunteer': '#16a34a',
+            'Intern': '#db2777'
+        };
+
+        let cards = [
+            { key: 'ALL', label: 'TOTAL STAFF', val: total, icon: 'groups', color: clsColors.total }
+        ];
+        cls.forEach(c => {
+            const count = registry.filter(e => (e.classification||'').toLowerCase() === c.toLowerCase()).length;
+            cards.push({ key: c, label: c.toUpperCase(), val: count, icon: clsIcons[c] || 'person', color: clsColors[c] });
+        });
+
+        document.getElementById('stat-cards').innerHTML = cards.map(c => {
+            const isActive = (c.key === 'ALL' && activeClassFilter === 'ALL') || 
+                             (c.key.toLowerCase() === activeClassFilter.toLowerCase());
+
+            const activeClassNames = isActive 
+                ? `border-2 bg-white shadow-md -translate-y-1 ring-2 ring-offset-1` 
+                : `bg-slate-50 border border-outline hover:bg-white hover:border-slate-400 hover:shadow-sm hover:-translate-y-0.5`;
+
+            const activeStyle = isActive 
+                ? `border-color: ${c.color}; --tw-ring-color: ${c.color}66; ring-color: ${c.color};` 
+                : '';
+
+            return `
+            <button type="button" 
+                    onclick="selectStatCard('${c.key}')" 
+                    title="Click to filter by ${c.label}"
+                    aria-pressed="${isActive}"
+                    style="${activeStyle}"
+                    class="stat-card ${activeClassNames} rounded-xl p-3 text-center cursor-pointer flex flex-col items-center justify-center transition-all duration-200 group focus:outline-none w-full">
+                <span class="material-symbols-outlined text-2xl mb-1 group-hover:scale-110 transition-transform" style="color: ${c.color}">${c.icon}</span>
+                <div class="text-2xl font-extrabold tracking-tight" style="color: ${c.color}">${c.val}</div>
+                <div class="text-[8pt] font-bold text-on-surface-variant uppercase mt-0.5 truncate w-full">${c.label}</div>
+                ${isActive ? `<span class="inline-flex items-center gap-1 text-[8px] font-black uppercase px-2 py-0.5 rounded-full mt-1.5 tracking-wider shadow-xs" style="background-color: ${c.color}15; color: ${c.color}">● Active Filter</span>` : `<span class="text-[8px] font-semibold text-slate-400 opacity-0 group-hover:opacity-100 transition-opacity mt-1">Click to filter</span>`}
+            </button>
+            `;
+        }).join('');
+    }
+
+    function selectStatCard(clsKey) {
+        const classSelect = document.getElementById('filter-class');
+        
+        if (clsKey === 'ALL' || clsKey === '') {
+            activeClassFilter = 'ALL';
+            if (classSelect) classSelect.value = '';
+        } else if (activeClassFilter.toLowerCase() === clsKey.toLowerCase()) {
+            // Clicking the currently active card toggles back to ALL
+            activeClassFilter = 'ALL';
+            if (classSelect) classSelect.value = '';
+        } else {
+            activeClassFilter = clsKey;
+            if (classSelect) classSelect.value = clsKey;
+        }
+
+        applyFilters(true);
+        buildStatCards();
+
+        // Smooth scroll to table results
+        const tableCard = document.getElementById('dir-table-body')?.closest('.bg-surface');
+        if (tableCard) {
+            tableCard.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+    }
+
+    // CHARTS (Top Analytics)
+    function buildCharts() {
+        const palette = ['#16a34a','#2563eb','#9333ea','#ea580c','#ca8a04','#0891b2','#db2777','#475569','#059669'];
+
+        // 1. Dept Chart
+        const deptsShort = ['Exec','Finance','H&S','HR','IT','Audit','Legal','Procure','Programs'];
+        const deptsFull = [
+            'Executive Management',
+            'Finance Department',
+            'Health & Safety Department',
+            'Human Resources Management Department',
+            'Information Technology (IT) Department',
+            'Internal Risk & Audits Department',
+            'Legal & Communication Department',
+            'Procurement Department',
+            'Programs Department'
+        ];
+        const deptCounts = deptsFull.map(d => registry.filter(e => e.department === d).length);
+        renderChart('chart-dept', 'bar', deptsShort, deptCounts, palette);
+
+        // 2. Classification Chart
+        const clsList = ['Permanent','Fixed-Term Contract','Part-Time','Casual','Consultant','Volunteer','Intern'];
+        const clsCounts = clsList.map(c => registry.filter(e => (e.classification||'').toLowerCase() === c.toLowerCase()).length);
+        renderChart('chart-class', 'doughnut', clsList, clsCounts, palette);
+
+        // 3. Mgmt Level Chart
+        const mgmts = ['Top Mgmt','Middle','Lower','Employee','Volunteer','Intern'];
+        const mgmtFull = ['Top Management','Middle Management','Lower Management','Employee','Volunteer','Intern'];
+        const mgmtCounts = mgmtFull.map(m => registry.filter(e => (e.mgmtLevel||'').includes(m) || e.mgmtLevel === m).length);
+        renderChart('chart-mgmt', 'bar', mgmts, mgmtCounts, palette);
+
+        // 4. Job Level Chart
+        const jobs = ['Exec','Director','Manager','Asst. Mgr','Officer','Assistant','Support'];
+        const jobFull = ['Executive','Director','Manager','Assistant Manager','Officer','Assistant','Support Staff'];
+        const jobCounts = jobFull.map(j => registry.filter(e => (e.jobLevel||'') === j).length);
+        renderChart('chart-job', 'bar', jobs, jobCounts, palette);
+    }
+
+    function renderChart(id, type, labels, data, colors) {
+        if(charts[id]) charts[id].destroy();
+        const canvas = document.getElementById(id);
+        if(!canvas) return;
+        const ctx = canvas.getContext('2d');
+        charts[id] = new Chart(ctx, {
+            type: type,
+            data: {
+                labels: labels,
+                datasets: [{
+                    data: data,
+                    backgroundColor: colors,
+                    borderWidth: type === 'bar' ? 0 : 2,
+                    borderColor: '#fff',
+                    borderRadius: type === 'bar' ? 4 : 0
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: type !== 'bar',
+                        position: 'bottom',
+                        labels: { font: { size: 9, family: 'Inter' }, boxWidth: 10, padding: 6 }
+                    }
+                },
+                scales: type === 'bar' ? {
+                    y: { beginAtZero: true, ticks: { stepSize: 1, font: { size: 9 } }, grid: { color: '#f1f5f9' } },
+                    x: { ticks: { font: { size: 8 } }, grid: { display: false } }
+                } : {}
+            }
+        });
+    }
+
+    // SEARCH & FILTER LOGIC
+    function applyFilters(skipStatCardsUpdate) {
+        const q = (document.getElementById('search-name').value || '').trim().toLowerCase();
+        const dept = document.getElementById('filter-dept').value;
+        const cls = document.getElementById('filter-class').value;
+        const mgmt = document.getElementById('filter-mgmt').value;
+        const level = document.getElementById('filter-level').value;
+
+        activeClassFilter = cls ? cls : 'ALL';
+
+        filteredRegistry = registry.filter(e => {
+            const matchName = !q || (e.fullName || '').toLowerCase().includes(q);
+            const matchDept = !dept || e.department === dept;
+            const matchCls = !cls || (e.classification || '').toLowerCase() === cls.toLowerCase();
+            const matchMgmt = !mgmt || (e.mgmtLevel || '') === mgmt;
+            const matchLevel = !level || (e.jobLevel || '') === level;
+            return matchName && matchDept && matchCls && matchMgmt && matchLevel;
+        });
+
+        renderDirectory();
+
+        if (!skipStatCardsUpdate) {
+            buildStatCards();
+        }
+    }
+
+    function resetFilters() {
+        document.getElementById('search-name').value = '';
+        document.getElementById('filter-dept').value = '';
+        document.getElementById('filter-class').value = '';
+        document.getElementById('filter-mgmt').value = '';
+        document.getElementById('filter-level').value = '';
+        activeClassFilter = 'ALL';
+        filteredRegistry = registry;
+        renderDirectory();
+        buildStatCards();
+    }
+
+    // RENDER TABLE - ONLY THE SPECIFIED FIELDS:
+    // Full Name, Employee ID, Department, Classification, Phone, Email
+    function renderDirectory() {
+        const tbody = document.getElementById('dir-table-body');
+        const empty = document.getElementById('dir-empty');
+        const countBadge = document.getElementById('results-count');
+
+        const data = filteredRegistry;
+        const filterNotice = activeClassFilter !== 'ALL' ? ` (Filtered by: ${activeClassFilter})` : '';
+        countBadge.textContent = `Showing ${data.length} of ${registry.length} Employees${filterNotice}`;
+
+        if(data.length === 0) {
+            tbody.innerHTML = '';
+            empty.classList.remove('hidden');
+            return;
+        }
+        empty.classList.add('hidden');
+
+        tbody.innerHTML = data.map(e => {
+            const cls = e.classification || 'Permanent';
+            const badgeStyle = clsBadges[cls] || 'bg-slate-100 text-slate-700 border-slate-200';
+            const phone = e.phone || e.workPhone || '-';
+            const email = e.email || e.workEmail || '-';
+            const deptDisplay = (e.department || '-').replace(' Department', '');
+
+            return `
+                <tr onclick="viewEmployee('${e.employeeId}')" class="hover:bg-slate-50 transition-colors fade-in text-on-surface cursor-pointer">
+                    <!-- 1. Full Name -->
+                    <td class="px-5 py-4 whitespace-nowrap">
+                        <div class="flex items-center gap-3">
+                            ${(e.photo || e.passportPhoto) 
+                                ? `<img src="${e.photo || e.passportPhoto}" class="w-8 h-8 rounded-full object-cover border border-slate-200 shrink-0 bg-white" alt="Photo"/>` 
+                                : `<div class="w-8 h-8 rounded-full bg-primary/10 text-primary font-bold text-xs flex items-center justify-center shrink-0">${(e.fullName||'?').charAt(0).toUpperCase()}</div>`
+                            }
+                            <span class="font-bold text-on-surface text-sm">${e.fullName || '-'}</span>
+                        </div>
+                    </td>
+
+                    <!-- 2. Employee ID -->
+                    <td class="px-5 py-4 whitespace-nowrap">
+                        <span class="font-mono text-xs font-bold text-secondary bg-blue-50 border border-blue-200 px-2.5 py-1 rounded-md whitespace-nowrap inline-block">
+                            ${e.employeeId || '-'}
+                        </span>
+                    </td>
+
+                    <!-- 3. Department -->
+                    <td class="px-5 py-4 text-xs font-semibold text-on-surface whitespace-nowrap">
+                        ${deptDisplay}
+                    </td>
+
+                    <!-- 4. Classification -->
+                    <td class="px-5 py-4 whitespace-nowrap">
+                        <span class="text-xs font-semibold px-2.5 py-1 rounded-md border whitespace-nowrap ${badgeStyle}">
+                            ${cls}
+                        </span>
+                    </td>
+
+                    <!-- 5. Phone -->
+                    <td class="px-5 py-4 text-xs whitespace-nowrap" onclick="event.stopPropagation()">
+                        ${phone !== '-' ? `<a href="tel:${phone}" class="font-medium text-slate-700 hover:text-primary flex items-center gap-1.5"><span class="material-symbols-outlined text-[15px] text-gray-400">call</span> ${phone}</a>` : '<span class="text-gray-400">-</span>'}
+                    </td>
+
+                    <!-- 6. Email -->
+                    <td class="px-5 py-4 text-xs whitespace-nowrap" onclick="event.stopPropagation()">
+                        ${email !== '-' ? `<a href="mailto:${email}" class="font-medium text-slate-700 hover:text-secondary flex items-center gap-1.5"><span class="material-symbols-outlined text-[15px] text-gray-400">mail</span> ${email}</a>` : '<span class="text-gray-400">-</span>'}
+                    </td>
+
+                    <!-- 7. Actions (View Button) -->
+                    <td class="px-5 py-4 text-right whitespace-nowrap" onclick="event.stopPropagation()">
+                        <button onclick="viewEmployee('${e.employeeId}')" title="View Static Profile" 
+                            class="h-8 px-3 bg-primary/10 hover:bg-primary text-primary hover:text-white rounded-md font-bold text-xs inline-flex items-center gap-1 transition shadow-sm cursor-pointer">
+                            <span class="material-symbols-outlined text-[16px]">visibility</span>
+                            <span>View</span>
+                        </button>
+                    </td>
+                </tr>
+            `;
+        }).join('');
+    }
+
+    // VIEW EMPLOYEE (STATIC IN-PAGE DOSSIER VIEW - NO MODAL BACKDROP)
+    function viewEmployee(id) {
+        const emp = (registry && registry.find(e => (e.employeeId === id || e.id === id))) ||
+                    (filteredRegistry && filteredRegistry.find(e => (e.employeeId === id || e.id === id))) ||
+                    (registry && registry[0]);
+        if(!emp) return;
+        activeEmployee = emp;
+
+        // Persist selected profile for cross-app synchronization
+        try {
+            localStorage.setItem('bcf_selected_profile', JSON.stringify(emp));
+        } catch(e) {}
+
+        // Populate Static Profile View
+        const nameHeader = document.getElementById('sp-name-header');
+        if (nameHeader) nameHeader.textContent = emp.fullName || 'Employee Details';
+
+        const fullNameEl = document.getElementById('sp-fullname');
+        if (fullNameEl) fullNameEl.textContent = emp.fullName || '-';
+
+        const avatarBox = document.getElementById('sp-avatar-box');
+        const photoSrc = emp.photo || emp.passportPhoto;
+        if (avatarBox) {
+            if (photoSrc) {
+                avatarBox.innerHTML = `<img src="${photoSrc}" class="w-full h-full object-cover rounded-2xl bg-white" alt="${emp.fullName || 'Staff'}"/>`;
+            } else {
+                avatarBox.innerHTML = `<span id="sp-avatar-char" class="font-black text-2xl sm:text-3xl">${(emp.fullName || '?').charAt(0).toUpperCase()}</span>`;
+            }
+        }
+
+        const titleEl = document.getElementById('sp-title');
+        if (titleEl) titleEl.textContent = emp.title || emp.position || 'BCF-SL Personnel';
+
+        const statusBadge = document.getElementById('sp-status-badge');
+        if (statusBadge) statusBadge.textContent = emp.status || 'Active';
+
+        const empidPill = document.getElementById('sp-empid-pill');
+        if (empidPill) empidPill.textContent = emp.employeeId || emp.id || '-';
+
+        const deptPill = document.getElementById('sp-dept-pill');
+        if (deptPill) deptPill.textContent = emp.department || 'Department';
+
+        const classPill = document.getElementById('sp-class-pill');
+        if (classPill) classPill.textContent = emp.classification || 'Permanent';
+
+        // 1. Full Name
+        const valName = document.getElementById('sp-val-name');
+        if (valName) valName.textContent = emp.fullName || '-';
+
+        // 2. Employee ID
+        const valId = document.getElementById('sp-val-id');
+        if (valId) valId.textContent = emp.employeeId || emp.id || '-';
+
+        // 3. Department
+        const valDept = document.getElementById('sp-val-dept');
+        if (valDept) valDept.textContent = emp.department || '-';
+
+        // 4. Classification
+        const valClass = document.getElementById('sp-val-class');
+        if (valClass) valClass.textContent = emp.classification || 'Permanent';
+
+        // 5. Phone
+        const phone = emp.phone || emp.workPhone || '-';
+        const valPhone = document.getElementById('sp-val-phone');
+        if (valPhone) {
+            valPhone.textContent = phone;
+            valPhone.href = phone !== '-' ? `tel:${phone}` : '#';
+        }
+
+        // 6. Email
+        const email = emp.email || emp.workEmail || '-';
+        const valEmail = document.getElementById('sp-val-email');
+        if (valEmail) {
+            valEmail.textContent = email;
+            valEmail.href = email !== '-' ? `mailto:${email}` : '#';
+        }
+
+        // Additional Static Fields
+        const valTitle = document.getElementById('sp-val-title');
+        if (valTitle) valTitle.textContent = emp.title || emp.position || '-';
+
+        const valUnit = document.getElementById('sp-val-unit');
+        if (valUnit) valUnit.textContent = emp.unit || emp.section || 'General Operations';
+
+        const valMgmt = document.getElementById('sp-val-mgmt');
+        if (valMgmt) valMgmt.textContent = emp.mgmtLevel || emp.managementLevel || 'Operational Level';
+
+        const valJob = document.getElementById('sp-val-job');
+        if (valJob) valJob.textContent = emp.jobLevel || 'Officer';
+
+        const valLocation = document.getElementById('sp-val-location');
+        if (valLocation) valLocation.textContent = emp.workLocation || emp.dutyStation || 'BCF-SL Freetown Office';
+
+        const valReports = document.getElementById('sp-val-reports');
+        if (valReports) valReports.textContent = emp.reportsTo || emp.supervisor || 'Department Director';
+
+        const valEmpdate = document.getElementById('sp-val-empdate');
+        if (valEmpdate) valEmpdate.textContent = emp.empDate || emp.employmentDate || '2026-01-01';
+
+        const valStatus = document.getElementById('sp-val-status');
+        if (valStatus) valStatus.textContent = `${emp.status || 'Active'} Personnel`;
+
+        // Hide directory card and show static profile view cleanly in-page
+        const mainCard = document.getElementById('dir-main-card');
+        if (mainCard) mainCard.classList.add('hidden');
+
+        const staticProf = document.getElementById('static-profile-view');
+        if (staticProf) {
+            staticProf.classList.remove('hidden');
+            staticProf.classList.add('flex');
+        }
+
+        // Also update fallback modal fields for compatibility
+        const avatarEl = document.getElementById('m-avatar');
+        if (avatarEl) avatarEl.textContent = (emp.fullName || emp.name || '?').charAt(0).toUpperCase();
+        const headerNameEl = document.getElementById('m-header-name');
+        if (headerNameEl) headerNameEl.textContent = emp.fullName || emp.name || 'Employee Details';
+        const headerIdEl = document.getElementById('m-header-id');
+        if (headerIdEl) headerIdEl.textContent = emp.employeeId || emp.id || '';
+        const mName = document.getElementById('m-name'); if (mName) mName.textContent = emp.fullName || '-';
+        const mId = document.getElementById('m-id'); if (mId) mId.textContent = emp.employeeId || '-';
+        const mDept = document.getElementById('m-dept'); if (mDept) mDept.textContent = emp.department || '-';
+        const mClass = document.getElementById('m-class'); if (mClass) mClass.textContent = emp.classification || '-';
+        const mPhone = document.getElementById('m-phone'); if (mPhone) { mPhone.textContent = phone; mPhone.href = phone !== '-' ? `tel:${phone}` : '#'; }
+        const mEmail = document.getElementById('m-email'); if (mEmail) { mEmail.textContent = email; mEmail.href = email !== '-' ? `mailto:${email}` : '#'; }
+
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function backToDirectory() {
+        const staticProf = document.getElementById('static-profile-view');
+        if (staticProf) {
+            staticProf.classList.add('hidden');
+            staticProf.classList.remove('flex');
+        }
+        const mainCard = document.getElementById('dir-main-card');
+        if (mainCard) {
+            mainCard.classList.remove('hidden');
+        }
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function printStaticProfile() {
+        window.print();
+    }
+
+    function closeViewModal() {
+        backToDirectory();
+        const modal = document.getElementById('view-modal');
+        if (modal) {
+            modal.classList.add('hidden');
+            modal.style.display = 'none';
+        }
+    }
+
+    // Close modal on escape key
+    document.addEventListener('keydown', function(e) {
+        if(e.key === 'Escape') {
+            backToDirectory();
+            closeViewModal();
+            cancelAuth();
+        }
+    });
+
+    // Close modal when clicking outside
+    const vModal = document.getElementById('view-modal');
+    if (vModal) {
+        vModal.addEventListener('click', function(e) {
+            if(e.target === this) closeViewModal();
+        });
+    }
+
+    const aModal = document.getElementById('auth-modal');
+    if (aModal) {
+        aModal.addEventListener('click', function(e) {
+            if(e.target === this) cancelAuth();
+        });
+    }
+
+    function printCurrentEmployee() {
+        if(!activeEmployee) return;
+        window.print();
+    }
+
+    function showDate() {
+        const options = { weekday: 'long', year: 'numeric', month: 'short', day: 'numeric' };
+        document.getElementById('current-date').textContent = new Date().toLocaleDateString('en-US', options);
+    }
+
+    window.onload = function() {
+        showDate();
+        // Automatically inherit role and permissions from updated system access rights
+        activeRole = getEffectiveSystemRole();
+        applyRole(activeRole);
+        filteredRegistry = registry;
+        buildStatCards();
+        buildCharts();
+        renderDirectory();
+
+        // ─── Live Real-time Hydration from MongoDB Atlas ───
+        fetch('/api/employees')
+            .then(res => res.json())
+            .then(data => {
+                if (data.success && Array.isArray(data.data) && data.data.length > 0) {
+                    const map = new Map();
+                    // Load Atlas records
+                    data.data.forEach(e => {
+                        const id = e.employeeId || e.id;
+                        if (id) map.set(id, e);
+                    });
+                    // Merge local staff (preserves local edits)
+                    registry.forEach(e => {
+                        const id = e.employeeId || e.id;
+                        if (id) {
+                            const exist = map.get(id) || {};
+                            map.set(id, { ...exist, ...e });
+                        }
+                    });
+                    registry = Array.from(map.values());
+                    localStorage.setItem('bcf_staff_registry', JSON.stringify(registry));
+                    applyFilters();
+                    buildStatCards();
+                    buildCharts();
+                }
+            })
+            .catch(console.warn);
+    };
+</script>
+
+<script>
+    function navToApp(nextRoute, fallbackPath, e) {
+        if (e) e.preventDefault();
+        try {
+            if (window.top && window.top !== window && window.top.location) {
+                window.top.location.href = nextRoute;
+                return;
+            }
+        } catch(err) {}
+        window.location.href = fallbackPath;
+    }
+
+    function exportStaffCSV() {
+        let csv = "data:text/csv;charset=utf-8,";
+        csv += "Employee ID,Full Name,Department,Classification,Management Level,Job Level,Phone,Email\n";
+        const list = (typeof filteredRegistry !== "undefined" && filteredRegistry && filteredRegistry.length > 0) ? filteredRegistry : (typeof registry !== "undefined" ? registry : []);
+        list.forEach(e => {
+            csv += `"${e.employeeId || ''}","${(e.fullName || '').replace(/"/g, '""')}","${(e.department || '').replace(/"/g, '""')}","${(e.classification || '').replace(/"/g, '""')}","${(e.mgmtLevel || '').replace(/"/g, '""')}","${(e.jobLevel || '').replace(/"/g, '""')}","${(e.phone || e.workPhone || '').replace(/"/g, '""')}","${(e.email || e.workEmail || '').replace(/"/g, '""')}"\n`;
+        });
+        const encodedUri = encodeURI(csv);
+        const link = document.createElement("a");
+        link.setAttribute("href", encodedUri);
+        link.setAttribute("download", `BCF_SL_Staff_Directory_${new Date().toISOString().split('T')[0]}.csv`);
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    }
+    window.exportStaffCSV = exportStaffCSV;
+
+    function onRoleDropdownChange(role) {
+        if (typeof applyRole === "function") {
+            applyRole(role);
+        }
+    }
+    window.onRoleDropdownChange = onRoleDropdownChange;
+</script>
+
+</body>
+</html>

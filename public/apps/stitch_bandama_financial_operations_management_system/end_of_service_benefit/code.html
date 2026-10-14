@@ -1,0 +1,2292 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" name="viewport"/>
+  <title>BCF-SL — End of Service Benefit (EOSB) Management & Settlement Console</title>
+  
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <script id="tailwind-config">
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            primary: '#004328',
+            'primary-dark': '#002b1a',
+            'primary-container': '#0d5c3a',
+            'primary-light': '#E8F5EE',
+            'primary-fixed': '#a9f3c5',
+            'bcf-gold': '#D97706',
+            'bcf-blue': '#1A56DB',
+            'bcf-purple': '#7E22CE',
+            surface: '#F8FAFC',
+            'surface-card': '#FFFFFF',
+            outline: '#E2E8F0',
+            'on-surface': '#0F172A',
+            'on-surface-variant': '#475569'
+          },
+          fontFamily: {
+            sans: ['"Plus Jakarta Sans"', 'system-ui', 'sans-serif'],
+            mono: ['"JetBrains Mono"', 'monospace']
+          }
+        }
+      }
+    };
+  </script>
+
+  <style>
+    @layer base {
+      html, body {
+        width: 100%;
+        margin: 0;
+        padding: 0;
+        background-color: #f8fafc;
+        color: #0f172a;
+        font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+      }
+      body {
+        overscroll-behavior-y: none;
+        -webkit-tap-highlight-color: transparent;
+      }
+    }
+    .custom-scrollbar::-webkit-scrollbar {
+      width: 5px;
+      height: 5px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-track {
+      background: #f1f5f9;
+      border-radius: 4px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-thumb {
+      background: #cbd5e1;
+      border-radius: 4px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+      background: #94a3b8;
+    }
+    .stat-glow {
+      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .stat-glow:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 25px -5px rgba(0, 67, 40, 0.08);
+    }
+    .watermark-grid {
+      background-image: radial-gradient(#004328 0.65px, transparent 0.65px);
+      background-size: 18px 18px;
+      opacity: 0.04;
+    }
+    @page {
+      size: A4 portrait;
+      margin: 8mm 10mm 8mm 10mm;
+    }
+    @media print {
+      html, body {
+        width: 100% !important;
+        height: auto !important;
+        background: #ffffff !important;
+        color: #000000 !important;
+        font-size: 11px !important;
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+      }
+      body * {
+        visibility: hidden !important;
+      }
+      #printable-voucher-modal, #printable-voucher-modal * {
+        visibility: visible !important;
+      }
+      #printable-voucher-modal {
+        position: absolute !important;
+        left: 0 !important;
+        top: 0 !important;
+        width: 100% !important;
+        background: transparent !important;
+        padding: 0 !important;
+        margin: 0 !important;
+        display: block !important;
+        box-shadow: none !important;
+      }
+      #printable-voucher-card {
+        box-shadow: none !important;
+        border: 1px solid #94a3b8 !important;
+        max-width: 100% !important;
+        width: 100% !important;
+        margin: 0 !important;
+        padding: 6mm 8mm !important;
+        page-break-inside: avoid !important;
+        break-inside: avoid !important;
+      }
+      .no-print {
+        display: none !important;
+      }
+    }
+  </style>
+</head>
+
+<body class="bg-surface text-on-surface min-h-screen flex flex-col antialiased selection:bg-primary selection:text-white">
+
+  <!-- TOP INSTITUTIONAL HEADER -->
+  <header class="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-outline shadow-xs no-print">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="h-16 flex items-center justify-between gap-4">
+        
+        <!-- Brand / Identity -->
+        <div class="flex items-center gap-3 min-w-0">
+          <img src="../bandama_charity_foundation_logo/bcf_official_logo.png" 
+               alt="Bandama Charity Foundation" 
+               class="h-10 w-auto object-contain shrink-0" 
+               onerror="this.onerror=null; this.src='/bcf_official_logo.png'; if(!this.src) this.src='/bcf-logo.jpg';" />
+          <div class="flex flex-col min-w-0">
+            <div class="flex items-center gap-2 flex-wrap">
+              <span class="text-xs font-black tracking-widest text-primary uppercase">BCF-SL</span>
+              <span class="px-2 py-0.5 rounded text-[10px] font-extrabold bg-emerald-100 text-emerald-800 border border-emerald-200">
+                FINANCIAL OPERATIONS &bull; EOSB
+              </span>
+              <span class="hidden md:inline-flex items-center gap-1 text-[10px] font-mono text-slate-500">
+                <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+                Sierra Leone Labor Law &bull; ISO-4217: SLE
+              </span>
+            </div>
+            <h1 class="text-sm sm:text-base font-extrabold text-on-surface truncate leading-tight">
+              End of Service Benefit (EOSB) Management & Settlement Console
+            </h1>
+          </div>
+        </div>
+
+        <!-- Quick Actions & Guide Switcher -->
+        <div class="flex items-center gap-2 shrink-0">
+          <button type="button" 
+                  onclick="openGuideModal()" 
+                  class="h-9 px-3 rounded-lg border border-primary/30 bg-primary-light hover:bg-emerald-100 text-xs font-bold text-primary flex items-center gap-1.5 transition shadow-2xs active:scale-95"
+                  title="View Official BCF-SL EOSB Calculation Guide & Policy">
+            <span class="material-symbols-outlined text-[17px]">menu_book</span>
+            <span class="hidden sm:inline">Calculation Guide</span>
+          </button>
+
+          <button type="button" 
+                  onclick="openNewCaseModal()" 
+                  class="h-9 px-3.5 rounded-lg bg-primary hover:bg-primary-container text-white text-xs font-bold flex items-center gap-1.5 transition shadow-2xs active:scale-95">
+            <span class="material-symbols-outlined text-[17px]">add_circle</span>
+            <span>New Settlement Case</span>
+          </button>
+
+          <!-- Navigation back to Finance Hub / Other tabs -->
+          <div class="hidden lg:flex items-center gap-1 pl-2 border-l border-slate-200">
+            <button type="button" 
+                    onclick="window.top.location.href='/finance/staff-payroll-statutory-schedule'" 
+                    class="h-9 px-2.5 rounded-lg hover:bg-slate-100 text-slate-600 text-xs font-semibold flex items-center gap-1 transition"
+                    title="Staff Payroll Schedule">
+              <span class="material-symbols-outlined text-[16px] text-slate-500">payments</span>
+              <span>Payroll</span>
+            </button>
+            <button type="button" 
+                    onclick="window.top.location.href='/finance/staff-loan-register-disbursements'" 
+                    class="h-9 px-2.5 rounded-lg hover:bg-slate-100 text-slate-600 text-xs font-semibold flex items-center gap-1 transition"
+                    title="Staff Loan Disbursements">
+              <span class="material-symbols-outlined text-[16px] text-slate-500">price_check</span>
+              <span>Loans</span>
+            </button>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </header>
+
+  <!-- SUB-NAVIGATION STRIP (FINANCE MODULE TABS) -->
+  <div class="bg-white border-b border-outline px-4 sm:px-6 lg:px-8 py-2 overflow-x-auto custom-scrollbar no-print">
+    <div class="max-w-7xl mx-auto flex items-center gap-2 text-xs">
+      <span class="text-slate-400 font-bold uppercase tracking-wider text-[10px] shrink-0 mr-1">Finance Hub:</span>
+      <a href="#" onclick="window.top.location.href='/finance/donor-funds-inflow-ledger'; return false;" class="px-2.5 py-1 rounded-md text-slate-600 hover:text-primary hover:bg-slate-100 transition whitespace-nowrap">Donor Inflows</a>
+      <a href="#" onclick="window.top.location.href='/finance/program-expenditure-budgets'; return false;" class="px-2.5 py-1 rounded-md text-slate-600 hover:text-primary hover:bg-slate-100 transition whitespace-nowrap">Budgets</a>
+      <a href="#" onclick="window.top.location.href='/finance/executive-treasury-bank-balance'; return false;" class="px-2.5 py-1 rounded-md text-slate-600 hover:text-primary hover:bg-slate-100 transition whitespace-nowrap">Treasury</a>
+      <a href="#" onclick="window.top.location.href='/finance/staff-payroll-statutory-schedule'; return false;" class="px-2.5 py-1 rounded-md text-slate-600 hover:text-primary hover:bg-slate-100 transition whitespace-nowrap">Staff Payroll</a>
+      <a href="#" onclick="window.top.location.href='/finance/staff-monthly-payslip-self-service'; return false;" class="px-2.5 py-1 rounded-md text-slate-600 hover:text-primary hover:bg-slate-100 transition whitespace-nowrap">Payslips</a>
+      <a href="#" onclick="window.top.location.href='/finance/staff-loan-register-disbursements'; return false;" class="px-2.5 py-1 rounded-md text-slate-600 hover:text-primary hover:bg-slate-100 transition whitespace-nowrap">Loan Disbursements</a>
+      <span class="px-2.5 py-1 rounded-md bg-primary text-white font-bold whitespace-nowrap flex items-center gap-1 shadow-2xs">
+        <span class="material-symbols-outlined text-[14px]">handshake</span>
+        End of Service (EOSB)
+      </span>
+    </div>
+  </div>
+
+  <!-- MAIN APPLICATION CONTENT -->
+  <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
+
+    <!-- HERO / BANNER POLICY SUMMARY -->
+    <section class="bg-gradient-to-r from-emerald-950 via-primary to-emerald-900 rounded-2xl p-6 text-white shadow-md relative overflow-hidden">
+      <div class="watermark-grid absolute inset-0 pointer-events-none"></div>
+      <div class="relative z-10 flex flex-col lg:flex-row lg:items-center justify-between gap-6">
+        <div class="max-w-3xl space-y-2">
+          <div class="flex items-center gap-2">
+            <span class="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold tracking-wider uppercase bg-emerald-400/20 text-emerald-200 border border-emerald-400/30">
+              BCF-SL HR & Finance Policy Standard
+            </span>
+            <span class="text-xs text-emerald-200/80 font-mono">Formula: Basic Monthly Salary &times; Years &times; Rate</span>
+          </div>
+          <h2 class="text-xl sm:text-2xl font-black tracking-tight text-white leading-tight">
+            End of Service Benefit (EOSB) Computation & Settlement Authority
+          </h2>
+          <p class="text-xs sm:text-sm text-emerald-100/90 leading-relaxed">
+            Recognizing staff loyalty, continuous service, and contribution to Bandama Charity Foundation Sierra Leone. 
+            Applies to proper resignation, retirement, contract completion, redundancy, or medical grounds — strictly in compliance with Sierra Leone labor standards.
+          </p>
+        </div>
+
+        <div class="flex flex-wrap lg:flex-col gap-2 shrink-0">
+          <button type="button" 
+                  onclick="scrollToCalculator()" 
+                  class="px-4 py-2 bg-white hover:bg-emerald-50 text-primary text-xs font-bold rounded-xl transition shadow-sm flex items-center gap-2 active:scale-95 cursor-pointer">
+            <span class="material-symbols-outlined text-[18px]">calculate</span>
+            <span>Launch EOSB Calculator</span>
+          </button>
+          <button type="button" 
+                  onclick="openGuideModal()" 
+                  class="px-4 py-2 bg-emerald-900/60 hover:bg-emerald-800/80 border border-emerald-400/30 text-white text-xs font-bold rounded-xl transition flex items-center gap-2 active:scale-95 cursor-pointer">
+            <span class="material-symbols-outlined text-[18px]">rule</span>
+            <span>View Benefit Rate Table</span>
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- KEY METRICS CARDS -->
+    <div class="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+      
+      <!-- Metric 1: Total Accrued / Paid -->
+      <div class="bg-white rounded-xl p-4 border border-outline shadow-2xs stat-glow">
+        <div class="flex items-center justify-between text-slate-500 mb-2">
+          <span class="text-[11px] font-bold uppercase tracking-wider truncate">Total EOSB Settled</span>
+          <div class="w-7 h-7 rounded-lg bg-emerald-50 text-emerald-700 flex items-center justify-center shrink-0">
+            <span class="material-symbols-outlined text-[18px]">account_balance_wallet</span>
+          </div>
+        </div>
+        <div class="text-lg sm:text-xl font-black text-slate-900 font-mono" id="kpi-total-disbursed">
+          SLE 168,750.00
+        </div>
+        <div class="text-[10px] text-emerald-700 font-semibold mt-1 flex items-center gap-1">
+          <span class="material-symbols-outlined text-[13px]">verified</span>
+          <span>100% Fully Disbursed &amp; Signed</span>
+        </div>
+      </div>
+
+      <!-- Metric 2: Pending Settlements -->
+      <div class="bg-white rounded-xl p-4 border border-outline shadow-2xs stat-glow">
+        <div class="flex items-center justify-between text-slate-500 mb-2">
+          <span class="text-[11px] font-bold uppercase tracking-wider truncate">Pending Settlements</span>
+          <div class="w-7 h-7 rounded-lg bg-amber-50 text-amber-600 flex items-center justify-center shrink-0">
+            <span class="material-symbols-outlined text-[18px]">pending_actions</span>
+          </div>
+        </div>
+        <div class="text-lg sm:text-xl font-black text-amber-600 font-mono" id="kpi-pending-cases">
+          2 Active Cases
+        </div>
+        <div class="text-[10px] text-slate-500 font-medium mt-1">
+          Audit &amp; Board Authorization
+        </div>
+      </div>
+
+      <!-- Metric 3: Active Staff Entitlement Pool -->
+      <div class="bg-white rounded-xl p-4 border border-outline shadow-2xs stat-glow">
+        <div class="flex items-center justify-between text-slate-500 mb-2">
+          <span class="text-[11px] font-bold uppercase tracking-wider truncate">Total Liability Reserve</span>
+          <div class="w-7 h-7 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center shrink-0">
+            <span class="material-symbols-outlined text-[18px]">savings</span>
+          </div>
+        </div>
+        <div class="text-lg sm:text-xl font-black text-blue-700 font-mono" id="kpi-total-liability">
+          SLE 492,000.00
+        </div>
+        <div class="text-[10px] text-slate-500 font-medium mt-1">
+          Actuarial Reserve Provision
+        </div>
+      </div>
+
+      <!-- Metric 4: Avg Continuous Service -->
+      <div class="bg-white rounded-xl p-4 border border-outline shadow-2xs stat-glow">
+        <div class="flex items-center justify-between text-slate-500 mb-2">
+          <span class="text-[11px] font-bold uppercase tracking-wider truncate text-slate-700">Avg Service Length</span>
+          <div class="w-7 h-7 rounded-lg bg-purple-50 text-purple-600 flex items-center justify-center shrink-0">
+            <span class="material-symbols-outlined text-[18px]">schedule</span>
+          </div>
+        </div>
+        <div class="text-lg sm:text-xl font-black text-purple-700 font-mono" id="kpi-avg-service">
+          4.5 Years
+        </div>
+        <div class="text-[10px] text-slate-500 font-medium mt-1">
+          Moderate to Long Tenure
+        </div>
+      </div>
+
+      <!-- Metric 5: Record Retention Period -->
+      <div class="bg-white rounded-xl p-4 border border-outline shadow-2xs stat-glow col-span-2 sm:col-span-2 lg:col-span-1">
+        <div class="flex items-center justify-between text-slate-500 mb-2">
+          <span class="text-[11px] font-bold uppercase tracking-wider truncate">Archival Retention</span>
+          <div class="w-7 h-7 rounded-lg bg-emerald-50 text-primary flex items-center justify-center shrink-0">
+            <span class="material-symbols-outlined text-[18px]">inventory_2</span>
+          </div>
+        </div>
+        <div class="text-lg sm:text-xl font-black text-primary font-mono">
+          5 Years Mandatory
+        </div>
+        <div class="text-[10px] text-slate-500 font-medium mt-1">
+          Hard &amp; Soft Copy Ledger
+        </div>
+      </div>
+
+    </div>
+
+    <!-- MAIN TWO-COLUMN WORKSPACE: CALCULATOR & REAL-TIME LEDGER -->
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+
+      <!-- LEFT COLUMN: INTERACTIVE EOSB CALCULATOR ENGINE (7 COLS) -->
+      <div class="lg:col-span-7 space-y-6" id="calculator-section">
+        
+        <div class="bg-white rounded-2xl border border-outline p-5 sm:p-6 shadow-xs relative">
+          
+          <!-- Card Header -->
+          <div class="flex items-center justify-between pb-4 border-b border-slate-100 gap-3">
+            <div class="flex items-center gap-2.5">
+              <div class="w-9 h-9 rounded-xl bg-emerald-50 text-primary border border-emerald-200 flex items-center justify-center font-bold">
+                <span class="material-symbols-outlined text-[20px]">calculate</span>
+              </div>
+              <div>
+                <h3 class="text-base font-extrabold text-slate-900 leading-tight">Interactive EOSB Computation Studio</h3>
+                <p class="text-xs text-slate-500">Live calculator based on BCF-SL Section 4 &amp; 6 Formula</p>
+              </div>
+            </div>
+
+            <!-- Pre-load Example Button -->
+            <button type="button" 
+                    onclick="loadGuideExample()" 
+                    class="h-8 px-2.5 rounded-lg border border-amber-300 bg-amber-50 hover:bg-amber-100 text-amber-900 text-xs font-bold inline-flex items-center gap-1 transition shadow-2xs active:scale-95"
+                    title="Load the 6-year, 10,000 SLE example from the Guide">
+              <span class="material-symbols-outlined text-[15px] text-amber-700">bolt</span>
+              <span>Load Guide Example</span>
+            </button>
+          </div>
+
+          <!-- STEP 1: EMPLOYEE SELECTION & PARTICULARS -->
+          <div class="mt-4 space-y-4">
+            
+            <div class="flex items-center justify-between">
+              <span class="text-xs font-black uppercase tracking-wider text-primary flex items-center gap-1.5">
+                <span class="w-5 h-5 rounded-full bg-emerald-100 text-emerald-800 text-[11px] font-mono flex items-center justify-center font-bold">1</span>
+                Employee Particulars &amp; Separation
+              </span>
+              <span class="text-[11px] text-slate-400">Syncs with Staff Registry</span>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              
+              <!-- Quick Select Employee -->
+              <div class="sm:col-span-2">
+                <div class="flex items-center justify-between mb-1">
+                  <label for="calc-staff-select" class="block text-xs font-bold text-slate-700">
+                    Select Employee from Registry (or enter custom)
+                  </label>
+                  <button type="button" 
+                          onclick="loadStaffRoster(true)" 
+                          class="text-primary hover:text-emerald-700 text-[11px] font-bold inline-flex items-center gap-1 transition"
+                          title="Reload registered staff from registry">
+                    <span class="material-symbols-outlined text-[14px]">sync</span>
+                    <span>Sync Registry</span>
+                  </button>
+                </div>
+                <div class="relative">
+                  <select id="calc-staff-select" 
+                          onchange="handleStaffSelectChange(this.value)" 
+                          class="w-full pl-3 pr-8 py-2 rounded-xl border border-slate-300 bg-slate-50/50 text-xs font-semibold text-slate-800 focus:outline-none focus:ring-2 focus:ring-primary focus:bg-white transition cursor-pointer">
+                    <!-- Populated dynamically via JS -->
+                  </select>
+                  <span class="material-symbols-outlined absolute right-2.5 top-2.5 text-slate-400 pointer-events-none text-[18px]">
+                    arrow_drop_down
+                  </span>
+                </div>
+              </div>
+
+              <!-- Employee Name -->
+              <div>
+                <label for="calc-emp-name" class="block text-[11px] font-bold text-slate-600 mb-1">Full Legal Name</label>
+                <input type="text" id="calc-emp-name" value="Albert Joseph Bandama" oninput="recalculate()" class="w-full px-3 py-1.5 rounded-lg border border-slate-300 text-xs font-bold text-slate-800 focus:outline-none focus:ring-2 focus:ring-primary" />
+              </div>
+
+              <!-- Employee ID -->
+              <div>
+                <label for="calc-emp-id" class="block text-[11px] font-bold text-slate-600 mb-1">Employee ID Number</label>
+                <input type="text" id="calc-emp-id" value="BCF-EMP-2026-0001" oninput="recalculate()" class="w-full px-3 py-1.5 rounded-lg border border-slate-300 text-xs font-mono font-bold text-slate-800 focus:outline-none focus:ring-2 focus:ring-primary" />
+              </div>
+
+              <!-- Department -->
+              <div>
+                <label for="calc-emp-dept" class="block text-[11px] font-bold text-slate-600 mb-1">Department</label>
+                <select id="calc-emp-dept" onchange="recalculate()" class="w-full px-2.5 py-1.5 rounded-lg border border-slate-300 text-xs font-semibold text-slate-800 focus:outline-none focus:ring-2 focus:ring-primary bg-white cursor-pointer">
+                  <option value="Programs Department">Programs Department</option>
+                  <option value="Programmes & Field Operations">Programmes & Field Operations</option>
+                  <option value="Finance Department">Finance Department</option>
+                  <option value="Finance & Accounts">Finance & Accounts</option>
+                  <option value="Human Resources Management Department">Human Resources Management Department</option>
+                  <option value="Human Resources & Admin">Human Resources & Admin</option>
+                  <option value="Executive Management">Executive Management</option>
+                  <option value="Executive Secretariat">Executive Secretariat</option>
+                  <option value="Health & Safety Department">Health & Safety Department</option>
+                  <option value="Information Technology (IT) Department">Information Technology (IT) Department</option>
+                  <option value="Internal Risk & Audits Department">Internal Risk & Audits Department</option>
+                  <option value="Legal & Communication Department">Legal & Communication Department</option>
+                  <option value="Procurement Department">Procurement Department</option>
+                  <option value="Procurement & Logistics">Procurement & Logistics</option>
+                  <option value="Monitoring & Evaluation">Monitoring & Evaluation</option>
+                </select>
+              </div>
+
+              <!-- Job Title -->
+              <div>
+                <label for="calc-emp-title" class="block text-[11px] font-bold text-slate-600 mb-1">Position / Job Title</label>
+                <input type="text" id="calc-emp-title" value="Accounts Officer" oninput="recalculate()" class="w-full px-3 py-1.5 rounded-lg border border-slate-300 text-xs font-semibold text-slate-800 focus:outline-none focus:ring-2 focus:ring-primary" />
+              </div>
+
+            </div>
+
+            <!-- STEP 2: DATES, TENURE & SEPARATION GROUNDS -->
+            <div class="pt-3 border-t border-slate-100 space-y-3">
+              <span class="text-xs font-black uppercase tracking-wider text-primary flex items-center gap-1.5">
+                <span class="w-5 h-5 rounded-full bg-emerald-100 text-emerald-800 text-[11px] font-mono flex items-center justify-center font-bold">2</span>
+                Service Tenure &amp; Separation Eligibility
+              </span>
+
+              <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                <!-- Start Date -->
+                <div>
+                  <div class="flex items-center justify-between mb-1">
+                    <label for="calc-start-date" class="block text-[11px] font-bold text-slate-700">
+                      Continuous Start Date
+                    </label>
+                    <span class="text-[9px] font-extrabold uppercase px-1.5 py-0.2 rounded bg-emerald-100 text-emerald-800 border border-emerald-200">
+                      = Employment Date
+                    </span>
+                  </div>
+                  <input type="date" 
+                         id="calc-start-date" 
+                         value="2020-03-01" 
+                         onchange="handleDateChange()" 
+                         class="w-full px-2.5 py-1.5 rounded-lg border border-slate-300 text-xs font-mono font-bold text-slate-800 focus:outline-none focus:ring-2 focus:ring-primary" />
+                  <div class="mt-1 flex items-center gap-1 text-[10px] text-emerald-700 font-semibold" id="start-date-source-badge">
+                    <span class="material-symbols-outlined text-[13px]">verified</span>
+                    <span id="start-date-source-text">Auto-synced: Continuous Start Date = Employment Date from Staff Registration</span>
+                  </div>
+                </div>
+
+                <!-- Separation Date -->
+                <div>
+                  <label for="calc-end-date" class="block text-[11px] font-bold text-slate-600 mb-1">
+                    Separation / Exit Date
+                  </label>
+                  <input type="date" 
+                         id="calc-end-date" 
+                         value="2026-03-01" 
+                         onchange="handleDateChange()" 
+                         class="w-full px-2.5 py-1.5 rounded-lg border border-slate-300 text-xs font-mono font-bold text-slate-800 focus:outline-none focus:ring-2 focus:ring-primary" />
+                </div>
+
+                <!-- Monthly Basic Salary -->
+                <div>
+                  <label for="calc-basic-salary" class="block text-[11px] font-bold text-slate-600 mb-1">
+                    Basic Monthly Salary (SLE)
+                  </label>
+                  <div class="relative">
+                    <span class="absolute left-2.5 top-1.5 text-xs font-bold text-slate-400">SLE</span>
+                    <input type="number" 
+                           id="calc-basic-salary" 
+                           value="10000" 
+                           step="100" 
+                           oninput="recalculate()" 
+                           class="w-full pl-10 pr-2.5 py-1.5 rounded-lg border border-slate-300 text-xs font-mono font-black text-primary focus:outline-none focus:ring-2 focus:ring-primary" />
+                  </div>
+                </div>
+              </div>
+
+              <!-- Separation Reason & Disciplinary Status -->
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                
+                <div>
+                  <label for="calc-reason" class="block text-[11px] font-bold text-slate-600 mb-1">
+                    Reason for Separation
+                  </label>
+                  <select id="calc-reason" 
+                          onchange="recalculate()" 
+                          class="w-full px-2.5 py-1.5 rounded-lg border border-slate-300 text-xs font-bold text-slate-800 focus:outline-none focus:ring-2 focus:ring-primary bg-white cursor-pointer">
+                    <option value="resignation">Voluntary Resignation (Proper Notice)</option>
+                    <option value="retirement">Normal Retirement</option>
+                    <option value="contract_completion" selected>Contract Completion (End of Term)</option>
+                    <option value="redundancy">Redundancy / Restructuring</option>
+                    <option value="medical_grounds">Medical Grounds</option>
+                    <option value="misconduct" class="text-red-600 font-bold">Dismissal for Gross Misconduct (DISQUALIFIED)</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label class="block text-[11px] font-bold text-slate-600 mb-1">
+                    Disciplinary &amp; Debt Clearance
+                  </label>
+                  <div class="flex items-center gap-3 pt-1">
+                    <label class="inline-flex items-center gap-1.5 text-xs text-slate-700 cursor-pointer">
+                      <input type="checkbox" id="calc-no-disciplinary" checked onchange="recalculate()" class="rounded text-primary focus:ring-primary" />
+                      <span>No Pending Disciplinary Cases</span>
+                    </label>
+                  </div>
+                </div>
+
+              </div>
+
+              <!-- DURATION & ELIGIBILITY STATUS BANNER -->
+              <div id="eligibility-banner" class="p-3 rounded-xl border transition-all flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
+                <!-- Dynamically rendered -->
+              </div>
+
+            </div>
+
+            <!-- STEP 3: BENEFIT RATE LOOKUP & CORE COMPUTATION -->
+            <div class="pt-3 border-t border-slate-100 space-y-3">
+              <span class="text-xs font-black uppercase tracking-wider text-primary flex items-center gap-1.5">
+                <span class="w-5 h-5 rounded-full bg-emerald-100 text-emerald-800 text-[11px] font-mono flex items-center justify-center font-bold">3</span>
+                Core EOSB Formula &amp; Benefit Rate Table
+              </span>
+
+              <!-- Live Benefit Rate Table Highlight -->
+              <div class="border border-slate-200 rounded-xl overflow-hidden text-xs">
+                <table class="w-full text-left">
+                  <thead class="bg-slate-50 text-[10px] uppercase font-bold text-slate-500 border-b border-slate-200">
+                    <tr>
+                      <th class="py-1.5 px-3">Years of Service</th>
+                      <th class="py-1.5 px-3">Benefit Rate</th>
+                      <th class="py-1.5 px-3">Description</th>
+                      <th class="py-1.5 px-3 text-right">Status</th>
+                    </tr>
+                  </thead>
+                  <tbody class="divide-y divide-slate-100 font-medium">
+                    <tr id="rate-row-1" class="transition-colors">
+                      <td class="py-1.5 px-3 font-semibold">1 – 2 years</td>
+                      <td class="py-1.5 px-3 font-mono font-bold text-emerald-800">25% (0.25)</td>
+                      <td class="py-1.5 px-3 text-slate-600">Probationary / short service</td>
+                      <td class="py-1.5 px-3 text-right" id="rate-badge-1">-</td>
+                    </tr>
+                    <tr id="rate-row-2" class="transition-colors">
+                      <td class="py-1.5 px-3 font-semibold">3 – 5 years</td>
+                      <td class="py-1.5 px-3 font-mono font-bold text-emerald-800">50% (0.50)</td>
+                      <td class="py-1.5 px-3 text-slate-600">Moderate service</td>
+                      <td class="py-1.5 px-3 text-right" id="rate-badge-2">-</td>
+                    </tr>
+                    <tr id="rate-row-3" class="transition-colors">
+                      <td class="py-1.5 px-3 font-semibold">6 – 10 years</td>
+                      <td class="py-1.5 px-3 font-mono font-bold text-emerald-800">75% (0.75)</td>
+                      <td class="py-1.5 px-3 text-slate-600">Long service</td>
+                      <td class="py-1.5 px-3 text-right" id="rate-badge-3">-</td>
+                    </tr>
+                    <tr id="rate-row-4" class="transition-colors">
+                      <td class="py-1.5 px-3 font-semibold">&gt; 10 years</td>
+                      <td class="py-1.5 px-3 font-mono font-bold text-emerald-800">100% (1.00)</td>
+                      <td class="py-1.5 px-3 text-slate-600">Extended senior service</td>
+                      <td class="py-1.5 px-3 text-right" id="rate-badge-4">-</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+
+              <!-- Core Formula Breakdown Box -->
+              <div class="p-3 bg-emerald-50/70 border border-emerald-200 rounded-xl space-y-1">
+                <div class="flex items-center justify-between text-xs">
+                  <span class="font-extrabold text-emerald-950 flex items-center gap-1">
+                    <span class="material-symbols-outlined text-[16px] text-primary">functions</span>
+                    Core Formula Computation
+                  </span>
+                  <span class="font-mono text-[11px] text-emerald-800 bg-white px-2 py-0.5 rounded border border-emerald-200">
+                    Basic Monthly Salary &times; Years &times; Rate
+                  </span>
+                </div>
+                
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between pt-1 gap-2">
+                  <div class="text-xs text-slate-700 font-mono" id="core-formula-breakdown">
+                    10,000 SLE &times; 6.00 Years &times; 0.75
+                  </div>
+                  <div class="text-sm font-black text-primary font-mono" id="core-formula-result">
+                    = SLE 45,000.00
+                  </div>
+                </div>
+
+                <!-- Excel Formula Equivalent pill -->
+                <div class="text-[10px] text-slate-500 font-mono pt-1 border-t border-emerald-200/60 flex items-center gap-1">
+                  <span class="text-emerald-700 font-bold">Excel Formula:</span>
+                  <span class="bg-white/80 px-1.5 py-0.5 rounded border border-emerald-200 truncate">
+                    =Basic_Salary * Years_of_Service * IF(C2&lt;=2,0.25,IF(C2&lt;=5,0.5,IF(C2&lt;=10,0.75,1)))
+                  </span>
+                </div>
+              </div>
+
+            </div>
+
+            <!-- STEP 4: OPTIONAL ADDITIONS & DEDUCTIONS -->
+            <div class="pt-3 border-t border-slate-100 space-y-3">
+              <span class="text-xs font-black uppercase tracking-wider text-primary flex items-center gap-1.5">
+                <span class="w-5 h-5 rounded-full bg-emerald-100 text-emerald-800 text-[11px] font-mono flex items-center justify-center font-bold">4</span>
+                Optional Additions &amp; Deductions (Section 6)
+              </span>
+
+              <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs">
+                
+                <!-- Leave Balance Compensation -->
+                <div class="p-2.5 rounded-xl border border-slate-200 bg-slate-50/50 space-y-1.5">
+                  <div class="flex items-center justify-between">
+                    <span class="font-bold text-slate-800">Leave Balance Cash</span>
+                    <span class="text-[10px] text-slate-400 font-mono">Days &times; Daily Rate</span>
+                  </div>
+                  <div>
+                    <label for="calc-leave-days" class="text-[10px] text-slate-500 block">Unused Leave Days</label>
+                    <input type="number" id="calc-leave-days" value="0" min="0" max="60" oninput="recalculate()" class="w-full px-2 py-1 rounded border border-slate-300 text-xs font-mono font-bold" />
+                  </div>
+                  <div class="text-[11px] font-mono font-bold text-emerald-800 text-right pt-0.5" id="calc-leave-amount">
+                    + SLE 0.00
+                  </div>
+                </div>
+
+                <!-- Gratuity Bonus -->
+                <div class="p-2.5 rounded-xl border border-slate-200 bg-slate-50/50 space-y-1.5">
+                  <div class="flex items-center justify-between">
+                    <span class="font-bold text-slate-800">Gratuity Bonus</span>
+                    <span class="text-[10px] text-slate-400 font-mono">5% – 10% of EOSB</span>
+                  </div>
+                  <div>
+                    <label for="calc-gratuity-rate" class="text-[10px] text-slate-500 block">Performance %</label>
+                    <select id="calc-gratuity-rate" onchange="recalculate()" class="w-full px-2 py-1 rounded border border-slate-300 text-xs font-semibold bg-white cursor-pointer">
+                      <option value="0">0% (Standard Service)</option>
+                      <option value="0.05" selected>5% (Excellent Performance)</option>
+                      <option value="0.075">7.5% (Distinguished Service)</option>
+                      <option value="0.10">10% (Exemplary Leadership)</option>
+                    </select>
+                  </div>
+                  <div class="text-[11px] font-mono font-bold text-emerald-800 text-right pt-0.5" id="calc-gratuity-amount">
+                    + SLE 2,250.00
+                  </div>
+                </div>
+
+                <!-- Severance Adjustment -->
+                <div class="p-2.5 rounded-xl border border-slate-200 bg-slate-50/50 space-y-1.5">
+                  <div class="flex items-center justify-between">
+                    <span class="font-bold text-slate-800">Severance Adj.</span>
+                    <span class="text-[10px] text-slate-400 font-mono">Donor Grant</span>
+                  </div>
+                  <div>
+                    <label for="calc-severance-adj" class="text-[10px] text-slate-500 block">Contract Amount (SLE)</label>
+                    <input type="number" id="calc-severance-adj" value="0" min="0" step="100" oninput="recalculate()" class="w-full px-2 py-1 rounded border border-slate-300 text-xs font-mono font-bold" />
+                  </div>
+                  <div class="text-[11px] font-mono font-bold text-emerald-800 text-right pt-0.5" id="calc-severance-amount">
+                    + SLE 0.00
+                  </div>
+                </div>
+
+              </div>
+
+              <!-- Deductions / Loan Recoveries -->
+              <div class="p-2.5 rounded-xl border border-rose-200 bg-rose-50/30 grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
+                <div>
+                  <label for="calc-loan-deduction" class="text-[11px] font-bold text-rose-900 block mb-0.5">
+                    Outstanding Staff Loan Recovery (SLE)
+                  </label>
+                  <p class="text-[10px] text-slate-500 mb-1">Deducted from final settlement entitlement</p>
+                  <input type="number" id="calc-loan-deduction" value="0" min="0" step="50" oninput="recalculate()" class="w-full px-2.5 py-1.5 rounded-lg border border-rose-200 text-xs font-mono font-bold text-rose-800 bg-white" />
+                </div>
+
+                <div>
+                  <label for="calc-other-deduction" class="text-[11px] font-bold text-rose-900 block mb-0.5">
+                    Other Clearances / Property Recovery (SLE)
+                  </label>
+                  <p class="text-[10px] text-slate-500 mb-1">Unreturned assets or foundation liabilities</p>
+                  <input type="number" id="calc-other-deduction" value="0" min="0" step="50" oninput="recalculate()" class="w-full px-2.5 py-1.5 rounded-lg border border-rose-200 text-xs font-mono font-bold text-rose-800 bg-white" />
+                </div>
+              </div>
+
+            </div>
+
+            <!-- SETTLEMENT SUMMARY ACCENT BAR -->
+            <div class="bg-gradient-to-br from-slate-900 to-emerald-950 p-4 rounded-xl text-white shadow-sm space-y-3">
+              <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-emerald-800/60 pb-3">
+                <div>
+                  <span class="text-[10px] uppercase font-bold tracking-wider text-emerald-400 block">Total Net Settlement Entitlement</span>
+                  <div class="text-2xl sm:text-3xl font-black font-mono text-white tracking-tight" id="calc-net-total-display">
+                    SLE 47,250.00
+                  </div>
+                </div>
+                <div class="text-right">
+                  <span class="text-[10px] text-emerald-300 font-mono block">Benefit Rate: <strong id="summary-rate-badge" class="font-bold text-white">75%</strong></span>
+                  <span class="text-[10px] text-emerald-300 font-mono block">Years of Service: <strong id="summary-years-badge" class="font-bold text-white">6.00 Yrs</strong></span>
+                </div>
+              </div>
+
+              <div class="text-[11px] text-emerald-100/90 italic font-medium" id="calc-net-words-display">
+                "Forty-Seven Thousand Two Hundred and Fifty Leones Only"
+              </div>
+
+              <!-- Action buttons -->
+              <div class="pt-2 flex flex-wrap items-center gap-2">
+                <button type="button" 
+                        onclick="saveCurrentSettlementCase()" 
+                        class="px-4 py-2 rounded-lg bg-emerald-500 hover:bg-emerald-400 text-slate-950 text-xs font-black inline-flex items-center gap-1.5 transition shadow-sm active:scale-95 cursor-pointer">
+                  <span class="material-symbols-outlined text-[17px]">save</span>
+                  <span>Commit to 5-Year Registry</span>
+                </button>
+
+                <button type="button" 
+                        onclick="previewOfficialVoucherModal()" 
+                        class="px-4 py-2 rounded-lg bg-white/10 hover:bg-white/20 border border-white/20 text-white text-xs font-bold inline-flex items-center gap-1.5 transition active:scale-95 cursor-pointer">
+                  <span class="material-symbols-outlined text-[17px]">receipt_long</span>
+                  <span>Preview &amp; Print Voucher</span>
+                </button>
+              </div>
+            </div>
+
+          </div>
+
+        </div>
+
+      </div>
+
+      <!-- RIGHT COLUMN: 6-STAGE APPROVAL WORKFLOW & RECENT SETTLEMENTS (5 COLS) -->
+      <div class="lg:col-span-5 space-y-6">
+
+        <!-- 6-STAGE APPROVAL ENGINE (SECTION 8) -->
+        <div class="bg-white rounded-2xl border border-outline p-5 shadow-xs space-y-4">
+          
+          <div class="flex items-center justify-between pb-3 border-b border-slate-100">
+            <div class="flex items-center gap-2">
+              <span class="material-symbols-outlined text-primary text-[22px]">checklist_rtl</span>
+              <div>
+                <h3 class="text-sm font-extrabold text-slate-900 leading-tight">6-Stage Approval &amp; Payment Process</h3>
+                <p class="text-[11px] text-slate-500">Section 8 BCF-SL Standard Operating Procedure</p>
+              </div>
+            </div>
+            <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-800" id="current-workflow-status">
+              Workflow Ready
+            </span>
+          </div>
+
+          <!-- Step Stepper List -->
+          <div class="space-y-2 text-xs" id="workflow-stepper-list">
+
+            <!-- Stage 1: HR -->
+            <div class="p-2.5 rounded-xl border border-slate-200 bg-slate-50/70 flex items-start gap-2.5 transition" id="stage-card-1">
+              <div class="w-6 h-6 rounded-full bg-emerald-600 text-white flex items-center justify-center font-bold text-xs shrink-0 mt-0.5">
+                <span class="material-symbols-outlined text-[14px]">check</span>
+              </div>
+              <div class="flex-1 min-w-0">
+                <div class="flex items-center justify-between gap-1">
+                  <span class="font-bold text-slate-900">1. HR Record Verification</span>
+                  <span class="text-[10px] font-bold text-emerald-700 bg-emerald-100 px-1.5 py-0.2 rounded">VERIFIED</span>
+                </div>
+                <p class="text-[11px] text-slate-500 mt-0.5">HR verifies employee files, contract terms, continuous years of service &amp; disciplinary status.</p>
+                <div class="text-[10px] text-slate-400 font-mono mt-1">Sign-off: H. Bangura (HR Dir) &bull; Verified</div>
+              </div>
+            </div>
+
+            <!-- Stage 2: Finance -->
+            <div class="p-2.5 rounded-xl border border-slate-200 bg-slate-50/70 flex items-start gap-2.5 transition" id="stage-card-2">
+              <div class="w-6 h-6 rounded-full bg-emerald-600 text-white flex items-center justify-center font-bold text-xs shrink-0 mt-0.5">
+                <span class="material-symbols-outlined text-[14px]">check</span>
+              </div>
+              <div class="flex-1 min-w-0">
+                <div class="flex items-center justify-between gap-1">
+                  <span class="font-bold text-slate-900">2. Finance Formula Computation</span>
+                  <span class="text-[10px] font-bold text-emerald-700 bg-emerald-100 px-1.5 py-0.2 rounded">COMPUTED</span>
+                </div>
+                <p class="text-[11px] text-slate-500 mt-0.5">Finance computes EOSB using approved formula, leave encashment, gratuity &amp; recoveries.</p>
+                <div class="text-[10px] text-slate-400 font-mono mt-1">Sign-off: A. Sesay (Head of Finance) &bull; Certified</div>
+              </div>
+            </div>
+
+            <!-- Stage 3: Audit -->
+            <div class="p-2.5 rounded-xl border border-amber-200 bg-amber-50/40 flex items-start gap-2.5 transition" id="stage-card-3">
+              <div class="w-6 h-6 rounded-full bg-amber-500 text-white flex items-center justify-center font-bold text-xs shrink-0 mt-0.5">
+                <span class="material-symbols-outlined text-[14px]">hourglass_empty</span>
+              </div>
+              <div class="flex-1 min-w-0">
+                <div class="flex items-center justify-between gap-1">
+                  <span class="font-bold text-slate-900">3. Internal Audit Compliance Review</span>
+                  <span class="text-[10px] font-bold text-amber-800 bg-amber-100 px-1.5 py-0.2 rounded">PENDING AUDIT</span>
+                </div>
+                <p class="text-[11px] text-slate-500 mt-0.5">Audit verifies compliance with BCF-SL manual, SL Labor Act, and budget authorization.</p>
+                <button type="button" onclick="signAuditCompliance()" class="mt-1 px-2 py-0.5 rounded bg-amber-200 hover:bg-amber-300 text-amber-900 text-[10px] font-bold inline-flex items-center gap-1 transition">
+                  <span class="material-symbols-outlined text-[12px]">verified</span>
+                  <span>Execute Audit Sign-Off</span>
+                </button>
+              </div>
+            </div>
+
+            <!-- Stage 4: CEO & Board -->
+            <div class="p-2.5 rounded-xl border border-slate-200 bg-slate-50/50 flex items-start gap-2.5 transition" id="stage-card-4">
+              <div class="w-6 h-6 rounded-full bg-slate-200 text-slate-600 flex items-center justify-center font-bold text-xs shrink-0 mt-0.5">
+                <span class="material-symbols-outlined text-[14px]">rule</span>
+              </div>
+              <div class="flex-1 min-w-0">
+                <div class="flex items-center justify-between gap-1">
+                  <span class="font-bold text-slate-900">4. CEO &amp; Governing Board Approval</span>
+                  <span class="text-[10px] font-bold text-slate-500 bg-slate-200 px-1.5 py-0.2 rounded">QUEUED</span>
+                </div>
+                <p class="text-[11px] text-slate-500 mt-0.5">Executive and Board Trustees authorize final disbursement from Foundation reserves.</p>
+                <button type="button" onclick="signExecutiveApproval()" class="mt-1 px-2 py-0.5 rounded bg-emerald-100 hover:bg-emerald-200 text-emerald-900 text-[10px] font-bold inline-flex items-center gap-1 transition">
+                  <span class="material-symbols-outlined text-[12px]">draw</span>
+                  <span>Board Executive Sign-Off</span>
+                </button>
+              </div>
+            </div>
+
+            <!-- Stage 5: Payment Execution -->
+            <div class="p-2.5 rounded-xl border border-slate-200 bg-slate-50/50 flex items-start gap-2.5 transition" id="stage-card-5">
+              <div class="w-6 h-6 rounded-full bg-slate-200 text-slate-600 flex items-center justify-center font-bold text-xs shrink-0 mt-0.5">
+                <span class="material-symbols-outlined text-[14px]">payments</span>
+              </div>
+              <div class="flex-1 min-w-0">
+                <div class="flex items-center justify-between gap-1">
+                  <span class="font-bold text-slate-900">5. Payment Execution (Payroll / Bank)</span>
+                  <span class="text-[10px] font-bold text-slate-500 bg-slate-200 px-1.5 py-0.2 rounded">AWAITING</span>
+                </div>
+                <p class="text-[11px] text-slate-500 mt-0.5">Direct electronic bank transfer to staff account or payroll integration run.</p>
+              </div>
+            </div>
+
+            <!-- Stage 6: Employee Acknowledgment -->
+            <div class="p-2.5 rounded-xl border border-slate-200 bg-slate-50/50 flex items-start gap-2.5 transition" id="stage-card-6">
+              <div class="w-6 h-6 rounded-full bg-slate-200 text-slate-600 flex items-center justify-center font-bold text-xs shrink-0 mt-0.5">
+                <span class="material-symbols-outlined text-[14px]">signature</span>
+              </div>
+              <div class="flex-1 min-w-0">
+                <div class="flex items-center justify-between gap-1">
+                  <span class="font-bold text-slate-900">6. Signed Acknowledgment &amp; Discharge</span>
+                  <span class="text-[10px] font-bold text-slate-500 bg-slate-200 px-1.5 py-0.2 rounded">FINAL FORM</span>
+                </div>
+                <p class="text-[11px] text-slate-500 mt-0.5">Employee signs End of Service Acknowledgment Form and full discharge of claims.</p>
+              </div>
+            </div>
+
+          </div>
+
+        </div>
+
+        <!-- 5-YEAR ARCHIVE NOTICE (SECTION 9) -->
+        <div class="bg-emerald-950 text-white rounded-2xl p-5 border border-emerald-800/60 shadow-xs space-y-2">
+          <div class="flex items-center gap-2">
+            <span class="material-symbols-outlined text-emerald-400 text-[20px]">folder_special</span>
+            <span class="text-xs font-black uppercase tracking-wider text-emerald-300">5-Year Mandatory Record Keeping</span>
+          </div>
+          <p class="text-xs text-emerald-100/90 leading-relaxed">
+            In accordance with BCF-SL Section 9, all EOSB computation records, verification checklists, board minutes, bank remittance proofs, and signed employee acknowledgment forms are permanently archived by HR &amp; Finance for a minimum of <strong>5 years</strong> in both physical hard copy and encrypted soft copy.
+          </p>
+          <div class="pt-2 flex items-center justify-between text-[11px] text-emerald-300/80 font-mono">
+            <span>Hard Copy Ref: Arch-HR-EOSB</span>
+            <span>Cloud Vault: Active</span>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+
+    <!-- SECTION: 5-YEAR EOSB SETTLEMENT REGISTER & ARCHIVE TABLE -->
+    <section class="bg-white rounded-2xl border border-outline p-5 sm:p-6 shadow-xs space-y-4">
+      
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-slate-100">
+        <div>
+          <div class="flex items-center gap-2">
+            <span class="material-symbols-outlined text-primary text-[22px]">history_edu</span>
+            <h3 class="text-base font-extrabold text-slate-900">5-Year EOSB Settlement Ledger &amp; Historical Archive</h3>
+            <span class="px-2 py-0.5 rounded-full text-xs font-bold bg-emerald-100 text-emerald-800" id="registry-count-badge">5 Records</span>
+          </div>
+          <p class="text-xs text-slate-500 mt-0.5">Comprehensive audit trail of computed, authorized, and paid end-of-service benefits.</p>
+        </div>
+
+        <div class="flex flex-wrap items-center gap-2">
+          <div class="relative">
+            <span class="material-symbols-outlined absolute left-2.5 top-2 text-slate-400 text-[18px]">search</span>
+            <input type="text" 
+                   id="registry-search" 
+                   oninput="renderRegistryTable()" 
+                   placeholder="Search employee, ID, ref..." 
+                   class="pl-8 pr-3 py-1.5 rounded-lg border border-slate-200 text-xs w-44 sm:w-56 focus:outline-none focus:ring-1 focus:ring-primary" />
+          </div>
+
+          <button type="button" 
+                  onclick="exportRegistryCSV()" 
+                  class="h-8 px-2.5 rounded-lg border border-slate-300 bg-white hover:bg-slate-50 text-slate-700 text-xs font-bold flex items-center gap-1 transition shadow-2xs">
+            <span class="material-symbols-outlined text-[15px]">file_download</span>
+            <span>Export CSV</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Register Table -->
+      <div class="overflow-x-auto custom-scrollbar border border-slate-200 rounded-xl">
+        <table class="w-full text-left text-xs">
+          <thead class="bg-slate-50 text-[10px] uppercase font-bold text-slate-500 border-b border-slate-200">
+            <tr>
+              <th class="py-2.5 px-3">Voucher Ref</th>
+              <th class="py-2.5 px-3">Employee Name</th>
+              <th class="py-2.5 px-3">Department</th>
+              <th class="py-2.5 px-3">Service</th>
+              <th class="py-2.5 px-3">Basic (SLE)</th>
+              <th class="py-2.5 px-3">Rate</th>
+              <th class="py-2.5 px-3">Core EOSB</th>
+              <th class="py-2.5 px-3">Net Entitlement</th>
+              <th class="py-2.5 px-3">Workflow Status</th>
+              <th class="py-2.5 px-3 text-right">Actions</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-slate-100 font-medium" id="registry-table-body">
+            <!-- Dynamically populated -->
+          </tbody>
+        </table>
+      </div>
+
+    </section>
+
+  </main>
+
+  <!-- MODAL 1: OFFICIAL PRINTABLE SETTLEMENT VOUCHER & ACKNOWLEDGMENT FORM -->
+  <div id="printable-voucher-modal" class="hidden fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-2 sm:p-4 overflow-y-auto">
+    <div class="bg-white rounded-2xl max-w-4xl w-full p-4 sm:p-8 shadow-2xl relative max-h-[92vh] overflow-y-auto custom-scrollbar border border-slate-300" id="printable-voucher-card">
+      
+      <!-- Top Action Bar (hidden in print) -->
+      <div class="flex items-center justify-between pb-4 mb-4 border-b border-slate-200 no-print">
+        <div class="flex items-center gap-2">
+          <span class="material-symbols-outlined text-primary text-[22px]">verified</span>
+          <span class="text-xs font-bold text-slate-800">Official Settlement Certificate Preview</span>
+        </div>
+        <div class="flex items-center gap-2">
+          <button type="button" 
+                  onclick="window.print()" 
+                  class="px-3.5 py-1.5 rounded-lg bg-primary hover:bg-primary-container text-white text-xs font-bold flex items-center gap-1.5 transition shadow-2xs">
+            <span class="material-symbols-outlined text-[16px]">print</span>
+            <span>Print Form (Ctrl+P)</span>
+          </button>
+          <button type="button" 
+                  onclick="closeVoucherModal()" 
+                  class="w-8 h-8 rounded-full hover:bg-slate-100 flex items-center justify-center text-slate-500 hover:text-slate-800 transition">
+            <span class="material-symbols-outlined text-[20px]">close</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- OFFICIAL VOUCHER BODY -->
+      <div class="space-y-4">
+        
+        <!-- Document Institutional Header -->
+        <div class="text-center border-b-2 border-primary pb-3">
+          <img src="../bandama_charity_foundation_logo/bcf_official_logo.png" 
+               alt="Bandama Charity Foundation" 
+               class="h-12 w-auto object-contain mx-auto mb-1" 
+               onerror="this.onerror=null; this.src='/bcf_official_logo.png'; if(!this.src) this.src='/bcf-logo.jpg';" />
+          <h2 class="text-sm sm:text-base font-black text-primary uppercase tracking-wider">
+            BANDAMA CHARITY FOUNDATION SIERRA LEONE
+          </h2>
+          <p class="text-[10px] text-slate-600 font-medium">
+            14 Wilkinson Road, Freetown, Sierra Leone &bull; Human Resources &amp; Financial Operations
+          </p>
+          <h3 class="text-xs sm:text-sm font-black text-slate-900 uppercase tracking-tight mt-1 underline">
+            END OF SERVICE BENEFIT (EOSB) CALCULATION &amp; SETTLEMENT CERTIFICATE
+          </h3>
+          <div class="flex flex-wrap items-center justify-center gap-2 mt-1.5 text-[10px] font-mono font-semibold text-slate-600">
+            <span class="bg-slate-100 px-2 py-0.5 rounded border border-slate-300">Voucher Ref: <strong class="text-primary" id="vouch-ref-display">BCF-EOSB-2026-0042</strong></span>
+            <span class="bg-slate-100 px-2 py-0.5 rounded border border-slate-300">Date Prepared: <strong id="vouch-date-display">03 March 2026</strong></span>
+            <span class="bg-emerald-100 text-emerald-900 px-2 py-0.5 rounded border border-emerald-300 font-bold">Labor Compliant</span>
+          </div>
+        </div>
+
+        <!-- Employee Particulars Grid -->
+        <div class="bg-slate-50 p-3 rounded-xl border border-slate-200 text-xs">
+          <div class="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
+            <div>
+              <span class="text-[9px] uppercase font-bold text-slate-400 block">Employee Name</span>
+              <strong class="text-slate-900" id="vouch-name">Albert Joseph Bandama</strong>
+            </div>
+            <div>
+              <span class="text-[9px] uppercase font-bold text-slate-400 block">Employee ID</span>
+              <strong class="font-mono text-primary" id="vouch-id">BCF-EMP-2026-0001</strong>
+            </div>
+            <div>
+              <span class="text-[9px] uppercase font-bold text-slate-400 block">Department</span>
+              <span class="text-slate-800 font-semibold" id="vouch-dept">Finance &amp; Accounts</span>
+            </div>
+            <div>
+              <span class="text-[9px] uppercase font-bold text-slate-400 block">Job Designation</span>
+              <span class="text-slate-800 font-semibold" id="vouch-title">Accounts Officer</span>
+            </div>
+            <div>
+              <span class="text-[9px] uppercase font-bold text-slate-400 block">Commencement Date</span>
+              <span class="font-mono text-slate-800" id="vouch-start">01 Mar 2020</span>
+            </div>
+            <div>
+              <span class="text-[9px] uppercase font-bold text-slate-400 block">Effective Exit Date</span>
+              <span class="font-mono text-slate-800" id="vouch-end">01 Mar 2026</span>
+            </div>
+            <div>
+              <span class="text-[9px] uppercase font-bold text-slate-400 block">Total Service Period</span>
+              <strong class="text-slate-900 font-mono" id="vouch-years">6.00 Continuous Years</strong>
+            </div>
+            <div>
+              <span class="text-[9px] uppercase font-bold text-slate-400 block">Separation Ground</span>
+              <strong class="text-emerald-800 font-semibold uppercase text-[10px]" id="vouch-reason">Contract Completion</strong>
+            </div>
+          </div>
+        </div>
+
+        <!-- Certified Computation Table -->
+        <div class="border border-slate-300 rounded-xl overflow-hidden text-xs">
+          <table class="w-full text-left">
+            <thead class="bg-slate-100 text-[10px] uppercase font-black text-slate-700 border-b border-slate-300">
+              <tr>
+                <th class="py-2 px-3">Component / Formula</th>
+                <th class="py-2 px-3">Computation Particulars</th>
+                <th class="py-2 px-3 text-right">Amount (SLE)</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-slate-200">
+              <tr>
+                <td class="py-2 px-3 font-bold text-slate-900">Basic Monthly Remuneration</td>
+                <td class="py-2 px-3 text-slate-600">Base salary at date of separation</td>
+                <td class="py-2 px-3 text-right font-mono font-bold" id="vouch-basic">10,000.00</td>
+              </tr>
+              <tr>
+                <td class="py-2 px-3 font-bold text-slate-900">Benefit Rate Tier</td>
+                <td class="py-2 px-3 text-slate-600" id="vouch-rate-desc">6 – 10 years category (75% of 1 month salary per year)</td>
+                <td class="py-2 px-3 text-right font-mono font-bold text-emerald-800" id="vouch-rate-pct">75.0%</td>
+              </tr>
+              <tr class="bg-emerald-50/50">
+                <td class="py-2 px-3 font-black text-primary">Core End of Service Benefit (EOSB)</td>
+                <td class="py-2 px-3 font-mono text-emerald-950" id="vouch-core-math">10,000 &times; 6.00 &times; 0.75</td>
+                <td class="py-2 px-3 text-right font-mono font-black text-primary" id="vouch-core-eosb">45,000.00</td>
+              </tr>
+              <tr>
+                <td class="py-2 px-3 font-semibold text-slate-800">Unused Leave Balance Encashment</td>
+                <td class="py-2 px-3 text-slate-500" id="vouch-leave-desc">0 days &times; daily rate</td>
+                <td class="py-2 px-3 text-right font-mono" id="vouch-leave-amt">0.00</td>
+              </tr>
+              <tr>
+                <td class="py-2 px-3 font-semibold text-slate-800">Exemplary Performance Gratuity</td>
+                <td class="py-2 px-3 text-slate-500" id="vouch-gratuity-desc">5.0% performance bonus of EOSB</td>
+                <td class="py-2 px-3 text-right font-mono text-emerald-800" id="vouch-gratuity-amt">+ 2,250.00</td>
+              </tr>
+              <tr>
+                <td class="py-2 px-3 font-semibold text-slate-800">Donor Contract Severance Adjustment</td>
+                <td class="py-2 px-3 text-slate-500">As per donor grant agreement</td>
+                <td class="py-2 px-3 text-right font-mono" id="vouch-severance-amt">0.00</td>
+              </tr>
+              <tr class="text-rose-700 bg-rose-50/30">
+                <td class="py-2 px-3 font-semibold">Less: Outstanding Loans &amp; Recoveries</td>
+                <td class="py-2 px-3 text-slate-500">Staff loan ledger &amp; asset reconciliation</td>
+                <td class="py-2 px-3 text-right font-mono font-bold" id="vouch-deductions-amt">- 0.00</td>
+              </tr>
+              <tr class="bg-slate-900 text-white font-black text-sm">
+                <td class="py-2.5 px-3">NET SETTLEMENT PAYABLE</td>
+                <td class="py-2.5 px-3 text-[10px] font-mono text-emerald-300">Certified Net Entitlement</td>
+                <td class="py-2.5 px-3 text-right font-mono text-emerald-400" id="vouch-net-total">SLE 47,250.00</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Amount in Words -->
+        <div class="p-2.5 bg-slate-100 rounded-lg text-xs font-medium text-slate-800">
+          <span class="font-bold text-slate-600 uppercase text-[10px] block">Net Payable in Words:</span>
+          <span class="italic font-bold text-slate-900" id="vouch-words">Forty-Seven Thousand Two Hundred and Fifty Leones Only</span>
+        </div>
+
+        <!-- Employee Acknowledgment & Discharge Clause -->
+        <div class="p-3 bg-emerald-50/50 rounded-xl border border-emerald-200 text-[11px] leading-relaxed text-slate-800">
+          <strong class="font-bold text-primary block uppercase tracking-wide text-[10px] mb-0.5">
+            EMPLOYEE ACKNOWLEDGMENT &amp; FULL DISCHARGE DECLARATION
+          </strong>
+          I hereby acknowledge receipt of the certified End of Service Benefit (EOSB) computation from Bandama Charity Foundation Sierra Leone. I confirm that all years of service, basic salary data, additions, and recoveries reflected above have been transparently calculated and agreed. Upon receipt of payment, I discharge the Foundation of all further monetary claims relating to my tenure.
+        </div>
+
+        <!-- 5-Tier Signature Authority Blocks -->
+        <div class="grid grid-cols-2 sm:grid-cols-5 gap-3 pt-3 border-t border-slate-300 text-[10px]">
+          
+          <!-- Employee -->
+          <div class="border border-slate-300 rounded-lg p-2 text-center flex flex-col justify-between h-24">
+            <span class="font-bold text-slate-700 uppercase">Employee</span>
+            <div class="border-b border-dashed border-slate-400 my-1"></div>
+            <div>
+              <strong class="block text-slate-900 truncate" id="sign-emp-name">A. J. Bandama</strong>
+              <span class="text-[9px] text-slate-400 font-mono">Date: ___/___/2026</span>
+            </div>
+          </div>
+
+          <!-- HR -->
+          <div class="border border-slate-300 rounded-lg p-2 text-center flex flex-col justify-between h-24">
+            <span class="font-bold text-slate-700 uppercase">HR Verification</span>
+            <div class="border-b border-dashed border-slate-400 my-1"></div>
+            <div>
+              <strong class="block text-emerald-900">H. Bangura</strong>
+              <span class="text-[9px] text-slate-400 font-mono">HR Director</span>
+            </div>
+          </div>
+
+          <!-- Finance -->
+          <div class="border border-slate-300 rounded-lg p-2 text-center flex flex-col justify-between h-24">
+            <span class="font-bold text-slate-700 uppercase">Finance Lead</span>
+            <div class="border-b border-dashed border-slate-400 my-1"></div>
+            <div>
+              <strong class="block text-emerald-900">A. Sesay</strong>
+              <span class="text-[9px] text-slate-400 font-mono">Head of Finance</span>
+            </div>
+          </div>
+
+          <!-- Internal Audit -->
+          <div class="border border-slate-300 rounded-lg p-2 text-center flex flex-col justify-between h-24">
+            <span class="font-bold text-slate-700 uppercase">Internal Audit</span>
+            <div class="border-b border-dashed border-slate-400 my-1"></div>
+            <div>
+              <strong class="block text-emerald-900">K. Mansaray</strong>
+              <span class="text-[9px] text-slate-400 font-mono">Audit &amp; Risk</span>
+            </div>
+          </div>
+
+          <!-- CEO & Board -->
+          <div class="border border-slate-300 rounded-lg p-2 text-center flex flex-col justify-between h-24 col-span-2 sm:col-span-1">
+            <span class="font-bold text-slate-700 uppercase">CEO / Board</span>
+            <div class="border-b border-dashed border-slate-400 my-1"></div>
+            <div>
+              <strong class="block text-emerald-900">Executive Chair</strong>
+              <span class="text-[9px] text-slate-400 font-mono">Governing Board</span>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Archival Footer Note -->
+        <div class="text-[9px] text-slate-400 text-center pt-2 border-t border-slate-200">
+          * MANDATORY ARCHIVAL SEAL: Retained by Human Resources and Financial Operations for a minimum of 5 years pursuant to BCF-SL Section 9 Guidelines.
+        </div>
+
+      </div>
+
+    </div>
+  </div>
+
+  <!-- MODAL 2: FULL CALCULATION GUIDE & POLICY DRAWER -->
+  <div id="guide-modal" class="hidden fixed inset-0 z-50 bg-black/50 backdrop-blur-xs flex items-center justify-center p-3 sm:p-6 overflow-y-auto">
+    <div class="bg-white rounded-2xl max-w-3xl w-full p-5 sm:p-7 shadow-2xl relative max-h-[90vh] overflow-y-auto custom-scrollbar border border-slate-200">
+      
+      <div class="flex items-center justify-between pb-3 mb-4 border-b border-slate-200">
+        <div class="flex items-center gap-2">
+          <span class="material-symbols-outlined text-primary text-[24px]">menu_book</span>
+          <div>
+            <h3 class="text-base font-extrabold text-slate-900">END OF SERVICE BENEFIT (EOSB) CALCULATION GUIDE</h3>
+            <p class="text-xs text-slate-500">Bandama Charity Foundation Sierra Leone &bull; Human Resources &amp; Finance</p>
+          </div>
+        </div>
+        <button type="button" onclick="closeGuideModal()" class="w-8 h-8 rounded-full hover:bg-slate-100 flex items-center justify-center text-slate-500 hover:text-slate-800 transition">
+          <span class="material-symbols-outlined text-[20px]">close</span>
+        </button>
+      </div>
+
+      <div class="space-y-4 text-xs text-slate-700 leading-relaxed">
+        
+        <div class="p-3 bg-slate-50 rounded-xl border border-slate-200 space-y-1">
+          <strong class="text-slate-900 font-bold block text-sm">Purpose &amp; Scope</strong>
+          <p>
+            To provide a transparent and fair method for computing employees&rsquo; end-of-service entitlement in accordance with organizational policy and Sierra Leone labor practice.
+          </p>
+        </div>
+
+        <div class="space-y-1">
+          <strong class="text-slate-900 font-bold block text-sm">1. What is End of Service Benefit?</strong>
+          <p>
+            The End of Service Benefit (EOSB) is a lump-sum payment made to an employee at the end of their employment, recognizing their years of service, loyalty, and contribution to the Foundation.
+            It applies when an employee retires, resigns properly, or completes a contract &mdash; <strong>but not when dismissed for gross misconduct</strong>.
+          </p>
+        </div>
+
+        <div class="space-y-1">
+          <strong class="text-slate-900 font-bold block text-sm">2. Eligibility Criteria</strong>
+          <p>An employee qualifies for EOSB if they:</p>
+          <ul class="list-disc pl-5 space-y-0.5">
+            <li>Have served at least <strong>1 year continuously</strong>;</li>
+            <li>Are leaving due to resignation, retirement, contract completion, redundancy, or medical grounds;</li>
+            <li>Have no pending disciplinary cases or debts with the Foundation.</li>
+          </ul>
+        </div>
+
+        <div class="space-y-1.5">
+          <strong class="text-slate-900 font-bold block text-sm">3. Core Formula for Calculation</strong>
+          <div class="p-3 bg-emerald-50 rounded-xl border border-emerald-200 font-mono text-center font-bold text-primary text-sm">
+            EOSB = Basic Monthly Salary &times; Years of Service &times; Benefit Rate
+          </div>
+        </div>
+
+        <div class="space-y-1.5">
+          <strong class="text-slate-900 font-bold block text-sm">4. Recommended Benefit Rate Table</strong>
+          <table class="w-full border border-slate-200 rounded-lg overflow-hidden text-left">
+            <thead class="bg-slate-100 font-bold text-slate-700">
+              <tr>
+                <th class="py-1.5 px-3">Years of Service</th>
+                <th class="py-1.5 px-3">Benefit Rate</th>
+                <th class="py-1.5 px-3">Description</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-slate-100">
+              <tr>
+                <td class="py-1.5 px-3 font-semibold">1 &ndash; 2 years</td>
+                <td class="py-1.5 px-3 font-mono font-bold text-primary">25% of 1 month salary per year</td>
+                <td class="py-1.5 px-3 text-slate-600">Probationary / short service</td>
+              </tr>
+              <tr>
+                <td class="py-1.5 px-3 font-semibold">3 &ndash; 5 years</td>
+                <td class="py-1.5 px-3 font-mono font-bold text-primary">50% of 1 month salary per year</td>
+                <td class="py-1.5 px-3 text-slate-600">Moderate service</td>
+              </tr>
+              <tr>
+                <td class="py-1.5 px-3 font-semibold">6 &ndash; 10 years</td>
+                <td class="py-1.5 px-3 font-mono font-bold text-primary">75% of 1 month salary per year</td>
+                <td class="py-1.5 px-3 text-slate-600">Long service</td>
+              </tr>
+              <tr>
+                <td class="py-1.5 px-3 font-semibold">&gt; 10 years</td>
+                <td class="py-1.5 px-3 font-mono font-bold text-primary">100% of 1 month salary per year</td>
+                <td class="py-1.5 px-3 text-slate-600">Extended senior service</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="p-3 bg-amber-50 rounded-xl border border-amber-200 space-y-1">
+          <strong class="text-amber-950 font-bold block text-sm">5. Example Calculation (from Policy)</strong>
+          <p>
+            Let&rsquo;s say an employee served <strong>6 years</strong> with a basic monthly salary of <strong>10,000 SLE</strong>:
+          </p>
+          <div class="font-mono font-bold text-slate-900 bg-white p-2 rounded border border-amber-200 text-xs">
+            EOSB = 10,000 &times; 6 &times; 0.75 = 45,000 SLE
+          </div>
+          <p class="text-[11px] text-amber-900">
+            So, the employee will receive 45,000 SLE as their end-of-service benefit (plus any optional additions).
+          </p>
+        </div>
+
+        <div class="space-y-1.5">
+          <strong class="text-slate-900 font-bold block text-sm">6. Optional Additions (if policy allows)</strong>
+          <table class="w-full border border-slate-200 rounded-lg overflow-hidden text-left">
+            <thead class="bg-slate-100 font-bold text-slate-700">
+              <tr>
+                <th class="py-1.5 px-3">Component</th>
+                <th class="py-1.5 px-3">Description</th>
+                <th class="py-1.5 px-3">Example</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-slate-100">
+              <tr>
+                <td class="py-1.5 px-3 font-semibold">Leave Balance Compensation</td>
+                <td class="py-1.5 px-3">Unused leave days paid in cash</td>
+                <td class="py-1.5 px-3 font-mono">(No. of days &times; Daily Rate)</td>
+              </tr>
+              <tr>
+                <td class="py-1.5 px-3 font-semibold">Gratuity Bonus</td>
+                <td class="py-1.5 px-3">5&ndash;10% of total EOSB for excellent performance</td>
+                <td class="py-1.5 px-3 font-mono">e.g., 45,000 &times; 0.05 = 2,250 SLE</td>
+              </tr>
+              <tr>
+                <td class="py-1.5 px-3 font-semibold">Severance Adjustment</td>
+                <td class="py-1.5 px-3">For contract completion (if donor-funded)</td>
+                <td class="py-1.5 px-3">As per donor agreement</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="space-y-1.5">
+          <strong class="text-slate-900 font-bold block text-sm">7. Excel Formula Implementation</strong>
+          <div class="p-3 bg-slate-900 text-emerald-400 rounded-xl font-mono text-xs space-y-1">
+            <div><span class="text-slate-400">Years of Service: </span>=DATEDIF(Start_Date, End_Date, "Y")</div>
+            <div><span class="text-slate-400">Benefit Rate: </span>=IF(C2&lt;=2, 0.25, IF(C2&lt;=5, 0.5, IF(C2&lt;=10, 0.75, 1)))</div>
+            <div><span class="text-slate-400">EOSB: </span>=Basic_Salary * Years_of_Service * Benefit_Rate</div>
+          </div>
+        </div>
+
+        <div class="space-y-1">
+          <strong class="text-slate-900 font-bold block text-sm">8. Approval and Payment Process</strong>
+          <ol class="list-decimal pl-5 space-y-0.5">
+            <li>HR verifies employee records and years of service.</li>
+            <li>Finance computes EOSB using approved formula.</li>
+            <li>Internal Audit reviews for compliance.</li>
+            <li>CEO and Governing Board approve payment.</li>
+            <li>Payment made via payroll system or direct transfer.</li>
+            <li>Employee signs End of Service Acknowledgment Form.</li>
+          </ol>
+        </div>
+
+        <div class="space-y-1">
+          <strong class="text-slate-900 font-bold block text-sm">9. Record Keeping</strong>
+          <p>
+            All EOSB records are maintained by HR and Finance for at least <strong>5 years</strong>, both in hard and soft copies.
+          </p>
+        </div>
+
+      </div>
+
+      <div class="mt-6 pt-3 border-t border-slate-200 flex justify-end">
+        <button type="button" onclick="closeGuideModal()" class="px-4 py-1.5 bg-primary text-white rounded-lg text-xs font-bold">
+          Understood &amp; Close Guide
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- TOAST NOTIFICATION CONTAINER -->
+  <div id="toast-container" class="fixed bottom-5 right-5 z-50 space-y-2 pointer-events-none"></div>
+
+  <!-- JAVASCRIPT LOGIC -->
+  <script>
+    // INITIAL MOCK SETTLEMENT REGISTRY (5-Year Historical Archive)
+    let settlementRegistry = [
+      {
+        id: "BCF-EOSB-2026-0042",
+        empId: "BCF-EMP-2026-0001",
+        empName: "Albert Joseph Bandama",
+        dept: "Finance & Accounts",
+        title: "Accounts Officer",
+        startDate: "2020-03-01",
+        endDate: "2026-03-01",
+        years: 6.00,
+        basicSalary: 10000,
+        rate: 0.75,
+        rateDesc: "75% (6–10 Yrs)",
+        reason: "Contract Completion",
+        coreEosb: 45000,
+        leaveDays: 0,
+        leaveAmount: 0,
+        gratuityRate: 0.05,
+        gratuityAmount: 2250,
+        severanceAmount: 0,
+        deductions: 0,
+        netEntitlement: 47250,
+        status: "Approved",
+        stage: 4,
+        dateCreated: "2026-03-01"
+      },
+      {
+        id: "BCF-EOSB-2026-0038",
+        empId: "BCF-EMP-2026-0004",
+        empName: "Mariama Sesay",
+        dept: "Programmes & Field Operations",
+        title: "Project Coordinator",
+        startDate: "2022-01-15",
+        endDate: "2026-01-15",
+        years: 4.00,
+        basicSalary: 8500,
+        rate: 0.50,
+        rateDesc: "50% (3–5 Yrs)",
+        reason: "Voluntary Resignation",
+        coreEosb: 17000,
+        leaveDays: 8,
+        leaveAmount: 3090.91,
+        gratuityRate: 0.05,
+        gratuityAmount: 850,
+        severanceAmount: 0,
+        deductions: 420,
+        netEntitlement: 20520.91,
+        status: "Disbursed",
+        stage: 6,
+        dateCreated: "2026-01-20"
+      },
+      {
+        id: "BCF-EOSB-2025-0029",
+        empId: "BCF-EMP-2026-0012",
+        empName: "Ibrahim Koroma",
+        dept: "Human Resources & Admin",
+        title: "Senior Admin Officer",
+        startDate: "2017-09-01",
+        endDate: "2025-09-01",
+        years: 8.00,
+        basicSalary: 12000,
+        rate: 0.75,
+        rateDesc: "75% (6–10 Yrs)",
+        reason: "Normal Retirement",
+        coreEosb: 72000,
+        leaveDays: 14,
+        leaveAmount: 7636.36,
+        gratuityRate: 0.10,
+        gratuityAmount: 7200,
+        severanceAmount: 0,
+        deductions: 0,
+        netEntitlement: 86836.36,
+        status: "Disbursed",
+        stage: 6,
+        dateCreated: "2025-09-05"
+      },
+      {
+        id: "BCF-EOSB-2025-0015",
+        empId: "BCF-EMP-2026-0019",
+        empName: "Fatmata Kamara",
+        dept: "Monitoring & Evaluation",
+        title: "M&E Field Officer",
+        startDate: "2023-06-01",
+        endDate: "2025-06-01",
+        years: 2.00,
+        basicSalary: 5500,
+        rate: 0.25,
+        rateDesc: "25% (1–2 Yrs)",
+        reason: "Contract Completion",
+        coreEosb: 2750,
+        leaveDays: 5,
+        leaveAmount: 1250,
+        gratuityRate: 0,
+        gratuityAmount: 0,
+        severanceAmount: 0,
+        deductions: 0,
+        netEntitlement: 4000,
+        status: "Disbursed",
+        stage: 6,
+        dateCreated: "2025-06-03"
+      },
+      {
+        id: "BCF-EOSB-2024-0008",
+        empId: "BCF-EMP-2026-0027",
+        empName: "Samuel Bangura",
+        dept: "Procurement & Logistics",
+        title: "Logistics Assistant",
+        startDate: "2023-02-01",
+        endDate: "2024-02-01",
+        years: 1.00,
+        basicSalary: 4000,
+        rate: 0.25,
+        rateDesc: "25% (1–2 Yrs)",
+        reason: "Medical Grounds",
+        coreEosb: 1000,
+        leaveDays: 10,
+        leaveAmount: 1818.18,
+        gratuityRate: 0.05,
+        gratuityAmount: 50,
+        severanceAmount: 0,
+        deductions: 0,
+        netEntitlement: 2868.18,
+        status: "Disbursed",
+        stage: 6,
+        dateCreated: "2024-02-10"
+      }
+    ];
+
+    // STAFF ROSTER (Synced with BCF Registry)
+    let staffRoster = [];
+
+    // Extract official Employment Date / Continuous Start Date from staff registration record
+    function getEmployeeStartDate(emp) {
+      if (!emp) return '';
+      const rawDate = emp.employmentDate || 
+                      emp.empDate || 
+                      emp.registrationDate || 
+                      emp.registeredAt || 
+                      emp.hireDate || 
+                      emp.startDate || 
+                      emp.dateOfEmployment || 
+                      emp.conStart || 
+                      '';
+      if (!rawDate) return '';
+
+      const str = String(rawDate).trim();
+      // YYYY-MM-DD
+      if (/^\d{4}-\d{2}-\d{2}$/.test(str)) {
+        return str;
+      }
+      // ISO timestamp like 2024-05-10T12:00:00...
+      if (str.includes('T')) {
+        return str.split('T')[0];
+      }
+      // DD/MM/YYYY
+      if (str.includes('/')) {
+        const parts = str.split('/');
+        if (parts.length === 3 && parts[2].length === 4) {
+          return `${parts[2]}-${parts[1].padStart(2, '0')}-${parts[0].padStart(2, '0')}`;
+        }
+      }
+      const d = new Date(str);
+      if (!isNaN(d.getTime())) {
+        return d.toISOString().split('T')[0];
+      }
+      return str;
+    }
+
+    function loadStaffRoster(showToastMsg = false) {
+      try {
+        let stored = JSON.parse(localStorage.getItem('bcf_staff_registry') || '[]');
+        if (Array.isArray(stored) && stored.length > 0) {
+          staffRoster = stored;
+        } else {
+          staffRoster = [
+            { employeeId: "BCF-EMP-2026-0001", fullName: "Albert Joseph Bandama", department: "Finance & Accounts", title: "Accounts Officer", payBasic: 10000, employmentDate: "2020-03-01", empDate: "2020-03-01" },
+            { employeeId: "BCF-EMP-2026-0004", fullName: "Mariama Sesay", department: "Programmes & Field Operations", title: "Project Coordinator", payBasic: 8500, employmentDate: "2022-01-15", empDate: "2022-01-15" },
+            { employeeId: "BCF-EMP-2026-0012", fullName: "Ibrahim Koroma", department: "Human Resources & Admin", title: "Senior Admin Officer", payBasic: 12000, employmentDate: "2017-09-01", empDate: "2017-09-01" },
+            { employeeId: "BCF-EMP-2026-0019", fullName: "Fatmata Kamara", department: "Monitoring & Evaluation", title: "M&E Field Officer", payBasic: 5500, employmentDate: "2023-06-01", empDate: "2023-06-01" },
+            { employeeId: "BCF-EMP-2026-0027", fullName: "Samuel Bangura", department: "Procurement & Logistics", title: "Logistics Assistant", payBasic: 4000, employmentDate: "2023-02-01", empDate: "2023-02-01" },
+            { employeeId: "BCF-EMP-2026-0033", fullName: "Sorie Tarawally", department: "Programmes & Field Operations", title: "Field Officer", payBasic: 4500, employmentDate: "2021-05-10", empDate: "2021-05-10" },
+            { employeeId: "BCF-EMP-2026-0045", fullName: "Zainab Conteh", department: "Finance & Accounts", title: "Treasury Accountant", payBasic: 9500, employmentDate: "2019-11-01", empDate: "2019-11-01" }
+          ];
+        }
+      } catch(e) {
+        staffRoster = [];
+      }
+
+      // Populate select dropdown
+      const select = document.getElementById('calc-staff-select');
+      if (select) {
+        const prevVal = select.value;
+        select.innerHTML = '<option value="">-- Choose Employee to Auto-populate --</option>';
+        staffRoster.forEach(s => {
+          const opt = document.createElement('option');
+          opt.value = s.employeeId;
+          const empStart = getEmployeeStartDate(s);
+          const dateLabel = empStart ? ` • Employed: ${empStart}` : '';
+          opt.textContent = `${s.fullName} (${s.employeeId}) — ${s.department || 'Staff'}${dateLabel}`;
+          select.appendChild(opt);
+        });
+        if (prevVal && staffRoster.some(s => s.employeeId === prevVal)) {
+          select.value = prevVal;
+        } else if (staffRoster.length > 0 && !prevVal) {
+          select.value = staffRoster[0].employeeId;
+        }
+      }
+
+      if (showToastMsg) {
+        showToast(`Staff registry synchronized (${staffRoster.length} staff loaded with employment dates)`, 'sync');
+      }
+    }
+
+    // STATE FOR CURRENT COMPUTATION
+    let currentCalc = {
+      empId: "BCF-EMP-2026-0001",
+      empName: "Albert Joseph Bandama",
+      dept: "Finance & Accounts",
+      title: "Accounts Officer",
+      startDate: "2020-03-01",
+      endDate: "2026-03-01",
+      basicSalary: 10000,
+      reason: "contract_completion",
+      noDisciplinary: true,
+      years: 6,
+      rate: 0.75,
+      rateDesc: "75% of 1 month salary per year",
+      coreEosb: 45000,
+      leaveDays: 0,
+      leaveAmount: 0,
+      gratuityRate: 0.05,
+      gratuityAmount: 2250,
+      severanceAmount: 0,
+      loanDeduction: 0,
+      otherDeduction: 0,
+      totalDeductions: 0,
+      netEntitlement: 47250,
+      isEligible: true,
+      ineligibilityReason: ""
+    };
+
+    function handleStaffSelectChange(empId) {
+      if (!empId) return;
+      const found = staffRoster.find(s => s.employeeId === empId);
+      if (found) {
+        document.getElementById('calc-emp-name').value = found.fullName || '';
+        document.getElementById('calc-emp-id').value = found.employeeId || '';
+        
+        // Department: match existing option or add dynamically so it's NEVER blank
+        if (found.department) {
+          const deptSelect = document.getElementById('calc-emp-dept');
+          let matched = false;
+          for (let i = 0; i < deptSelect.options.length; i++) {
+            if (deptSelect.options[i].value.trim().toLowerCase() === found.department.trim().toLowerCase()) {
+              deptSelect.selectedIndex = i;
+              matched = true;
+              break;
+            }
+          }
+          if (!matched) {
+            const newOpt = new Option(found.department, found.department, true, true);
+            deptSelect.add(newOpt);
+            deptSelect.value = found.department;
+          }
+        }
+        
+        if (found.title) document.getElementById('calc-emp-title').value = found.title;
+        
+        const basicVal = found.payBasic || found.basicSalary || found.basic || found.salary || 0;
+        if (basicVal) document.getElementById('calc-basic-salary').value = parseFloat(basicVal) || 0;
+        
+        // CRITICAL REQUIREMENT: Let Continuous Start Date be the exact Employment Date from staff registration
+        const empStartDate = getEmployeeStartDate(found);
+        const startDateInput = document.getElementById('calc-start-date');
+        const badgeText = document.getElementById('start-date-source-text');
+
+        if (empStartDate && startDateInput) {
+          startDateInput.value = empStartDate;
+          if (badgeText) {
+            badgeText.textContent = `Auto-synced: Continuous Start Date = Employment Date (${empStartDate})`;
+          }
+        } else {
+          if (badgeText) {
+            badgeText.textContent = `Manual start date entry (No registration date recorded)`;
+          }
+        }
+
+        // Check if contract has a specific end date, or adjust if separation date was prior to start date
+        if (found.conEnd) {
+          document.getElementById('calc-end-date').value = found.conEnd;
+        } else {
+          const currentEnd = document.getElementById('calc-end-date').value;
+          if (!currentEnd || (empStartDate && new Date(currentEnd) < new Date(empStartDate))) {
+            document.getElementById('calc-end-date').value = new Date().toISOString().split('T')[0];
+          }
+        }
+
+        recalculate();
+        showToast(`Loaded ${found.fullName}: Start Date set to Employment Date (${empStartDate || 'Custom'})`, 'badge');
+      }
+    }
+
+    function handleDateChange() {
+      const badgeText = document.getElementById('start-date-source-text');
+      if (badgeText) {
+        badgeText.textContent = `Active Continuous Start Date: ${document.getElementById('calc-start-date').value}`;
+      }
+      recalculate();
+    }
+
+    // Excel DATEDIF equivalent calculation
+    function calculateYearsOfService(startDateStr, endDateStr) {
+      const start = new Date(startDateStr);
+      const end = new Date(endDateStr);
+      if (isNaN(start.getTime()) || isNaN(end.getTime()) || end < start) {
+        return { totalYears: 0, exactYears: 0, months: 0, days: 0 };
+      }
+
+      let years = end.getFullYear() - start.getFullYear();
+      let months = end.getMonth() - start.getMonth();
+      let days = end.getDate() - start.getDate();
+
+      if (days < 0) {
+        months -= 1;
+        const prevMonthDate = new Date(end.getFullYear(), end.getMonth(), 0);
+        days += prevMonthDate.getDate();
+      }
+      if (months < 0) {
+        years -= 1;
+        months += 12;
+      }
+
+      // Fractional years for precise accounting
+      const exactYears = years + (months / 12) + (days / 365.25);
+      return { totalYears: years, exactYears: exactYears, months: months, days: days };
+    }
+
+    // Rate Table Lookup (Section 4 of Guide)
+    function lookupBenefitRate(years) {
+      if (years < 1) return { rate: 0, label: "0%", desc: "Under 1 year (Ineligible)" };
+      if (years <= 2) return { rate: 0.25, label: "25%", desc: "Probationary / short service (25% per year)" };
+      if (years <= 5) return { rate: 0.50, label: "50%", desc: "Moderate service (50% per year)" };
+      if (years <= 10) return { rate: 0.75, label: "75%", desc: "Long service (75% per year)" };
+      return { rate: 1.00, label: "100%", desc: "Extended senior service (100% per year)" };
+    }
+
+    function recalculate() {
+      const empName = document.getElementById('calc-emp-name').value || 'Staff Employee';
+      const empId = document.getElementById('calc-emp-id').value || 'BCF-EMP-XXXX';
+      const dept = document.getElementById('calc-emp-dept').value;
+      const title = document.getElementById('calc-emp-title').value;
+      const startDate = document.getElementById('calc-start-date').value;
+      const endDate = document.getElementById('calc-end-date').value;
+      const basicSalary = Math.max(0, parseFloat(document.getElementById('calc-basic-salary').value) || 0);
+      const reason = document.getElementById('calc-reason').value;
+      const noDisciplinary = document.getElementById('calc-no-disciplinary').checked;
+
+      const leaveDays = Math.max(0, parseFloat(document.getElementById('calc-leave-days').value) || 0);
+      const gratuityRate = parseFloat(document.getElementById('calc-gratuity-rate').value) || 0;
+      const severanceAdj = Math.max(0, parseFloat(document.getElementById('calc-severance-adj').value) || 0);
+      const loanDeduct = Math.max(0, parseFloat(document.getElementById('calc-loan-deduction').value) || 0);
+      const otherDeduct = Math.max(0, parseFloat(document.getElementById('calc-other-deduction').value) || 0);
+
+      // Duration
+      const tenure = calculateYearsOfService(startDate, endDate);
+      // Strictly follows Section 7 Excel formula: Years of Service = DATEDIF(Start_Date, End_Date, "Y")
+      const years = tenure.totalYears;
+
+      // Rate Lookup
+      const rateInfo = lookupBenefitRate(years);
+
+      // Eligibility Check (Rule 2 & 3 of Guide)
+      let isEligible = true;
+      let ineligibilityReason = "";
+
+      if (reason === "misconduct") {
+        isEligible = false;
+        ineligibilityReason = "DISQUALIFIED: Under BCF-SL Policy Section 2, EOSB does NOT apply when an employee is dismissed for gross misconduct.";
+      } else if (years < 1) {
+        isEligible = false;
+        ineligibilityReason = `INELIGIBLE: Continuous service from employment date (${startDate}) is less than 1 continuous year (${tenure.months} months, ${tenure.days} days). Minimum 1 full continuous year required by BCF-SL policy.`;
+      } else if (!noDisciplinary) {
+        isEligible = false;
+        ineligibilityReason = "HOLD: Pending disciplinary case or unresolved debt with the Foundation requires HR clearance before payment.";
+      }
+
+      // Calculations
+      let coreEosb = 0;
+      if (isEligible) {
+        // Core formula: Basic Monthly Salary * Years of Service * Benefit Rate
+        coreEosb = basicSalary * years * rateInfo.rate;
+      }
+
+      // Daily Rate for leave encashment (Monthly Basic / 22 work days)
+      const dailyRate = basicSalary / 22;
+      const leaveAmount = isEligible ? (leaveDays * dailyRate) : 0;
+      const gratuityAmount = isEligible ? (coreEosb * gratuityRate) : 0;
+      const totalDeductions = loanDeduct + otherDeduct;
+      const netEntitlement = Math.max(0, (coreEosb + leaveAmount + gratuityAmount + severanceAdj) - totalDeductions);
+
+      // Store in currentCalc
+      currentCalc = {
+        empId,
+        empName,
+        dept,
+        title,
+        startDate,
+        endDate,
+        basicSalary,
+        reason,
+        noDisciplinary,
+        years,
+        tenure,
+        rate: rateInfo.rate,
+        rateLabel: rateInfo.label,
+        rateDesc: rateInfo.desc,
+        coreEosb,
+        leaveDays,
+        leaveAmount,
+        gratuityRate,
+        gratuityAmount,
+        severanceAmount: severanceAdj,
+        loanDeduction: loanDeduct,
+        otherDeduction: otherDeduct,
+        totalDeductions,
+        netEntitlement,
+        isEligible,
+        ineligibilityReason
+      };
+
+      // Update UI elements
+      updateCalculatorUI();
+    }
+
+    function updateCalculatorUI() {
+      // 1. Eligibility Banner
+      const banner = document.getElementById('eligibility-banner');
+      if (banner) {
+        if (!currentCalc.isEligible) {
+          banner.className = "p-3 rounded-xl border border-rose-300 bg-rose-50 text-rose-900 flex flex-col sm:flex-row sm:items-center justify-between gap-2.5";
+          banner.innerHTML = `
+            <div class="flex items-center gap-2">
+              <span class="material-symbols-outlined text-rose-600 text-[22px]">gpp_bad</span>
+              <div>
+                <span class="text-xs font-black uppercase text-rose-800">Benefit Entitlement Disqualified / On Hold</span>
+                <p class="text-[11px] text-rose-700 leading-tight mt-0.5">${currentCalc.ineligibilityReason}</p>
+              </div>
+            </div>
+            <span class="px-2.5 py-1 rounded bg-rose-200 text-rose-900 font-extrabold text-[10px] shrink-0 font-mono">
+              0.00 SLE PAYABLE
+            </span>
+          `;
+        } else {
+          banner.className = "p-3 rounded-xl border border-emerald-300 bg-emerald-50 text-emerald-950 flex flex-col sm:flex-row sm:items-center justify-between gap-2.5";
+          banner.innerHTML = `
+            <div class="flex items-center gap-2">
+              <span class="material-symbols-outlined text-emerald-600 text-[22px]">verified</span>
+              <div>
+                <span class="text-xs font-black uppercase text-emerald-900">Fully Qualified &amp; Eligible for EOSB</span>
+                <p class="text-[11px] text-emerald-800 leading-tight mt-0.5">
+                  Tenure: <strong>${currentCalc.years} Completed Years (=DATEDIF)</strong> [Exact: ${currentCalc.tenure.totalYears}y ${currentCalc.tenure.months}m ${currentCalc.tenure.days}d from ${currentCalc.startDate}] &bull; Rate Tier: <strong>${currentCalc.rateLabel}</strong>
+                </p>
+              </div>
+            </div>
+            <span class="px-2.5 py-1 rounded bg-emerald-200 text-emerald-900 font-extrabold text-[10px] shrink-0 font-mono">
+              ELIGIBILITY CLEARED
+            </span>
+          `;
+        }
+      }
+
+      // 2. Highlight active Rate Table Row
+      [1, 2, 3, 4].forEach(idx => {
+        const row = document.getElementById(`rate-row-${idx}`);
+        const badge = document.getElementById(`rate-badge-${idx}`);
+        if (row && badge) {
+          row.classList.remove('bg-emerald-100/70', 'font-bold', 'border-l-4', 'border-primary');
+          badge.innerHTML = '-';
+        }
+      });
+
+      if (currentCalc.isEligible) {
+        let activeIdx = 0;
+        if (currentCalc.years <= 2) activeIdx = 1;
+        else if (currentCalc.years <= 5) activeIdx = 2;
+        else if (currentCalc.years <= 10) activeIdx = 3;
+        else activeIdx = 4;
+
+        const activeRow = document.getElementById(`rate-row-${activeIdx}`);
+        const activeBadge = document.getElementById(`rate-badge-${activeIdx}`);
+        if (activeRow && activeBadge) {
+          activeRow.classList.add('bg-emerald-100/70', 'font-bold', 'border-l-4', 'border-primary');
+          activeBadge.innerHTML = '<span class="px-1.5 py-0.5 rounded bg-primary text-white text-[9px] font-bold">ACTIVE TIER</span>';
+        }
+      }
+
+      // 3. Core Formula Breakdown
+      const formulaBreakdown = document.getElementById('core-formula-breakdown');
+      const formulaResult = document.getElementById('core-formula-result');
+      if (formulaBreakdown && formulaResult) {
+        if (currentCalc.isEligible) {
+          formulaBreakdown.textContent = `${formatSLE(currentCalc.basicSalary)} SLE × ${currentCalc.years} Years (=DATEDIF) × ${currentCalc.rate}`;
+          formulaResult.textContent = `= SLE ${formatSLE(currentCalc.coreEosb)}`;
+        } else {
+          formulaBreakdown.textContent = `Ineligible — No EOSB Accrued`;
+          formulaResult.textContent = `= SLE 0.00`;
+        }
+      }
+
+      // 4. Additions display
+      const leaveDisp = document.getElementById('calc-leave-amount');
+      if (leaveDisp) leaveDisp.textContent = `+ SLE ${formatSLE(currentCalc.leaveAmount)}`;
+
+      const gratDisp = document.getElementById('calc-gratuity-amount');
+      if (gratDisp) gratDisp.textContent = `+ SLE ${formatSLE(currentCalc.gratuityAmount)}`;
+
+      const sevDisp = document.getElementById('calc-severance-amount');
+      if (sevDisp) sevDisp.textContent = `+ SLE ${formatSLE(currentCalc.severanceAmount)}`;
+
+      // 5. Total display
+      const netDisp = document.getElementById('calc-net-total-display');
+      if (netDisp) netDisp.textContent = `SLE ${formatSLE(currentCalc.netEntitlement)}`;
+
+      const wordsDisp = document.getElementById('calc-net-words-display');
+      if (wordsDisp) wordsDisp.textContent = `"${numberToWords(Math.round(currentCalc.netEntitlement))} Leones Only"`;
+
+      const rateBadge = document.getElementById('summary-rate-badge');
+      if (rateBadge) rateBadge.textContent = currentCalc.isEligible ? currentCalc.rateLabel : "0%";
+
+      const yearsBadge = document.getElementById('summary-years-badge');
+      if (yearsBadge) yearsBadge.textContent = `${currentCalc.years} Yrs (=DATEDIF)`;
+    }
+
+    function formatSLE(num) {
+      return (Number(num) || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    }
+
+    function loadGuideExample() {
+      document.getElementById('calc-emp-name').value = "Albert Joseph Bandama";
+      document.getElementById('calc-emp-id').value = "BCF-EMP-2026-0001";
+      document.getElementById('calc-emp-dept').value = "Finance & Accounts";
+      document.getElementById('calc-emp-title').value = "Accounts Officer";
+      document.getElementById('calc-start-date').value = "2020-03-01";
+      document.getElementById('calc-end-date').value = "2026-03-01";
+      document.getElementById('calc-basic-salary').value = "10000";
+      document.getElementById('calc-reason').value = "contract_completion";
+      document.getElementById('calc-no-disciplinary').checked = true;
+      document.getElementById('calc-leave-days').value = "0";
+      document.getElementById('calc-gratuity-rate').value = "0.05";
+      document.getElementById('calc-severance-adj').value = "0";
+      document.getElementById('calc-loan-deduction').value = "0";
+      document.getElementById('calc-other-deduction').value = "0";
+
+      recalculate();
+      showToast("Loaded Section 5 Guide Example: 6 Years × 10,000 SLE = 45,000 EOSB + 2,250 Gratuity = 47,250 SLE", "menu_book");
+    }
+
+    function scrollToCalculator() {
+      const calcEl = document.getElementById('calculator-section');
+      if (calcEl) calcEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+
+    // Number to words converter
+    function numberToWords(number) {
+      const units = ['', 'One', 'Two', 'Three', 'Four', 'Five', 'Six', 'Seven', 'Eight', 'Nine', 'Ten', 'Eleven', 'Twelve', 'Thirteen', 'Fourteen', 'Fifteen', 'Sixteen', 'Seventeen', 'Eighteen', 'Nineteen'];
+      const tens = ['', '', 'Twenty', 'Thirty', 'Forty', 'Fifty', 'Sixty', 'Seventy', 'Eighty', 'Ninety'];
+      
+      if (number === 0) return 'Zero';
+      
+      function helper(n) {
+        if (n < 20) return units[n];
+        if (n < 100) return tens[Math.floor(n / 10)] + (n % 10 !== 0 ? ' ' + units[n % 10] : '');
+        if (n < 1000) return units[Math.floor(n / 100)] + ' Hundred' + (n % 100 !== 0 ? ' and ' + helper(n % 100) : '');
+        if (n < 1000000) return helper(Math.floor(n / 1000)) + ' Thousand' + (n % 1000 !== 0 ? ' ' + helper(n % 1000) : '');
+        return helper(Math.floor(n / 1000000)) + ' Million' + (n % 1000000 !== 0 ? ' ' + helper(n % 1000000) : '');
+      }
+      
+      return helper(number);
+    }
+
+    // RENDER 5-YEAR SETTLEMENT REGISTRY
+    function renderRegistryTable() {
+      const tbody = document.getElementById('registry-table-body');
+      if (!tbody) return;
+
+      const searchTerm = (document.getElementById('registry-search')?.value || '').toLowerCase().trim();
+
+      const filtered = settlementRegistry.filter(r => {
+        if (!searchTerm) return true;
+        return r.empName.toLowerCase().includes(searchTerm) ||
+               r.id.toLowerCase().includes(searchTerm) ||
+               r.empId.toLowerCase().includes(searchTerm) ||
+               r.dept.toLowerCase().includes(searchTerm) ||
+               r.reason.toLowerCase().includes(searchTerm);
+      });
+
+      const countBadge = document.getElementById('registry-count-badge');
+      if (countBadge) countBadge.textContent = `${filtered.length} Record${filtered.length === 1 ? '' : 's'}`;
+
+      if (filtered.length === 0) {
+        tbody.innerHTML = `
+          <tr>
+            <td colspan="10" class="py-8 text-center text-slate-400">
+              <span class="material-symbols-outlined text-[32px] block mx-auto mb-1">search_off</span>
+              No settlement records found matching your search.
+            </td>
+          </tr>
+        `;
+        return;
+      }
+
+      tbody.innerHTML = filtered.map(item => {
+        let statusBadge = '';
+        if (item.status === 'Disbursed') {
+          statusBadge = '<span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-800 border border-emerald-200">Disbursed</span>';
+        } else if (item.status === 'Approved') {
+          statusBadge = '<span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-blue-100 text-blue-800 border border-blue-200">Approved</span>';
+        } else {
+          statusBadge = '<span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-100 text-amber-800 border border-amber-200">Pending Audit</span>';
+        }
+
+        return `
+          <tr class="hover:bg-slate-50/80 transition-colors">
+            <td class="py-2.5 px-3 font-mono font-bold text-primary">${item.id}</td>
+            <td class="py-2.5 px-3">
+              <div class="font-bold text-slate-900">${item.empName}</div>
+              <div class="text-[10px] text-slate-400 font-mono">${item.empId}</div>
+            </td>
+            <td class="py-2.5 px-3 text-slate-600">${item.dept}</td>
+            <td class="py-2.5 px-3 font-mono font-bold text-slate-800">${item.years.toFixed(1)} Yrs</td>
+            <td class="py-2.5 px-3 font-mono">${formatSLE(item.basicSalary)}</td>
+            <td class="py-2.5 px-3 font-mono text-emerald-800 font-bold">${Math.round(item.rate * 100)}%</td>
+            <td class="py-2.5 px-3 font-mono font-bold text-slate-800">${formatSLE(item.coreEosb)}</td>
+            <td class="py-2.5 px-3 font-mono font-black text-primary text-sm">${formatSLE(item.netEntitlement)}</td>
+            <td class="py-2.5 px-3">${statusBadge}</td>
+            <td class="py-2.5 px-3 text-right whitespace-nowrap">
+              <button type="button" 
+                      onclick="viewArchivedVoucher('${item.id}')" 
+                      class="px-2 py-1 rounded bg-slate-100 hover:bg-slate-200 text-slate-700 text-[11px] font-bold inline-flex items-center gap-1 transition"
+                      title="View Voucher">
+                <span class="material-symbols-outlined text-[14px]">receipt_long</span>
+                <span>Voucher</span>
+              </button>
+            </td>
+          </tr>
+        `;
+      }).join('');
+
+      // Refresh KPI totals
+      updateKPISummaries();
+    }
+
+    function updateKPISummaries() {
+      const disbursedTotal = settlementRegistry
+        .filter(s => s.status === 'Disbursed')
+        .reduce((sum, s) => sum + s.netEntitlement, 0);
+
+      const pendingCount = settlementRegistry.filter(s => s.status !== 'Disbursed').length;
+
+      const totalYears = settlementRegistry.reduce((sum, s) => sum + s.years, 0);
+      const avgYears = settlementRegistry.length > 0 ? (totalYears / settlementRegistry.length).toFixed(1) : "0.0";
+
+      const disbursedEl = document.getElementById('kpi-total-disbursed');
+      if (disbursedEl) disbursedEl.textContent = `SLE ${formatSLE(disbursedTotal)}`;
+
+      const pendingEl = document.getElementById('kpi-pending-cases');
+      if (pendingEl) pendingEl.textContent = `${pendingCount} Active Case${pendingCount === 1 ? '' : 's'}`;
+
+      const avgEl = document.getElementById('kpi-avg-service');
+      if (avgEl) avgEl.textContent = `${avgYears} Years`;
+    }
+
+    // COMMIT CURRENT SETTLEMENT CASE
+    function saveCurrentSettlementCase() {
+      if (!currentCalc.isEligible) {
+        alert("Cannot commit an ineligible case. Please review the separation grounds or years of service.");
+        return;
+      }
+
+      const newRef = `BCF-EOSB-${new Date().getFullYear()}-${String(settlementRegistry.length + 1).padStart(4, '0')}`;
+      
+      const newRecord = {
+        id: newRef,
+        empId: currentCalc.empId,
+        empName: currentCalc.empName,
+        dept: currentCalc.dept,
+        title: currentCalc.title,
+        startDate: currentCalc.startDate,
+        endDate: currentCalc.endDate,
+        years: currentCalc.years,
+        basicSalary: currentCalc.basicSalary,
+        rate: currentCalc.rate,
+        rateDesc: currentCalc.rateDesc,
+        reason: currentCalc.reason === 'contract_completion' ? 'Contract Completion' :
+                currentCalc.reason === 'retirement' ? 'Normal Retirement' :
+                currentCalc.reason === 'resignation' ? 'Voluntary Resignation' : 'Other Clearance',
+        coreEosb: currentCalc.coreEosb,
+        leaveDays: currentCalc.leaveDays,
+        leaveAmount: currentCalc.leaveAmount,
+        gratuityRate: currentCalc.gratuityRate,
+        gratuityAmount: currentCalc.gratuityAmount,
+        severanceAmount: currentCalc.severanceAmount,
+        deductions: currentCalc.totalDeductions,
+        netEntitlement: currentCalc.netEntitlement,
+        status: "Approved",
+        stage: 4,
+        dateCreated: new Date().toISOString().split('T')[0]
+      };
+
+      settlementRegistry.unshift(newRecord);
+      try {
+        localStorage.setItem('bcf_eosb_registry', JSON.stringify(settlementRegistry));
+      } catch(e) {}
+
+      renderRegistryTable();
+      showToast(`Settlement case ${newRef} committed to 5-Year Registry!`, 'save');
+      previewOfficialVoucherModal();
+    }
+
+    // MODAL PREVIEW & PRINT
+    function previewOfficialVoucherModal() {
+      document.getElementById('vouch-ref-display').textContent = `BCF-EOSB-2026-0042`;
+      document.getElementById('vouch-date-display').textContent = new Date().toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
+      document.getElementById('vouch-name').textContent = currentCalc.empName;
+      document.getElementById('vouch-id').textContent = currentCalc.empId;
+      document.getElementById('vouch-dept').textContent = currentCalc.dept;
+      document.getElementById('vouch-title').textContent = currentCalc.title;
+      document.getElementById('vouch-start').textContent = currentCalc.startDate;
+      document.getElementById('vouch-end').textContent = currentCalc.endDate;
+      document.getElementById('vouch-years').textContent = `${currentCalc.years.toFixed(2)} Continuous Years`;
+      document.getElementById('vouch-reason').textContent = currentCalc.reason.replace(/_/g, ' ');
+
+      document.getElementById('vouch-basic').textContent = formatSLE(currentCalc.basicSalary);
+      document.getElementById('vouch-rate-pct').textContent = `${Math.round(currentCalc.rate * 100)}%`;
+      document.getElementById('vouch-rate-desc').textContent = currentCalc.rateDesc;
+
+      document.getElementById('vouch-core-math').textContent = `${formatSLE(currentCalc.basicSalary)} × ${currentCalc.years.toFixed(2)} × ${currentCalc.rate}`;
+      document.getElementById('vouch-core-eosb').textContent = formatSLE(currentCalc.coreEosb);
+
+      document.getElementById('vouch-leave-desc').textContent = `${currentCalc.leaveDays} unused days at SLE ${(currentCalc.basicSalary/22).toFixed(2)}/day`;
+      document.getElementById('vouch-leave-amt').textContent = formatSLE(currentCalc.leaveAmount);
+
+      document.getElementById('vouch-gratuity-desc').textContent = `${Math.round(currentCalc.gratuityRate * 100)}% Performance Gratuity`;
+      document.getElementById('vouch-gratuity-amt').textContent = `+ ${formatSLE(currentCalc.gratuityAmount)}`;
+
+      document.getElementById('vouch-severance-amt').textContent = formatSLE(currentCalc.severanceAmount);
+      document.getElementById('vouch-deductions-amt').textContent = `- ${formatSLE(currentCalc.totalDeductions)}`;
+
+      document.getElementById('vouch-net-total').textContent = `SLE ${formatSLE(currentCalc.netEntitlement)}`;
+      document.getElementById('vouch-words').textContent = `${numberToWords(Math.round(currentCalc.netEntitlement))} Leones Only`;
+
+      document.getElementById('sign-emp-name').textContent = currentCalc.empName;
+
+      document.getElementById('printable-voucher-modal').classList.remove('hidden');
+    }
+
+    function viewArchivedVoucher(refId) {
+      const record = settlementRegistry.find(r => r.id === refId);
+      if (!record) return;
+
+      document.getElementById('vouch-ref-display').textContent = record.id;
+      document.getElementById('vouch-date-display').textContent = record.dateCreated;
+      document.getElementById('vouch-name').textContent = record.empName;
+      document.getElementById('vouch-id').textContent = record.empId;
+      document.getElementById('vouch-dept').textContent = record.dept;
+      document.getElementById('vouch-title').textContent = record.title;
+      document.getElementById('vouch-start').textContent = record.startDate;
+      document.getElementById('vouch-end').textContent = record.endDate;
+      document.getElementById('vouch-years').textContent = `${record.years.toFixed(2)} Continuous Years`;
+      document.getElementById('vouch-reason').textContent = record.reason;
+
+      document.getElementById('vouch-basic').textContent = formatSLE(record.basicSalary);
+      document.getElementById('vouch-rate-pct').textContent = `${Math.round(record.rate * 100)}%`;
+      document.getElementById('vouch-rate-desc').textContent = record.rateDesc;
+
+      document.getElementById('vouch-core-math').textContent = `${formatSLE(record.basicSalary)} × ${record.years.toFixed(2)} × ${record.rate}`;
+      document.getElementById('vouch-core-eosb').textContent = formatSLE(record.coreEosb);
+
+      document.getElementById('vouch-leave-desc').textContent = `${record.leaveDays} unused days`;
+      document.getElementById('vouch-leave-amt').textContent = formatSLE(record.leaveAmount);
+
+      document.getElementById('vouch-gratuity-desc').textContent = `${Math.round(record.gratuityRate * 100)}% Performance Gratuity`;
+      document.getElementById('vouch-gratuity-amt').textContent = `+ ${formatSLE(record.gratuityAmount)}`;
+
+      document.getElementById('vouch-severance-amt').textContent = formatSLE(record.severanceAmount);
+      document.getElementById('vouch-deductions-amt').textContent = `- ${formatSLE(record.deductions)}`;
+
+      document.getElementById('vouch-net-total').textContent = `SLE ${formatSLE(record.netEntitlement)}`;
+      document.getElementById('vouch-words').textContent = `${numberToWords(Math.round(record.netEntitlement))} Leones Only`;
+
+      document.getElementById('sign-emp-name').textContent = record.empName;
+
+      document.getElementById('printable-voucher-modal').classList.remove('hidden');
+    }
+
+    function closeVoucherModal() {
+      document.getElementById('printable-voucher-modal').classList.add('hidden');
+    }
+
+    function openGuideModal() {
+      document.getElementById('guide-modal').classList.remove('hidden');
+    }
+
+    function closeGuideModal() {
+      document.getElementById('guide-modal').classList.add('hidden');
+    }
+
+    function openNewCaseModal() {
+      document.getElementById('calc-staff-select').value = "";
+      document.getElementById('calc-emp-name').value = "";
+      document.getElementById('calc-emp-id').value = "BCF-EMP-2026-";
+      document.getElementById('calc-basic-salary').value = "5000";
+      document.getElementById('calc-start-date').value = "2023-01-01";
+      document.getElementById('calc-end-date').value = new Date().toISOString().split('T')[0];
+      document.getElementById('calc-leave-days').value = "0";
+      document.getElementById('calc-gratuity-rate').value = "0";
+      document.getElementById('calc-severance-adj').value = "0";
+      document.getElementById('calc-loan-deduction').value = "0";
+      document.getElementById('calc-other-deduction').value = "0";
+      recalculate();
+      scrollToCalculator();
+      showToast("Ready for new EOSB calculation entry", "add_circle");
+    }
+
+    // SIGN OFF WORKFLOW SIMULATIONS
+    function signAuditCompliance() {
+      const card = document.getElementById('stage-card-3');
+      if (card) {
+        card.innerHTML = `
+          <div class="w-6 h-6 rounded-full bg-emerald-600 text-white flex items-center justify-center font-bold text-xs shrink-0 mt-0.5">
+            <span class="material-symbols-outlined text-[14px]">check</span>
+          </div>
+          <div class="flex-1 min-w-0">
+            <div class="flex items-center justify-between gap-1">
+              <span class="font-bold text-slate-900">3. Internal Audit Compliance Review</span>
+              <span class="text-[10px] font-bold text-emerald-800 bg-emerald-100 px-1.5 py-0.2 rounded">AUDITED &amp; CLEARED</span>
+            </div>
+            <p class="text-[11px] text-slate-500 mt-0.5">Full compliance verified with SL Labor Act, BCF-SL Manual, and donor covenants.</p>
+            <div class="text-[10px] text-slate-400 font-mono mt-1">Sign-off: K. Mansaray (Head of Audit) &bull; Verified</div>
+          </div>
+        `;
+      }
+      showToast("Internal Audit Compliance Sign-Off Executed!", "verified");
+    }
+
+    function signExecutiveApproval() {
+      const card = document.getElementById('stage-card-4');
+      if (card) {
+        card.innerHTML = `
+          <div class="w-6 h-6 rounded-full bg-emerald-600 text-white flex items-center justify-center font-bold text-xs shrink-0 mt-0.5">
+            <span class="material-symbols-outlined text-[14px]">check</span>
+          </div>
+          <div class="flex-1 min-w-0">
+            <div class="flex items-center justify-between gap-1">
+              <span class="font-bold text-slate-900">4. CEO &amp; Governing Board Approval</span>
+              <span class="text-[10px] font-bold text-emerald-800 bg-emerald-100 px-1.5 py-0.2 rounded">AUTHORIZED</span>
+            </div>
+            <p class="text-[11px] text-slate-500 mt-0.5">Disbursement authorized from Foundation Reserves by Executive Board Resolution.</p>
+            <div class="text-[10px] text-slate-400 font-mono mt-1">Sign-off: Chief Executive &amp; Board Chair &bull; Sealed</div>
+          </div>
+        `;
+      }
+      showToast("CEO & Governing Board Authorization Sealed!", "draw");
+    }
+
+    // EXPORT TO CSV
+    function exportRegistryCSV() {
+      let csvContent = "data:text/csv;charset=utf-8,";
+      csvContent += "Voucher Ref,Employee ID,Employee Name,Department,Years of Service,Basic Salary SLE,Benefit Rate,Core EOSB SLE,Net Entitlement SLE,Status\n";
+
+      settlementRegistry.forEach(r => {
+        csvContent += `"${r.id}","${r.empId}","${r.empName}","${r.dept}",${r.years},${r.basicSalary},${r.rate},${r.coreEosb},${r.netEntitlement},"${r.status}"\n`;
+      });
+
+      const encodedUri = encodeURI(csvContent);
+      const link = document.createElement("a");
+      link.setAttribute("href", encodedUri);
+      link.setAttribute("download", `BCF_SL_EOSB_Settlement_Ledger_${new Date().toISOString().split('T')[0]}.csv`);
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      showToast("Exported 5-Year EOSB Ledger to CSV", "file_download");
+    }
+
+    // TOAST SYSTEM
+    function showToast(message, icon = 'info') {
+      const container = document.getElementById('toast-container');
+      if (!container) return;
+
+      const toast = document.createElement('div');
+      toast.className = "bg-slate-900/95 text-white text-xs px-3.5 py-2.5 rounded-xl shadow-lg flex items-center gap-2 border border-slate-700 pointer-events-auto transform translate-y-2 opacity-0 transition-all duration-200";
+      toast.innerHTML = `
+        <span class="material-symbols-outlined text-[18px] text-emerald-400">${icon}</span>
+        <span>${message}</span>
+      `;
+
+      container.appendChild(toast);
+      setTimeout(() => {
+        toast.classList.remove('translate-y-2', 'opacity-0');
+      }, 10);
+
+      setTimeout(() => {
+        toast.classList.add('opacity-0', 'translate-y-2');
+        setTimeout(() => toast.remove(), 250);
+      }, 3500);
+    }
+
+    // INITIALIZATION ON LOAD & CROSS-TAB SYNC
+    window.addEventListener('DOMContentLoaded', () => {
+      try {
+        const savedRegistry = localStorage.getItem('bcf_eosb_registry');
+        if (savedRegistry) {
+          settlementRegistry = JSON.parse(savedRegistry);
+        }
+      } catch(e) {}
+
+      loadStaffRoster();
+      recalculate();
+      renderRegistryTable();
+    });
+
+    // Cross-tab synchronization when staff are registered or updated in other modules
+    window.addEventListener('storage', (e) => {
+      if (e.key === 'bcf_staff_registry') {
+        loadStaffRoster(true);
+      }
+      if (e.key === 'bcf_eosb_registry' && e.newValue) {
+        try {
+          settlementRegistry = JSON.parse(e.newValue);
+          renderRegistryTable();
+        } catch(_) {}
+      }
+    });
+
+    // Auto-refresh roster when focusing back onto tab
+    window.addEventListener('focus', () => {
+      loadStaffRoster(false);
+    });
+  </script>
+
+</body>
+</html>

@@ -1,0 +1,2221 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" name="viewport"/>
+  <title>Donation Registration Form - BCF-SL DonorLog CRM</title>
+  <link href="https://fonts.googleapis.com" rel="preconnect"/>
+  <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..24,400..600,0..1,0" rel="stylesheet"/>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script id="tailwind-config">
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            primary: '#0f766e',
+            'primary-dark': '#0d5d56',
+            'primary-light': '#ccfbf1',
+            secondary: '#006c49',
+            'secondary-container': '#d1fae5',
+            surface: '#f8fafc',
+            'surface-card': '#ffffff',
+            'on-surface': '#0f172a',
+            'on-surface-variant': '#64748b',
+            outline: '#e2e8f0',
+            'outline-strong': '#cbd5e1'
+          },
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+            display: ['Plus Jakarta Sans', 'sans-serif']
+          }
+        }
+      }
+    };
+  </script>
+  <style>
+    @layer base {
+      html, body {
+        width: 100%;
+        margin: 0;
+        padding: 0;
+        font-family: 'Inter', sans-serif;
+      }
+      body {
+        overscroll-behavior-y: none;
+      }
+    }
+    .custom-scrollbar::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-track {
+      background: #f1f5f9;
+    }
+    .custom-scrollbar::-webkit-scrollbar-thumb {
+      background: #cbd5e1;
+      border-radius: 4px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+      background: #94a3b8;
+    }
+    
+    /* Interactive Checkbox & Radio Style */
+    .form-choice-btn {
+      transition: all 0.15s ease-in-out;
+      cursor: pointer;
+      user-select: none;
+    }
+    .form-choice-btn.active {
+      background-color: #0f766e;
+      color: #ffffff;
+      border-color: #0f766e;
+      box-shadow: 0 1px 3px rgba(15, 118, 110, 0.3);
+    }
+    .form-choice-btn.active .choice-box {
+      background-color: #ffffff;
+      border-color: #ffffff;
+      color: #0f766e;
+    }
+
+    /* Print Specific Rules */
+    @media print {
+      body {
+        background-color: #ffffff !important;
+        color: #000000 !important;
+        font-size: 11px !important;
+      }
+      header, nav, #floating-action-dock, #toast-container, .no-print {
+        display: none !important;
+      }
+      main {
+        padding: 0 !important;
+        margin: 0 !important;
+      }
+      .printable-paper {
+        border: 2px solid #0f172a !important;
+        box-shadow: none !important;
+        border-radius: 0 !important;
+        padding: 16px !important;
+        margin: 0 !important;
+        width: 100% !important;
+        max-width: 100% !important;
+      }
+      .page-break-inside-avoid {
+        page-break-inside: avoid;
+      }
+      input, select, textarea {
+        border-color: #64748b !important;
+        color: #000000 !important;
+        background: #ffffff !important;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+      }
+      .badge-print {
+        border: 1px solid #000000 !important;
+        background-color: #f1f5f9 !important;
+        color: #000000 !important;
+      }
+    }
+  </style>
+</head>
+
+<body class="bg-slate-100 text-slate-800 antialiased min-h-screen flex flex-col font-sans">
+
+  <!-- TOP APP HEADER -->
+  <header class="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-slate-200 px-4 sm:px-8 py-2.5 shadow-xs no-print">
+    <div class="max-w-6xl mx-auto flex items-center justify-between gap-4">
+      <div class="flex items-center gap-3">
+        <img alt="BCF-SL Official Logo" class="h-9 w-auto object-contain shrink-0 rounded"
+             src="/bcf_official_logo.png" onerror="this.onerror=null; this.src='../../../../bcf_official_logo.png';"/>
+        <div>
+          <div class="flex items-center gap-2">
+            <h1 class="font-display font-extrabold text-slate-900 text-sm tracking-tight">BANDAMA CHARITY FOUNDATION (BCF-SL)</h1>
+            <span class="px-2 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-teal-50 text-teal-800 border border-teal-200">DonorLog CRM</span>
+          </div>
+          <p class="text-[11px] text-slate-500 font-medium">Log New Donation &bull; Official Registration &amp; Audit Dossier</p>
+        </div>
+      </div>
+
+      <!-- Quick Action Toolbar -->
+      <div class="flex items-center gap-2">
+        <a href="../donor_dossier_history/code.html" class="px-3 py-1.5 rounded-lg border border-teal-300 bg-teal-50/70 hover:bg-teal-100 text-teal-900 text-xs font-bold inline-flex items-center gap-1.5 transition shadow-2xs" title="Open Donor Dossier Ledger">
+          <span class="material-symbols-outlined text-[16px] text-teal-700">folder_shared</span>
+          <span class="hidden sm:inline">Donor Dossier</span>
+        </a>
+
+        <a href="../donors_directory_log/code.html" class="px-3 py-1.5 rounded-lg border border-slate-300 hover:bg-slate-50 text-slate-700 text-xs font-semibold inline-flex items-center gap-1.5 transition shadow-2xs" title="Open Donors Directory">
+          <span class="material-symbols-outlined text-[16px] text-slate-600">group</span>
+          <span class="hidden sm:inline">Directory</span>
+        </a>
+
+        <button type="button" onclick="loadSampleDonation()" class="px-3 py-1.5 rounded-lg border border-slate-300 hover:bg-slate-50 text-slate-700 text-xs font-semibold inline-flex items-center gap-1.5 transition shadow-2xs" title="Fill realistic sample donation details">
+          <span class="material-symbols-outlined text-[16px] text-teal-700">data_object</span>
+          <span class="hidden sm:inline">Sample Data</span>
+        </button>
+
+        <button type="button" onclick="resetDonationForm()" class="px-3 py-1.5 rounded-lg border border-slate-300 hover:bg-slate-50 text-slate-700 text-xs font-semibold inline-flex items-center gap-1.5 transition shadow-2xs" title="Clear form for a new registration">
+          <span class="material-symbols-outlined text-[16px] text-slate-500">restart_alt</span>
+          <span class="hidden sm:inline">New Blank</span>
+        </button>
+
+        <button type="button" onclick="togglePastRecordsModal()" class="px-3 py-1.5 rounded-lg border border-teal-300 bg-teal-50/70 hover:bg-teal-100 text-teal-900 text-xs font-bold inline-flex items-center gap-1.5 transition shadow-2xs">
+          <span class="material-symbols-outlined text-[16px] text-teal-700">receipt_long</span>
+          <span>Ledger Log</span>
+          <span id="badge-saved-count" class="ml-0.5 px-1.5 py-0.2 bg-teal-700 text-white rounded-full text-[10px]">0</span>
+        </button>
+
+        <button type="button" onclick="window.print()" class="px-3.5 py-1.5 rounded-lg bg-teal-700 hover:bg-teal-800 text-white text-xs font-bold inline-flex items-center gap-1.5 transition shadow-sm" title="Print or save as PDF">
+          <span class="material-symbols-outlined text-[16px]">print</span>
+          <span>Print / PDF</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- MAIN WRAPPER -->
+  <main class="flex-1 w-full max-w-5xl mx-auto p-4 sm:p-6 pb-32">
+
+    <!-- FORM PAPER CONTAINER -->
+    <div class="printable-paper bg-white rounded-2xl border border-slate-200 shadow-md p-6 sm:p-10 space-y-7 transition-all">
+
+      <!-- 1. OFFICIAL FORM HEADER & TITLE -->
+      <div class="border-b-2 border-teal-800 pb-5 text-center relative">
+        <div class="grid grid-cols-1 md:grid-cols-12 items-center gap-4 mb-3">
+          <!-- Logo (Left) -->
+          <div class="md:col-span-3 flex items-center justify-center md:justify-start">
+            <img alt="BCF-SL Logo" class="h-16 w-auto object-contain rounded" 
+                 src="/bcf_official_logo.png" onerror="this.onerror=null; this.src='../../../../bcf_official_logo.png';"/>
+          </div>
+
+          <!-- Organization Title Block (Center) -->
+          <div class="md:col-span-5 text-center flex flex-col items-center justify-center">
+            <div class="text-[11px] font-black uppercase tracking-widest text-teal-900">Non-Governmental Organization &bull; Sierra Leone</div>
+            <div class="text-base sm:text-lg font-black text-slate-900 tracking-tight leading-tight my-0.5">BANDAMA CHARITY FOUNDATION &ndash; SIERRA LEONE</div>
+            <div class="text-[11px] font-bold text-teal-700 font-mono">BCF-SL &bull; REG. NO: SL-NNGO-2023-084</div>
+          </div>
+          
+          <!-- Address & Contact Block (Right) -->
+          <div class="md:col-span-4 text-center md:text-right md:border-l md:border-slate-200 md:pl-4 text-[11px] text-slate-600 font-medium leading-tight space-y-0.5">
+            <div><span class="font-bold text-slate-800">Southern Region Office:</span> 2 Ernest Gborie Street Off Gerihun Road Bo, Sierra Leone</div>
+            <div><span class="font-bold text-slate-800">Headquarters:</span> Freetown, Sierra Leone</div>
+            <div class="text-teal-800 font-semibold">bandamacharityfoundationsl@gmail.com</div>
+            <div class="text-teal-900 font-bold font-mono">+23278242826</div>
+          </div>
+        </div>
+
+        <div class="mt-4 pt-3 border-t border-slate-100">
+          <span class="inline-block px-4 py-1 rounded-full bg-teal-800 text-white text-xs font-black tracking-widest uppercase mb-1.5 shadow-2xs">
+            DONATION REGISTRATION FORM
+          </span>
+          <p class="text-xs text-slate-600 font-medium max-w-2xl mx-auto italic">
+            Complete one form per donation received. Attach supporting documents (receipt, voucher, photos) where applicable.
+          </p>
+        </div>
+      </div>
+
+      <!-- 2. REGISTRATION METADATA HEADER GRID -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 bg-slate-50 p-4 rounded-xl border border-slate-200">
+        <div>
+          <label class="block text-[11px] font-bold uppercase text-slate-600 mb-1 flex items-center gap-1">
+            <span class="material-symbols-outlined text-[14px] text-teal-700">tag</span>
+            <span>Donation ID</span>
+            <span class="text-rose-500">*</span>
+          </label>
+          <input type="text" id="reg-donation-id" value="DON-2025-001" required
+                 class="w-full h-9 px-3 rounded-lg border border-slate-300 text-xs font-mono font-bold text-teal-900 bg-white focus:ring-1 focus:ring-teal-700 focus:outline-none"/>
+        </div>
+
+        <div>
+          <label class="block text-[11px] font-bold uppercase text-slate-600 mb-1 flex items-center gap-1">
+            <span class="material-symbols-outlined text-[14px] text-teal-700">badge</span>
+            <span>Donor ID</span>
+          </label>
+          <input type="text" id="reg-donor-id" value="DNR-SL-0104" placeholder="e.g. DNR-SL-0104"
+                 class="w-full h-9 px-3 rounded-lg border border-slate-300 text-xs font-mono font-semibold text-slate-800 bg-white focus:ring-1 focus:ring-teal-700 focus:outline-none"/>
+        </div>
+
+        <div>
+          <label class="block text-[11px] font-bold uppercase text-slate-600 mb-1 flex items-center gap-1">
+            <span class="material-symbols-outlined text-[14px] text-teal-700">person</span>
+            <span>Registered By</span>
+            <span class="text-rose-500">*</span>
+          </label>
+          <input type="text" id="reg-registered-by" value="Amadu Kamara (Grants Officer)" required
+                 class="w-full h-9 px-3 rounded-lg border border-slate-300 text-xs font-semibold text-slate-800 bg-white focus:ring-1 focus:ring-teal-700 focus:outline-none"/>
+        </div>
+
+        <div>
+          <label class="block text-[11px] font-bold uppercase text-slate-600 mb-1 flex items-center gap-1">
+            <span class="material-symbols-outlined text-[14px] text-teal-700">calendar_today</span>
+            <span>Date of Registration</span>
+            <span class="text-rose-500">*</span>
+          </label>
+          <input type="date" id="reg-date" required
+                 class="w-full h-9 px-3 rounded-lg border border-slate-300 text-xs font-semibold text-slate-800 bg-white focus:ring-1 focus:ring-teal-700 focus:outline-none"/>
+        </div>
+      </div>
+
+      <!-- 3. SECTION: DONOR PROFILE -->
+      <div class="space-y-4 pt-2">
+        <div class="flex items-center justify-between border-b border-slate-200 pb-2">
+          <h2 class="text-sm font-extrabold text-slate-900 uppercase tracking-wide flex items-center gap-2">
+            <span class="w-6 h-6 rounded-md bg-teal-100 text-teal-800 flex items-center justify-center font-bold text-xs">1</span>
+            <span>Donor Profile</span>
+          </h2>
+          <span class="text-[11px] text-rose-600 font-semibold">* Required fields</span>
+        </div>
+
+        <!-- Donor Type -->
+        <div>
+          <label class="block text-xs font-bold text-slate-700 mb-1.5">
+            Donor Type <span class="text-rose-500">*</span>
+          </label>
+          <div class="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-2" id="donor-type-group">
+            <button type="button" onclick="selectDonorType('Individual')" class="form-choice-btn donor-type-pill px-2.5 py-2 rounded-lg border border-slate-300 text-xs font-semibold flex items-center justify-center gap-1.5 bg-white text-slate-700 hover:border-teal-600">
+              <span class="choice-box w-3.5 h-3.5 rounded-sm border border-slate-400 flex items-center justify-center text-[10px]"></span>
+              <span>Individual</span>
+            </button>
+            <button type="button" onclick="selectDonorType('Corporate')" class="form-choice-btn donor-type-pill active px-2.5 py-2 rounded-lg border border-teal-700 text-xs font-semibold flex items-center justify-center gap-1.5 bg-teal-700 text-white">
+              <span class="choice-box w-3.5 h-3.5 rounded-sm border border-white flex items-center justify-center text-[10px]">&check;</span>
+              <span>Corporate</span>
+            </button>
+            <button type="button" onclick="selectDonorType('NGO/Foundation')" class="form-choice-btn donor-type-pill px-2.5 py-2 rounded-lg border border-slate-300 text-xs font-semibold flex items-center justify-center gap-1.5 bg-white text-slate-700 hover:border-teal-600">
+              <span class="choice-box w-3.5 h-3.5 rounded-sm border border-slate-400 flex items-center justify-center text-[10px]"></span>
+              <span>NGO / Fdn</span>
+            </button>
+            <button type="button" onclick="selectDonorType('Government')" class="form-choice-btn donor-type-pill px-2.5 py-2 rounded-lg border border-slate-300 text-xs font-semibold flex items-center justify-center gap-1.5 bg-white text-slate-700 hover:border-teal-600">
+              <span class="choice-box w-3.5 h-3.5 rounded-sm border border-slate-400 flex items-center justify-center text-[10px]"></span>
+              <span>Government</span>
+            </button>
+            <button type="button" onclick="selectDonorType('Multilateral')" class="form-choice-btn donor-type-pill px-2.5 py-2 rounded-lg border border-slate-300 text-xs font-semibold flex items-center justify-center gap-1.5 bg-white text-slate-700 hover:border-teal-600">
+              <span class="choice-box w-3.5 h-3.5 rounded-sm border border-slate-400 flex items-center justify-center text-[10px]"></span>
+              <span>Multilateral</span>
+            </button>
+            <button type="button" onclick="selectDonorType('Faith-Based')" class="form-choice-btn donor-type-pill px-2.5 py-2 rounded-lg border border-slate-300 text-xs font-semibold flex items-center justify-center gap-1.5 bg-white text-slate-700 hover:border-teal-600">
+              <span class="choice-box w-3.5 h-3.5 rounded-sm border border-slate-400 flex items-center justify-center text-[10px]"></span>
+              <span>Faith-Based</span>
+            </button>
+            <button type="button" onclick="selectDonorType('Other')" class="form-choice-btn donor-type-pill px-2.5 py-2 rounded-lg border border-slate-300 text-xs font-semibold flex items-center justify-center gap-1.5 bg-white text-slate-700 hover:border-teal-600">
+              <span class="choice-box w-3.5 h-3.5 rounded-sm border border-slate-400 flex items-center justify-center text-[10px]"></span>
+              <span>Other</span>
+            </button>
+          </div>
+          <input type="hidden" id="selected-donor-type" value="Corporate"/>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+          <div>
+            <label class="block text-xs font-bold text-slate-700 mb-1">Name of CEO / Executive Director</label>
+            <input type="text" id="donor-ceo" placeholder="e.g. Dr. Haja Fatima Sesay"
+                   class="w-full h-9 px-3 rounded-lg border border-slate-300 text-xs focus:ring-1 focus:ring-teal-700 focus:outline-none"/>
+          </div>
+
+          <div>
+            <label class="block text-xs font-bold text-slate-700 mb-1">
+              Name of Donor (Contact Person) <span class="text-rose-500">*</span>
+            </label>
+            <input type="text" id="donor-contact" required placeholder="e.g. Sahr Emmanuel Bangura" value="Sahr Emmanuel Bangura"
+                   class="w-full h-9 px-3 rounded-lg border border-slate-300 text-xs font-semibold focus:ring-1 focus:ring-teal-700 focus:outline-none"/>
+          </div>
+
+          <div>
+            <label class="block text-xs font-bold text-slate-700 mb-1">
+              Organization Name <span class="text-rose-500">*</span>
+            </label>
+            <input type="text" id="donor-org" required placeholder="e.g. Sierra Leone Commercial Bank CSR Trust" value="Sierra Leone Commercial Bank CSR Trust"
+                   class="w-full h-9 px-3 rounded-lg border border-slate-300 text-xs font-semibold focus:ring-1 focus:ring-teal-700 focus:outline-none"/>
+          </div>
+
+          <div>
+            <label class="block text-xs font-bold text-slate-700 mb-1">
+              Organization Email <span class="text-rose-500">*</span>
+            </label>
+            <input type="email" id="donor-email" required placeholder="csr@slcb-freetown.com" value="csr@slcb-freetown.com"
+                   class="w-full h-9 px-3 rounded-lg border border-slate-300 text-xs focus:ring-1 focus:ring-teal-700 focus:outline-none"/>
+          </div>
+
+          <div>
+            <label class="block text-xs font-bold text-slate-700 mb-1">
+              Organization Phone <span class="text-rose-500">*</span>
+            </label>
+            <input type="tel" id="donor-phone" required placeholder="+232 76 543210" value="+232 76 543210"
+                   class="w-full h-9 px-3 rounded-lg border border-slate-300 text-xs font-mono focus:ring-1 focus:ring-teal-700 focus:outline-none"/>
+          </div>
+
+          <div>
+            <label class="block text-xs font-bold text-slate-700 mb-1">
+              Country of Operation <span class="text-rose-500">*</span>
+            </label>
+            <input type="text" id="donor-country" required placeholder="e.g. Sierra Leone / West Africa" value="Sierra Leone"
+                   class="w-full h-9 px-3 rounded-lg border border-slate-300 text-xs font-semibold focus:ring-1 focus:ring-teal-700 focus:outline-none"/>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+          <div class="sm:col-span-2">
+            <label class="block text-xs font-bold text-slate-700 mb-1">Organization Address</label>
+            <input type="text" id="donor-address" placeholder="e.g. 29 Siaka Stevens Street, Freetown, Sierra Leone" value="29 Siaka Stevens Street, Freetown, Sierra Leone"
+                   class="w-full h-9 px-3 rounded-lg border border-slate-300 text-xs focus:ring-1 focus:ring-teal-700 focus:outline-none"/>
+          </div>
+
+          <div>
+            <label class="block text-xs font-bold text-slate-700 mb-1">Website</label>
+            <input type="url" id="donor-website" placeholder="https://www.slcb.com" value="https://www.slcb.com"
+                   class="w-full h-9 px-3 rounded-lg border border-slate-300 text-xs font-mono focus:ring-1 focus:ring-teal-700 focus:outline-none"/>
+          </div>
+        </div>
+
+        <!-- Organization Logo File Ref & Checkbox -->
+        <div class="p-3 bg-slate-50 rounded-xl border border-slate-200 flex flex-col sm:flex-row items-center justify-between gap-3">
+          <div class="flex items-center gap-3">
+            <label class="flex items-center gap-2 cursor-pointer font-bold text-xs text-slate-800">
+              <input type="checkbox" id="donor-logo-attached" checked class="w-4 h-4 rounded text-teal-700 focus:ring-0 cursor-pointer"/>
+              <span>Organization Logo Attached</span>
+            </label>
+            <span class="text-[11px] text-slate-500 italic">(PNG, JPG or Vector)</span>
+          </div>
+
+          <div class="flex items-center gap-2 w-full sm:w-auto">
+            <span class="text-xs font-semibold text-slate-600 shrink-0">File Ref.:</span>
+            <input type="text" id="donor-logo-ref" value="LOGO_SLCB_2025.PNG" placeholder="e.g. LOGO_SLCB_2025.PNG"
+                   class="h-8 px-2.5 rounded border border-slate-300 text-xs font-mono text-slate-700 w-full sm:w-60 focus:outline-none"/>
+            <label class="h-8 px-2.5 rounded bg-white hover:bg-slate-100 border border-slate-300 text-slate-700 text-xs font-bold flex items-center gap-1 cursor-pointer shrink-0 transition">
+              <span class="material-symbols-outlined text-[15px]">upload_file</span>
+              <span>Upload</span>
+              <input type="file" accept="image/*" class="hidden" onchange="handleLogoUpload(this)"/>
+            </label>
+          </div>
+        </div>
+      </div>
+
+      <!-- 4. SECTION: DONATION DETAILS -->
+      <div class="space-y-4 pt-2">
+        <div class="flex items-center justify-between border-b border-slate-200 pb-2">
+          <h2 class="text-sm font-extrabold text-slate-900 uppercase tracking-wide flex items-center gap-2">
+            <span class="w-6 h-6 rounded-md bg-teal-100 text-teal-800 flex items-center justify-center font-bold text-xs">2</span>
+            <span>Donation Details</span>
+          </h2>
+          <span class="text-[11px] text-teal-800 font-bold bg-teal-50 px-2 py-0.5 rounded border border-teal-200">Financial / In-Kind Instrument</span>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <!-- Date Received -->
+          <div>
+            <label class="block text-xs font-bold text-slate-700 mb-1">
+              Date Received <span class="text-rose-500">*</span>
+            </label>
+            <input type="date" id="donation-date-received" required
+                   class="w-full h-9 px-3 rounded-lg border border-slate-300 text-xs font-semibold text-slate-800 bg-white focus:ring-1 focus:ring-teal-700 focus:outline-none"/>
+          </div>
+
+          <!-- Item Type -->
+          <div>
+            <label class="block text-xs font-bold text-slate-700 mb-1">
+              Item Type <span class="text-rose-500">*</span>
+            </label>
+            <div class="grid grid-cols-2 gap-2">
+              <button type="button" onclick="selectItemType('Money')" id="btn-type-money" class="form-choice-btn active px-3 py-2 rounded-lg border border-teal-700 text-xs font-bold flex items-center justify-center gap-1.5 bg-teal-700 text-white">
+                <span class="material-symbols-outlined text-[15px]">payments</span>
+                <span>Money</span>
+              </button>
+              <button type="button" onclick="selectItemType('In-Kind')" id="btn-type-inkind" class="form-choice-btn px-3 py-2 rounded-lg border border-slate-300 text-xs font-bold flex items-center justify-center gap-1.5 bg-white text-slate-700 hover:border-teal-600">
+                <span class="material-symbols-outlined text-[15px]">inventory_2</span>
+                <span>In-Kind</span>
+              </button>
+            </div>
+            <input type="hidden" id="selected-item-type" value="Money"/>
+          </div>
+        </div>
+
+        <!-- Conditional Container: Money Fields -->
+        <div id="panel-money" class="p-4 bg-teal-50/60 rounded-xl border border-teal-200 space-y-3">
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <label class="block text-xs font-bold text-teal-950 mb-1">
+                Amount Received <span class="text-rose-500">*</span>
+              </label>
+              <div class="relative flex items-center">
+                <span class="absolute left-3 text-xs font-bold text-teal-800" id="currency-prefix">NLe</span>
+                <input type="number" step="any" min="0" id="money-amount" value="350000" oninput="syncEstimatedValue()"
+                       class="w-full h-10 pl-11 pr-3 rounded-lg border border-teal-300 text-sm font-mono font-black text-slate-900 focus:ring-1 focus:ring-teal-700 focus:outline-none bg-white"/>
+              </div>
+            </div>
+
+            <div>
+              <label class="block text-xs font-bold text-teal-950 mb-1">Currency</label>
+              <div class="grid grid-cols-5 gap-1.5" id="currency-options">
+                <button type="button" onclick="selectCurrency('SLE')" class="form-choice-btn curr-pill active px-1 py-2 rounded border border-teal-700 text-xs font-bold text-center bg-teal-700 text-white">SLE</button>
+                <button type="button" onclick="selectCurrency('USD')" class="form-choice-btn curr-pill px-1 py-2 rounded border border-slate-300 text-xs font-bold text-center bg-white text-slate-700 hover:border-teal-600">USD</button>
+                <button type="button" onclick="selectCurrency('GBP')" class="form-choice-btn curr-pill px-1 py-2 rounded border border-slate-300 text-xs font-bold text-center bg-white text-slate-700 hover:border-teal-600">GBP</button>
+                <button type="button" onclick="selectCurrency('EUR')" class="form-choice-btn curr-pill px-1 py-2 rounded border border-slate-300 text-xs font-bold text-center bg-white text-slate-700 hover:border-teal-600">EUR</button>
+                <button type="button" onclick="selectCurrency('Other')" class="form-choice-btn curr-pill px-1 py-2 rounded border border-slate-300 text-xs font-bold text-center bg-white text-slate-700 hover:border-teal-600">Other</button>
+              </div>
+              <input type="hidden" id="selected-currency" value="SLE"/>
+            </div>
+          </div>
+        </div>
+
+        <!-- Conditional Container: In-Kind Fields -->
+        <div id="panel-inkind" class="p-4 bg-amber-50/70 rounded-xl border border-amber-200 space-y-3 hidden">
+          <div class="text-xs font-bold text-amber-900 flex items-center gap-1.5">
+            <span class="material-symbols-outlined text-[16px] text-amber-700">package_2</span>
+            <span>In-Kind Goods, Vehicles, Medical Supplies or Equipment</span>
+          </div>
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+            <div>
+              <label class="block text-xs font-bold text-slate-700 mb-1">If In-Kind: Name of Items</label>
+              <input type="text" id="inkind-name" placeholder="e.g. 50 Solar Vaccine Refrigerators"
+                     class="w-full h-9 px-3 rounded-lg border border-slate-300 text-xs bg-white focus:outline-none"/>
+            </div>
+            <div>
+              <label class="block text-xs font-bold text-slate-700 mb-1">If In-Kind: Qty Received</label>
+              <input type="text" id="inkind-qty" placeholder="e.g. 50 Units / 12 Crates"
+                     class="w-full h-9 px-3 rounded-lg border border-slate-300 text-xs bg-white focus:outline-none"/>
+            </div>
+            <div>
+              <label class="block text-xs font-bold text-slate-700 mb-1">If In-Kind: Est. Cost (NLe)</label>
+              <input type="number" step="any" min="0" id="inkind-cost" placeholder="0.00" oninput="syncEstimatedValue()"
+                     class="w-full h-9 px-3 rounded-lg border border-slate-300 text-xs font-mono font-bold bg-white focus:outline-none"/>
+            </div>
+          </div>
+        </div>
+
+        <!-- Restriction & Frequency -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-1">
+          <div>
+            <label class="block text-xs font-bold text-slate-700 mb-1.5">
+              Restricted / Unrestricted <span class="text-rose-500">*</span>
+            </label>
+            <div class="grid grid-cols-2 gap-2">
+              <button type="button" onclick="selectRestriction('Restricted')" id="btn-res-restricted" class="form-choice-btn active px-3 py-2 rounded-lg border border-teal-700 text-xs font-semibold flex items-center justify-center gap-1.5 bg-teal-700 text-white">
+                <span class="choice-box w-3.5 h-3.5 rounded-sm border border-white flex items-center justify-center text-[10px]">&check;</span>
+                <span>Restricted</span>
+              </button>
+              <button type="button" onclick="selectRestriction('Unrestricted')" id="btn-res-unrestricted" class="form-choice-btn px-3 py-2 rounded-lg border border-slate-300 text-xs font-semibold flex items-center justify-center gap-1.5 bg-white text-slate-700 hover:border-teal-600">
+                <span class="choice-box w-3.5 h-3.5 rounded-sm border border-slate-400 flex items-center justify-center text-[10px]"></span>
+                <span>Unrestricted</span>
+              </button>
+            </div>
+            <input type="hidden" id="selected-restriction" value="Restricted"/>
+            <span class="text-[10px] text-slate-500 block mt-1" id="restriction-hint">Restricted: Bound by donor stipulations to specific program deliverables.</span>
+          </div>
+
+          <div>
+            <label class="block text-xs font-bold text-slate-700 mb-1.5">
+              Donation Frequency <span class="text-rose-500">*</span>
+            </label>
+            <div class="grid grid-cols-4 gap-1.5" id="frequency-group">
+              <button type="button" onclick="selectFrequency('One-time')" class="form-choice-btn freq-pill active px-1.5 py-2 rounded-lg border border-teal-700 text-xs font-semibold text-center bg-teal-700 text-white">One-time</button>
+              <button type="button" onclick="selectFrequency('Monthly')" class="form-choice-btn freq-pill px-1.5 py-2 rounded-lg border border-slate-300 text-xs font-semibold text-center bg-white text-slate-700 hover:border-teal-600">Monthly</button>
+              <button type="button" onclick="selectFrequency('Quarterly')" class="form-choice-btn freq-pill px-1.5 py-2 rounded-lg border border-slate-300 text-xs font-semibold text-center bg-white text-slate-700 hover:border-teal-600">Quarterly</button>
+              <button type="button" onclick="selectFrequency('Annual')" class="form-choice-btn freq-pill px-1.5 py-2 rounded-lg border border-slate-300 text-xs font-semibold text-center bg-white text-slate-700 hover:border-teal-600">Annual</button>
+            </div>
+            <input type="hidden" id="selected-frequency" value="One-time"/>
+          </div>
+        </div>
+      </div>
+
+      <!-- 5. SECTION: CAMPAIGN & PROGRAM ALLOCATION -->
+      <div class="space-y-4 pt-2">
+        <div class="flex items-center justify-between border-b border-slate-200 pb-2">
+          <h2 class="text-sm font-extrabold text-slate-900 uppercase tracking-wide flex items-center gap-2">
+            <span class="w-6 h-6 rounded-md bg-teal-100 text-teal-800 flex items-center justify-center font-bold text-xs">3</span>
+            <span>Campaign &amp; Program Allocation</span>
+          </h2>
+          <span class="text-[11px] text-slate-500 font-medium">Auto-aligns with Master Programs Ledger</span>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+          <div>
+            <label class="block text-xs font-bold text-slate-700 mb-1">Campaign Name</label>
+            <input type="text" id="campaign-name" placeholder="e.g. 2025 Maternal Health Care Drive" value="2025 Maternal Health Care Drive"
+                   class="w-full h-9 px-3 rounded-lg border border-slate-300 text-xs font-semibold focus:ring-1 focus:ring-teal-700 focus:outline-none"/>
+          </div>
+
+          <div>
+            <label class="block text-xs font-bold text-slate-700 mb-1">
+              Program Code <span class="text-rose-500">*</span>
+            </label>
+            <select id="program-code" onchange="handleProgramCodeSelect(this.value)" required
+                    class="w-full h-9 px-3 rounded-lg border border-slate-300 text-xs font-mono font-bold bg-white text-slate-800 focus:ring-1 focus:ring-teal-700 focus:outline-none cursor-pointer">
+              <option value="BCF-H01" selected>BCF-H01 (Health)</option>
+              <option value="BCF-E02">BCF-E02 (Education)</option>
+              <option value="BCF-A03">BCF-A03 (Agriculture)</option>
+              <option value="BCF-CC04">BCF-CC04 (Climate Change)</option>
+              <option value="BCF-SJ05">BCF-SJ05 (Social Justice)</option>
+              <option value="BCF-I06">BCF-I06 (Innovation & Tech)</option>
+              <option value="BCF-AR07">BCF-AR07 (Addiction Rehab)</option>
+              <option value="BCF-EP08">BCF-EP08 (Empowerment)</option>
+            </select>
+          </div>
+
+          <div>
+            <label class="block text-xs font-bold text-slate-700 mb-1">
+              Project Tracking ID <span class="text-rose-500">*</span>
+            </label>
+            <input type="text" id="project-tracking-id" value="BCF-H01-01-2025" required
+                   class="w-full h-9 px-3 rounded-lg border border-slate-300 text-xs font-mono font-bold text-teal-800 bg-white focus:ring-1 focus:ring-teal-700 focus:outline-none"/>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div>
+            <label class="block text-xs font-bold text-slate-700 mb-1">
+              Program Category <span class="text-rose-500">*</span>
+            </label>
+            <input type="text" id="program-category" value="Health" required readonly
+                   class="w-full h-9 px-3 rounded-lg border border-slate-300 text-xs font-semibold bg-slate-50 text-slate-700 focus:outline-none"/>
+          </div>
+
+          <div>
+            <label class="block text-xs font-bold text-slate-700 mb-1">
+              Program Title <span class="text-rose-500">*</span>
+            </label>
+            <input type="text" id="program-title" value="Rural Maternal Health Outreach Bo" required
+                   class="w-full h-9 px-3 rounded-lg border border-slate-300 text-xs font-semibold focus:ring-1 focus:ring-teal-700 focus:outline-none"/>
+          </div>
+        </div>
+      </div>
+
+      <!-- 6. SECTION: PAYMENT METHOD -->
+      <div class="space-y-3 pt-2">
+        <div class="border-b border-slate-200 pb-2">
+          <h2 class="text-sm font-extrabold text-slate-900 uppercase tracking-wide flex items-center gap-2">
+            <span class="w-6 h-6 rounded-md bg-teal-100 text-teal-800 flex items-center justify-center font-bold text-xs">4</span>
+            <span>Payment Method</span>
+          </h2>
+        </div>
+
+        <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2" id="payment-methods-grid">
+          <button type="button" onclick="selectPaymentMethod('Cash')" class="form-choice-btn pay-btn px-2.5 py-2 rounded-lg border border-slate-300 text-xs font-semibold flex items-center gap-2 bg-white text-slate-700 hover:border-teal-600">
+            <span class="choice-box w-3.5 h-3.5 rounded-sm border border-slate-400 flex items-center justify-center text-[10px]"></span>
+            <span>Cash</span>
+          </button>
+          <button type="button" onclick="selectPaymentMethod('Bank Transfer')" class="form-choice-btn pay-btn active px-2.5 py-2 rounded-lg border border-teal-700 text-xs font-semibold flex items-center gap-2 bg-teal-700 text-white">
+            <span class="choice-box w-3.5 h-3.5 rounded-sm border border-white flex items-center justify-center text-[10px]">&check;</span>
+            <span>Bank Transfer</span>
+          </button>
+          <button type="button" onclick="selectPaymentMethod('Mobile Money')" class="form-choice-btn pay-btn px-2.5 py-2 rounded-lg border border-slate-300 text-xs font-semibold flex items-center gap-2 bg-white text-slate-700 hover:border-teal-600">
+            <span class="choice-box w-3.5 h-3.5 rounded-sm border border-slate-400 flex items-center justify-center text-[10px]"></span>
+            <span>Mobile Money</span>
+          </button>
+          <button type="button" onclick="selectPaymentMethod('Cheque')" class="form-choice-btn pay-btn px-2.5 py-2 rounded-lg border border-slate-300 text-xs font-semibold flex items-center gap-2 bg-white text-slate-700 hover:border-teal-600">
+            <span class="choice-box w-3.5 h-3.5 rounded-sm border border-slate-400 flex items-center justify-center text-[10px]"></span>
+            <span>Cheque</span>
+          </button>
+          <button type="button" onclick="selectPaymentMethod('Direct Deposit')" class="form-choice-btn pay-btn px-2.5 py-2 rounded-lg border border-slate-300 text-xs font-semibold flex items-center gap-2 bg-white text-slate-700 hover:border-teal-600">
+            <span class="choice-box w-3.5 h-3.5 rounded-sm border border-slate-400 flex items-center justify-center text-[10px]"></span>
+            <span>Direct Deposit</span>
+          </button>
+          <button type="button" onclick="selectPaymentMethod('Electronic Payment')" class="form-choice-btn pay-btn px-2.5 py-2 rounded-lg border border-slate-300 text-xs font-semibold flex items-center gap-2 bg-white text-slate-700 hover:border-teal-600">
+            <span class="choice-box w-3.5 h-3.5 rounded-sm border border-slate-400 flex items-center justify-center text-[10px]"></span>
+            <span>Electronic Pay</span>
+          </button>
+          <button type="button" onclick="selectPaymentMethod('In-Kind Support')" class="form-choice-btn pay-btn px-2.5 py-2 rounded-lg border border-slate-300 text-xs font-semibold flex items-center gap-2 bg-white text-slate-700 hover:border-teal-600">
+            <span class="choice-box w-3.5 h-3.5 rounded-sm border border-slate-400 flex items-center justify-center text-[10px]"></span>
+            <span>In-Kind Support</span>
+          </button>
+          <button type="button" onclick="selectPaymentMethod('Direct Payment to Institution/Vendor')" class="form-choice-btn pay-btn px-2.5 py-2 rounded-lg border border-slate-300 text-xs font-semibold flex items-center gap-2 bg-white text-slate-700 hover:border-teal-600 sm:col-span-2">
+            <span class="choice-box w-3.5 h-3.5 rounded-sm border border-slate-400 flex items-center justify-center text-[10px]"></span>
+            <span>Direct Payment to Institution/Vendor</span>
+          </button>
+          <button type="button" onclick="selectPaymentMethod('Other')" class="form-choice-btn pay-btn px-2.5 py-2 rounded-lg border border-slate-300 text-xs font-semibold flex items-center gap-2 bg-white text-slate-700 hover:border-teal-600">
+            <span class="choice-box w-3.5 h-3.5 rounded-sm border border-slate-400 flex items-center justify-center text-[10px]"></span>
+            <span>Other</span>
+          </button>
+        </div>
+        <input type="hidden" id="selected-payment-method" value="Bank Transfer"/>
+      </div>
+
+      <!-- 7. SECTION: PROOF OF PAYMENT / SUPPORT -->
+      <div class="space-y-4 pt-2">
+        <div class="flex items-center justify-between border-b border-slate-200 pb-2">
+          <h2 class="text-sm font-extrabold text-slate-900 uppercase tracking-wide flex items-center gap-2">
+            <span class="w-6 h-6 rounded-md bg-teal-100 text-teal-800 flex items-center justify-center font-bold text-xs">5</span>
+            <span>Proof of Payment / Support &amp; Verification</span>
+          </h2>
+          <span class="text-[11px] text-teal-700 font-bold">Audit &amp; Compliance Trail</span>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+          <div>
+            <label class="block text-xs font-bold text-slate-700 mb-1">Receipt Number</label>
+            <input type="text" id="proof-receipt-no" placeholder="REC-2025-0814" value="REC-2025-0814"
+                   class="w-full h-9 px-3 rounded-lg border border-slate-300 text-xs font-mono font-semibold focus:ring-1 focus:ring-teal-700 focus:outline-none"/>
+          </div>
+
+          <div>
+            <label class="block text-xs font-bold text-slate-700 mb-1">Transaction Reference</label>
+            <input type="text" id="proof-tx-ref" placeholder="TX-SLCB-998240" value="TX-SLCB-998240"
+                   class="w-full h-9 px-3 rounded-lg border border-slate-300 text-xs font-mono font-semibold focus:ring-1 focus:ring-teal-700 focus:outline-none"/>
+          </div>
+
+          <div>
+            <label class="block text-xs font-bold text-slate-700 mb-1">Voucher Number</label>
+            <input type="text" id="proof-voucher-no" placeholder="PV-2025-044" value="PV-2025-044"
+                   class="w-full h-9 px-3 rounded-lg border border-slate-300 text-xs font-mono font-semibold focus:ring-1 focus:ring-teal-700 focus:outline-none"/>
+          </div>
+
+          <div>
+            <label class="block text-xs font-bold text-slate-700 mb-1">
+              Date of Payment/Distribution <span class="text-rose-500">*</span>
+            </label>
+            <input type="date" id="proof-date-payment" required
+                   class="w-full h-9 px-3 rounded-lg border border-slate-300 text-xs font-semibold text-slate-800 bg-white focus:ring-1 focus:ring-teal-700 focus:outline-none"/>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 bg-slate-50 p-3.5 rounded-xl border border-slate-200">
+          <div>
+            <label class="block text-xs font-bold text-slate-800 mb-1">
+              Amount / Estimated Value <span class="text-rose-500">*</span>
+            </label>
+            <div class="flex items-center gap-2">
+              <span class="text-xs font-black text-teal-800 font-mono">NLe</span>
+              <input type="text" id="proof-estimated-value" value="350,000.00" required
+                     class="w-full h-9 px-3 rounded-lg border border-slate-300 text-sm font-mono font-black text-teal-900 bg-white focus:ring-1 focus:ring-teal-700 focus:outline-none"/>
+            </div>
+          </div>
+
+          <div>
+            <label class="block text-xs font-bold text-slate-800 mb-1.5">Beneficiary Acknowledgement</label>
+            <div class="grid grid-cols-2 gap-2">
+              <button type="button" onclick="selectBeneficiaryAck(true)" id="btn-ack-yes" class="form-choice-btn active px-3 py-1.5 rounded-lg border border-teal-700 text-xs font-bold flex items-center justify-center gap-1.5 bg-teal-700 text-white">
+                <span class="choice-box w-3.5 h-3.5 rounded-sm border border-white flex items-center justify-center text-[10px]">&check;</span>
+                <span>Yes</span>
+              </button>
+              <button type="button" onclick="selectBeneficiaryAck(false)" id="btn-ack-no" class="form-choice-btn px-3 py-1.5 rounded-lg border border-slate-300 text-xs font-bold flex items-center justify-center gap-1.5 bg-white text-slate-700 hover:border-teal-600">
+                <span class="choice-box w-3.5 h-3.5 rounded-sm border border-slate-400 flex items-center justify-center text-[10px]"></span>
+                <span>No</span>
+              </button>
+            </div>
+            <input type="hidden" id="selected-beneficiary-ack" value="Yes"/>
+          </div>
+        </div>
+
+        <!-- Supporting Document Attached & Image/File Ref -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 p-3.5 rounded-xl border border-slate-200 bg-white">
+          <div>
+            <label class="block text-xs font-bold text-slate-800 mb-1.5">
+              Supporting Document Attached <span class="text-rose-500">*</span>
+            </label>
+            <div class="grid grid-cols-2 gap-2">
+              <button type="button" onclick="selectSupportingDoc(true)" id="btn-supdoc-yes" class="form-choice-btn active px-3 py-1.5 rounded-lg border border-teal-700 text-xs font-bold flex items-center justify-center gap-1.5 bg-teal-700 text-white">
+                <span class="choice-box w-3.5 h-3.5 rounded-sm border border-white flex items-center justify-center text-[10px]">&check;</span>
+                <span>Yes</span>
+              </button>
+              <button type="button" onclick="selectSupportingDoc(false)" id="btn-supdoc-no" class="form-choice-btn px-3 py-1.5 rounded-lg border border-slate-300 text-xs font-bold flex items-center justify-center gap-1.5 bg-white text-slate-700 hover:border-teal-600">
+                <span class="choice-box w-3.5 h-3.5 rounded-sm border border-slate-400 flex items-center justify-center text-[10px]"></span>
+                <span>No</span>
+              </button>
+            </div>
+            <input type="hidden" id="selected-supporting-doc" value="Yes"/>
+          </div>
+
+          <div>
+            <label class="block text-xs font-bold text-slate-800 mb-1">
+              Attach Document (Image / PDF) &bull; File Ref.
+            </label>
+            <div class="flex items-center gap-2">
+              <input type="text" id="proof-doc-ref" value="SLCB_TRANSFER_SLIP_0814.PDF" placeholder="File Ref.: ______________"
+                     class="w-full h-9 px-3 rounded-lg border border-slate-300 text-xs font-mono text-slate-700 focus:outline-none"/>
+              <label class="h-9 px-3 rounded-lg bg-teal-50 hover:bg-teal-100 border border-teal-200 text-teal-800 text-xs font-bold flex items-center gap-1 cursor-pointer shrink-0 transition">
+                <span class="material-symbols-outlined text-[16px]">attachment</span>
+                <span>Choose</span>
+                <input type="file" accept="image/*,application/pdf" class="hidden" onchange="handleDocUpload(this)"/>
+              </label>
+            </div>
+          </div>
+        </div>
+
+        <!-- Donation Status -->
+        <div>
+          <label class="block text-xs font-bold text-slate-700 mb-1.5">
+            Donation Status <span class="text-rose-500">*</span>
+          </label>
+          <div class="grid grid-cols-2 sm:grid-cols-4 gap-2" id="status-group">
+            <button type="button" onclick="selectDonationStatus('Pending')" class="form-choice-btn status-pill px-3 py-2 rounded-lg border border-slate-300 text-xs font-bold flex items-center justify-center gap-1.5 bg-white text-slate-700">
+              <span class="w-2.5 h-2.5 rounded-full bg-slate-400"></span>
+              <span>Pending</span>
+            </button>
+            <button type="button" onclick="selectDonationStatus('Verified')" class="form-choice-btn status-pill active px-3 py-2 rounded-lg border border-teal-700 text-xs font-bold flex items-center justify-center gap-1.5 bg-teal-700 text-white">
+              <span class="w-2.5 h-2.5 rounded-full bg-emerald-300"></span>
+              <span>Verified</span>
+            </button>
+            <button type="button" onclick="selectDonationStatus('Receipted')" class="form-choice-btn status-pill px-3 py-2 rounded-lg border border-slate-300 text-xs font-bold flex items-center justify-center gap-1.5 bg-white text-slate-700">
+              <span class="w-2.5 h-2.5 rounded-full bg-blue-500"></span>
+              <span>Receipted</span>
+            </button>
+            <button type="button" onclick="selectDonationStatus('Flagged')" class="form-choice-btn status-pill px-3 py-2 rounded-lg border border-slate-300 text-xs font-bold flex items-center justify-center gap-1.5 bg-white text-slate-700">
+              <span class="w-2.5 h-2.5 rounded-full bg-rose-500"></span>
+              <span>Flagged</span>
+            </button>
+          </div>
+          <input type="hidden" id="selected-donation-status" value="Verified"/>
+        </div>
+
+        <!-- Verification Person & Date -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div>
+            <label class="block text-xs font-bold text-slate-700 mb-1">
+              Verified By <span class="text-rose-500">*</span>
+            </label>
+            <input type="text" id="verified-by" value="Josephine Koroma (Finance Director)" required
+                   class="w-full h-9 px-3 rounded-lg border border-slate-300 text-xs font-semibold focus:ring-1 focus:ring-teal-700 focus:outline-none"/>
+          </div>
+
+          <div>
+            <label class="block text-xs font-bold text-slate-700 mb-1">Verification Date</label>
+            <input type="date" id="verified-date"
+                   class="w-full h-9 px-3 rounded-lg border border-slate-300 text-xs font-semibold text-slate-800 bg-white focus:ring-1 focus:ring-teal-700 focus:outline-none"/>
+          </div>
+        </div>
+
+        <!-- Acknowledgement Letter & Tax Receipt Issued -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 bg-slate-50 p-3.5 rounded-xl border border-slate-200">
+          <div>
+            <label class="block text-xs font-bold text-slate-800 mb-1.5">Acknowledgement Letter Sent</label>
+            <div class="grid grid-cols-2 gap-2">
+              <button type="button" onclick="selectAckLetter(true)" id="btn-acklet-yes" class="form-choice-btn active px-3 py-1.5 rounded-lg border border-teal-700 text-xs font-bold flex items-center justify-center gap-1.5 bg-teal-700 text-white">
+                <span class="choice-box w-3.5 h-3.5 rounded-sm border border-white flex items-center justify-center text-[10px]">&check;</span>
+                <span>Yes</span>
+              </button>
+              <button type="button" onclick="selectAckLetter(false)" id="btn-acklet-no" class="form-choice-btn px-3 py-1.5 rounded-lg border border-slate-300 text-xs font-bold flex items-center justify-center gap-1.5 bg-white text-slate-700 hover:border-teal-600">
+                <span class="choice-box w-3.5 h-3.5 rounded-sm border border-slate-400 flex items-center justify-center text-[10px]"></span>
+                <span>No</span>
+              </button>
+            </div>
+            <input type="hidden" id="selected-ack-letter" value="Yes"/>
+          </div>
+
+          <div>
+            <label class="block text-xs font-bold text-slate-800 mb-1.5">Tax Receipt Issued</label>
+            <div class="grid grid-cols-2 gap-2">
+              <button type="button" onclick="selectTaxReceipt(true)" id="btn-tax-yes" class="form-choice-btn active px-3 py-1.5 rounded-lg border border-teal-700 text-xs font-bold flex items-center justify-center gap-1.5 bg-teal-700 text-white">
+                <span class="choice-box w-3.5 h-3.5 rounded-sm border border-white flex items-center justify-center text-[10px]">&check;</span>
+                <span>Yes</span>
+              </button>
+              <button type="button" onclick="selectTaxReceipt(false)" id="btn-tax-no" class="form-choice-btn px-3 py-1.5 rounded-lg border border-slate-300 text-xs font-bold flex items-center justify-center gap-1.5 bg-white text-slate-700 hover:border-teal-600">
+                <span class="choice-box w-3.5 h-3.5 rounded-sm border border-slate-400 flex items-center justify-center text-[10px]"></span>
+                <span>No</span>
+              </button>
+            </div>
+            <input type="hidden" id="selected-tax-receipt" value="Yes"/>
+          </div>
+        </div>
+      </div>
+
+      <!-- 8. SECTION: ADDITIONAL NOTES / REMARKS -->
+      <div class="space-y-2 pt-2">
+        <div class="border-b border-slate-200 pb-2">
+          <h2 class="text-sm font-extrabold text-slate-900 uppercase tracking-wide flex items-center gap-2">
+            <span class="w-6 h-6 rounded-md bg-teal-100 text-teal-800 flex items-center justify-center font-bold text-xs">6</span>
+            <span>Additional Notes / Remarks</span>
+          </h2>
+        </div>
+        <textarea id="additional-notes" rows="3" placeholder="Enter stewardship covenants, designated beneficiary communities, reporting timelines, or donor specific instructions..."
+                  class="w-full p-3 rounded-xl border border-slate-300 text-xs focus:ring-1 focus:ring-teal-700 focus:outline-none">Donation approved for the Bo District Maternal Clinic equipment overhaul. Quarter 1 impact report and photographic documentation requested prior to tranche 2 disbursement.</textarea>
+      </div>
+
+      <!-- 9. SECTION: PREPARED & REVIEWED SIGN-OFF BLOCK -->
+      <div class="pt-6 border-t-2 border-slate-300 space-y-4 page-break-inside-avoid">
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-8 text-xs">
+          <!-- Prepared by -->
+          <div class="space-y-3 bg-slate-50 p-4 rounded-xl border border-slate-200">
+            <div class="font-extrabold uppercase text-slate-900 tracking-wider flex items-center gap-1.5">
+              <span class="material-symbols-outlined text-[16px] text-teal-700">edit_note</span>
+              <span>Prepared by (Intake Officer)</span>
+            </div>
+            <div>
+              <div class="text-[11px] text-slate-500 mb-0.5">Signature / Name:</div>
+              <input type="text" id="sig-prepared-by" value="Amadu Kamara, Compliance Officer"
+                     class="w-full h-8 px-2.5 rounded border border-slate-300 text-xs font-semibold bg-white focus:outline-none"/>
+            </div>
+            <div>
+              <div class="text-[11px] text-slate-500 mb-0.5">Date:</div>
+              <input type="date" id="sig-prepared-date"
+                     class="w-full h-8 px-2.5 rounded border border-slate-300 text-xs font-semibold bg-white focus:outline-none"/>
+            </div>
+            <div class="border-b-2 border-dashed border-slate-300 pt-3"></div>
+            <div class="text-[10px] text-slate-400 italic text-center">Officer Signature &amp; Stamp</div>
+          </div>
+
+          <!-- Reviewed / Approved by -->
+          <div class="space-y-3 bg-slate-50 p-4 rounded-xl border border-slate-200">
+            <div class="font-extrabold uppercase text-slate-900 tracking-wider flex items-center gap-1.5">
+              <span class="material-symbols-outlined text-[16px] text-teal-700">verified</span>
+              <span>Reviewed / Approved by (Director)</span>
+            </div>
+            <div>
+              <div class="text-[11px] text-slate-500 mb-0.5">Signature / Name:</div>
+              <input type="text" id="sig-approved-by" value="Josephine Koroma, Director of Finance"
+                     class="w-full h-8 px-2.5 rounded border border-slate-300 text-xs font-semibold bg-white focus:outline-none"/>
+            </div>
+            <div>
+              <div class="text-[11px] text-slate-500 mb-0.5">Date:</div>
+              <input type="date" id="sig-approved-date"
+                     class="w-full h-8 px-2.5 rounded border border-slate-300 text-xs font-semibold bg-white focus:outline-none"/>
+            </div>
+            <div class="border-b-2 border-dashed border-slate-300 pt-3"></div>
+            <div class="text-[10px] text-slate-400 italic text-center">Executive / Finance Approval Stamp</div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </main>
+
+  <!-- FIXED FLOATING ACTION DOCK (BOTTOM) -->
+  <div id="floating-action-dock" class="fixed bottom-14 left-0 right-0 z-40 bg-white/95 backdrop-blur-xl border-t border-slate-200 px-4 py-3 shadow-lg no-print">
+    <div class="max-w-4xl mx-auto flex items-center justify-between gap-3">
+      <div class="flex items-center gap-2">
+        <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
+        <span class="text-xs font-bold text-slate-700">BCF-SL Donation Intake Console</span>
+      </div>
+
+      <div class="flex items-center gap-2">
+        <button type="button" onclick="resetDonationForm()" class="px-3 py-2 rounded-lg border border-slate-300 hover:bg-slate-100 text-slate-700 text-xs font-bold transition">
+          Clear
+        </button>
+        <button type="button" onclick="window.print()" class="px-3.5 py-2 rounded-lg border border-slate-300 bg-white hover:bg-slate-50 text-slate-800 text-xs font-bold inline-flex items-center gap-1.5 transition shadow-2xs">
+          <span class="material-symbols-outlined text-[16px] text-slate-600">print</span>
+          <span>Print Form</span>
+        </button>
+        <button type="button" id="btn-save-record" onclick="saveDonationRecord()" class="px-5 py-2 rounded-lg bg-teal-700 hover:bg-teal-800 text-white text-xs font-black inline-flex items-center gap-2 shadow-sm transition active:scale-95">
+          <span class="material-symbols-outlined text-[17px]">save</span>
+          <span>Save &amp; Record Donation</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- SAVED RECORDS MODAL / LEDGER LOG -->
+  <div id="records-modal" class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4 hidden no-print">
+    <div class="bg-white rounded-2xl border border-slate-200 shadow-2xl max-w-3xl w-full max-h-[85vh] flex flex-col overflow-hidden animate-in fade-in zoom-in-95 duration-150">
+      <div class="p-4 border-b border-slate-200 flex items-center justify-between bg-slate-50">
+        <div class="flex items-center gap-2">
+          <span class="material-symbols-outlined text-teal-700">receipt_long</span>
+          <h3 class="text-sm font-black text-slate-900 uppercase">Donation Intake Ledger Records</h3>
+        </div>
+        <button type="button" onclick="togglePastRecordsModal()" class="w-7 h-7 rounded-full flex items-center justify-center hover:bg-slate-200 text-slate-500">
+          <span class="material-symbols-outlined text-[18px]">close</span>
+        </button>
+      </div>
+
+      <div class="p-4 overflow-y-auto flex-1 custom-scrollbar space-y-3">
+        <div id="records-list-container" class="space-y-2">
+          <!-- Dynamically populated via JS -->
+        </div>
+      </div>
+
+      <div class="p-3 border-t border-slate-200 bg-slate-50 flex items-center justify-between text-xs">
+        <button type="button" onclick="clearAllStoredRecords()" class="text-rose-600 hover:text-rose-800 font-bold">
+          Clear All Records
+        </button>
+        <button type="button" onclick="togglePastRecordsModal()" class="px-3.5 py-1.5 rounded-lg bg-slate-800 text-white font-bold">
+          Close
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- OFFICIAL BCF-SL EMAIL DISPATCH NOTIFICATION MODAL -->
+  <div id="email-dispatch-modal" class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4 hidden no-print">
+    <div class="bg-white rounded-2xl border border-slate-200 shadow-2xl max-w-3xl w-full max-h-[90vh] flex flex-col overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+      
+      <!-- Modal Header -->
+      <div class="px-5 py-3.5 bg-teal-800 text-white flex items-center justify-between">
+        <div class="flex items-center gap-2.5">
+          <div class="w-8 h-8 rounded-lg bg-teal-700 flex items-center justify-center text-teal-100 shadow-2xs">
+            <span class="material-symbols-outlined text-[20px]">mark_email_read</span>
+          </div>
+          <div>
+            <h3 class="text-sm font-black uppercase tracking-wide">Official Email Notification Dispatched</h3>
+            <p class="text-[11px] text-teal-200">Confirmation transmitted to Organization Email &amp; tracked in BCF-SL Database</p>
+          </div>
+        </div>
+        <button type="button" onclick="closeEmailDispatchModal()" class="w-8 h-8 rounded-full flex items-center justify-center hover:bg-teal-700 text-teal-100 transition">
+          <span class="material-symbols-outlined text-[18px]">close</span>
+        </button>
+      </div>
+
+      <!-- Transmission Metadata Banner -->
+      <div class="bg-slate-50 border-b border-slate-200 px-5 py-2.5 text-xs space-y-1">
+        <div class="flex items-center justify-between gap-2 flex-wrap">
+          <div class="flex items-center gap-2">
+            <span class="text-slate-400 font-bold uppercase text-[10px]">To:</span>
+            <span id="modal-email-recipient" class="font-bold text-slate-900 font-mono"></span>
+          </div>
+          <div class="flex items-center gap-1.5 text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200 text-[10px] font-extrabold uppercase">
+            <span class="w-1.5 h-1.5 rounded-full bg-emerald-600 animate-pulse"></span>
+            <span>Recorded in BCF-SL Central Database</span>
+          </div>
+        </div>
+        <div class="flex items-center gap-2 text-slate-500">
+          <span class="text-slate-400 font-bold uppercase text-[10px]">From:</span>
+          <span>BANDAMA CHARITY FOUNDATION – SIERRA LEONE &lt;<strong class="text-slate-700">bandamacharityfoundationsl@gmail.com</strong>&gt;</span>
+        </div>
+        <div class="flex items-center gap-2 text-slate-500">
+          <span class="text-slate-400 font-bold uppercase text-[10px]">Subject:</span>
+          <span id="modal-email-subject" class="font-bold text-slate-800"></span>
+        </div>
+      </div>
+
+      <!-- Rendered Email Letterhead Body Container -->
+      <div class="p-5 overflow-y-auto flex-1 custom-scrollbar bg-slate-100/70">
+        <div id="modal-email-body" class="bg-white rounded-xl border border-slate-200 p-6 shadow-xs text-xs space-y-4 text-slate-700">
+          <!-- Populated dynamically via JS -->
+        </div>
+      </div>
+
+      <!-- Modal Footer Action Bar -->
+      <div class="px-5 py-3 border-t border-slate-200 bg-white flex flex-col sm:flex-row items-center justify-between gap-3 text-xs">
+        <div class="flex items-center gap-2 w-full sm:w-auto flex-wrap">
+          <button type="button" id="btn-modal-gmail" class="px-3.5 py-2 rounded-lg bg-red-600 hover:bg-red-700 text-white font-bold inline-flex items-center gap-1.5 transition shadow-xs" title="Send official confirmation from bandamacharityfoundationsl@gmail.com">
+            <span class="material-symbols-outlined text-[16px]">mail</span>
+            <span>Send from Gmail</span>
+          </button>
+          <button type="button" id="btn-modal-mailto" class="px-3 py-2 rounded-lg bg-teal-700 hover:bg-teal-800 text-white font-bold inline-flex items-center gap-1.5 transition shadow-xs">
+            <span class="material-symbols-outlined text-[16px]">open_in_browser</span>
+            <span>Mail Client</span>
+          </button>
+          <button type="button" onclick="copyEmailBodyToClipboard()" class="px-3 py-2 rounded-lg border border-slate-300 hover:bg-slate-50 text-slate-700 font-bold inline-flex items-center gap-1.5 transition">
+            <span class="material-symbols-outlined text-[16px] text-slate-500">content_copy</span>
+            <span>Copy Email Text</span>
+          </button>
+        </div>
+
+        <div class="flex items-center gap-2 w-full sm:w-auto justify-end flex-wrap">
+          <button type="button" onclick="closeEmailDispatchModal(); resetDonationForm();" class="px-3.5 py-2 rounded-lg bg-teal-700 hover:bg-teal-800 text-white font-bold inline-flex items-center gap-1.5 transition shadow-2xs" title="Clear form and register another donor">
+            <span class="material-symbols-outlined text-[16px]">add_circle</span>
+            <span>Record Another Donor</span>
+          </button>
+          <a id="btn-modal-view-dossier" href="../donor_dossier_history/code.html" class="px-3.5 py-2 rounded-lg bg-teal-800 hover:bg-teal-900 text-white font-bold inline-flex items-center gap-1.5 transition shadow-2xs" title="Open full dossier record in Donor Dossier ledger">
+            <span class="material-symbols-outlined text-[16px]">folder_shared</span>
+            <span>View in Donor Dossier</span>
+          </a>
+          <a href="../donors_directory_log/code.html" class="px-3.5 py-2 rounded-lg border border-teal-600 text-teal-800 hover:bg-teal-50 font-bold inline-flex items-center gap-1.5 transition">
+            <span class="material-symbols-outlined text-[16px]">visibility</span>
+            <span>Donors Directory</span>
+          </a>
+          <button type="button" onclick="closeEmailDispatchModal()" class="px-4 py-2 rounded-lg bg-slate-800 hover:bg-slate-900 text-white font-bold transition">
+            Done
+          </button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- TOAST CONTAINER -->
+  <div id="toast-container" class="fixed bottom-24 right-4 z-50 space-y-2 pointer-events-none no-print"></div>
+
+  <!-- BOTTOM DONORLOG NAVIGATION BAR -->
+  <nav class="fixed bottom-0 w-full z-40 bg-white border-t border-slate-200 shadow-md no-print">
+    <div class="max-w-md mx-auto flex items-center justify-around h-14 px-4 text-xs font-semibold">
+      <a href="../donors_directory_log/code.html" class="flex flex-col items-center justify-center text-slate-500 hover:text-teal-700 transition">
+        <span class="material-symbols-outlined text-[20px]">group</span>
+        <span class="text-[10px]">Donors</span>
+      </a>
+      <a href="code.html" class="flex flex-col items-center justify-center text-teal-700 font-bold">
+        <div class="w-6 h-6 rounded-full bg-teal-100 flex items-center justify-center">
+          <span class="material-symbols-outlined text-[16px]">volunteer_activism</span>
+        </div>
+        <span class="text-[10px]">Log Gift</span>
+      </a>
+      <a href="../donor_dossier_history/code.html" class="flex flex-col items-center justify-center text-slate-500 hover:text-teal-700 transition">
+        <span class="material-symbols-outlined text-[20px]">folder_shared</span>
+        <span class="text-[10px]">Dossiers</span>
+      </a>
+      <a href="../giving_analytics_reports/code.html" class="flex flex-col items-center justify-center text-slate-500 hover:text-teal-700 transition">
+        <span class="material-symbols-outlined text-[20px]">insights</span>
+        <span class="text-[10px]">Reports</span>
+      </a>
+    </div>
+  </nav>
+
+  <!-- JAVASCRIPT LOGIC ENGINE -->
+  <script>
+    const PROGRAM_MAP = {
+      'BCF-H01': { cat: 'Health', title: 'Rural Maternal Health Outreach Bo', defaultTracking: 'BCF-H01-01-2025' },
+      'BCF-E02': { cat: 'Education', title: 'Primary School Literacy & Tech Kits', defaultTracking: 'BCF-E02-02-2025' },
+      'BCF-A03': { cat: 'Agriculture', title: 'Kono Smallholder Agro-Cooperative', defaultTracking: 'BCF-A03-03-2025' },
+      'BCF-CC04': { cat: 'Climate Change', title: 'Coastal Mangrove Bio-Shield Project', defaultTracking: 'BCF-CC04-04-2025' },
+      'BCF-SJ05': { cat: 'Social Justice', title: 'Community Legal Defense & GBV Centre', defaultTracking: 'BCF-SJ05-05-2025' },
+      'BCF-I06': { cat: 'Innovation', title: 'Youth Digital Coding Hub Freetown', defaultTracking: 'BCF-I06-06-2025' },
+      'BCF-AR07': { cat: 'Addiction Rehabilitation', title: 'Kush Substance Detox & Clinical Recovery', defaultTracking: 'BCF-AR07-07-2025' },
+      'BCF-EP08': { cat: 'Empowerment', title: 'Women Micro-Grant Enterprise Network', defaultTracking: 'BCF-EP08-08-2025' }
+    };
+
+    // State
+    let savedDonations = [];
+
+    const DEFAULT_DONATIONS_BENCHMARK = [
+      {
+        id: "DON-2025-001",
+        donorId: "DNR-SL-0104",
+        registeredBy: "Amadu Kamara (Grants Officer)",
+        dateRegistered: "2025-01-15",
+        donorType: "Corporate",
+        ceo: "Dr. Haja Fatima Sesay",
+        contactPerson: "Sahr Emmanuel Bangura (CSR Director)",
+        orgName: "Sierra Leone Commercial Bank CSR Trust",
+        email: "csr@slcb-freetown.com",
+        phone: "+232 76 543210",
+        address: "29 Siaka Stevens Street, Freetown, Sierra Leone",
+        country: "Sierra Leone",
+        website: "https://www.slcb.com",
+        logoAttached: true,
+        logoRef: "LOGO_SLCB_2025.PNG",
+        dateReceived: "2025-01-15",
+        itemType: "Money",
+        moneyAmount: 350000,
+        currency: "SLE",
+        restriction: "Restricted",
+        frequency: "One-time",
+        campaign: "2025 Maternal Health Care Drive",
+        programCode: "BCF-H01",
+        programCategory: "Health",
+        programTitle: "Rural Maternal Health Outreach Bo",
+        projectTrackingId: "BCF-H01-01-2025",
+        paymentMethod: "Bank Transfer",
+        receiptNo: "REC-2025-0814",
+        txRef: "TX-SLCB-998240",
+        voucherNo: "PV-2025-044",
+        datePayment: "2025-01-15",
+        estimatedValue: "350,000.00",
+        beneficiaryAck: "Yes",
+        supportingDocAttached: "Yes",
+        docRef: "SLCB_TRANSFER_SLIP_0814.PDF",
+        status: "Verified",
+        verifiedBy: "Josephine Koroma (Finance Director)",
+        verifiedDate: "2025-01-15",
+        ackLetterSent: "Yes",
+        taxReceiptIssued: "Yes",
+        notes: "Donation approved for the Bo District Maternal Clinic equipment overhaul. Quarter 1 impact report and photographic documentation requested prior to tranche 2 disbursement.",
+        preparedBy: "Amadu Kamara, Compliance Officer",
+        approvedBy: "Josephine Koroma, Director of Finance",
+        emailDispatched: true,
+        emailSentTo: "csr@slcb-freetown.com",
+        emailSentAt: "2025-01-15T10:30:00.000Z",
+        timestamp: Date.now() - 86400000 * 2
+      },
+      {
+        id: "DON-2025-002",
+        donorId: "DNR-INT-0088",
+        registeredBy: "Fatmata Turay (Program Assistant)",
+        dateRegistered: "2025-01-18",
+        donorType: "Multilateral",
+        ceo: "Rudolf Schwenk (Country Representative)",
+        contactPerson: "Mariama Jalloh (Child Health Specialist)",
+        orgName: "UNICEF Sierra Leone Country Office",
+        email: "freetown@unicef.org",
+        phone: "+232 22 235555",
+        address: "Medical Stores Compound, New England Ville, Freetown",
+        country: "Sierra Leone / International",
+        website: "https://www.unicef.org/sierraleone",
+        logoAttached: true,
+        logoRef: "UNICEF_SL_OFFICIAL.PNG",
+        dateReceived: "2025-01-18",
+        itemType: "In-Kind",
+        moneyAmount: 0,
+        currency: "SLE",
+        inkindName: "Medical Refrigerators & Solar Vaccine Coolers",
+        inkindQty: "45 Units",
+        inkindCost: 220000,
+        restriction: "Restricted",
+        frequency: "Quarterly",
+        campaign: "Immunization Cold-Chain Rollout",
+        programCode: "BCF-H01",
+        programCategory: "Health",
+        programTitle: "District Vaccine Cold-Chain Solar Facility",
+        projectTrackingId: "BCF-H01-11-2025",
+        paymentMethod: "In-Kind Support",
+        receiptNo: "REC-2025-0902",
+        txRef: "UN-AWB-883192",
+        voucherNo: "PV-2025-051",
+        datePayment: "2025-01-18",
+        estimatedValue: "220,000.00",
+        beneficiaryAck: "Yes",
+        supportingDocAttached: "Yes",
+        docRef: "WAYBILL_UNICEF_REFRIGERATORS.PDF",
+        status: "Verified",
+        verifiedBy: "Josephine Koroma (Finance Director)",
+        verifiedDate: "2025-01-19",
+        ackLetterSent: "Yes",
+        taxReceiptIssued: "Yes",
+        notes: "Cold-chain units allocated directly to 16 Peripheral Health Units in Southern Region. Maintenance handover supervised by District Medical Officer.",
+        preparedBy: "Fatmata Turay, Program Assistant",
+        approvedBy: "Josephine Koroma, Director of Finance",
+        emailDispatched: true,
+        emailSentTo: "freetown@unicef.org",
+        emailSentAt: "2025-01-18T14:15:00.000Z",
+        timestamp: Date.now() - 86400000 * 5
+      },
+      {
+        id: "DON-2025-003",
+        donorId: "DNR-US-0045",
+        registeredBy: "Amadu Kamara (Grants Officer)",
+        dateRegistered: "2025-01-22",
+        donorType: "NGO/Foundation",
+        ceo: "Jacquelline Fuller (President)",
+        contactPerson: "Kevin O'Connor (Africa Tech Grants Lead)",
+        orgName: "Google.org & USAID Tech Equity Fund",
+        email: "grants@google.org",
+        phone: "+1 650 253 0000",
+        address: "1600 Amphitheatre Pkwy, Mountain View, CA, USA",
+        country: "United States",
+        website: "https://www.google.org",
+        logoAttached: true,
+        logoRef: "GOOGLE_ORG_LOGO.SVG",
+        dateReceived: "2025-01-22",
+        itemType: "Money",
+        moneyAmount: 280000,
+        currency: "USD",
+        restriction: "Restricted",
+        frequency: "One-time",
+        campaign: "Youth Digital Economy Accelerator",
+        programCode: "BCF-I06",
+        programCategory: "Innovation",
+        programTitle: "Youth Digital Coding Hub Freetown",
+        projectTrackingId: "BCF-I06-06-2025",
+        paymentMethod: "Electronic Payment",
+        receiptNo: "REC-2025-1044",
+        txRef: "SWIFT-CHASUS33-772190",
+        voucherNo: "PV-2025-068",
+        datePayment: "2025-01-22",
+        estimatedValue: "280,000.00",
+        beneficiaryAck: "Yes",
+        supportingDocAttached: "Yes",
+        docRef: "SWIFT_CONFIRMATION_TECH_HUB.PDF",
+        status: "Verified",
+        verifiedBy: "Josephine Koroma (Finance Director)",
+        verifiedDate: "2025-01-23",
+        ackLetterSent: "Yes",
+        taxReceiptIssued: "Yes",
+        notes: "Tranche 1 funding for Freetown Youth Coding Hub setup, 60 laptops, and solar inverter setup. Bi-monthly milestones tracked in project portal.",
+        preparedBy: "Amadu Kamara, Compliance Officer",
+        approvedBy: "Josephine Koroma, Director of Finance",
+        emailDispatched: true,
+        emailSentTo: "grants@google.org",
+        emailSentAt: "2025-01-22T09:00:00.000Z",
+        timestamp: Date.now() - 86400000 * 9
+      },
+      {
+        id: "DON-2025-004",
+        donorId: "DNR-IND-0771",
+        registeredBy: "Amadu Kamara (Grants Officer)",
+        dateRegistered: "2025-02-01",
+        donorType: "Individual",
+        ceo: "N/A (Individual Contributor)",
+        contactPerson: "Dr. Mohamed S. Bangura",
+        orgName: "Dr. Mohamed S. Bangura Diaspora Endowment",
+        email: "m.bangura.md@gmail.com",
+        phone: "+44 7911 123456",
+        address: "74 Marylebone High St, London W1U 5JW, UK",
+        country: "United Kingdom / Sierra Leonean Diaspora",
+        website: "",
+        logoAttached: false,
+        logoRef: "",
+        dateReceived: "2025-02-01",
+        itemType: "Money",
+        moneyAmount: 180000,
+        currency: "SLE",
+        restriction: "Restricted",
+        frequency: "Monthly",
+        campaign: "Bo Community School Expansion",
+        programCode: "BCF-E02",
+        programCategory: "Education",
+        programTitle: "Primary School Literacy & Tech Kits",
+        projectTrackingId: "BCF-E02-02-2025",
+        paymentMethod: "Orange Money",
+        receiptNo: "REC-2025-1108",
+        txRef: "OM-SL-8849201",
+        voucherNo: "PV-2025-074",
+        datePayment: "2025-02-01",
+        estimatedValue: "180,000.00",
+        beneficiaryAck: "Yes",
+        supportingDocAttached: "Yes",
+        docRef: "ORANGE_MONEY_RECEIPT.PDF",
+        status: "Verified",
+        verifiedBy: "Josephine Koroma (Finance Director)",
+        verifiedDate: "2025-02-01",
+        ackLetterSent: "Yes",
+        taxReceiptIssued: "Yes",
+        notes: "Monthly pledge for community education solar kits and digital learning tablets.",
+        preparedBy: "Amadu Kamara, Compliance Officer",
+        approvedBy: "Josephine Koroma, Director of Finance",
+        emailDispatched: true,
+        emailSentTo: "m.bangura.md@gmail.com",
+        emailSentAt: "2025-02-01T16:20:00.000Z",
+        timestamp: Date.now() - 86400000 * 12
+      }
+    ];
+
+    function getNextAvailableDonationId() {
+      let maxNum = 0;
+      savedDonations.forEach(d => {
+        if (d && d.id) {
+          const m = d.id.match(/DON-(\d{4})-(\d+)/i) || d.id.match(/DON-(\d+)/i);
+          if (m) {
+            const val = parseInt(m[2] || m[1], 10);
+            if (!isNaN(val) && val > maxNum) maxNum = val;
+          }
+        }
+      });
+      return `DON-2025-${String(maxNum + 1).padStart(3, '0')}`;
+    }
+
+    function getNextAvailableDonorId() {
+      let maxNum = 100;
+      savedDonations.forEach(d => {
+        if (d && d.donorId) {
+          const m = d.donorId.match(/DNR-[A-Za-z]+-(\d+)/i) || d.donorId.match(/DNR-(\d+)/i);
+          if (m) {
+            const val = parseInt(m[1], 10);
+            if (!isNaN(val) && val > maxNum) maxNum = val;
+          }
+        }
+      });
+      return `DNR-SL-${String(maxNum + 1).padStart(4, '0')}`;
+    }
+
+    function prepareNextDonationForm() {
+      const nextId = getNextAvailableDonationId();
+      const nextDnrId = getNextAvailableDonorId();
+      const idInput = document.getElementById('reg-donation-id');
+      if (idInput) idInput.value = nextId;
+      const dnrInput = document.getElementById('reg-donor-id');
+      if (dnrInput) dnrInput.value = nextDnrId;
+    }
+
+    function initDates() {
+      const today = new Date().toISOString().split('T')[0];
+      const dateInputs = ['reg-date', 'donation-date-received', 'proof-date-payment', 'verified-date', 'sig-prepared-date', 'sig-approved-date'];
+      dateInputs.forEach(id => {
+        const el = document.getElementById(id);
+        if (el && !el.value) el.value = today;
+      });
+    }
+
+    // Donor Type Selection
+    function selectDonorType(type) {
+      document.getElementById('selected-donor-type').value = type;
+      const buttons = document.querySelectorAll('#donor-type-group .donor-type-pill');
+      buttons.forEach(btn => {
+        const spanText = btn.querySelector('span:last-child').textContent.trim();
+        const box = btn.querySelector('.choice-box');
+        if (spanText === type || (type === 'NGO/Foundation' && spanText.includes('NGO'))) {
+          btn.className = 'form-choice-btn donor-type-pill active px-2.5 py-2 rounded-lg border border-teal-700 text-xs font-semibold flex items-center justify-center gap-1.5 bg-teal-700 text-white';
+          if (box) { box.innerHTML = '&check;'; box.className = 'choice-box w-3.5 h-3.5 rounded-sm border border-white flex items-center justify-center text-[10px]'; }
+        } else {
+          btn.className = 'form-choice-btn donor-type-pill px-2.5 py-2 rounded-lg border border-slate-300 text-xs font-semibold flex items-center justify-center gap-1.5 bg-white text-slate-700 hover:border-teal-600';
+          if (box) { box.innerHTML = ''; box.className = 'choice-box w-3.5 h-3.5 rounded-sm border border-slate-400 flex items-center justify-center text-[10px]'; }
+        }
+      });
+    }
+
+    // Item Type Toggle
+    function selectItemType(type) {
+      document.getElementById('selected-item-type').value = type;
+      const btnMoney = document.getElementById('btn-type-money');
+      const btnInkind = document.getElementById('btn-type-inkind');
+      const panelMoney = document.getElementById('panel-money');
+      const panelInkind = document.getElementById('panel-inkind');
+
+      if (type === 'Money') {
+        btnMoney.className = 'form-choice-btn active px-3 py-2 rounded-lg border border-teal-700 text-xs font-bold flex items-center justify-center gap-1.5 bg-teal-700 text-white';
+        btnInkind.className = 'form-choice-btn px-3 py-2 rounded-lg border border-slate-300 text-xs font-bold flex items-center justify-center gap-1.5 bg-white text-slate-700 hover:border-teal-600';
+        panelMoney.classList.remove('hidden');
+        panelInkind.classList.add('hidden');
+      } else {
+        btnInkind.className = 'form-choice-btn active px-3 py-2 rounded-lg border border-teal-700 text-xs font-bold flex items-center justify-center gap-1.5 bg-teal-700 text-white';
+        btnMoney.className = 'form-choice-btn px-3 py-2 rounded-lg border border-slate-300 text-xs font-bold flex items-center justify-center gap-1.5 bg-white text-slate-700 hover:border-teal-600';
+        panelInkind.classList.remove('hidden');
+        panelMoney.classList.add('hidden');
+      }
+      syncEstimatedValue();
+    }
+
+    // Currency Selection
+    function selectCurrency(curr) {
+      document.getElementById('selected-currency').value = curr;
+      const prefix = document.getElementById('currency-prefix');
+      if (prefix) prefix.textContent = curr === 'SLE' ? 'NLe' : curr;
+
+      const pills = document.querySelectorAll('#currency-options .curr-pill');
+      pills.forEach(p => {
+        if (p.textContent.trim() === curr) {
+          p.className = 'form-choice-btn curr-pill active px-1 py-2 rounded border border-teal-700 text-xs font-bold text-center bg-teal-700 text-white';
+        } else {
+          p.className = 'form-choice-btn curr-pill px-1 py-2 rounded border border-slate-300 text-xs font-bold text-center bg-white text-slate-700 hover:border-teal-600';
+        }
+      });
+      syncEstimatedValue();
+    }
+
+    // Restriction Selection
+    function selectRestriction(res) {
+      document.getElementById('selected-restriction').value = res;
+      const btnR = document.getElementById('btn-res-restricted');
+      const btnU = document.getElementById('btn-res-unrestricted');
+      const hint = document.getElementById('restriction-hint');
+      const boxR = btnR.querySelector('.choice-box');
+      const boxU = btnU.querySelector('.choice-box');
+
+      if (res === 'Restricted') {
+        btnR.className = 'form-choice-btn active px-3 py-2 rounded-lg border border-teal-700 text-xs font-semibold flex items-center justify-center gap-1.5 bg-teal-700 text-white';
+        btnU.className = 'form-choice-btn px-3 py-2 rounded-lg border border-slate-300 text-xs font-semibold flex items-center justify-center gap-1.5 bg-white text-slate-700 hover:border-teal-600';
+        if (boxR) { boxR.innerHTML = '&check;'; boxR.className = 'choice-box w-3.5 h-3.5 rounded-sm border border-white flex items-center justify-center text-[10px]'; }
+        if (boxU) { boxU.innerHTML = ''; boxU.className = 'choice-box w-3.5 h-3.5 rounded-sm border border-slate-400 flex items-center justify-center text-[10px]'; }
+        if (hint) hint.textContent = "Restricted: Bound by donor stipulations to specific program deliverables.";
+      } else {
+        btnU.className = 'form-choice-btn active px-3 py-2 rounded-lg border border-teal-700 text-xs font-semibold flex items-center justify-center gap-1.5 bg-teal-700 text-white';
+        btnR.className = 'form-choice-btn px-3 py-2 rounded-lg border border-slate-300 text-xs font-semibold flex items-center justify-center gap-1.5 bg-white text-slate-700 hover:border-teal-600';
+        if (boxU) { boxU.innerHTML = '&check;'; boxU.className = 'choice-box w-3.5 h-3.5 rounded-sm border border-white flex items-center justify-center text-[10px]'; }
+        if (boxR) { boxR.innerHTML = ''; boxR.className = 'choice-box w-3.5 h-3.5 rounded-sm border border-slate-400 flex items-center justify-center text-[10px]'; }
+        if (hint) hint.textContent = "Unrestricted: Core general operational funds with full executive discretion.";
+      }
+    }
+
+    // Frequency Selection
+    function selectFrequency(freq) {
+      document.getElementById('selected-frequency').value = freq;
+      const pills = document.querySelectorAll('#frequency-group .freq-pill');
+      pills.forEach(p => {
+        if (p.textContent.trim() === freq) {
+          p.className = 'form-choice-btn freq-pill active px-1.5 py-2 rounded-lg border border-teal-700 text-xs font-semibold text-center bg-teal-700 text-white';
+        } else {
+          p.className = 'form-choice-btn freq-pill px-1.5 py-2 rounded-lg border border-slate-300 text-xs font-semibold text-center bg-white text-slate-700 hover:border-teal-600';
+        }
+      });
+    }
+
+    // Program Code Select
+    function handleProgramCodeSelect(code) {
+      const match = PROGRAM_MAP[code];
+      if (match) {
+        document.getElementById('program-category').value = match.cat;
+        document.getElementById('program-title').value = match.title;
+        const tracking = document.getElementById('project-tracking-id');
+        if (tracking && (!tracking.value || tracking.value.startsWith('BCF-'))) {
+          tracking.value = match.defaultTracking;
+        }
+      }
+    }
+
+    // Payment Method Selection
+    function selectPaymentMethod(method) {
+      document.getElementById('selected-payment-method').value = method;
+      const buttons = document.querySelectorAll('#payment-methods-grid .pay-btn');
+      buttons.forEach(btn => {
+        const text = btn.querySelector('span:last-child').textContent.trim();
+        const box = btn.querySelector('.choice-box');
+        if (text === method || (method.startsWith('Direct Payment') && text.startsWith('Direct Payment'))) {
+          btn.className = 'form-choice-btn pay-btn active px-2.5 py-2 rounded-lg border border-teal-700 text-xs font-semibold flex items-center gap-2 bg-teal-700 text-white ' + (btn.classList.contains('sm:col-span-2') ? 'sm:col-span-2' : '');
+          if (box) { box.innerHTML = '&check;'; box.className = 'choice-box w-3.5 h-3.5 rounded-sm border border-white flex items-center justify-center text-[10px]'; }
+        } else {
+          btn.className = 'form-choice-btn pay-btn px-2.5 py-2 rounded-lg border border-slate-300 text-xs font-semibold flex items-center gap-2 bg-white text-slate-700 hover:border-teal-600 ' + (btn.classList.contains('sm:col-span-2') ? 'sm:col-span-2' : '');
+          if (box) { box.innerHTML = ''; box.className = 'choice-box w-3.5 h-3.5 rounded-sm border border-slate-400 flex items-center justify-center text-[10px]'; }
+        }
+      });
+    }
+
+    // Beneficiary Ack
+    function selectBeneficiaryAck(isYes) {
+      document.getElementById('selected-beneficiary-ack').value = isYes ? 'Yes' : 'No';
+      const btnY = document.getElementById('btn-ack-yes');
+      const btnN = document.getElementById('btn-ack-no');
+      btnY.className = isYes ? 'form-choice-btn active px-3 py-1.5 rounded-lg border border-teal-700 text-xs font-bold flex items-center justify-center gap-1.5 bg-teal-700 text-white' : 'form-choice-btn px-3 py-1.5 rounded-lg border border-slate-300 text-xs font-bold flex items-center justify-center gap-1.5 bg-white text-slate-700 hover:border-teal-600';
+      btnN.className = !isYes ? 'form-choice-btn active px-3 py-1.5 rounded-lg border border-teal-700 text-xs font-bold flex items-center justify-center gap-1.5 bg-teal-700 text-white' : 'form-choice-btn px-3 py-1.5 rounded-lg border border-slate-300 text-xs font-bold flex items-center justify-center gap-1.5 bg-white text-slate-700 hover:border-teal-600';
+    }
+
+    // Supporting Doc
+    function selectSupportingDoc(isYes) {
+      document.getElementById('selected-supporting-doc').value = isYes ? 'Yes' : 'No';
+      const btnY = document.getElementById('btn-supdoc-yes');
+      const btnN = document.getElementById('btn-supdoc-no');
+      btnY.className = isYes ? 'form-choice-btn active px-3 py-1.5 rounded-lg border border-teal-700 text-xs font-bold flex items-center justify-center gap-1.5 bg-teal-700 text-white' : 'form-choice-btn px-3 py-1.5 rounded-lg border border-slate-300 text-xs font-bold flex items-center justify-center gap-1.5 bg-white text-slate-700 hover:border-teal-600';
+      btnN.className = !isYes ? 'form-choice-btn active px-3 py-1.5 rounded-lg border border-teal-700 text-xs font-bold flex items-center justify-center gap-1.5 bg-teal-700 text-white' : 'form-choice-btn px-3 py-1.5 rounded-lg border border-slate-300 text-xs font-bold flex items-center justify-center gap-1.5 bg-white text-slate-700 hover:border-teal-600';
+    }
+
+    // Donation Status Selection
+    function selectDonationStatus(status) {
+      document.getElementById('selected-donation-status').value = status;
+      const pills = document.querySelectorAll('#status-group .status-pill');
+      pills.forEach(p => {
+        const text = p.querySelector('span:last-child').textContent.trim();
+        if (text === status) {
+          p.className = 'form-choice-btn status-pill active px-3 py-2 rounded-lg border border-teal-700 text-xs font-bold flex items-center justify-center gap-1.5 bg-teal-700 text-white';
+        } else {
+          p.className = 'form-choice-btn status-pill px-3 py-2 rounded-lg border border-slate-300 text-xs font-bold flex items-center justify-center gap-1.5 bg-white text-slate-700';
+        }
+      });
+    }
+
+    // Ack Letter
+    function selectAckLetter(isYes) {
+      document.getElementById('selected-ack-letter').value = isYes ? 'Yes' : 'No';
+      const btnY = document.getElementById('btn-acklet-yes');
+      const btnN = document.getElementById('btn-acklet-no');
+      btnY.className = isYes ? 'form-choice-btn active px-3 py-1.5 rounded-lg border border-teal-700 text-xs font-bold flex items-center justify-center gap-1.5 bg-teal-700 text-white' : 'form-choice-btn px-3 py-1.5 rounded-lg border border-slate-300 text-xs font-bold flex items-center justify-center gap-1.5 bg-white text-slate-700 hover:border-teal-600';
+      btnN.className = !isYes ? 'form-choice-btn active px-3 py-1.5 rounded-lg border border-teal-700 text-xs font-bold flex items-center justify-center gap-1.5 bg-teal-700 text-white' : 'form-choice-btn px-3 py-1.5 rounded-lg border border-slate-300 text-xs font-bold flex items-center justify-center gap-1.5 bg-white text-slate-700 hover:border-teal-600';
+    }
+
+    // Tax Receipt
+    function selectTaxReceipt(isYes) {
+      document.getElementById('selected-tax-receipt').value = isYes ? 'Yes' : 'No';
+      const btnY = document.getElementById('btn-tax-yes');
+      const btnN = document.getElementById('btn-tax-no');
+      btnY.className = isYes ? 'form-choice-btn active px-3 py-1.5 rounded-lg border border-teal-700 text-xs font-bold flex items-center justify-center gap-1.5 bg-teal-700 text-white' : 'form-choice-btn px-3 py-1.5 rounded-lg border border-slate-300 text-xs font-bold flex items-center justify-center gap-1.5 bg-white text-slate-700 hover:border-teal-600';
+      btnN.className = !isYes ? 'form-choice-btn active px-3 py-1.5 rounded-lg border border-teal-700 text-xs font-bold flex items-center justify-center gap-1.5 bg-teal-700 text-white' : 'form-choice-btn px-3 py-1.5 rounded-lg border border-slate-300 text-xs font-bold flex items-center justify-center gap-1.5 bg-white text-slate-700 hover:border-teal-600';
+    }
+
+    // Sync Estimated Value input
+    function syncEstimatedValue() {
+      const type = document.getElementById('selected-item-type').value;
+      const target = document.getElementById('proof-estimated-value');
+      if (!target) return;
+
+      if (type === 'Money') {
+        const val = parseFloat(document.getElementById('money-amount')?.value) || 0;
+        target.value = val.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+      } else {
+        const val = parseFloat(document.getElementById('inkind-cost')?.value) || 0;
+        target.value = val.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+      }
+    }
+
+    // Upload handlers
+    function handleLogoUpload(input) {
+      if (input.files && input.files[0]) {
+        const name = input.files[0].name;
+        document.getElementById('donor-logo-ref').value = name;
+        document.getElementById('donor-logo-attached').checked = true;
+        showToast(`Logo attached: ${name}`, 'check');
+      }
+    }
+
+    function handleDocUpload(input) {
+      if (input.files && input.files[0]) {
+        const name = input.files[0].name;
+        document.getElementById('proof-doc-ref').value = name;
+        selectSupportingDoc(true);
+        showToast(`Document attached: ${name}`, 'attachment');
+      }
+    }
+
+    // Reset Form
+    function resetDonationForm() {
+      prepareNextDonationForm();
+      document.getElementById('donor-ceo').value = "";
+      document.getElementById('donor-contact').value = "";
+      document.getElementById('donor-org').value = "";
+      document.getElementById('donor-email').value = "";
+      document.getElementById('donor-phone').value = "";
+      document.getElementById('donor-address').value = "";
+      document.getElementById('donor-website').value = "";
+      document.getElementById('donor-logo-ref').value = "";
+      document.getElementById('donor-logo-attached').checked = false;
+      document.getElementById('money-amount').value = "";
+      document.getElementById('inkind-name').value = "";
+      document.getElementById('inkind-qty').value = "";
+      document.getElementById('inkind-cost').value = "";
+      document.getElementById('proof-receipt-no').value = "";
+      document.getElementById('proof-tx-ref').value = "";
+      document.getElementById('proof-voucher-no').value = "";
+      document.getElementById('proof-estimated-value').value = "0.00";
+      document.getElementById('proof-doc-ref').value = "";
+      document.getElementById('additional-notes').value = "";
+
+      selectDonorType('Corporate');
+      selectItemType('Money');
+      selectCurrency('SLE');
+      selectRestriction('Restricted');
+      selectFrequency('One-time');
+      selectPaymentMethod('Bank Transfer');
+      selectBeneficiaryAck(true);
+      selectSupportingDoc(false);
+      selectDonationStatus('Pending');
+      selectAckLetter(false);
+      selectTaxReceipt(false);
+      initDates();
+      showToast("Ready for new donation registration", "refresh");
+    }
+
+    // Load Realistic Sample Donation
+    function loadSampleDonation() {
+      const sampleId = getNextAvailableDonationId();
+      document.getElementById('reg-donation-id').value = sampleId;
+      document.getElementById('reg-donor-id').value = getNextAvailableDonorId();
+      document.getElementById('reg-registered-by').value = "Amadu Kamara (Grants Officer)";
+      selectDonorType('Corporate');
+      document.getElementById('donor-ceo').value = "Dr. Haja Fatima Sesay";
+      document.getElementById('donor-contact').value = "Sahr Emmanuel Bangura (CSR Director)";
+      document.getElementById('donor-org').value = "Sierra Leone Commercial Bank CSR Trust";
+      document.getElementById('donor-email').value = "csr@slcb-freetown.com";
+      document.getElementById('donor-phone').value = "+232 76 543210";
+      document.getElementById('donor-country').value = "Sierra Leone";
+      document.getElementById('donor-address').value = "29 Siaka Stevens Street, Freetown, Sierra Leone";
+      document.getElementById('donor-website').value = "https://www.slcb.com";
+      document.getElementById('donor-logo-attached').checked = true;
+      document.getElementById('donor-logo-ref').value = "LOGO_SLCB_2025.PNG";
+
+      selectItemType('Money');
+      document.getElementById('money-amount').value = "350000";
+      selectCurrency('SLE');
+      selectRestriction('Restricted');
+      selectFrequency('One-time');
+
+      document.getElementById('campaign-name').value = "2025 Maternal Health Care Drive";
+      document.getElementById('program-code').value = "BCF-H01";
+      handleProgramCodeSelect('BCF-H01');
+
+      selectPaymentMethod('Bank Transfer');
+      document.getElementById('proof-receipt-no').value = "REC-2025-0814";
+      document.getElementById('proof-tx-ref').value = "TX-SLCB-998240";
+      document.getElementById('proof-voucher-no').value = "PV-2025-044";
+      document.getElementById('proof-estimated-value').value = "350,000.00";
+      selectBeneficiaryAck(true);
+      selectSupportingDoc(true);
+      document.getElementById('proof-doc-ref').value = "SLCB_TRANSFER_SLIP_0814.PDF";
+
+      selectDonationStatus('Verified');
+      document.getElementById('verified-by').value = "Josephine Koroma (Finance Director)";
+      selectAckLetter(true);
+      selectTaxReceipt(true);
+
+      document.getElementById('additional-notes').value = "Donation approved for the Bo District Maternal Clinic equipment overhaul. Quarter 1 impact report and photographic documentation requested prior to tranche 2 disbursement.";
+      document.getElementById('sig-prepared-by').value = "Amadu Kamara, Compliance Officer";
+      document.getElementById('sig-approved-by').value = "Josephine Koroma, Director of Finance";
+      initDates();
+      showToast(`Loaded sample donation (${sampleId})`, "check_circle");
+    }
+
+    // Save Record to LocalStorage
+    function saveDonationRecord() {
+      let donationId = document.getElementById('reg-donation-id').value.trim();
+      const orgName = document.getElementById('donor-org').value.trim();
+      if (!orgName) {
+        alert("Please ensure Donor / Organization Name is entered!");
+        document.getElementById('donor-org').focus();
+        return;
+      }
+
+      if (!donationId) {
+        donationId = getNextAvailableDonationId();
+        document.getElementById('reg-donation-id').value = donationId;
+      }
+
+      // Safety check: is this ID already in use by a DIFFERENT organization?
+      const existingIdx = savedDonations.findIndex(d => d.id === donationId);
+      if (existingIdx >= 0) {
+        const existingOrg = (savedDonations[existingIdx].orgName || '').trim().toLowerCase();
+        if (existingOrg !== orgName.trim().toLowerCase()) {
+          // Different donor! Auto-assign a fresh unique ID so nothing is ever overwritten!
+          donationId = getNextAvailableDonationId();
+          document.getElementById('reg-donation-id').value = donationId;
+        }
+      }
+
+      const saveBtn = document.getElementById('btn-save-record');
+      if (saveBtn) {
+        saveBtn.innerHTML = '<span class="material-symbols-outlined text-[17px] animate-spin">progress_activity</span><span>Saving...</span>';
+      }
+
+      const record = {
+        id: donationId,
+        donorId: document.getElementById('reg-donor-id').value.trim() || getNextAvailableDonorId(),
+        registeredBy: document.getElementById('reg-registered-by').value.trim(),
+        dateRegistered: document.getElementById('reg-date').value,
+        donorType: document.getElementById('selected-donor-type').value,
+        ceo: document.getElementById('donor-ceo').value.trim(),
+        contactPerson: document.getElementById('donor-contact').value.trim(),
+        orgName: orgName,
+        email: document.getElementById('donor-email').value.trim(),
+        phone: document.getElementById('donor-phone').value.trim(),
+        address: document.getElementById('donor-address').value.trim(),
+        country: document.getElementById('donor-country').value.trim(),
+        website: document.getElementById('donor-website').value.trim(),
+        logoAttached: document.getElementById('donor-logo-attached').checked,
+        logoRef: document.getElementById('donor-logo-ref').value.trim(),
+        dateReceived: document.getElementById('donation-date-received').value,
+        itemType: document.getElementById('selected-item-type').value,
+        moneyAmount: parseFloat(document.getElementById('money-amount').value) || 0,
+        currency: document.getElementById('selected-currency').value,
+        inkindName: document.getElementById('inkind-name').value.trim(),
+        inkindQty: document.getElementById('inkind-qty').value.trim(),
+        inkindCost: parseFloat(document.getElementById('inkind-cost').value) || 0,
+        restriction: document.getElementById('selected-restriction').value,
+        frequency: document.getElementById('selected-frequency').value,
+        campaign: document.getElementById('campaign-name').value.trim(),
+        programCode: document.getElementById('program-code').value,
+        programCategory: document.getElementById('program-category').value,
+        programTitle: document.getElementById('program-title').value.trim(),
+        projectTrackingId: document.getElementById('project-tracking-id').value.trim(),
+        paymentMethod: document.getElementById('selected-payment-method').value,
+        receiptNo: document.getElementById('proof-receipt-no').value.trim(),
+        txRef: document.getElementById('proof-tx-ref').value.trim(),
+        voucherNo: document.getElementById('proof-voucher-no').value.trim(),
+        datePayment: document.getElementById('proof-date-payment').value,
+        estimatedValue: document.getElementById('proof-estimated-value').value.trim(),
+        beneficiaryAck: document.getElementById('selected-beneficiary-ack').value,
+        supportingDocAttached: document.getElementById('selected-supporting-doc').value,
+        docRef: document.getElementById('proof-doc-ref').value.trim(),
+        status: document.getElementById('selected-donation-status').value,
+        verifiedBy: document.getElementById('verified-by').value.trim(),
+        verifiedDate: document.getElementById('verified-date').value,
+        ackLetterSent: document.getElementById('selected-ack-letter').value,
+        taxReceiptIssued: document.getElementById('selected-tax-receipt').value,
+        notes: document.getElementById('additional-notes').value.trim(),
+        preparedBy: document.getElementById('sig-prepared-by').value.trim(),
+        approvedBy: document.getElementById('sig-approved-by').value.trim(),
+        timestamp: Date.now()
+      };
+
+      // Set email dispatch metadata
+      const orgEmail = record.email || 'bandamacharityfoundationsl@gmail.com';
+      record.emailDispatched = true;
+      record.emailSentTo = orgEmail;
+      record.emailSentAt = new Date().toISOString();
+      record.emailSubject = `OFFICIAL CONFIRMATION: Donation ${donationId} Registered in BCF-SL Database - Bandama Charity Foundation SL`;
+
+      // Add or replace in local list
+      const targetIdx = savedDonations.findIndex(d => d.id === donationId);
+      if (targetIdx >= 0) {
+        savedDonations[targetIdx] = record;
+      } else {
+        savedDonations.unshift(record);
+      }
+
+      try {
+        localStorage.setItem('bcf_donorlog_donations', JSON.stringify(savedDonations));
+        // Cross app broadcast to Donors Directory & Donor Dossier
+        const channel = new BroadcastChannel('bcf_programs_sync_channel');
+        channel.postMessage({ type: 'DONATION_RECORDED', donation: record });
+      } catch(e) {}
+
+      updateSavedCountBadge();
+
+      // Automatically advance form to the next available ID for subsequent entries
+      setTimeout(() => {
+        prepareNextDonationForm();
+      }, 500);
+
+      // Prepare email content & Dispatch to Next.js API route if online
+      const { plainText, html } = generateDonationEmailContent(record);
+      try {
+        fetch('/api/send-donation-email', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            to: orgEmail,
+            subject: record.emailSubject,
+            text: plainText,
+            html: html,
+            donation: record
+          })
+        }).then(r => r.json()).then(res => {
+          if (res && res.method === 'GMAIL_SMTP_AUTOMATED') {
+            showToast(`Sent directly via Gmail SMTP from bandamacharityfoundationsl@gmail.com!`, 'verified');
+          }
+        }).catch(err => console.log('Email API notice:', err));
+      } catch(err) {}
+
+      setTimeout(() => {
+        if (saveBtn) {
+          saveBtn.innerHTML = '<span class="material-symbols-outlined text-[17px]">done_all</span><span>Saved Successfully!</span>';
+          setTimeout(() => {
+            saveBtn.innerHTML = '<span class="material-symbols-outlined text-[17px]">save</span><span>Save &amp; Record Donation</span>';
+          }, 1800);
+        }
+        showToast(`Donation ${donationId} recorded & confirmation email dispatched to ${orgEmail}!`, "mark_email_read");
+        
+        // Open the official confirmation email modal with full details of what was given
+        openEmailDispatchModal(record);
+      }, 400);
+    }
+
+    let activeEmailPlainText = '';
+
+    // Generate Rich Official BCF-SL Email Content
+    function generateDonationEmailContent(r) {
+      const org = r.orgName || 'Esteemed Donor Organization';
+      const contact = r.contactPerson || 'Donor Representative';
+      const ceo = r.ceo ? `Attn: ${r.ceo} (CEO / Executive Director)` : '';
+      const amountStr = r.itemType === 'In-Kind' 
+        ? `${r.inkindName || 'In-Kind Goods'} (Qty: ${r.inkindQty || '-'}, Valuation: SLE ${parseFloat(r.inkindCost || 0).toLocaleString('en-US', { minimumFractionDigits: 2 })})`
+        : `${r.currency || 'SLE'} ${parseFloat(r.moneyAmount || 0).toLocaleString('en-US', { minimumFractionDigits: 2 })}`;
+      
+      const dateRec = r.dateReceived || r.dateRegistered || new Date().toISOString().split('T')[0];
+      const tracking = r.projectTrackingId || 'BCF-H01-01-2025';
+
+      const plainText = 
+`OFFICIAL CONFIRMATION OF DONATION REGISTRATION
+BANDAMA CHARITY FOUNDATION – SIERRA LEONE (BCF-SL)
+Non-Governmental Organization • Sierra Leone • Reg. No: SL-NNGO-2023-084
+Headquarters: Freetown, Sierra Leone
+Southern Region Office: 2 Ernest Gborie Street Off Gerihun Road Bo, Sierra Leone
+Email: bandamacharityfoundationsl@gmail.com | Phone: +23278242826
+
+Date: ${dateRec}
+To: ${contact} (${org})
+${ceo ? ceo + '\n' : ''}Organization Email: ${r.email || '-'}
+Country of Operation: ${r.country || 'Sierra Leone'}
+
+Dear ${contact} and the leadership of ${org},
+
+We write on behalf of the Governing Board, Executive Leadership, and beneficiary communities of BANDAMA CHARITY FOUNDATION – SIERRA LEONE (BCF-SL) to formally acknowledge and confirm that your contribution has been received, verified, and officially recorded into the BCF-SL Central Donation Database.
+
+DONATION REGISTRATION DOSSIER:
+============================================================
+• Donation ID: ${r.id}
+• Donor Account ID: ${r.donorId || 'N/A'}
+• Date Received: ${dateRec}
+• Date Registered: ${r.dateRegistered || dateRec}
+• Registered By: ${r.registeredBy || 'BCF-SL Grants Management Office'}
+• Donor Type: ${r.donorType || 'Corporate / Institutional'}
+
+DETAILS OF CONTRIBUTION GIVEN:
+============================================================
+• Contribution Category: ${r.itemType || 'Money'}
+• Details of What Was Given: ${amountStr}
+• Recorded Valuation: NLe ${r.estimatedValue || '0.00'}
+• Allocated Program: ${r.programCode || 'BCF-H01'} - ${r.programCategory || 'Health'} (${r.programTitle || 'Rural Health Project'})
+• Project Tracking ID: ${tracking}
+• Grant Designation: ${r.restriction || 'Restricted'}
+• Giving Frequency: ${r.frequency || 'One-time'}
+${r.campaign ? `• Campaign: ${r.campaign}\n` : ''}
+FINANCIAL AUDIT & TRANSACTION TRACEABILITY:
+============================================================
+• Payment Method: ${r.paymentMethod || 'Bank Transfer'}
+• Official Receipt No: ${r.receiptNo || 'REC-' + r.id}
+• Transaction Reference: ${r.txRef || 'N/A'}
+• Payment Voucher No: ${r.voucherNo || 'N/A'}
+• Ledger Verification Status: ${r.status || 'Verified'}
+• BCF-SL Verifying Officer: ${r.verifiedBy || 'Josephine Koroma (Finance Director)'}
+• Official Tax Receipt Issued: ${r.taxReceiptIssued || 'Yes'}
+• Official Acknowledgment Letter: ${r.ackLetterSent || 'Yes'}
+
+${r.notes ? `STEWARDSHIP & AUDIT NOTES:\n${r.notes}\n\n` : ''}Your generous investment provides vital resources to advance sustainable community health, education, and livelihood resilience across Sierra Leone. Comprehensive project milestones and financial utilization reports will be routed directly to this email address.
+
+Thank you for your partnership and dedication to transforming lives.
+
+With sincere gratitude,
+
+DIRECTORATE OF DONOR RELATIONS & PARTNERSHIPS
+BANDAMA CHARITY FOUNDATION – SIERRA LEONE (BCF-SL)
+Headquarters: Freetown, Sierra Leone
+Southern Region Office: 2 Ernest Gborie Street Off Gerihun Road Bo, Sierra Leone
+Email: bandamacharityfoundationsl@gmail.com
+Phone: +23278242826`;
+
+      activeEmailPlainText = plainText;
+
+      const html = `
+        <div class="space-y-4 font-sans">
+          <!-- BCF Letterhead -->
+          <div class="text-center pb-3 border-b-2 border-slate-200">
+            <div class="inline-block px-2.5 py-0.5 rounded-full bg-teal-50 border border-teal-200 text-[10px] font-extrabold uppercase tracking-widest text-teal-800 mb-1">
+              Official Donation Acknowledgment Letter
+            </div>
+            <h1 class="text-sm font-black text-slate-900 tracking-tight">BANDAMA CHARITY FOUNDATION &ndash; SIERRA LEONE</h1>
+            <div class="text-[10px] font-semibold text-slate-500">Non-Governmental Organization &bull; Sierra Leone &bull; REG. NO: SL-NNGO-2023-084</div>
+            <div class="text-[10px] text-slate-400 mt-0.5">
+              <span>Southern Region Office: 2 Ernest Gborie Street Off Gerihun Road Bo, Sierra Leone</span> &bull; 
+              <span>Headquarters: Freetown, Sierra Leone</span>
+            </div>
+            <div class="text-[10px] text-teal-700 font-semibold mt-0.5">
+              bandamacharityfoundationsl@gmail.com &bull; +23278242826
+            </div>
+          </div>
+
+          <!-- Salutation Block -->
+          <div class="bg-teal-50/70 p-3.5 rounded-xl border border-teal-200 text-xs">
+            <div class="flex justify-between items-start gap-2">
+              <div>
+                <span class="text-[10px] uppercase font-bold text-teal-800">Transmitted To:</span>
+                <div class="font-black text-slate-900 text-sm">${contact}</div>
+                <div class="text-slate-800 font-bold">${org}</div>
+                ${ceo ? `<div class="text-[11px] text-slate-600 font-medium">${ceo}</div>` : ''}
+                <div class="text-[11px] text-teal-800 font-mono mt-0.5">${r.email || '-'}</div>
+              </div>
+              <div class="text-right shrink-0">
+                <span class="text-[10px] uppercase font-bold text-slate-400">Date Logged:</span>
+                <div class="font-mono font-bold text-slate-800">${dateRec}</div>
+                <div class="text-[10px] text-teal-700 font-bold uppercase mt-1">Ref: ${r.id}</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Confirmation Statement -->
+          <p class="text-xs text-slate-700 leading-relaxed">
+            Dear <strong class="text-slate-900">${contact}</strong> and the leadership of <strong class="text-slate-900">${org}</strong>,
+          </p>
+          <p class="text-xs text-slate-700 leading-relaxed">
+            We write on behalf of the Governing Board, Executive Leadership, and beneficiary communities of <strong>BANDAMA CHARITY FOUNDATION &ndash; SIERRA LEONE (BCF-SL)</strong> to formally confirm that your generous contribution has been received, verified, and officially recorded into the <strong>BCF-SL Central Donation Database</strong>.
+          </p>
+
+          <!-- DETAILS OF WHAT WAS GIVEN TABLE -->
+          <div class="border border-slate-200 rounded-xl overflow-hidden shadow-2xs">
+            <div class="bg-teal-800 text-white px-3 py-1.5 text-[11px] font-black uppercase tracking-wider flex items-center justify-between">
+              <span>Contribution Details &bull; What Was Given</span>
+              <span class="font-mono text-teal-200">${r.itemType || 'Money'}</span>
+            </div>
+            <table class="w-full text-xs divide-y divide-slate-200">
+              <tbody class="divide-y divide-slate-100 bg-white">
+                <tr>
+                  <td class="px-3 py-2 font-semibold text-slate-500 w-1/3 bg-slate-50">Donation ID</td>
+                  <td class="px-3 py-2 font-mono font-bold text-teal-800">${r.id} <span class="text-slate-400 font-normal">(Donor ID: ${r.donorId || 'N/A'})</span></td>
+                </tr>
+                <tr>
+                  <td class="px-3 py-2 font-semibold text-slate-500 bg-slate-50">What Was Given</td>
+                  <td class="px-3 py-2 font-black text-slate-900 text-sm font-mono text-teal-900">${amountStr}</td>
+                </tr>
+                <tr>
+                  <td class="px-3 py-2 font-semibold text-slate-500 bg-slate-50">Recorded Valuation</td>
+                  <td class="px-3 py-2 font-mono font-black text-slate-900">NLe ${r.estimatedValue || '0.00'}</td>
+                </tr>
+                <tr>
+                  <td class="px-3 py-2 font-semibold text-slate-500 bg-slate-50">Allocated Program</td>
+                  <td class="px-3 py-2 font-semibold text-slate-800">${r.programCode || 'BCF-H01'} &bull; ${r.programCategory || 'Health'} &ndash; ${r.programTitle || 'Rural Health Project'}</td>
+                </tr>
+                <tr>
+                  <td class="px-3 py-2 font-semibold text-slate-500 bg-slate-50">Project Tracking ID</td>
+                  <td class="px-3 py-2 font-mono font-bold text-teal-700">${tracking}</td>
+                </tr>
+                <tr>
+                  <td class="px-3 py-2 font-semibold text-slate-500 bg-slate-50">Grant Restriction &amp; Frequency</td>
+                  <td class="px-3 py-2 font-medium text-slate-700">${r.restriction || 'Restricted'} &bull; ${r.frequency || 'One-time'} Contribution</td>
+                </tr>
+                ${r.campaign ? `
+                <tr>
+                  <td class="px-3 py-2 font-semibold text-slate-500 bg-slate-50">Campaign Drive</td>
+                  <td class="px-3 py-2 font-semibold text-slate-800">${r.campaign}</td>
+                </tr>
+                ` : ''}
+              </tbody>
+            </table>
+          </div>
+
+          <!-- AUDIT & VERIFICATION ROW -->
+          <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 bg-slate-50 p-2.5 rounded-lg border border-slate-200 text-[11px]">
+            <div>
+              <span class="text-[9px] uppercase font-bold text-slate-400 block">Payment Method</span>
+              <span class="font-bold text-slate-800">${r.paymentMethod || 'Bank Transfer'}</span>
+            </div>
+            <div>
+              <span class="text-[9px] uppercase font-bold text-slate-400 block">Receipt No.</span>
+              <span class="font-mono font-bold text-teal-800">${r.receiptNo || 'REC-' + r.id}</span>
+            </div>
+            <div>
+              <span class="text-[9px] uppercase font-bold text-slate-400 block">Tx / Voucher Ref</span>
+              <span class="font-mono text-slate-700 truncate block">${r.txRef || r.voucherNo || '-'}</span>
+            </div>
+            <div>
+              <span class="text-[9px] uppercase font-bold text-slate-400 block">Status in Database</span>
+              <span class="font-bold text-emerald-700">&check; ${r.status || 'Verified'}</span>
+            </div>
+          </div>
+
+          <!-- Closing Note -->
+          <p class="text-xs text-slate-600 leading-relaxed italic">
+            &ldquo;Thank you for partnering with BCF-SL. Your support directly advances our mission of uplifting vulnerable populations across Sierra Leone. An official tax receipt and milestone progress updates will be issued in accordance with your grant agreement.&rdquo;
+          </p>
+
+          <div class="pt-3 border-t border-slate-200 flex justify-between items-end text-[11px] text-slate-500">
+            <div>
+              <div class="font-bold text-slate-800">Directorate of Donor Relations &amp; Financial Compliance</div>
+              <div>Bandama Charity Foundation &ndash; Sierra Leone</div>
+            </div>
+            <div class="text-right font-mono text-[10px] text-teal-700 font-bold">
+              REG: SL-NNGO-2023-084
+            </div>
+          </div>
+        </div>
+      `;
+
+      return { plainText, html };
+    }
+
+    // Modal Control Functions
+    function openEmailDispatchModal(record) {
+      const modal = document.getElementById('email-dispatch-modal');
+      if (!modal) return;
+
+      const recipientEl = document.getElementById('modal-email-recipient');
+      const subjectEl = document.getElementById('modal-email-subject');
+      const bodyEl = document.getElementById('modal-email-body');
+      const mailtoBtn = document.getElementById('btn-modal-mailto');
+
+      const { plainText, html } = generateDonationEmailContent(record);
+      const subject = `OFFICIAL CONFIRMATION: Donation ${record.id} Registered in BCF-SL Database - Bandama Charity Foundation SL`;
+      const recipient = record.email || 'bandamacharityfoundationsl@gmail.com';
+
+      if (recipientEl) recipientEl.textContent = recipient;
+      if (subjectEl) subjectEl.textContent = subject;
+      if (bodyEl) bodyEl.innerHTML = html;
+
+      if (mailtoBtn) {
+        mailtoBtn.onclick = () => {
+          const mailtoUrl = `mailto:${encodeURIComponent(recipient)}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(plainText)}`;
+          window.location.href = mailtoUrl;
+        };
+      }
+
+      const gmailBtn = document.getElementById('btn-modal-gmail');
+      if (gmailBtn) {
+        gmailBtn.onclick = () => {
+          const gmailUrl = `https://mail.google.com/mail/?view=cm&fs=1&to=${encodeURIComponent(recipient)}&su=${encodeURIComponent(subject)}&body=${encodeURIComponent(plainText)}`;
+          window.open(gmailUrl, '_blank');
+        };
+      }
+
+      const dossierBtn = document.getElementById('btn-modal-view-dossier');
+      if (dossierBtn) {
+        dossierBtn.href = `../donor_dossier_history/code.html?id=${encodeURIComponent(record.id)}`;
+      }
+
+      modal.classList.remove('hidden');
+    }
+
+    function closeEmailDispatchModal() {
+      const modal = document.getElementById('email-dispatch-modal');
+      if (modal) modal.classList.add('hidden');
+    }
+
+    function copyEmailBodyToClipboard() {
+      if (!activeEmailPlainText) return;
+      navigator.clipboard.writeText(activeEmailPlainText).then(() => {
+        showToast("Official email acknowledgment copied to clipboard!", "content_copy");
+      }).catch(() => {
+        showToast("Copied to clipboard", "content_copy");
+      });
+    }
+
+    function previewRecordEmail(idx) {
+      const record = savedDonations[idx];
+      if (record) {
+        openEmailDispatchModal(record);
+      }
+    }
+
+    function loadSavedRecords() {
+      try {
+        const stored = localStorage.getItem('bcf_donorlog_donations');
+        if (stored) {
+          const parsed = JSON.parse(stored);
+          if (Array.isArray(parsed) && parsed.length > 0) {
+            const map = new Map();
+            parsed.forEach(d => {
+              if (d && d.id) map.set(d.id, d);
+            });
+            DEFAULT_DONATIONS_BENCHMARK.forEach(bm => {
+              if (!map.has(bm.id) && !Array.from(map.values()).some(v => v.orgName && v.orgName.toLowerCase() === bm.orgName.toLowerCase())) {
+                map.set(bm.id, bm);
+              }
+            });
+            savedDonations = Array.from(map.values());
+            localStorage.setItem('bcf_donorlog_donations', JSON.stringify(savedDonations));
+          } else {
+            savedDonations = [...DEFAULT_DONATIONS_BENCHMARK];
+            localStorage.setItem('bcf_donorlog_donations', JSON.stringify(savedDonations));
+          }
+        } else {
+          savedDonations = [...DEFAULT_DONATIONS_BENCHMARK];
+          localStorage.setItem('bcf_donorlog_donations', JSON.stringify(savedDonations));
+        }
+      } catch(e) {
+        savedDonations = [...DEFAULT_DONATIONS_BENCHMARK];
+      }
+      updateSavedCountBadge();
+      prepareNextDonationForm();
+    }
+
+    function updateSavedCountBadge() {
+      const badge = document.getElementById('badge-saved-count');
+      if (badge) badge.textContent = savedDonations.length;
+    }
+
+    function togglePastRecordsModal() {
+      const modal = document.getElementById('records-modal');
+      if (!modal) return;
+      if (modal.classList.contains('hidden')) {
+        renderRecordsList();
+        modal.classList.remove('hidden');
+      } else {
+        modal.classList.add('hidden');
+      }
+    }
+
+    function renderRecordsList() {
+      const container = document.getElementById('records-list-container');
+      if (!container) return;
+
+      if (savedDonations.length === 0) {
+        container.innerHTML = `
+          <div class="text-center py-8 text-slate-400">
+            <span class="material-symbols-outlined text-4xl mb-1">receipt_long</span>
+            <p class="text-xs">No saved donation records found.</p>
+          </div>
+        `;
+        return;
+      }
+
+      container.innerHTML = savedDonations.map((d, idx) => `
+        <div class="p-3 bg-slate-50 hover:bg-slate-100 rounded-xl border border-slate-200 flex flex-col sm:flex-row sm:items-center justify-between gap-3 transition">
+          <div>
+            <div class="flex items-center gap-2">
+              <span class="font-mono font-bold text-teal-800 text-xs">${d.id}</span>
+              <span class="text-xs font-bold text-slate-900">${d.orgName || 'Anonymous Donor'}</span>
+              <span class="px-2 py-0.5 rounded text-[10px] font-bold ${d.status === 'Verified' ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-800'}">${d.status || 'Pending'}</span>
+            </div>
+            <div class="text-[11px] text-slate-500 mt-0.5 flex items-center gap-3">
+              <span>Program: <strong class="text-slate-700">${d.programCode || 'BCF-H01'}</strong></span>
+              <span>Received: <strong class="text-slate-700">${d.dateReceived || '-'}</strong></span>
+              <span>Amount: <strong class="text-teal-900 font-mono">NLe ${d.estimatedValue || '0.00'}</strong></span>
+            </div>
+          </div>
+          <div class="flex items-center gap-2 shrink-0">
+            <button type="button" onclick="previewRecordEmail(${idx})" class="px-2.5 py-1 rounded bg-teal-50 hover:bg-teal-100 text-teal-800 text-xs font-bold inline-flex items-center gap-1 transition border border-teal-200" title="View Dispatched Email Letter">
+              <span class="material-symbols-outlined text-[14px]">mail</span>
+              <span>Email</span>
+            </button>
+            <button type="button" onclick="loadRecordIntoForm(${idx})" class="px-2.5 py-1 rounded bg-teal-700 hover:bg-teal-800 text-white text-xs font-bold inline-flex items-center gap-1 transition">
+              <span class="material-symbols-outlined text-[14px]">open_in_new</span>
+              <span>Open</span>
+            </button>
+            <button type="button" onclick="deleteRecord(${idx})" class="px-2 py-1 rounded bg-rose-50 hover:bg-rose-600 text-rose-700 hover:text-white text-xs font-bold transition">
+              <span class="material-symbols-outlined text-[14px]">delete</span>
+            </button>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function loadRecordIntoForm(idx) {
+      const d = savedDonations[idx];
+      if (!d) return;
+
+      document.getElementById('reg-donation-id').value = d.id || '';
+      document.getElementById('reg-donor-id').value = d.donorId || '';
+      document.getElementById('reg-registered-by').value = d.registeredBy || '';
+      document.getElementById('reg-date').value = d.dateRegistered || '';
+
+      if (d.donorType) selectDonorType(d.donorType);
+      document.getElementById('donor-ceo').value = d.ceo || '';
+      document.getElementById('donor-contact').value = d.contactPerson || '';
+      document.getElementById('donor-org').value = d.orgName || '';
+      document.getElementById('donor-email').value = d.email || '';
+      document.getElementById('donor-phone').value = d.phone || '';
+      document.getElementById('donor-country').value = d.country || '';
+      document.getElementById('donor-address').value = d.address || '';
+      document.getElementById('donor-website').value = d.website || '';
+      document.getElementById('donor-logo-attached').checked = !!d.logoAttached;
+      document.getElementById('donor-logo-ref').value = d.logoRef || '';
+
+      document.getElementById('donation-date-received').value = d.dateReceived || '';
+      if (d.itemType) selectItemType(d.itemType);
+      document.getElementById('money-amount').value = d.moneyAmount || '';
+      if (d.currency) selectCurrency(d.currency);
+      document.getElementById('inkind-name').value = d.inkindName || '';
+      document.getElementById('inkind-qty').value = d.inkindQty || '';
+      document.getElementById('inkind-cost').value = d.inkindCost || '';
+
+      if (d.restriction) selectRestriction(d.restriction);
+      if (d.frequency) selectFrequency(d.frequency);
+
+      document.getElementById('campaign-name').value = d.campaign || '';
+      if (d.programCode) {
+        document.getElementById('program-code').value = d.programCode;
+        handleProgramCodeSelect(d.programCode);
+      }
+      if (d.programCategory) document.getElementById('program-category').value = d.programCategory;
+      if (d.programTitle) document.getElementById('program-title').value = d.programTitle;
+      if (d.projectTrackingId) document.getElementById('project-tracking-id').value = d.projectTrackingId;
+
+      if (d.paymentMethod) selectPaymentMethod(d.paymentMethod);
+      document.getElementById('proof-receipt-no').value = d.receiptNo || '';
+      document.getElementById('proof-tx-ref').value = d.txRef || '';
+      document.getElementById('proof-voucher-no').value = d.voucherNo || '';
+      document.getElementById('proof-date-payment').value = d.datePayment || '';
+      document.getElementById('proof-estimated-value').value = d.estimatedValue || '';
+
+      selectBeneficiaryAck(d.beneficiaryAck === 'Yes');
+      selectSupportingDoc(d.supportingDocAttached === 'Yes');
+      document.getElementById('proof-doc-ref').value = d.docRef || '';
+
+      if (d.status) selectDonationStatus(d.status);
+      document.getElementById('verified-by').value = d.verifiedBy || '';
+      document.getElementById('verified-date').value = d.verifiedDate || '';
+
+      selectAckLetter(d.ackLetterSent === 'Yes');
+      selectTaxReceipt(d.taxReceiptIssued === 'Yes');
+
+      document.getElementById('additional-notes').value = d.notes || '';
+      document.getElementById('sig-prepared-by').value = d.preparedBy || '';
+      document.getElementById('sig-approved-by').value = d.approvedBy || '';
+
+      togglePastRecordsModal();
+      showToast(`Loaded ${d.id} into Registration Form`, "open_in_new");
+    }
+
+    function deleteRecord(idx) {
+      if (confirm("Delete this donation registration record from local ledger?")) {
+        savedDonations.splice(idx, 1);
+        try {
+          localStorage.setItem('bcf_donorlog_donations', JSON.stringify(savedDonations));
+        } catch(e) {}
+        updateSavedCountBadge();
+        renderRecordsList();
+        showToast("Record deleted", "delete");
+      }
+    }
+
+    function clearAllStoredRecords() {
+      if (confirm("Clear all recorded donation forms? This cannot be undone.")) {
+        savedDonations = [];
+        try {
+          localStorage.removeItem('bcf_donorlog_donations');
+        } catch(e) {}
+        updateSavedCountBadge();
+        renderRecordsList();
+        showToast("All records cleared", "delete_forever");
+      }
+    }
+
+    // Toast Notification Utility
+    function showToast(msg, icon = 'info') {
+      const container = document.getElementById('toast-container');
+      if (!container) return;
+
+      const toast = document.createElement('div');
+      toast.className = "bg-slate-900 text-white text-xs px-3.5 py-2.5 rounded-xl shadow-xl flex items-center gap-2 border border-slate-700 pointer-events-auto transform translate-y-2 opacity-0 transition-all duration-200";
+      toast.innerHTML = `
+        <span class="material-symbols-outlined text-[17px] text-teal-400">${icon}</span>
+        <span class="font-medium">${msg}</span>
+      `;
+
+      container.appendChild(toast);
+      setTimeout(() => {
+        toast.classList.remove('translate-y-2', 'opacity-0');
+      }, 10);
+
+      setTimeout(() => {
+        toast.classList.add('opacity-0', 'translate-y-2');
+        setTimeout(() => toast.remove(), 250);
+      }, 3000);
+    }
+
+    // Init on DOM ready
+    window.addEventListener('DOMContentLoaded', () => {
+      initDates();
+      loadSavedRecords();
+    });
+  </script>
+
+</body>
+</html>

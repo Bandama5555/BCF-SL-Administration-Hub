@@ -1,0 +1,549 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover"/>
+    <title>Security & Audit Logs - BCF-SL Super Admin</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+
+    function navToApp(nextRoute, fallbackPath, e) {
+        if (e) e.preventDefault();
+        try {
+            if (window.top && window.top !== window && window.top.location) {
+                window.top.location.href = nextRoute;
+                return;
+            }
+        } catch(err) {}
+        window.location.href = fallbackPath;
+    }
+
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: "#15803d",
+                        "primary-dark": "#166534",
+                        secondary: "#2563eb",
+                        tertiary: "#9333ea",
+                        surface: "#ffffff",
+                        "surface-container": "#f8fafc",
+                        "on-surface": "#0f172a",
+                        "on-surface-variant": "#475569",
+                        outline: "#e2e8f0",
+                        error: "#dc2626"
+                    },
+                    fontFamily: {
+                        sans: ['Calibri', 'Inter', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace']
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body { font-size: 11pt; overscroll-behavior-y: none; }
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-thumb { background-color: #cbd5e1; border-radius: 3px; }
+        .stat-card { transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); }
+        @media print {
+            header, button, input, select, #audit-search-container, .no-print { display: none !important; }
+            body { background: white !important; font-size: 9pt; }
+            #print-report-header { display: block !important; }
+            table { width: 100% !important; border-collapse: collapse !important; }
+            th, td { border: 1px solid #cbd5e1 !important; padding: 6px 8px !important; }
+        }
+    </style>
+</head>
+<body class="bg-[#f1f5f9] text-on-surface flex flex-col min-h-screen font-sans">
+
+<!-- HEADER -->
+<header class="bg-surface border-b border-outline shadow-sm z-30 sticky top-0">
+    <div class="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between gap-4">
+        <div class="flex items-center gap-4">
+            <img src="../../bcf-logo.png" onerror="this.src='/bcf-logo.jpg'" alt="BCF-SL Logo" class="h-10 w-auto object-contain"/>
+            <div class="hidden sm:block">
+                <div class="flex items-center gap-2">
+                    <h1 class="font-bold text-base sm:text-lg text-primary leading-tight">BANDAMA CHARITY FOUNDATION SIERRA LEONE</h1>
+                    <span class="px-2 py-0.5 rounded bg-amber-100 text-amber-900 font-extrabold text-[10px] tracking-wider uppercase">Super Admin</span>
+                </div>
+                <p class="text-[9pt] font-semibold text-secondary">Immutable Security &amp; Activity Audit Trail</p>
+            </div>
+        </div>
+
+        <div class="flex items-center gap-1.5 sm:gap-2">
+            <a href="../account_management/code.html" onclick="navToApp('/super-admin/account-management', '../account_management/code.html', event)" class="h-9 px-3 rounded-lg border border-outline bg-surface hover:bg-slate-100 text-xs font-semibold flex items-center gap-1.5 transition">
+                <span class="material-symbols-outlined text-[17px] text-primary">manage_accounts</span>
+                <span class="hidden md:inline">Account Management</span>
+            </a>
+            <a href="../access_matrix/code.html" onclick="navToApp('/super-admin/access-matrix', '../access_matrix/code.html', event)" class="h-9 px-3 rounded-lg border border-outline bg-surface hover:bg-slate-100 text-xs font-semibold flex items-center gap-1.5 transition">
+                <span class="material-symbols-outlined text-[17px] text-secondary">security</span>
+                <span class="hidden md:inline">Access Matrix</span>
+            </a>
+            <a href="../executive_analytics/code.html" onclick="navToApp('/super-admin/executive-analytics', '../executive_analytics/code.html', event)" class="h-9 px-3 rounded-lg border border-outline bg-surface hover:bg-slate-100 text-xs font-semibold flex items-center gap-1.5 transition">
+                <span class="material-symbols-outlined text-[17px] text-tertiary">insights</span>
+                <span class="hidden md:inline">Analytics</span>
+            </a>
+        </div>
+    </div>
+</header>
+
+<div class="max-w-7xl mx-auto w-full px-4 py-6 flex flex-col gap-6">
+
+    <!-- TITLE & ACTION BUTTONS -->
+    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+        <div>
+            <h2 class="text-2xl sm:text-3xl font-extrabold text-on-surface tracking-tight flex items-center gap-2.5">
+                <span class="material-symbols-outlined text-tertiary text-3xl">history_edu</span>
+                Immutable Audit Trail &amp; Activity Logs
+            </h2>
+            <p class="text-on-surface-variant text-sm mt-0.5">Cryptographically sequenced activity records tracking user authentication, permission changes, and record updates</p>
+        </div>
+
+        <div class="flex items-center gap-2">
+            <button onclick="exportAuditCsv()" class="h-10 px-4 bg-surface hover:bg-slate-100 border border-outline text-slate-700 rounded-lg text-xs font-bold flex items-center gap-2 transition shadow-sm">
+                <span class="material-symbols-outlined text-[18px]">download</span>
+                <span>Export CSV</span>
+            </button>
+            <button onclick="printAuditLog()" class="h-10 px-4 bg-primary hover:bg-primary-dark text-white rounded-lg text-xs font-bold flex items-center gap-2 transition shadow-sm">
+                <span class="material-symbols-outlined text-[18px]">print</span>
+                <span>Print Log Report</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- STAT METRICS ROW (Interactive Quick-Filter Buttons) -->
+    <div id="stat-cards-row" class="grid grid-cols-2 sm:grid-cols-4 gap-4">
+        <button type="button" id="card-log-all" onclick="selectLogFilter('ALL')" title="Show all audit events" class="stat-card bg-surface border border-outline hover:border-slate-400 hover:bg-slate-50/50 rounded-xl p-4 shadow-sm flex flex-col text-left cursor-pointer transition-all duration-200 group focus:outline-none w-full">
+            <div class="flex items-center justify-between w-full mb-1">
+                <span class="text-xs font-bold text-on-surface-variant uppercase tracking-wider">Total Audit Events</span>
+                <span class="material-symbols-outlined text-slate-500 text-xl group-hover:scale-110 transition-transform">history</span>
+            </div>
+            <div class="text-2xl font-extrabold text-on-surface" id="stat-total-logs">0</div>
+            <div class="flex items-center justify-between w-full mt-1">
+                <span class="text-[10px] text-slate-500">All recorded operations</span>
+                <span id="badge-log-all" class="text-[8px] font-black uppercase px-2 py-0.5 rounded-full hidden">● Active</span>
+            </div>
+        </button>
+
+        <button type="button" id="card-log-success" onclick="selectLogFilter('SUCCESS')" title="Filter by Successful actions" class="stat-card bg-surface border border-outline hover:border-emerald-500 hover:bg-emerald-50/30 rounded-xl p-4 shadow-sm flex flex-col text-left cursor-pointer transition-all duration-200 group focus:outline-none w-full">
+            <div class="flex items-center justify-between w-full mb-1">
+                <span class="text-xs font-bold text-emerald-700 uppercase tracking-wider">Successful Actions</span>
+                <span class="material-symbols-outlined text-emerald-600 text-xl group-hover:scale-110 transition-transform">verified</span>
+            </div>
+            <div class="text-2xl font-extrabold text-emerald-700" id="stat-success-logs">0</div>
+            <div class="flex items-center justify-between w-full mt-1">
+                <span class="text-[10px] text-emerald-600">Verified &amp; committed</span>
+                <span id="badge-log-success" class="text-[8px] font-black uppercase px-2 py-0.5 rounded-full hidden">● Active</span>
+            </div>
+        </button>
+
+        <button type="button" id="card-log-role" onclick="selectLogFilter('ROLE')" title="Filter by RBAC and Role events" class="stat-card bg-surface border border-outline hover:border-blue-500 hover:bg-blue-50/30 rounded-xl p-4 shadow-sm flex flex-col text-left cursor-pointer transition-all duration-200 group focus:outline-none w-full">
+            <div class="flex items-center justify-between w-full mb-1">
+                <span class="text-xs font-bold text-secondary uppercase tracking-wider">RBAC / Role Events</span>
+                <span class="material-symbols-outlined text-secondary text-xl group-hover:scale-110 transition-transform">security</span>
+            </div>
+            <div class="text-2xl font-extrabold text-secondary" id="stat-role-logs">0</div>
+            <div class="flex items-center justify-between w-full mt-1">
+                <span class="text-[10px] text-blue-600">Permission modifications</span>
+                <span id="badge-log-role" class="text-[8px] font-black uppercase px-2 py-0.5 rounded-full hidden">● Active</span>
+            </div>
+        </button>
+
+        <button type="button" id="card-log-sec" onclick="selectLogFilter('SECURITY')" title="Filter by Security and Password events" class="stat-card bg-surface border border-outline hover:border-amber-500 hover:bg-amber-50/30 rounded-xl p-4 shadow-sm flex flex-col text-left cursor-pointer transition-all duration-200 group focus:outline-none w-full">
+            <div class="flex items-center justify-between w-full mb-1">
+                <span class="text-xs font-bold text-amber-700 uppercase tracking-wider">Security / Passwords</span>
+                <span class="material-symbols-outlined text-amber-600 text-xl group-hover:scale-110 transition-transform">lock</span>
+            </div>
+            <div class="text-2xl font-extrabold text-amber-700" id="stat-sec-logs">0</div>
+            <div class="flex items-center justify-between w-full mt-1">
+                <span class="text-[10px] text-amber-600">Credential lifecycle events</span>
+                <span id="badge-log-sec" class="text-[8px] font-black uppercase px-2 py-0.5 rounded-full hidden">● Active</span>
+            </div>
+        </button>
+    </div>
+
+    <!-- AUDIT LOGS TABLE SECTION -->
+    <div class="bg-surface border border-outline rounded-2xl shadow-sm overflow-hidden flex flex-col">
+        <!-- Search & Filter Controls -->
+        <div class="p-5 border-b border-outline flex flex-col gap-3.5 bg-slate-50">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                <h3 class="font-bold text-base text-on-surface flex items-center gap-2">
+                    <span class="material-symbols-outlined text-slate-600">manage_search</span>
+                    Audit Records Explorer
+                </h3>
+                <span id="audit-badge" class="text-xs font-bold text-on-surface-variant bg-white border border-outline px-3 py-1 rounded-full self-start sm:self-auto shadow-sm">
+                    Loading logs...
+                </span>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-3 lg:grid-cols-4 gap-3">
+                <div class="relative lg:col-span-2">
+                    <span class="material-symbols-outlined absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400 text-[18px]">search</span>
+                    <input type="text" id="audit-search" placeholder="Search by Audit ID, User ID, action, keyword..." 
+                        class="w-full h-10 pl-10 pr-3 rounded-lg border border-outline text-xs sm:text-sm outline-none focus:border-primary font-medium bg-surface"
+                        oninput="filterAuditLogs()">
+                </div>
+
+                <div>
+                    <select id="filter-module" onchange="filterAuditLogs()" class="w-full h-10 px-3 rounded-lg border border-outline text-xs sm:text-sm outline-none focus:border-primary font-medium bg-surface">
+                        <option value="">All Modules</option>
+                        <option value="Super Admin / RBAC">Super Admin / RBAC</option>
+                        <option value="HR">HR Management</option>
+                        <option value="Finance">Finance</option>
+                        <option value="Programs">Programs</option>
+                        <option value="Security">Security &amp; Auth</option>
+                    </select>
+                </div>
+
+                <div>
+                    <select id="filter-result" onchange="filterAuditLogs()" class="w-full h-10 px-3 rounded-lg border border-outline text-xs sm:text-sm outline-none focus:border-primary font-medium bg-surface">
+                        <option value="">All Results</option>
+                        <option value="Successful">Successful</option>
+                        <option value="Failed">Failed / Blocked</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <!-- TABLE -->
+        <div class="overflow-x-auto">
+            <table class="w-full text-left text-xs border-collapse">
+                <thead class="bg-slate-100 text-slate-700 uppercase tracking-wider text-[10px] font-bold border-b border-outline">
+                    <tr>
+                        <th class="px-4 py-3.5 whitespace-nowrap font-mono">Audit ID</th>
+                        <th class="px-4 py-3.5 whitespace-nowrap">User ID</th>
+                        <th class="px-4 py-3.5 whitespace-nowrap">Employee ID</th>
+                        <th class="px-4 py-3.5 whitespace-nowrap">Action Performed</th>
+                        <th class="px-4 py-3.5 whitespace-nowrap">Module</th>
+                        <th class="px-4 py-3.5 whitespace-nowrap">Date / Time</th>
+                        <th class="px-4 py-3.5 whitespace-nowrap">Previous Value</th>
+                        <th class="px-4 py-3.5 whitespace-nowrap">New Value</th>
+                        <th class="px-4 py-3.5 whitespace-nowrap">Result</th>
+                    </tr>
+                </thead>
+                <tbody id="audit-tbody" class="divide-y divide-outline">
+                    <!-- Populated dynamically -->
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Empty State -->
+        <div id="audit-empty" class="hidden py-16 text-center text-on-surface-variant">
+            <span class="material-symbols-outlined text-5xl text-slate-300 block mb-2">find_in_page</span>
+            <p class="font-bold text-sm text-on-surface">No audit records match your filters.</p>
+        </div>
+    </div>
+</div>
+
+<script>
+
+    function navToApp(nextRoute, fallbackPath, e) {
+        if (e) e.preventDefault();
+        try {
+            if (window.top && window.top !== window && window.top.location) {
+                window.top.location.href = nextRoute;
+                return;
+            }
+        } catch(err) {}
+        window.location.href = fallbackPath;
+    }
+
+    
+    let activeLogFilter = 'ALL';
+
+    function showAuditToast(msg) {
+        const toast = document.getElementById('audit-toast');
+        const text = document.getElementById('audit-toast-msg');
+        if (!toast) return;
+        if (text) text.textContent = msg;
+        toast.classList.remove('translate-y-20', 'opacity-0');
+        toast.classList.add('translate-y-0', 'opacity-100');
+        setTimeout(() => {
+            toast.classList.add('translate-y-20', 'opacity-0');
+            toast.classList.remove('translate-y-0', 'opacity-100');
+        }, 3000);
+    }
+
+    function selectLogFilter(key) {
+        if (key === 'ALL' || key === '') {
+            activeLogFilter = 'ALL';
+        } else if (activeLogFilter === key) {
+            // Toggle off
+            activeLogFilter = 'ALL';
+        } else {
+            activeLogFilter = key;
+        }
+
+        filterAuditLogs();
+        updateLogCardStyles();
+
+        // Smooth scroll to table
+        const table = document.getElementById('audit-tbody')?.closest('.bg-surface');
+        if (table) {
+            table.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+    }
+
+    function updateLogCardStyles() {
+        const cards = {
+            'ALL': { id: 'card-log-all', badge: 'badge-log-all', color: '#0f172a', bg: 'bg-slate-100 text-slate-800' },
+            'SUCCESS': { id: 'card-log-success', badge: 'badge-log-success', color: '#059669', bg: 'bg-emerald-100 text-emerald-800' },
+            'ROLE': { id: 'card-log-role', badge: 'badge-log-role', color: '#2563eb', bg: 'bg-blue-100 text-blue-800' },
+            'SECURITY': { id: 'card-log-sec', badge: 'badge-log-sec', color: '#d97706', bg: 'bg-amber-100 text-amber-800' }
+        };
+
+        Object.keys(cards).forEach(k => {
+            const config = cards[k];
+            const cardEl = document.getElementById(config.id);
+            const badgeEl = document.getElementById(config.badge);
+            if (!cardEl) return;
+
+            const isActive = activeLogFilter === k;
+            if (isActive) {
+                cardEl.className = 'stat-card border-2 bg-white shadow-md -translate-y-1 ring-2 ring-offset-1 rounded-xl p-4 flex flex-col text-left cursor-pointer transition-all duration-200 group focus:outline-none w-full';
+                cardEl.style.borderColor = config.color;
+                if (badgeEl) {
+                    badgeEl.className = `text-[8px] font-black uppercase px-2 py-0.5 rounded-full inline-block ${config.bg}`;
+                    badgeEl.textContent = '● Active Filter';
+                }
+            } else {
+                cardEl.className = 'stat-card bg-surface border border-outline hover:bg-slate-50 hover:border-slate-400 hover:shadow-sm hover:-translate-y-0.5 rounded-xl p-4 flex flex-col text-left cursor-pointer transition-all duration-200 group focus:outline-none w-full';
+                cardEl.style.borderColor = '';
+                if (badgeEl) {
+                    badgeEl.className = 'hidden';
+                }
+            }
+        });
+    }
+
+    let auditLogs = JSON.parse(localStorage.getItem('bcf_audit_logs') || '[]');
+    let filteredLogs = [];
+
+    // Seed realistic audit records if empty
+    function ensureInitialLogs() {
+        if(!auditLogs || auditLogs.length === 0) {
+            auditLogs = [
+                {
+                    auditId: "AUD-000001",
+                    userId: "USR-BCF-0001",
+                    employeeId: "BCF-PTE-2026-0001",
+                    action: "Initialized Super Admin System & Core RBAC",
+                    module: "Super Admin / RBAC",
+                    dateTime: "10/09/2026 09:00",
+                    ipSession: "192.168.1.10",
+                    previousValue: "System Uninitialized",
+                    newValue: "RBAC Architecture Active",
+                    result: "Successful"
+                },
+                {
+                    auditId: "AUD-000002",
+                    userId: "USR-BCF-0001",
+                    employeeId: "BCF-PTE-2026-0001",
+                    action: "Configured Executive Access Matrix",
+                    module: "Super Admin / RBAC",
+                    dateTime: "11/09/2026 10:30",
+                    ipSession: "192.168.1.10",
+                    previousValue: "Default Matrix",
+                    newValue: "15 Modules x 7 Role Tiers",
+                    result: "Successful"
+                },
+                {
+                    auditId: "AUD-000003",
+                    userId: "USR-BCF-0002",
+                    employeeId: "BCF-PTE-2026-0002",
+                    action: "Auto-Provisioned Employee Account",
+                    module: "HR",
+                    dateTime: "12/09/2026 11:45",
+                    ipSession: "192.168.1.18",
+                    previousValue: "None",
+                    newValue: "USR-BCF-0003 (Finance Director)",
+                    result: "Successful"
+                },
+                {
+                    auditId: "AUD-000004",
+                    userId: "USR-BCF-0001",
+                    employeeId: "BCF-EMP-2026-0004",
+                    action: "Assigned Role & Access Level",
+                    module: "Super Admin / RBAC",
+                    dateTime: "12/09/2026 14:20",
+                    ipSession: "192.168.1.10",
+                    previousValue: "Officer",
+                    newValue: "Internal Risk & Audits Director",
+                    result: "Successful"
+                },
+                {
+                    auditId: "AUD-000005",
+                    userId: "USR-BCF-0001",
+                    employeeId: "BCF-PTE-2026-0001",
+                    action: "Enforced 2FA & Password Policy",
+                    module: "Super Admin / RBAC",
+                    dateTime: "13/09/2026 08:15",
+                    ipSession: "192.168.1.10",
+                    previousValue: "Standard Auth",
+                    newValue: "Enforced 2FA + Role Guard",
+                    result: "Successful"
+                }
+            ];
+            localStorage.setItem('bcf_audit_logs', JSON.stringify(auditLogs));
+        }
+    }
+
+    function updateStats() {
+        const total = auditLogs.length;
+        const success = auditLogs.filter(l => l.result === 'Successful').length;
+        const roleEvents = auditLogs.filter(l => (l.action||'').includes('Role') || (l.action||'').includes('Access') || (l.action||'').includes('Provisioned')).length;
+        const secEvents = auditLogs.filter(l => (l.action||'').includes('Password') || (l.action||'').includes('2FA') || (l.action||'').includes('Auth') || (l.action||'').includes('Suspended')).length;
+
+        document.getElementById('stat-total-logs').textContent = total;
+        document.getElementById('stat-success-logs').textContent = success;
+        document.getElementById('stat-role-logs').textContent = roleEvents;
+        document.getElementById('stat-sec-logs').textContent = secEvents;
+        updateLogCardStyles();
+    }
+
+    function filterAuditLogs() {
+        const q = (document.getElementById('audit-search').value || '').trim().toLowerCase();
+        const mod = document.getElementById('filter-module').value;
+        const res = document.getElementById('filter-result').value;
+
+        filteredLogs = auditLogs.filter(l => {
+            const matchQ = !q || (l.auditId||'').toLowerCase().includes(q) ||
+                           (l.userId||'').toLowerCase().includes(q) ||
+                           (l.employeeId||'').toLowerCase().includes(q) ||
+                           (l.action||'').toLowerCase().includes(q) ||
+                           (l.previousValue||'').toLowerCase().includes(q) ||
+                           (l.newValue||'').toLowerCase().includes(q);
+            const matchMod = !mod || l.module === mod;
+            const matchRes = !res || l.result === res;
+
+            let matchCard = true;
+            if (activeLogFilter === 'SUCCESS') {
+                matchCard = l.result === 'Successful';
+            } else if (activeLogFilter === 'ROLE') {
+                matchCard = (l.action||'').includes('Role') || (l.action||'').includes('Access') || (l.action||'').includes('Provisioned');
+            } else if (activeLogFilter === 'SECURITY') {
+                matchCard = (l.action||'').includes('Password') || (l.action||'').includes('2FA') || (l.action||'').includes('Auth') || (l.action||'').includes('Suspended');
+            }
+
+            return matchQ && matchMod && matchRes && matchCard;
+        });
+
+        renderLogs();
+    }
+
+    function renderLogs() {
+        const tbody = document.getElementById('audit-tbody');
+        const empty = document.getElementById('audit-empty');
+        const badge = document.getElementById('audit-badge');
+
+        const data = filteredLogs;
+        const filterNotice = activeLogFilter !== 'ALL' ? ` (Filtered: ${activeLogFilter})` : '';
+        badge.textContent = `Showing ${data.length} of ${auditLogs.length} Events${filterNotice}`;
+
+        if(data.length === 0) {
+            tbody.innerHTML = '';
+            empty.classList.remove('hidden');
+            return;
+        }
+        empty.classList.add('hidden');
+
+        tbody.innerHTML = data.map(l => {
+            const isSuccess = l.result === 'Successful';
+            return `
+                <tr class="hover:bg-slate-50 transition-colors border-b border-outline">
+                    <td class="px-4 py-3 font-mono font-bold text-slate-900 whitespace-nowrap">
+                        ${l.auditId}
+                    </td>
+                    <td class="px-4 py-3 font-mono font-bold text-secondary whitespace-nowrap">
+                        ${l.userId}
+                    </td>
+                    <td class="px-4 py-3 font-mono text-slate-600 whitespace-nowrap">
+                        ${l.employeeId}
+                    </td>
+                    <td class="px-4 py-3 font-semibold text-slate-900 whitespace-nowrap">
+                        ${l.action}
+                    </td>
+                    <td class="px-4 py-3 whitespace-nowrap">
+                        <span class="px-2 py-0.5 rounded bg-slate-100 border border-slate-200 text-slate-700 text-[10px] font-bold">
+                            ${l.module}
+                        </span>
+                    </td>
+                    <td class="px-4 py-3 text-slate-500 whitespace-nowrap text-[11px]">
+                        ${l.dateTime}
+                    </td>
+                    <td class="px-4 py-3 text-slate-600 max-w-xs truncate text-[11px]" title="${l.previousValue}">
+                        ${l.previousValue}
+                    </td>
+                    <td class="px-4 py-3 text-slate-900 font-medium max-w-xs truncate text-[11px]" title="${l.newValue}">
+                        ${l.newValue}
+                    </td>
+                    <td class="px-4 py-3 whitespace-nowrap">
+                        <span class="px-2 py-0.5 rounded-full text-[10px] font-bold ${isSuccess ? 'bg-emerald-100 text-emerald-800' : 'bg-rose-100 text-rose-800'}">
+                            ${l.result}
+                        </span>
+                    </td>
+                </tr>
+            `;
+        }).join('');
+    }
+
+    function exportAuditCsv() {
+        if(auditLogs.length === 0) { alert('No logs to export'); return; }
+        const headers = ["Audit ID", "User ID", "Employee ID", "Action", "Module", "Date Time", "IP Session", "Previous Value", "New Value", "Result"];
+        const rows = auditLogs.map(l => [
+            l.auditId, l.userId, l.employeeId, `"${(l.action||'').replace(/"/g, '""')}"`,
+            l.module, l.dateTime, l.ipSession, `"${(l.previousValue||'').replace(/"/g, '""')}"`,
+            `"${(l.newValue||'').replace(/"/g, '""')}"`, l.result
+        ]);
+
+        const csvContent = "data:text/csv;charset=utf-8," + [headers.join(','), ...rows.map(e => e.join(','))].join('\n');
+        const encodedUri = encodeURI(csvContent);
+        const link = document.createElement("a");
+        link.setAttribute("href", encodedUri);
+        link.setAttribute("download", `BCF_SL_Audit_Log_${new Date().toISOString().slice(0,10)}.csv`);
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        showAuditToast(`✅ Audit Log Exported: ${auditLogs.length} records downloaded.`);
+    }
+
+    
+    function printAuditLog() {
+        const ts = document.getElementById('print-timestamp');
+        if (ts) ts.textContent = new Date().toLocaleString('en-GB');
+        window.print();
+    }
+
+    window.onload = function() {
+        ensureInitialLogs();
+        filteredLogs = auditLogs;
+        renderLogs();
+        updateStats();
+    };
+</script>
+
+<!-- PRINT REPORT HEADER (Only visible when printing) -->
+<div id="print-report-header" class="hidden pb-4 mb-4 border-b border-slate-300">
+    <div class="flex items-center justify-between">
+        <div>
+            <h1 class="text-xl font-bold text-slate-900">BANDAMA CHARITY FOUNDATION SIERRA LEONE</h1>
+            <p class="text-xs text-slate-600 font-semibold">Official System Audit Log &amp; Security Compliance Trail</p>
+        </div>
+        <div class="text-right text-xs text-slate-500">
+            <div>Printed: <span id="print-timestamp"></span></div>
+            <div class="font-mono text-[10px]">Confidential — Super Admin Record</div>
+        </div>
+    </div>
+</div>
+
+<!-- AUDIT TOAST NOTIFICATION -->
+<div id="audit-toast" class="fixed bottom-6 right-6 z-50 bg-slate-900 text-white px-4 py-3 rounded-xl shadow-xl border border-slate-700 text-xs font-semibold flex items-center gap-2.5 transform transition-all duration-300 translate-y-20 opacity-0 pointer-events-none">
+    <span class="material-symbols-outlined text-emerald-400 text-[20px]">check_circle</span>
+    <span id="audit-toast-msg">Operation completed.</span>
+</div>
+
+</body>
+</html>

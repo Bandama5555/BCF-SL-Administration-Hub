@@ -1,0 +1,514 @@
+<!DOCTYPE html>
+
+<html lang="en"><head><meta charset="utf-8"/><meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" name="viewport"/><link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700&amp;family=JetBrains+Mono:wght@400;500;600&amp;display=swap" rel="stylesheet"/><link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/><style>@layer base{html,body{width:100vw;margin:0;padding:0;}body{overscroll-behavior:none;}.pb-safe{padding-bottom:env(safe-area-inset-bottom,0px);}.pt-safe{padding-top:env(safe-area-inset-top,0px);}main>:first-child{margin-top:0!important;}main>:last-child{margin-bottom:0!important;}}::-webkit-scrollbar{display:none;}</style><script src="https://cdn.tailwindcss.com"></script><script id="tailwind-config">tailwind.config = { darkMode: "class", theme: { extend: { "colors": { "primary-fixed-dim": "#b0c9e8", "on-surface": "#0b1c30", "primary": "#001428", "on-tertiary": "#ffffff", "outline": "#74777e", "tertiary": "#260b00", "tertiary-fixed-dim": "#ffb68e", "error-container": "#ffdad6", "surface-bright": "#f8f9ff", "on-secondary-fixed-variant": "#005232", "surface-container-highest": "#d3e4fe", "on-secondary-fixed": "#002111", "inverse-primary": "#b0c9e8", "secondary": "#226b47", "surface-tint": "#49607c", "on-primary-fixed-variant": "#314863", "on-background": "#0b1c30", "on-tertiary-container": "#dc712b", "tertiary-fixed": "#ffdbca", "inverse-on-surface": "#eaf1ff", "tertiary-container": "#461b00", "surface-variant": "#d3e4fe", "on-surface-variant": "#43474d", "surface-container-low": "#eff4ff", "on-tertiary-fixed": "#331200", "primary-fixed": "#d1e4ff", "outline-variant": "#c3c6ce", "primary-container": "#0f2942", "secondary-container": "#a9f3c5", "surface-container": "#e5eeff", "on-error": "#ffffff", "on-tertiary-fixed-variant": "#763300", "secondary-fixed": "#a9f3c5", "surface-container-lowest": "#ffffff", "error": "#ba1a1a", "on-secondary": "#ffffff", "surface-dim": "#cbdbf5", "surface": "#f8f9ff", "on-primary-fixed": "#011d35", "on-error-container": "#93000a", "on-primary-container": "#7991af", "on-secondary-container": "#29714d", "background": "#f8f9ff", "inverse-surface": "#213145", "secondary-fixed-dim": "#8ed6aa", "surface-container-high": "#dce9ff", "on-primary": "#ffffff" }, "borderRadius": { "DEFAULT": "0.125rem", "lg": "0.25rem", "xl": "0.5rem", "full": "0.75rem" }, "spacing": { "space-md": "1rem", "max-content-width": "80rem", "space-2xs": "0.25rem", "space-xl": "2rem", "sidebar-width": "17.5rem", "gutter-desktop": "2rem", "space-sm": "0.75rem", "space-2xl": "3rem", "gutter-tablet": "1.5rem", "space-lg": "1.5rem", "space-xs": "0.5rem", "gutter-mobile": "1rem" }, "fontFamily": { "label-sm": ["Public Sans"], "headline-sm": ["Public Sans"], "body-md": ["Public Sans"], "mono-num-lg": ["JetBrains Mono"], "body-lg": ["Public Sans"], "mono-num-md": ["JetBrains Mono"], "headline-lg": ["Public Sans"], "mono-code-sm": ["JetBrains Mono"], "label-md": ["Public Sans"], "headline-md": ["Public Sans"], "display-lg": ["Public Sans"], "body-sm": ["Public Sans"] }, "fontSize": { "label-sm": ["11px", { "lineHeight": "16px", "letterSpacing": "0.04em", "fontWeight": "600" }], "headline-sm": ["16px", { "lineHeight": "24px", "letterSpacing": "-0.005em", "fontWeight": "600" }], "body-md": ["14px", { "lineHeight": "20px", "fontWeight": "400" }], "mono-num-lg": ["20px", { "lineHeight": "28px", "fontWeight": "600" }], "body-lg": ["16px", { "lineHeight": "24px", "fontWeight": "400" }], "mono-num-md": ["14px", { "lineHeight": "20px", "fontWeight": "500" }], "headline-lg": ["24px", { "lineHeight": "32px", "letterSpacing": "-0.015em", "fontWeight": "700" }], "mono-code-sm": ["11px", { "lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "500" }], "label-md": ["13px", { "lineHeight": "18px", "letterSpacing": "0.01em", "fontWeight": "600" }], "headline-md": ["20px", { "lineHeight": "28px", "letterSpacing": "-0.01em", "fontWeight": "600" }], "display-lg": ["32px", { "lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "700" }], "body-sm": ["12px", { "lineHeight": "16px", "fontWeight": "400" }] } } } }</script></head><body class="bg-surface font-body-md text-body-md text-on-surface flex flex-col min-h-screen"><header class="fixed top-0 w-full z-50 pt-safe bg-surface/80 backdrop-blur-xl shadow-[0_1px_8px_rgba(0,0,0,0.04)]"><div class="h-16 px-gutter-mobile flex items-center justify-between gap-space-xs"><div class="flex items-center gap-space-xs min-w-0"><img alt="BCF-SL Official Crest" class="h-8 w-auto object-contain flex-shrink-0" src="https://lh3.googleusercontent.com/aida/AEtjO1WC_uhmkyxYVEMRO2LoyDpyn4eujyCn9k53QWkHk589b4XXXMLXuU7jETq9VhEQdaDIyZ4UZnhQAHB_VIbjHUH8DrTEki_3wL-YBH1O78wJf_8TvySpZYdhQ_OkpK7rv4nPrWaZv8HdmoYK_ZoZBLYb6iOdIThq3OvtUklJOHOEyV063btRea2A5TYc9c9cr6sX2QroxeIox-IdON7v7pYqT9JjawbDT8PDmxypRtE0DfW-wAcNlh0MWT4"/><div class="flex flex-col min-w-0"><div class="flex items-center gap-space-2xs"><span class="font-headline-sm text-headline-sm text-primary tracking-tight truncate leading-none">BCF-SL Admin</span><span class="font-mono-code-sm text-mono-code-sm px-space-2xs py-0.5 bg-surface-container-high text-on-primary-fixed-variant rounded-DEFAULT uppercase tracking-wider flex-shrink-0">[HR VERIFIER]</span></div><span class="font-label-sm text-label-sm text-on-surface-variant truncate">Review &amp; Approve</span></div></div><div class="flex items-center gap-space-xs flex-shrink-0"><button class="w-11 h-11 flex items-center justify-center relative text-on-surface-variant hover:text-on-surface transition-colors"><span class="material-symbols-outlined">notifications</span><span class="absolute top-2 right-2 flex items-center justify-center min-w-[16px] h-4 px-1 bg-error text-on-error font-mono-code-sm text-[10px] rounded-full">3</span></button><div class="flex items-center justify-center w-11 h-11"><img alt="Profile" class="w-8 h-8 rounded-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBXo9l2fdnfkkA_005ywqQa6-u63v5VmqA4-sERwtsp5tqKwNlxKXrcBezQNGJMgFdl_skWSveKta2wALo48ow7faR2uUDiwyBBMoah85K3LchwAQyJ_Y78_rHn5mKVTAobmdlx9le4c-grs8Kj2qvVJbwXl6Z2oxgz_Hwo4PzB72KwWvs6vX7qHLe0aaRxmNsEf1Af7kZpEkv6TODkkT3PzHfCdIL2-0E1chNBnZewS2JN_TPlaLdm"/></div></div></div></header><main class="flex flex-col relative w-full pt-16 pb-24 bg-surface flex-grow"><div class="flex flex-col w-full px-gutter-mobile space-y-space-md py-space-sm">
+<!-- Application Key Overview Banner -->
+<div class="bg-surface-container-low rounded-xl p-space-md shadow-sm flex flex-col space-y-space-sm">
+<div class="flex items-start justify-between gap-space-xs">
+<div class="flex items-center gap-space-sm min-w-0">
+<div class="relative flex-shrink-0">
+<img class="w-12 h-12 rounded-full object-cover shadow-sm" data-alt="Portrait photo of Mariama Kamara, an African female humanitarian field logistics manager with a confident and kind expression, wearing formal office attire in an administrative Sierra Leone foundation branch office." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCq4xV5eRNn88quIw2SPGB05CzOMexwa6QXo9G7tcchUwoAxiNT3pmOLq-KFzuQq1_7-YOeDeN5sVmVNY47eFHuNsjMrfCtRvigDyiewlc1j0bILo10VNgzxKYT6LGIoqcpeixSAmqawVMlKpw9UACq3frrZguEz2TYkbFaT1R3WQMSpyYhRfse5cOAWMOka33hVxtx-RRZuT8YNR1hKvBG0mxrGgV42XWWL5FzZ0TzMWSTlM1tb2Av"/>
+<span class="absolute bottom-0 right-0 w-3.5 h-3.5 bg-secondary rounded-full ring-2 ring-surface-container-low"></span>
+</div>
+<div class="flex flex-col min-w-0">
+<div class="flex items-center gap-space-2xs flex-wrap">
+<h1 class="font-headline-sm text-headline-sm text-on-surface truncate">Mariama Kamara</h1>
+<span class="font-mono-code-sm text-mono-code-sm bg-surface-container-high text-on-primary-fixed-variant px-space-2xs py-0.5 rounded-DEFAULT uppercase">Field Coordinator</span>
+</div>
+<p class="font-mono-code-sm text-mono-code-sm text-on-surface-variant">REF-SL-2025-0842 • Kenema District Office</p>
+</div>
+</div>
+<div class="flex flex-col items-end flex-shrink-0">
+<span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-[#FEF3C7] text-[#78350F] shadow-sm">
+<span class="w-1.5 h-1.5 rounded-full bg-[#B45309] animate-pulse"></span>
+<span class="font-label-sm text-label-sm uppercase tracking-wide">Under Review</span>
+</span>
+<span class="font-mono-code-sm text-mono-code-sm text-on-surface-variant mt-1">Tier 3 Category</span>
+</div>
+</div>
+<!-- Metric Badges Row -->
+<div class="grid grid-cols-3 gap-space-2xs pt-space-2xs">
+<div class="bg-surface-container-lowest p-space-xs rounded-lg shadow-sm flex flex-col">
+<span class="font-label-sm text-label-sm text-on-surface-variant uppercase">Principal</span>
+<span class="font-mono-num-md text-mono-num-md text-primary font-semibold">NLe 10,000</span>
+<span class="font-body-sm text-body-sm text-on-surface-variant">Tenor: 10 Mos</span>
+</div>
+<div class="bg-surface-container-lowest p-space-xs rounded-lg shadow-sm flex flex-col">
+<span class="font-label-sm text-label-sm text-on-surface-variant uppercase">Gross Monthly</span>
+<span class="font-mono-num-md text-mono-num-md text-on-surface font-semibold">NLe 8,500</span>
+<span class="font-body-sm text-body-sm text-secondary">Verified Active</span>
+</div>
+<div class="bg-surface-container-lowest p-space-xs rounded-lg shadow-sm flex flex-col">
+<span class="font-label-sm text-label-sm text-on-surface-variant uppercase">Installment</span>
+<span class="font-mono-num-md text-mono-num-md text-primary font-semibold">NLe 1,000</span>
+<span class="font-body-sm text-body-sm text-secondary">11.7% of Salary</span>
+</div>
+</div>
+</div>
+<!-- Workflow Progress Stepper (Animated Visual Track) -->
+<div class="bg-surface-container-lowest rounded-xl p-space-md shadow-sm flex flex-col space-y-space-sm">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-space-2xs">
+<span class="material-symbols-outlined text-primary text-[20px]">account_tree</span>
+<span class="font-label-md text-label-md text-on-surface uppercase tracking-wider">Multi-Stage Statutory Workflow</span>
+</div>
+<span class="font-mono-code-sm text-mono-code-sm text-on-surface-variant">Stage 2 of 5</span>
+</div>
+<!-- Stepper Pipeline -->
+<div class="relative pt-space-xs pb-1">
+<!-- Continuous Base Track -->
+<div class="absolute top-4 left-4 right-4 h-1 bg-surface-container-high rounded-full -translate-y-1/2"></div>
+<!-- Progress Fill Bar (Stage 2 reached) -->
+<div class="absolute top-4 left-4 w-[28%] h-1 bg-secondary rounded-full -translate-y-1/2 transition-all duration-500"></div>
+<div class="relative flex justify-between items-start">
+<!-- Step 1: Staff App -->
+<div class="flex flex-col items-center text-center w-14">
+<div class="w-7 h-7 rounded-full bg-secondary text-on-secondary flex items-center justify-center shadow-sm">
+<span class="material-symbols-outlined text-[16px]">check</span>
+</div>
+<span class="font-label-sm text-label-sm text-on-surface font-medium mt-1.5 leading-none">Applicant</span>
+<span class="font-mono-code-sm text-mono-code-sm text-secondary mt-0.5">Signed</span>
+</div>
+<!-- Step 2: HR Verification (Active) -->
+<div class="flex flex-col items-center text-center w-14">
+<div class="w-7 h-7 rounded-full bg-primary text-on-primary flex items-center justify-center shadow-md ring-4 ring-primary-fixed">
+<span class="material-symbols-outlined text-[16px] animate-spin" style="animation-duration: 4s;">hourglass_top</span>
+</div>
+<span class="font-label-sm text-label-sm text-primary font-bold mt-1.5 leading-none">HR Review</span>
+<span class="font-mono-code-sm text-mono-code-sm text-on-primary-fixed-variant mt-0.5">Active</span>
+</div>
+<!-- Step 3: Finance Review -->
+<div class="flex flex-col items-center text-center w-14">
+<div class="w-7 h-7 rounded-full bg-surface-container-high text-on-surface-variant flex items-center justify-center">
+<span class="material-symbols-outlined text-[14px]">lock</span>
+</div>
+<span class="font-label-sm text-label-sm text-on-surface-variant mt-1.5 leading-none">Finance</span>
+<span class="font-mono-code-sm text-mono-code-sm text-on-surface-variant mt-0.5">Pending</span>
+</div>
+<!-- Step 4: CEO Approval -->
+<div class="flex flex-col items-center text-center w-14">
+<div class="w-7 h-7 rounded-full bg-surface-container-high text-on-surface-variant flex items-center justify-center">
+<span class="material-symbols-outlined text-[14px]">lock</span>
+</div>
+<span class="font-label-sm text-label-sm text-on-surface-variant mt-1.5 leading-none">CEO Exec</span>
+<span class="font-mono-code-sm text-mono-code-sm text-on-surface-variant mt-0.5">Pending</span>
+</div>
+<!-- Step 5: Disbursement -->
+<div class="flex flex-col items-center text-center w-14">
+<div class="w-7 h-7 rounded-full bg-surface-container-high text-on-surface-variant flex items-center justify-center">
+<span class="material-symbols-outlined text-[14px]">lock</span>
+</div>
+<span class="font-label-sm text-label-sm text-on-surface-variant mt-1.5 leading-none">Payout</span>
+<span class="font-mono-code-sm text-mono-code-sm text-on-surface-variant mt-0.5">Treasury</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Section D: Human Resources Official Verification Docket -->
+<div class="bg-surface-container-lowest rounded-xl shadow-sm p-space-md flex flex-col space-y-space-md">
+<div class="flex items-center justify-between pb-space-xs">
+<div class="flex items-center gap-space-xs">
+<span class="w-2.5 h-6 bg-primary rounded-DEFAULT"></span>
+<div>
+<h2 class="font-headline-sm text-headline-sm text-on-surface">Section D: HR Verification Docket</h2>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Statutory compliance check pursuant to BCF-SL Staff Welfare Policy</p>
+</div>
+</div>
+<span class="font-mono-code-sm text-mono-code-sm px-space-2xs py-1 rounded bg-surface-container text-on-surface font-semibold">[HR AUDIT]</span>
+</div>
+<!-- Verification Checklist with Toggles -->
+<div class="space-y-space-xs" id="hr-checklist-group">
+<!-- Item 1 -->
+<div class="flex items-start justify-between p-space-xs bg-surface-container-low rounded-lg gap-space-xs">
+<div class="flex items-start gap-space-xs min-w-0">
+<button class="mt-0.5 w-5 h-5 rounded-DEFAULT bg-primary flex items-center justify-center text-on-primary flex-shrink-0 transition-colors" onclick="toggleAuditCheck(this)" type="button">
+<span class="material-symbols-outlined text-[16px]">check</span>
+</button>
+<div class="flex flex-col min-w-0">
+<span class="font-body-md text-body-md text-on-surface font-medium leading-snug">Minimum 1 continuous year of service</span>
+<span class="font-mono-code-sm text-mono-code-sm text-secondary flex items-center gap-1 mt-0.5">
+<span class="material-symbols-outlined text-[14px]">verified</span> Confirmed • 4 Yrs 2 Mos (Appointed Aug 2020)
+            </span>
+</div>
+</div>
+<span class="font-label-sm text-label-sm px-2 py-0.5 rounded-full bg-[#DCFCE7] text-[#14532D] flex-shrink-0">Eligible</span>
+</div>
+<!-- Item 2 -->
+<div class="flex items-start justify-between p-space-xs bg-surface-container-low rounded-lg gap-space-xs">
+<div class="flex items-start gap-space-xs min-w-0">
+<button class="mt-0.5 w-5 h-5 rounded-DEFAULT bg-primary flex items-center justify-center text-on-primary flex-shrink-0 transition-colors" onclick="toggleAuditCheck(this)" type="button">
+<span class="material-symbols-outlined text-[16px]">check</span>
+</button>
+<div class="flex flex-col min-w-0">
+<span class="font-body-md text-body-md text-on-surface font-medium leading-snug">Zero outstanding or unsettled foundation loans</span>
+<span class="font-mono-code-sm text-mono-code-sm text-secondary flex items-center gap-1 mt-0.5">
+<span class="material-symbols-outlined text-[14px]">task_alt</span> Ledger Verified • Nil Prior Obligations
+            </span>
+</div>
+</div>
+<span class="font-label-sm text-label-sm px-2 py-0.5 rounded-full bg-[#DCFCE7] text-[#14532D] flex-shrink-0">Clear</span>
+</div>
+<!-- Item 3 -->
+<div class="flex items-start justify-between p-space-xs bg-surface-container-low rounded-lg gap-space-xs">
+<div class="flex items-start gap-space-xs min-w-0">
+<button class="mt-0.5 w-5 h-5 rounded-DEFAULT bg-primary flex items-center justify-center text-on-primary flex-shrink-0 transition-colors" onclick="toggleAuditCheck(this)" type="button">
+<span class="material-symbols-outlined text-[16px]">check</span>
+</button>
+<div class="flex flex-col min-w-0">
+<span class="font-body-md text-body-md text-on-surface font-medium leading-snug">Employment contract valid &amp; active standing</span>
+<span class="font-mono-code-sm text-mono-code-sm text-secondary flex items-center gap-1 mt-0.5">
+<span class="material-symbols-outlined text-[14px]">shield</span> Permanent Full-time • Kenema Field Branch
+            </span>
+</div>
+</div>
+<span class="font-label-sm text-label-sm px-2 py-0.5 rounded-full bg-[#DCFCE7] text-[#14532D] flex-shrink-0">Active</span>
+</div>
+<!-- Item 4 -->
+<div class="flex items-start justify-between p-space-xs bg-surface-container-low rounded-lg gap-space-xs">
+<div class="flex items-start gap-space-xs min-w-0">
+<button class="mt-0.5 w-5 h-5 rounded-DEFAULT bg-primary flex items-center justify-center text-on-primary flex-shrink-0 transition-colors" onclick="toggleAuditCheck(this)" type="button">
+<span class="material-symbols-outlined text-[16px]">check</span>
+</button>
+<div class="flex flex-col min-w-0">
+<span class="font-body-md text-body-md text-on-surface font-medium leading-snug">Disciplinary status clean &amp; conduct appraisal</span>
+<span class="font-mono-code-sm text-mono-code-sm text-secondary flex items-center gap-1 mt-0.5">
+<span class="material-symbols-outlined text-[14px]">military_tech</span> Exemplary • 2024 Performance: Grade A
+            </span>
+</div>
+</div>
+<span class="font-label-sm text-label-sm px-2 py-0.5 rounded-full bg-[#DCFCE7] text-[#14532D] flex-shrink-0">Satisfactory</span>
+</div>
+</div>
+<!-- HR Director Remarks -->
+<div class="flex flex-col space-y-1.5">
+<label class="font-label-md text-label-md text-on-surface flex items-center justify-between">
+<span>HR Director Official Findings &amp; Remarks</span>
+<span class="font-mono-code-sm text-mono-code-sm text-on-surface-variant">Mandatory Audit Field</span>
+</label>
+<div class="relative">
+<textarea class="w-full bg-surface-container-low text-on-surface font-body-md text-body-md p-space-xs rounded-lg outline-none focus:bg-surface-container transition-colors resize-none leading-relaxed" id="hr-remarks-field" placeholder="Enter findings..." rows="3">Applicant is in good standing with exemplary field service record in Kenema District. Verified eligible under Tier 3 rules.</textarea>
+</div>
+</div>
+<!-- HR Official Stamp & Cryptographic Signature Watermark Seal -->
+<div class="relative overflow-hidden rounded-xl bg-surface-container-low p-space-sm shadow-inner flex items-center justify-between gap-space-xs">
+<!-- Subtle institutional seal watermark visual -->
+<div class="flex items-center gap-space-sm min-w-0 z-10">
+<div class="w-11 h-11 rounded-full bg-surface-container-lowest flex items-center justify-center text-secondary shadow-sm flex-shrink-0">
+<span class="material-symbols-outlined text-[26px]">approval</span>
+</div>
+<div class="flex flex-col min-w-0">
+<div class="flex items-center gap-1">
+<span class="font-headline-sm text-headline-sm text-on-surface truncate">Dr. Samuel Sesay</span>
+<span class="material-symbols-outlined text-secondary text-[16px]">verified</span>
+</div>
+<span class="font-body-sm text-body-sm text-on-surface-variant">Director of Human Resources • BCF-SL</span>
+<span class="font-mono-code-sm text-mono-code-sm text-primary font-semibold">Verified: 28-Oct-2024 • 10:42 GMT</span>
+</div>
+</div>
+<!-- Formal Watermark Stamp Badge -->
+<div class="flex-shrink-0 z-10 px-space-xs py-1 rounded bg-secondary/10 text-secondary text-right flex flex-col items-end">
+<span class="font-mono-code-sm text-[10px] font-bold tracking-widest leading-none">AUTHENTICATED</span>
+<span class="font-mono-code-sm text-[9px] text-secondary/80 mt-0.5">REG# SL-BCF-HR-88</span>
+</div>
+</div>
+</div>
+<!-- Section E: Finance Department Review & Capacity Assessment Preview (Collapsible Accordion) -->
+<div class="bg-surface-container-lowest rounded-xl shadow-sm overflow-hidden flex flex-col">
+<!-- Accordion Header Button -->
+<button class="w-full flex items-center justify-between p-space-md bg-surface-container-low text-left" onclick="toggleAccordion('finance-collapsible', 'finance-icon')" type="button">
+<div class="flex items-center gap-space-xs min-w-0">
+<span class="w-2.5 h-6 bg-[#0D5C3A] rounded-DEFAULT"></span>
+<div>
+<h2 class="font-headline-sm text-headline-sm text-on-surface flex items-center gap-space-2xs">
+<span>Section E: Finance Capacity Preview</span>
+<span class="font-mono-code-sm text-mono-code-sm px-1.5 py-0.5 rounded bg-surface-container-highest text-on-primary-fixed-variant">[STAGE 3 DRAFT]</span>
+</h2>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Treasury liquidity allocation &amp; debt-service ratio verification</p>
+</div>
+</div>
+<div class="flex items-center gap-space-2xs">
+<span class="material-symbols-outlined text-on-surface-variant transition-transform duration-300" id="finance-icon">expand_more</span>
+</div>
+</button>
+<!-- Collapsible Drawer -->
+<div class="hidden p-space-md space-y-space-md" id="finance-collapsible">
+<!-- Finance Checklist Metrics -->
+<div class="space-y-space-xs">
+<div class="flex items-center justify-between p-space-xs bg-surface-container-low rounded-lg">
+<div class="flex flex-col min-w-0">
+<span class="font-body-md text-body-md text-on-surface font-medium">Policy Tier Maximum Entitlement</span>
+<span class="font-mono-code-sm text-mono-code-sm text-on-surface-variant">Tier 3 Cap: NLe 15,000 • Requested: NLe 10,000</span>
+</div>
+<span class="font-mono-code-sm text-mono-code-sm px-2 py-0.5 rounded bg-[#DCFCE7] text-[#14532D] font-bold">COMPLIANT</span>
+</div>
+<div class="flex items-center justify-between p-space-xs bg-surface-container-low rounded-lg">
+<div class="flex flex-col min-w-0">
+<span class="font-body-md text-body-md text-on-surface font-medium">Debt-Service Ratio (Ceiling: 33.3%)</span>
+<span class="font-mono-code-sm text-mono-code-sm text-secondary font-semibold">Scheduled: 11.76% (NLe 1,000 / NLe 8,500)</span>
+</div>
+<span class="font-mono-code-sm text-mono-code-sm px-2 py-0.5 rounded bg-[#DCFCE7] text-[#14532D] font-bold">PASSED</span>
+</div>
+<div class="flex items-center justify-between p-space-xs bg-surface-container-low rounded-lg">
+<div class="flex flex-col min-w-0">
+<span class="font-body-md text-body-md text-on-surface font-medium">Q4 Staff Loan Treasury Allocation</span>
+<span class="font-mono-code-sm text-mono-code-sm text-on-surface-variant">Reserve Balance: NLe 240,000 Available</span>
+</div>
+<span class="font-mono-code-sm text-mono-code-sm px-2 py-0.5 rounded bg-[#DCFCE7] text-[#14532D] font-bold">FUNDED</span>
+</div>
+<div class="flex items-center justify-between p-space-xs bg-surface-container-low rounded-lg">
+<div class="flex flex-col min-w-0">
+<span class="font-body-md text-body-md text-on-surface font-medium">Statutory Tax &amp; NASSIT Withholding Status</span>
+<span class="font-mono-code-sm text-mono-code-sm text-on-surface-variant">Zero conflicting third-party garnishments</span>
+</div>
+<span class="font-mono-code-sm text-mono-code-sm px-2 py-0.5 rounded bg-[#DCFCE7] text-[#14532D] font-bold">CLEAR</span>
+</div>
+</div>
+<!-- Finance Notes -->
+<div class="flex flex-col space-y-1.5">
+<label class="font-label-md text-label-md text-on-surface">Finance Officer Pre-Review Advisory Notes</label>
+<div class="bg-surface-container-low p-space-xs rounded-lg text-on-surface font-body-md text-body-md">
+          Feasible. Monthly deduction scheduled for Nov 2024 payroll cycle upon final CEO executive endorsement.
+        </div>
+</div>
+</div>
+</div>
+<!-- Supporting Documents & Template Sub-actions -->
+<div class="bg-surface-container-lowest rounded-xl p-space-md shadow-sm flex flex-col space-y-space-sm">
+<div class="flex items-center justify-between">
+<span class="font-label-md text-label-md text-on-surface flex items-center gap-space-2xs">
+<span class="material-symbols-outlined text-primary text-[18px]">attachment</span>
+<span>Audit Trail &amp; Annexures</span>
+</span>
+<span class="font-mono-code-sm text-mono-code-sm text-on-surface-variant">2 Documents Attached</span>
+</div>
+<div class="grid grid-cols-2 gap-space-xs">
+<button class="flex items-center gap-space-xs p-space-xs bg-surface-container-low rounded-lg text-left hover:bg-surface-container transition-colors min-w-0" onclick="showToast('Application Docket PDF generating...')" type="button">
+<span class="material-symbols-outlined text-primary text-[22px] flex-shrink-0">picture_as_pdf</span>
+<div class="flex flex-col min-w-0">
+<span class="font-label-sm text-label-sm text-on-surface truncate">Full Application Dossier</span>
+<span class="font-mono-code-sm text-mono-code-sm text-on-surface-variant">PDF • 1.4 MB</span>
+</div>
+</button>
+<button class="flex items-center gap-space-xs p-space-xs bg-surface-container-low rounded-lg text-left hover:bg-surface-container transition-colors min-w-0" onclick="showToast('Downloading BCF-SL Official Template...')" type="button">
+<span class="material-symbols-outlined text-secondary text-[22px] flex-shrink-0">description</span>
+<div class="flex flex-col min-w-0">
+<span class="font-label-sm text-label-sm text-on-surface truncate">BCF-SL Form B-4</span>
+<span class="font-mono-code-sm text-mono-code-sm text-on-surface-variant">Official Template</span>
+</div>
+</button>
+</div>
+</div>
+<!-- Regulatory Decision Action Bar -->
+<div class="bg-surface-container-lowest rounded-xl p-space-md shadow-md flex flex-col space-y-space-sm">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-space-2xs">
+<span class="material-symbols-outlined text-primary text-[18px]">gavel</span>
+<span class="font-label-md text-label-md text-on-surface uppercase tracking-wider">Statutory Decision Ruling</span>
+</div>
+<span class="font-mono-code-sm text-mono-code-sm text-secondary font-semibold">Role: HR Verifier</span>
+</div>
+<div class="grid grid-cols-3 gap-space-2xs">
+<!-- 1. Approved -->
+<button class="h-11 rounded bg-secondary hover:bg-[#15803D] text-on-secondary font-label-md text-label-md font-semibold flex items-center justify-center gap-1.5 shadow-sm transition-all active:scale-[0.98]" onclick="handleDecision('Approved')" type="button">
+<span class="material-symbols-outlined text-[18px]">check_circle</span>
+<span>Approve</span>
+</button>
+<!-- 2. Deferred -->
+<button class="h-11 rounded bg-[#FEF3C7] hover:bg-[#FDE68A] text-[#78350F] font-label-md text-label-md font-semibold flex items-center justify-center gap-1.5 shadow-sm transition-all active:scale-[0.98]" onclick="openDeferModal()" type="button">
+<span class="material-symbols-outlined text-[18px]">update</span>
+<span>Defer</span>
+</button>
+<!-- 3. Not Approved -->
+<button class="h-11 rounded bg-[#FEE2E2] hover:bg-[#FECACA] text-[#991B1B] font-label-md text-label-md font-semibold flex items-center justify-center gap-1.5 shadow-sm transition-all active:scale-[0.98]" onclick="openRejectModal()" type="button">
+<span class="material-symbols-outlined text-[18px]">cancel</span>
+<span>Reject</span>
+</button>
+</div>
+<!-- Secondary Recommendation Forwarding -->
+<button class="w-full h-10 rounded bg-primary text-on-primary font-label-md text-label-md flex items-center justify-center gap-space-2xs shadow-sm hover:bg-primary/90 transition-colors" onclick="handleForwardWithRecommendation()" type="button">
+<span class="material-symbols-outlined text-[18px]">send</span>
+<span>Forward with High Recommendation to CEO</span>
+</button>
+</div>
+<!-- Rejection Reason Modal (Hidden by default) -->
+<div class="fixed inset-0 z-50 bg-primary/60 backdrop-blur-sm hidden flex items-end sm:items-center justify-center p-space-sm" id="rejection-modal">
+<div class="w-full max-w-lg bg-surface-container-lowest rounded-xl shadow-xl overflow-hidden flex flex-col animate-in fade-in zoom-in-95 duration-200">
+<!-- Institutional Top Accent Bar -->
+<div class="h-1.5 bg-error w-full"></div>
+<div class="p-space-md flex flex-col space-y-space-sm">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-space-2xs text-error">
+<span class="material-symbols-outlined text-[24px]">report</span>
+<h3 class="font-headline-sm text-headline-sm text-on-surface">Formal Refusal Docket Entry</h3>
+</div>
+<button class="w-8 h-8 rounded-full flex items-center justify-center text-on-surface-variant hover:bg-surface-container" onclick="closeRejectModal()" type="button">
+<span class="material-symbols-outlined text-[18px]">close</span>
+</button>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant">
+          Policy requires an official, archived justification for loan non-endorsement. This record will trigger formal notification to the applicant and internal audit.
+        </p>
+<div class="flex flex-col space-y-1">
+<label class="font-label-sm text-label-sm text-on-surface uppercase">Standardized Reason</label>
+<select class="w-full p-space-xs rounded bg-surface-container text-on-surface font-body-md text-body-md outline-none" id="reject-code">
+<option value="DSR_EXCEEDED">DSR ceiling threshold breached (&gt; 33.3%)</option>
+<option value="TENURE_INSUFFICIENT">Service length below mandatory 1-year threshold</option>
+<option value="PREVIOUS_DEFAULT">Unsettled or delinquent prior obligation on record</option>
+<option value="BUDGET_EXHAUSTION">Treasury tranche quota fully subscribed</option>
+<option value="OTHER">Other substantive audit objection</option>
+</select>
+</div>
+<div class="flex flex-col space-y-1">
+<label class="font-label-sm text-label-sm text-on-surface uppercase">Audit Trail Refusal Narrative</label>
+<textarea class="w-full p-space-xs rounded bg-surface-container text-on-surface font-body-md text-body-md outline-none resize-none" id="reject-explanation" placeholder="Provide detailed audit grounds..." rows="3"></textarea>
+</div>
+<div class="flex items-center justify-end gap-space-xs pt-space-xs">
+<button class="px-space-md h-10 rounded bg-surface-container text-on-surface font-label-md text-label-md" onclick="closeRejectModal()" type="button">
+            Cancel
+          </button>
+<button class="px-space-md h-10 rounded bg-error text-on-error font-label-md text-label-md flex items-center gap-1.5" onclick="confirmRejection()" type="button">
+<span class="material-symbols-outlined text-[18px]">gavel</span>
+<span>Record Formal Rejection</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+<!-- Deferral Remarks Modal (Hidden by default) -->
+<div class="fixed inset-0 z-50 bg-primary/60 backdrop-blur-sm hidden flex items-end sm:items-center justify-center p-space-sm" id="deferral-modal">
+<div class="w-full max-w-lg bg-surface-container-lowest rounded-xl shadow-xl overflow-hidden flex flex-col">
+<div class="h-1.5 bg-[#B45309] w-full"></div>
+<div class="p-space-md flex flex-col space-y-space-sm">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-space-2xs text-[#B45309]">
+<span class="material-symbols-outlined text-[24px]">pending_actions</span>
+<h3 class="font-headline-sm text-headline-sm text-on-surface">Application Deferral Requisition</h3>
+</div>
+<button class="w-8 h-8 rounded-full flex items-center justify-center text-on-surface-variant hover:bg-surface-container" onclick="closeDeferModal()" type="button">
+<span class="material-symbols-outlined text-[18px]">close</span>
+</button>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant">
+          Specify exact documentation or verification clarifications needed from applicant before HR verification can conclude.
+        </p>
+<div class="flex flex-col space-y-1">
+<label class="font-label-sm text-label-sm text-on-surface uppercase">Actionable Requisition Notes</label>
+<textarea class="w-full p-space-xs rounded bg-surface-container text-on-surface font-body-md text-body-md outline-none resize-none" id="defer-notes" placeholder="e.g., Request additional medical invoice proof or supervisor counter-signature..." rows="3"></textarea>
+</div>
+<div class="flex items-center justify-end gap-space-xs pt-space-xs">
+<button class="px-space-md h-10 rounded bg-surface-container text-on-surface font-label-md text-label-md" onclick="closeDeferModal()" type="button">
+            Cancel
+          </button>
+<button class="px-space-md h-10 rounded bg-[#B45309] text-on-primary font-label-md text-label-md flex items-center gap-1.5" onclick="confirmDeferral()" type="button">
+<span class="material-symbols-outlined text-[18px]">send_time_extension</span>
+<span>Issue Deferral Notice</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+<!-- Toast Notification System -->
+<div class="fixed bottom-20 left-4 right-4 z-50 hidden bg-primary text-on-primary p-space-sm rounded-xl shadow-xl flex items-center justify-between" id="toast-banner">
+<div class="flex items-center gap-space-xs min-w-0">
+<span class="material-symbols-outlined text-secondary text-[20px]" id="toast-icon">check_circle</span>
+<span class="font-body-sm text-body-sm truncate" id="toast-message">Application updated successfully.</span>
+</div>
+<button class="text-on-primary/80 hover:text-on-primary p-1" onclick="document.getElementById('toast-banner').classList.add('hidden')" type="button">
+<span class="material-symbols-outlined text-[16px]">close</span>
+</button>
+</div>
+</div>
+<script>
+  function toggleAuditCheck(button) {
+    const icon = button.querySelector('.material-symbols-outlined');
+    if (icon.textContent === 'check') {
+      icon.textContent = 'close';
+      button.classList.remove('bg-primary');
+      button.classList.add('bg-error');
+    } else {
+      icon.textContent = 'check';
+      button.classList.remove('bg-error');
+      button.classList.add('bg-primary');
+    }
+  }
+
+  function toggleAccordion(contentId, iconId) {
+    const content = document.getElementById(contentId);
+    const icon = document.getElementById(iconId);
+    if (content.classList.contains('hidden')) {
+      content.classList.remove('hidden');
+      icon.classList.add('rotate-180');
+    } else {
+      content.classList.add('hidden');
+      icon.classList.remove('rotate-180');
+    }
+  }
+
+  function showToast(message, isError = false) {
+    const toast = document.getElementById('toast-banner');
+    const toastMsg = document.getElementById('toast-message');
+    const toastIcon = document.getElementById('toast-icon');
+
+    toastMsg.textContent = message;
+    if (isError) {
+      toastIcon.textContent = 'error';
+      toastIcon.classList.remove('text-secondary');
+      toastIcon.classList.add('text-error-container');
+    } else {
+      toastIcon.textContent = 'check_circle';
+      toastIcon.classList.remove('text-error-container');
+      toastIcon.classList.add('text-secondary');
+    }
+
+    toast.classList.remove('hidden');
+    setTimeout(() => {
+      toast.classList.add('hidden');
+    }, 4000);
+  }
+
+  function handleDecision(decision) {
+    if (decision === 'Approved') {
+      showToast('Application endorsed by HR. Automated dispatch sent to Finance Director & CEO.');
+    }
+  }
+
+  function handleForwardWithRecommendation() {
+    showToast('Endorsement registered. Transferred to Stage 3 Finance assessment queue.');
+  }
+
+  function openRejectModal() {
+    document.getElementById('rejection-modal').classList.remove('hidden');
+  }
+
+  function closeRejectModal() {
+    document.getElementById('rejection-modal').classList.add('hidden');
+  }
+
+  function confirmRejection() {
+    const reason = document.getElementById('reject-explanation').value.trim();
+    if (!reason) {
+      alert('Mandatory policy requirement: Please provide formal refusal narrative before submitting.');
+      return;
+    }
+    closeRejectModal();
+    showToast('Rejection logged to ledger. Notification triggered to applicant.', true);
+  }
+
+  function openDeferModal() {
+    document.getElementById('deferral-modal').classList.remove('hidden');
+  }
+
+  function closeDeferModal() {
+    document.getElementById('deferral-modal').classList.add('hidden');
+  }
+
+  function confirmDeferral() {
+    const notes = document.getElementById('defer-notes').value.trim();
+    if (!notes) {
+      alert('Please enter requisite details needed from the applicant.');
+      return;
+    }
+    closeDeferModal();
+    showToast('Deferral notice issued. Applicant requested for clarification.');
+  }
+</script></main><nav class="fixed bottom-0 w-full z-50 pb-safe bg-surface/90 backdrop-blur-xl shadow-[0_1px_8px_rgba(0,0,0,0.04)]" data-active-classes="text-primary-container font-semibold"><div class="flex justify-around items-center h-16 px-space-2xs"><a class="flex flex-col items-center justify-center gap-0.5 w-16 h-12 text-on-surface-variant hover:text-on-surface transition-colors" data-path="apply-&amp;-check" href="#" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;"><span class="material-symbols-outlined text-[22px]">assignment_add</span><span class="font-label-sm text-label-sm truncate max-w-[72px] text-center leading-tight">Apply</span></a><a aria-current="page" class="flex flex-col items-center justify-center gap-0.5 w-16 h-12 transition-colors text-primary-container font-semibold" data-path="review-&amp;-approve" href="#" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;"><span class="material-symbols-outlined text-[22px]">fact_check</span><span class="font-label-sm text-label-sm truncate max-w-[72px] text-center leading-tight">Review</span></a><a class="flex flex-col items-center justify-center gap-0.5 w-16 h-12 text-on-surface-variant hover:text-on-surface transition-colors" data-path="ceo-sign-off" href="#" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;"><span class="material-symbols-outlined text-[22px]">verified</span><span class="font-label-sm text-label-sm truncate max-w-[72px] text-center leading-tight">Sign-off</span></a><a class="flex flex-col items-center justify-center gap-0.5 w-16 h-12 text-on-surface-variant hover:text-on-surface transition-colors" data-path="tracking-&amp;-portfolio" href="#" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;"><span class="material-symbols-outlined text-[22px]">account_balance</span><span class="font-label-sm text-label-sm truncate max-w-[72px] text-center leading-tight">Portfolio</span></a></div></nav></body></html>

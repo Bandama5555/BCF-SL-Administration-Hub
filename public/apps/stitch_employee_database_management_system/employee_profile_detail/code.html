@@ -1,0 +1,2685 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover"/>
+    <title>Employee Profile - BCF-SL</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: "#16a34a",
+                        "primary-dark": "#15803d",
+                        secondary: "#2563eb",
+                        tertiary: "#9333ea",
+                        surface: "#ffffff",
+                        "surface-container": "#f3f4f6",
+                        "on-surface": "#111827",
+                        "on-surface-variant": "#4b5563",
+                        outline: "#e5e7eb",
+                        error: "#dc2626"
+                    },
+                    fontFamily: { sans: ['Calibri', 'Inter', 'sans-serif'] }
+                }
+            }
+        }
+    </script>
+    <style>
+        body { font-size: 11pt; overscroll-behavior-y: none; }
+        .hidden-step { display: none !important; }
+        ::-webkit-scrollbar { width: 6px; } ::-webkit-scrollbar-thumb { background:#d1d5db; border-radius:3px; }
+        .tab-btn.active { border-bottom-color: #16a34a; color: #16a34a; font-weight: 700; }
+        .info-row { display: grid; grid-template-columns: 1fr 2fr; gap: 8px; padding: 8px 0; border-bottom: 1px solid #f3f4f6; }
+        .info-label { font-weight: 600; color: #4b5563; font-size: 10pt; }
+        .info-val { color: #111827; font-size: 11pt; }
+    
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            20%, 60% { transform: translateX(-6px); }
+            40%, 80% { transform: translateX(6px); }
+        }
+        .shake { animation: shake 0.4s ease-in-out; }
+    
+    </style>
+</head>
+<body class="bg-surface-container text-on-surface flex flex-col min-h-screen font-sans">
+
+<!-- SELECTOR VIEW -->
+<div id="selector-view">
+    <header class="bg-surface border-b border-outline shadow-sm sticky top-0 z-50">
+        <div class="max-w-5xl mx-auto h-16 px-4 flex items-center justify-between gap-4">
+            <div class="flex items-center gap-4">
+                <img src="../bcf-logo.png" onerror="this.src='/bcf-logo.jpg'" alt="BCF Logo" class="h-10 w-auto object-contain"/>
+                <div class="hidden sm:block">
+                    <h1 class="font-bold text-lg text-primary leading-tight">BANDAMA CHARITY FOUNDATION SIERRA LEONE</h1>
+                    <p class="text-[9pt] font-semibold text-secondary">Save Lives <span class="text-tertiary px-1">|</span> Empowering Communities Through Services</p>
+                </div>
+            </div>
+            <div class="flex items-center gap-2 sm:gap-3">
+                <!-- EXPORT ALL STAFF (TOP BAR) -->
+                <div class="relative inline-block text-left" id="export-dropdown-selector-top">
+                    <button type="button" id="btn-export-all-top" onclick="toggleExportStaffMenu('export-menu-top', event)" class="h-9 px-3 sm:px-4 rounded bg-emerald-600 hover:bg-emerald-700 text-white text-xs sm:text-sm font-bold flex items-center gap-1.5 transition shadow cursor-pointer">
+                        <span class="material-symbols-outlined text-[18px]">download</span>
+                        <span>Export Staff</span>
+                        <span class="material-symbols-outlined text-[16px] -mr-1">arrow_drop_down</span>
+                    </button>
+                    <div id="export-menu-top" class="export-dropdown-menu hidden absolute right-0 mt-2 w-72 rounded-xl bg-white shadow-2xl ring-1 ring-black/5 border border-slate-200 divide-y divide-slate-100 z-50">
+                        <div class="p-3 bg-emerald-50/80 rounded-t-xl border-b border-emerald-100">
+                            <div class="text-xs font-bold text-emerald-900 flex items-center gap-1.5">
+                                <span class="material-symbols-outlined text-[18px] text-emerald-600">groups</span>
+                                <span>Export Staff Database</span>
+                            </div>
+                            <div class="text-[11px] text-emerald-700 mt-0.5" id="export-count-top">Download all registered staff records</div>
+                        </div>
+                        <div class="py-1">
+                            <button type="button" onclick="downloadStaffExcel(); closeAllExportMenus();" class="w-full text-left px-3.5 py-2.5 hover:bg-slate-50 flex items-center gap-3 transition group">
+                                <div class="w-8 h-8 rounded-lg bg-emerald-100 text-emerald-700 flex items-center justify-center shrink-0 group-hover:bg-emerald-200">
+                                    <span class="material-symbols-outlined text-[20px]">table_view</span>
+                                </div>
+                                <div class="flex-1 min-w-0">
+                                    <div class="text-xs font-bold text-slate-800 group-hover:text-emerald-700">Excel Workbook (.xls)</div>
+                                    <div class="text-[10px] text-slate-500">Multi-sheet styled spreadsheet</div>
+                                </div>
+                            </button>
+                            <button type="button" onclick="downloadStaffCSV(); closeAllExportMenus();" class="w-full text-left px-3.5 py-2.5 hover:bg-slate-50 flex items-center gap-3 transition group">
+                                <div class="w-8 h-8 rounded-lg bg-blue-100 text-blue-700 flex items-center justify-center shrink-0 group-hover:bg-blue-200">
+                                    <span class="material-symbols-outlined text-[20px]">description</span>
+                                </div>
+                                <div class="flex-1 min-w-0">
+                                    <div class="text-xs font-bold text-slate-800 group-hover:text-blue-700">CSV Spreadsheet (.csv)</div>
+                                    <div class="text-[10px] text-slate-500">Universal table for Excel &amp; Sheets</div>
+                                </div>
+                            </button>
+                            <button type="button" onclick="downloadStaffJSON(); closeAllExportMenus();" class="w-full text-left px-3.5 py-2.5 hover:bg-slate-50 flex items-center gap-3 transition group">
+                                <div class="w-8 h-8 rounded-lg bg-purple-100 text-purple-700 flex items-center justify-center shrink-0 group-hover:bg-purple-200">
+                                    <span class="material-symbols-outlined text-[20px]">data_object</span>
+                                </div>
+                                <div class="flex-1 min-w-0">
+                                    <div class="text-xs font-bold text-slate-800 group-hover:text-purple-700">JSON Database (.json)</div>
+                                    <div class="text-[10px] text-slate-500">Complete raw structured records</div>
+                                </div>
+                            </button>
+                            <button type="button" onclick="printStaffSummary(); closeAllExportMenus();" class="w-full text-left px-3.5 py-2.5 hover:bg-slate-50 flex items-center gap-3 transition group">
+                                <div class="w-8 h-8 rounded-lg bg-slate-100 text-slate-700 flex items-center justify-center shrink-0 group-hover:bg-slate-200">
+                                    <span class="material-symbols-outlined text-[20px]">print</span>
+                                </div>
+                                <div class="flex-1 min-w-0">
+                                    <div class="text-xs font-bold text-slate-800 group-hover:text-slate-900">Print Staff Summary</div>
+                                    <div class="text-[10px] text-slate-500">Official printable staff roster</div>
+                                </div>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <a href="../staff_directory/code.html" class="text-xs sm:text-sm font-semibold text-on-surface-variant hover:text-primary flex items-center gap-1">
+                    <span class="material-symbols-outlined text-[18px]">arrow_back</span> Directory
+                </a>
+            </div>
+        </div>
+    </header>
+    
+<!-- SEQUENTIAL WORKFLOW NAVIGATION BAR -->
+<div class="bg-surface border-b border-outline px-4 py-2 text-xs font-bold shadow-2xs">
+    <div class="max-w-5xl mx-auto flex items-center justify-between">
+        <a href="../staff_directory/code.html" onclick="navToApp('/employees/staff-directory', '../staff_directory/code.html', event)" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-slate-300 hover:bg-slate-100 text-slate-700 transition">
+            <span>← Back to Staff Directory</span>
+        </a>
+        <span class="text-slate-300 font-bold">|</span>
+        <a href="../register_staff_auto_id/code.html" onclick="navToApp('/employees/register-staff', '../register_staff_auto_id/code.html', event)" class="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg bg-primary hover:bg-primary-dark text-white shadow-2xs transition">
+            <span>Next →</span>
+        </a>
+    </div>
+</div>
+
+<div class="max-w-5xl mx-auto px-4 pt-6 pb-24 flex flex-col gap-6">
+        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+            <div class="flex items-center gap-3">
+                <span class="material-symbols-outlined text-primary text-3xl">search</span>
+                <div>
+                    <h2 class="text-2xl font-bold">Select an Employee</h2>
+                    <p class="text-xs text-on-surface-variant">View individual records or download complete profiles for all registered staff</p>
+                </div>
+            </div>
+            <!-- PROMINENT DOWNLOAD ALL STAFF DROPDOWN -->
+            <div class="relative inline-block text-left" id="export-dropdown-selector-banner">
+                <button type="button" id="btn-export-all-banner" onclick="toggleExportStaffMenu('export-menu-banner', event)" class="h-10 px-4 rounded-xl bg-gradient-to-r from-emerald-600 to-green-700 hover:from-emerald-700 hover:to-green-800 text-white text-xs sm:text-sm font-bold flex items-center gap-2 transition shadow-md hover:shadow-lg cursor-pointer">
+                    <span class="material-symbols-outlined text-[20px]">file_download</span>
+                    <span>Download All Staff</span>
+                    <span class="material-symbols-outlined text-[18px]">arrow_drop_down</span>
+                </button>
+                <div id="export-menu-banner" class="export-dropdown-menu hidden absolute right-0 mt-2 w-80 rounded-xl bg-white shadow-2xl ring-1 ring-black/5 border border-slate-200 divide-y divide-slate-100 z-50">
+                    <div class="p-3 bg-emerald-50/80 rounded-t-xl border-b border-emerald-100">
+                        <div class="text-xs font-bold text-emerald-900 flex items-center gap-1.5">
+                            <span class="material-symbols-outlined text-[18px] text-emerald-600">groups</span>
+                            <span>Download Staff Information</span>
+                        </div>
+                        <div class="text-[11px] text-emerald-700 mt-0.5" id="export-count-banner">Download complete records for all registered staff</div>
+                    </div>
+                    <div class="py-1">
+                        <button type="button" onclick="downloadStaffExcel(); closeAllExportMenus();" class="w-full text-left px-3.5 py-2.5 hover:bg-slate-50 flex items-center gap-3 transition group">
+                            <div class="w-8 h-8 rounded-lg bg-emerald-100 text-emerald-700 flex items-center justify-center shrink-0 group-hover:bg-emerald-200">
+                                <span class="material-symbols-outlined text-[20px]">table_view</span>
+                            </div>
+                            <div class="flex-1 min-w-0">
+                                <div class="text-xs font-bold text-slate-800 group-hover:text-emerald-700">Excel Workbook (.xls)</div>
+                                <div class="text-[10px] text-slate-500">Multi-sheet styled spreadsheet with all details</div>
+                            </div>
+                        </button>
+                        <button type="button" onclick="downloadStaffCSV(); closeAllExportMenus();" class="w-full text-left px-3.5 py-2.5 hover:bg-slate-50 flex items-center gap-3 transition group">
+                            <div class="w-8 h-8 rounded-lg bg-blue-100 text-blue-700 flex items-center justify-center shrink-0 group-hover:bg-blue-200">
+                                <span class="material-symbols-outlined text-[20px]">description</span>
+                            </div>
+                            <div class="flex-1 min-w-0">
+                                <div class="text-xs font-bold text-slate-800 group-hover:text-blue-700">CSV Spreadsheet (.csv)</div>
+                                <div class="text-[10px] text-slate-500">Standard table compatible with Excel &amp; Sheets</div>
+                            </div>
+                        </button>
+                        <button type="button" onclick="downloadStaffJSON(); closeAllExportMenus();" class="w-full text-left px-3.5 py-2.5 hover:bg-slate-50 flex items-center gap-3 transition group">
+                            <div class="w-8 h-8 rounded-lg bg-purple-100 text-purple-700 flex items-center justify-center shrink-0 group-hover:bg-purple-200">
+                                <span class="material-symbols-outlined text-[20px]">data_object</span>
+                            </div>
+                            <div class="flex-1 min-w-0">
+                                <div class="text-xs font-bold text-slate-800 group-hover:text-purple-700">JSON Database (.json)</div>
+                                <div class="text-[10px] text-slate-500">Complete raw structured records</div>
+                            </div>
+                        </button>
+                        <button type="button" onclick="printStaffSummary(); closeAllExportMenus();" class="w-full text-left px-3.5 py-2.5 hover:bg-slate-50 flex items-center gap-3 transition group">
+                            <div class="w-8 h-8 rounded-lg bg-slate-100 text-slate-700 flex items-center justify-center shrink-0 group-hover:bg-slate-200">
+                                <span class="material-symbols-outlined text-[20px]">print</span>
+                            </div>
+                            <div class="flex-1 min-w-0">
+                                <div class="text-xs font-bold text-slate-800 group-hover:text-slate-900">Print Staff Summary</div>
+                                <div class="text-[10px] text-slate-500">Official printable staff roster</div>
+                            </div>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="bg-surface rounded-xl border border-outline p-5 shadow-sm flex flex-col gap-4">
+            <div class="relative">
+                <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant">search</span>
+                <input type="text" id="sel-search" placeholder="Search by name, ID, position, department..." class="w-full h-12 pl-10 pr-4 rounded-lg bg-surface-container hover:bg-gray-100 focus:bg-surface focus:ring-2 focus:ring-primary outline-none transition" oninput="filterEmployees()">
+            </div>
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+                <select id="sel-dept" onchange="filterEmployees()" class="h-10 px-3 rounded border border-outline text-sm outline-none focus:border-primary">
+                    <option value="">All Departments</option>
+                    <option>Executive Management</option><option>Finance Department</option><option>Health & Safety Department</option><option>Human Resources Management Department</option><option>Information Technology (IT) Department</option><option>Internal Risk & Audits Department</option><option>Legal & Communication Department</option><option>Procurement Department</option><option>Programs Department</option>
+                </select>
+                <select id="sel-class" onchange="filterEmployees()" class="h-10 px-3 rounded border border-outline text-sm outline-none focus:border-primary">
+                    <option value="">All Types</option>
+                    <option>Permanent</option><option>Fixed-Term Contract</option><option>Part-Time</option><option>Casual</option><option>Consultant</option><option>Volunteer</option><option>Intern</option>
+                </select>
+                <select id="sel-status" onchange="filterEmployees()" class="h-10 px-3 rounded border border-outline text-sm outline-none focus:border-primary">
+                    <option value="">All Status</option>
+                    <option>Active</option><option>Probation</option><option>Leave</option><option>Suspended</option><option>Resigned</option><option>Terminated</option>
+                </select>
+                <button onclick="clearFilters()" class="h-10 px-4 rounded border border-outline text-sm font-semibold hover:bg-surface-container transition">Clear Filters</button>
+            </div>
+        </div>
+        <div id="emp-list" class="flex flex-col gap-3"></div>
+        <div id="emp-empty" class="hidden py-16 text-center text-on-surface-variant bg-surface rounded-xl border border-outline">
+            <span class="material-symbols-outlined text-5xl block mb-2">group</span>
+            <p class="font-semibold">No employees found. <a href="../register_staff_auto_id/code.html" class="text-primary underline">Register the first staff member.</a></p>
+        </div>
+    </div>
+</div>
+
+<!-- PROFILE VIEW -->
+<div id="profile-view" class="hidden flex-col flex-1">
+    <!-- Profile Header -->
+    <header id="prof-header" class="bg-surface border-b border-outline shadow-sm sticky top-0 z-50">
+        <div class="max-w-5xl mx-auto h-16 px-4 flex items-center justify-between gap-4">
+            <button onclick="backToSelector()" class="flex items-center gap-2 text-on-surface-variant hover:text-primary font-semibold text-sm transition">
+                <span class="material-symbols-outlined text-[20px]">arrow_back</span> Back
+            </button>
+            <div class="flex items-center gap-2 sm:gap-3">
+                <button id="btn-edit-profile" onclick="openEditModal()" class="h-9 px-3 sm:px-4 rounded bg-surface-container hover:bg-gray-200 text-xs sm:text-sm font-bold flex items-center gap-1.5 transition">
+                    <span class="material-symbols-outlined text-[16px]">edit</span> Edit
+                </button>
+                <button onclick="exportProfile()" class="h-9 px-3 sm:px-4 rounded bg-primary text-white hover:bg-primary-dark text-xs sm:text-sm font-bold flex items-center gap-1.5 transition shadow" title="Export this individual profile to PDF">
+                    <span class="material-symbols-outlined text-[16px]">picture_as_pdf</span> Export PDF
+                </button>
+                <!-- EXPORT ALL STAFF (PROFILE VIEW) -->
+                <div class="relative inline-block text-left" id="export-dropdown-profile-wrap">
+                    <button type="button" id="btn-export-all-profile" onclick="toggleExportStaffMenu('export-menu-profile', event)" class="h-9 px-3 sm:px-4 rounded bg-emerald-600 hover:bg-emerald-700 text-white text-xs sm:text-sm font-bold flex items-center gap-1.5 transition shadow cursor-pointer" title="Download information for all staff">
+                        <span class="material-symbols-outlined text-[18px]">download</span>
+                        <span class="hidden sm:inline">Export All Staff</span>
+                        <span class="sm:hidden">All Staff</span>
+                        <span class="material-symbols-outlined text-[16px] -mr-1">arrow_drop_down</span>
+                    </button>
+                    <div id="export-menu-profile" class="export-dropdown-menu hidden absolute right-0 mt-2 w-72 rounded-xl bg-white shadow-2xl ring-1 ring-black/5 border border-slate-200 divide-y divide-slate-100 z-50">
+                        <div class="p-3 bg-emerald-50/80 rounded-t-xl border-b border-emerald-100">
+                            <div class="text-xs font-bold text-emerald-900 flex items-center gap-1.5">
+                                <span class="material-symbols-outlined text-[18px] text-emerald-600">groups</span>
+                                <span>Export Staff Database</span>
+                            </div>
+                            <div class="text-[11px] text-emerald-700 mt-0.5" id="export-count-profile">Download all registered staff records</div>
+                        </div>
+                        <div class="py-1">
+                            <button type="button" onclick="downloadStaffExcel(); closeAllExportMenus();" class="w-full text-left px-3.5 py-2.5 hover:bg-slate-50 flex items-center gap-3 transition group">
+                                <div class="w-8 h-8 rounded-lg bg-emerald-100 text-emerald-700 flex items-center justify-center shrink-0 group-hover:bg-emerald-200">
+                                    <span class="material-symbols-outlined text-[20px]">table_view</span>
+                                </div>
+                                <div class="flex-1 min-w-0">
+                                    <div class="text-xs font-bold text-slate-800 group-hover:text-emerald-700">Excel Workbook (.xls)</div>
+                                    <div class="text-[10px] text-slate-500">Multi-sheet styled spreadsheet</div>
+                                </div>
+                            </button>
+                            <button type="button" onclick="downloadStaffCSV(); closeAllExportMenus();" class="w-full text-left px-3.5 py-2.5 hover:bg-slate-50 flex items-center gap-3 transition group">
+                                <div class="w-8 h-8 rounded-lg bg-blue-100 text-blue-700 flex items-center justify-center shrink-0 group-hover:bg-blue-200">
+                                    <span class="material-symbols-outlined text-[20px]">description</span>
+                                </div>
+                                <div class="flex-1 min-w-0">
+                                    <div class="text-xs font-bold text-slate-800 group-hover:text-blue-700">CSV Spreadsheet (.csv)</div>
+                                    <div class="text-[10px] text-slate-500">Universal table for Excel &amp; Sheets</div>
+                                </div>
+                            </button>
+                            <button type="button" onclick="downloadStaffJSON(); closeAllExportMenus();" class="w-full text-left px-3.5 py-2.5 hover:bg-slate-50 flex items-center gap-3 transition group">
+                                <div class="w-8 h-8 rounded-lg bg-purple-100 text-purple-700 flex items-center justify-center shrink-0 group-hover:bg-purple-200">
+                                    <span class="material-symbols-outlined text-[20px]">data_object</span>
+                                </div>
+                                <div class="flex-1 min-w-0">
+                                    <div class="text-xs font-bold text-slate-800 group-hover:text-purple-700">JSON Database (.json)</div>
+                                    <div class="text-[10px] text-slate-500">Complete raw structured records</div>
+                                </div>
+                            </button>
+                            <button type="button" onclick="printStaffSummary(); closeAllExportMenus();" class="w-full text-left px-3.5 py-2.5 hover:bg-slate-50 flex items-center gap-3 transition group">
+                                <div class="w-8 h-8 rounded-lg bg-slate-100 text-slate-700 flex items-center justify-center shrink-0 group-hover:bg-slate-200">
+                                    <span class="material-symbols-outlined text-[20px]">print</span>
+                                </div>
+                                <div class="flex-1 min-w-0">
+                                    <div class="text-xs font-bold text-slate-800 group-hover:text-slate-900">Print Staff Summary</div>
+                                    <div class="text-[10px] text-slate-500">Official printable staff roster</div>
+                                </div>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <a href="../staff_directory/code.html" class="h-9 px-3 sm:px-4 rounded bg-secondary text-white hover:bg-blue-700 text-xs sm:text-sm font-bold flex items-center gap-1.5 transition shadow">
+                    <span class="material-symbols-outlined text-[16px]">group</span> Directory
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <div id="profile-content" class="max-w-5xl mx-auto w-full px-4 pt-6 pb-24 flex flex-col gap-6">
+        <!-- BCF Header Card -->
+        <div class="bg-gradient-to-r from-primary to-secondary rounded-xl p-6 text-white flex items-center gap-6 shadow-lg">
+            <div class="w-20 h-20 rounded-xl bg-white/20 flex items-center justify-center overflow-hidden shrink-0">
+                <img id="prof-photo" src="" onerror="this.style.display='none'" class="w-full h-full object-cover rounded-xl"/>
+                <span id="prof-initials" class="text-2xl font-bold text-white">?</span>
+            </div>
+            <div class="flex-1 min-w-0">
+                <p class="text-white/70 text-xs font-semibold uppercase">Bandama Charity Foundation Sierra Leone</p>
+                <h2 id="prof-name" class="text-2xl font-extrabold mt-0.5 truncate">Employee Name</h2>
+                <p id="prof-title" class="text-white/90 font-semibold truncate">Position</p>
+                <div class="flex flex-wrap gap-3 mt-2 text-xs font-semibold">
+                    <span id="prof-id" class="bg-white/20 px-2 py-0.5 rounded">ID</span>
+                    <span id="prof-dept" class="bg-white/20 px-2 py-0.5 rounded">Dept</span>
+                    <span id="prof-class" class="bg-white/20 px-2 py-0.5 rounded">Class</span>
+                    <span id="prof-status-badge" class="bg-white/20 px-2 py-0.5 rounded">Status</span>
+                </div>
+            </div>
+        </div>
+
+
+        <!-- Tab Navigation -->
+        <div id="tab-nav" class="bg-surface rounded-xl border border-outline shadow-sm overflow-x-auto">
+            <div class="flex border-b border-outline min-w-max">
+                <button class="tab-btn active px-4 py-3 text-sm border-b-2 border-primary transition" onclick="showTab(0)" id="tbtn-0">Personal</button>
+                <button class="tab-btn px-4 py-3 text-sm border-b-2 border-transparent text-on-surface-variant transition" onclick="showTab(1)" id="tbtn-1">Emergency <span id="tlock-1" class="text-xs ml-1 opacity-70">🔒</span></button>
+                <button class="tab-btn px-4 py-3 text-sm border-b-2 border-transparent text-on-surface-variant transition" onclick="showTab(2)" id="tbtn-2">Employment</button>
+                <button class="tab-btn px-4 py-3 text-sm border-b-2 border-transparent text-on-surface-variant transition" onclick="showTab(3)" id="tbtn-3">Work Loc.</button>
+                <button class="tab-btn px-4 py-3 text-sm border-b-2 border-transparent text-on-surface-variant transition" onclick="showTab(4)" id="tbtn-4">Education <span id="tlock-4" class="text-xs ml-1 opacity-70">🔒</span></button>
+                <button class="tab-btn px-4 py-3 text-sm border-b-2 border-transparent text-on-surface-variant transition" onclick="showTab(5)" id="tbtn-5">Experience <span id="tlock-5" class="text-xs ml-1 opacity-70">🔒</span></button>
+                <button class="tab-btn px-4 py-3 text-sm border-b-2 border-transparent text-on-surface-variant transition" onclick="showTab(6)" id="tbtn-6">Skills <span id="tlock-6" class="text-xs ml-1 opacity-70">🔒</span></button>
+                <button class="tab-btn px-4 py-3 text-sm border-b-2 border-transparent text-on-surface-variant transition" onclick="showTab(7)" id="tbtn-7">Finance <span id="tlock-7" class="text-xs ml-1 opacity-70">🔒</span></button>
+                <button class="tab-btn px-4 py-3 text-sm border-b-2 border-transparent text-on-surface-variant transition" onclick="showTab(8)" id="tbtn-8">Payroll <span id="tlock-8" class="text-xs ml-1 opacity-70">🔒</span></button>
+            </div>
+        </div>
+
+        <!-- TAB PANELS -->
+        <div class="bg-surface rounded-xl border border-outline shadow-sm p-6">
+
+            <!-- TAB 0: Personal -->
+            <div id="tab-0" class="tab-panel">
+                <h3 class="font-bold text-primary mb-4">Personal Information</h3>
+                <div class="info-row"><span class="info-label">Full Name</span><span class="info-val" id="v-name">-</span></div>
+                <div class="info-row"><span class="info-label">Employee ID</span><span class="info-val font-mono text-secondary font-bold" id="v-empid">-</span></div>
+                <div class="info-row"><span class="info-label">Gender</span><span class="info-val" id="v-gender">-</span></div>
+                <div class="info-row"><span class="info-label">Date of Birth</span><span class="info-val" id="v-dob">-</span></div>
+                <div class="info-row"><span class="info-label">Nationality</span><span class="info-val" id="v-nation">-</span></div>
+                <div class="info-row"><span class="info-label">Phone</span><span class="info-val" id="v-phone">-</span></div>
+                <div class="info-row"><span class="info-label">Email</span><span class="info-val" id="v-email">-</span></div>
+                <div class="info-row"><span class="info-label">Marital Status</span><span class="info-val" id="v-marital">-</span></div>
+                <div class="info-row"><span class="info-label">No. of Children</span><span class="info-val" id="v-children">-</span></div>
+                <div class="info-row"><span class="info-label">NIN / Passport</span><span class="info-val" id="v-nin">-</span></div>
+                <div class="info-row"><span class="info-label">NASSIT No.</span><span class="info-val" id="v-nassit">-</span></div>
+                <div class="info-row"><span class="info-label">Residential Address</span><span class="info-val" id="v-address">-</span></div>
+            </div>
+
+            <!-- TAB 1: Emergency -->
+            <div id="tab-1" class="tab-panel hidden-step">
+                <div id="emergency-staff-lock" class="bg-red-50 border border-red-200 rounded-xl p-4 mb-5 flex items-start gap-3">
+                    <span class="material-symbols-outlined text-red-600 text-2xl shrink-0 mt-0.5">shield</span>
+                    <div>
+                        <div class="flex items-center gap-2">
+                            <h4 class="font-bold text-red-900 text-sm">Confidential Emergency Contact Records</h4>
+                            <span class="text-[10px] font-extrabold bg-red-100 text-red-800 px-2 py-0.5 rounded border border-red-200 uppercase">Restricted</span>
+                        </div>
+                        <p class="text-xs text-red-700 mt-1 leading-relaxed">
+                            Next-of-kin personal contact details and residential addresses registered during onboarding are confidential and restricted to HR management and emergency responders.
+                        </p>
+                    </div>
+                </div>
+                <h3 class="font-bold text-error mb-4">Emergency Contact</h3>
+                <div class="info-row"><span class="info-label">Contact Person</span><span class="info-val" id="v-emname">-</span></div>
+                <div class="info-row"><span class="info-label">Relationship</span><span class="info-val" id="v-emrel">-</span></div>
+                <div class="info-row"><span class="info-label">Phone</span><span class="info-val" id="v-emphone">-</span></div>
+                <div class="info-row"><span class="info-label">Email</span><span class="info-val" id="v-ememail">-</span></div>
+                <div class="info-row"><span class="info-label">Address</span><span class="info-val" id="v-emaddress">-</span></div>
+            </div>
+
+            <!-- TAB 2: Employment -->
+            <div id="tab-2" class="tab-panel hidden-step">
+                <h3 class="font-bold text-secondary mb-4">Employment Information</h3>
+                <div class="info-row"><span class="info-label">Department</span><span class="info-val" id="v-dept">-</span></div>
+                <div class="info-row"><span class="info-label">Position / Title</span><span class="info-val" id="v-title">-</span></div>
+                <div class="info-row"><span class="info-label">Unit</span><span class="info-val" id="v-unit">-</span></div>
+                <div class="info-row"><span class="info-label">Management Level</span><span class="info-val" id="v-mgmt">-</span></div>
+                <div class="info-row"><span class="info-label">Classification</span><span class="info-val" id="v-class">-</span></div>
+                <div class="info-row"><span class="info-label">Job Level</span><span class="info-val" id="v-joblevel">-</span></div>
+                <div class="info-row"><span class="info-label">Employment Date</span><span class="info-val" id="v-empdate">-</span></div>
+                <div class="info-row"><span class="info-label">Contract Period</span><span class="info-val" id="v-contract">-</span></div>
+                <div class="info-row"><span class="info-label">Current Status</span><span class="info-val font-bold text-primary" id="v-status">-</span></div>
+            </div>
+
+            <!-- TAB 3: Work Location -->
+            <div id="tab-3" class="tab-panel hidden-step">
+                <h3 class="font-bold text-primary mb-4">Work Location & Reporting</h3>
+                <div class="info-row"><span class="info-label">Working Location</span><span class="info-val" id="v-workloc">-</span></div>
+                <div class="info-row"><span class="info-label">Reports To</span><span class="info-val" id="v-reports">-</span></div>
+                <div class="info-row"><span class="info-label">Working Phone</span><span class="info-val" id="v-workphone">-</span></div>
+                <div class="info-row"><span class="info-label">Working Email</span><span class="info-val" id="v-workemail">-</span></div>
+                <div class="info-row"><span class="info-label">Probation Start</span><span class="info-val" id="v-probstart">-</span></div>
+                <div class="info-row"><span class="info-label">Probation End</span><span class="info-val" id="v-probend">-</span></div>
+            </div>
+
+            <!-- TAB 4: Education -->
+            <div id="tab-4" class="tab-panel hidden-step">
+                <div id="edu-staff-lock" class="bg-gradient-to-r from-red-50 to-amber-50 border border-red-200 rounded-xl p-5 mb-5 flex items-start gap-4">
+                    <div class="w-12 h-12 rounded-xl bg-red-100 border border-red-200 flex items-center justify-center shrink-0 text-red-600">
+                        <span class="material-symbols-outlined text-3xl">school</span>
+                    </div>
+                    <div>
+                        <div class="flex items-center gap-2">
+                            <h4 class="font-bold text-red-900 text-sm sm:text-base">Restricted Access — Education &amp; Academic Qualifications</h4>
+                            <span class="text-[10px] font-extrabold bg-red-100 text-red-800 px-2 py-0.5 rounded border border-red-200 uppercase">Confidential</span>
+                        </div>
+                        <p class="text-xs text-red-800 mt-1.5 leading-relaxed">
+                            Academic credentials, degree certificates, transcripts, and institution records registered during staff onboarding in <strong>Register New Staff</strong> are confidential under BCF-SL HR Policy. Access is restricted to <strong>Super Admin, HR Director, Finance Director, CEO, and Internal Risk &amp; Audits Director</strong>.
+                        </p>
+                        <div class="mt-3 flex items-center gap-2">
+                            <button type="button" onclick="promptElevatedAuth()" class="px-3.5 py-1.5 rounded-lg bg-red-600 hover:bg-red-700 text-white text-xs font-bold transition flex items-center gap-1.5 shadow-xs">
+                                <span class="material-symbols-outlined text-[16px]">key</span>
+                                Authenticate for Elevated Access
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div id="edu-admin-note" class="bg-blue-50 border border-blue-200 rounded-xl p-3.5 mb-4 text-blue-900 text-xs font-semibold hidden items-center gap-2">
+                    <span class="material-symbols-outlined text-[18px] text-blue-600">verified_user</span>
+                    <span>Authorized Access: Viewing academic qualifications as <strong id="edu-role-label">Super Admin</strong>.</span>
+                </div>
+                <h3 class="font-bold text-primary mb-4">Education &amp; Qualifications</h3>
+                <div id="v-edu-list" class="flex flex-col gap-4"></div>
+            </div>
+
+            <!-- TAB 5: Experience -->
+            <div id="tab-5" class="tab-panel hidden-step">
+                <div id="exp-staff-lock" class="bg-gradient-to-r from-red-50 to-amber-50 border border-red-200 rounded-xl p-5 mb-5 flex items-start gap-4">
+                    <div class="w-12 h-12 rounded-xl bg-red-100 border border-red-200 flex items-center justify-center shrink-0 text-red-600">
+                        <span class="material-symbols-outlined text-3xl">history</span>
+                    </div>
+                    <div>
+                        <div class="flex items-center gap-2">
+                            <h4 class="font-bold text-red-900 text-sm sm:text-base">Restricted Access — Work Experience &amp; Employment History</h4>
+                            <span class="text-[10px] font-extrabold bg-red-100 text-red-800 px-2 py-0.5 rounded border border-red-200 uppercase">Confidential</span>
+                        </div>
+                        <p class="text-xs text-red-800 mt-1.5 leading-relaxed">
+                            Past employment records, duration of service, supervisor references, and career history registered during staff onboarding in <strong>Register New Staff</strong> are confidential under BCF-SL HR Policy. Access is restricted to <strong>Super Admin, HR Director, Finance Director, CEO, and Internal Risk &amp; Audits Director</strong>.
+                        </p>
+                        <div class="mt-3 flex items-center gap-2">
+                            <button type="button" onclick="promptElevatedAuth()" class="px-3.5 py-1.5 rounded-lg bg-red-600 hover:bg-red-700 text-white text-xs font-bold transition flex items-center gap-1.5 shadow-xs">
+                                <span class="material-symbols-outlined text-[16px]">key</span>
+                                Authenticate for Elevated Access
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div id="exp-admin-note" class="bg-blue-50 border border-blue-200 rounded-xl p-3.5 mb-4 text-blue-900 text-xs font-semibold hidden items-center gap-2">
+                    <span class="material-symbols-outlined text-[18px] text-blue-600">verified_user</span>
+                    <span>Authorized Access: Viewing work experience records as <strong id="exp-role-label">Super Admin</strong>.</span>
+                </div>
+                <h3 class="font-bold text-secondary mb-4">Work Experience</h3>
+                <div id="v-exp-list" class="flex flex-col gap-4"></div>
+            </div>
+
+            <!-- TAB 6: Skills -->
+            <div id="tab-6" class="tab-panel hidden-step">
+                <div id="skills-staff-lock" class="bg-gradient-to-r from-red-50 to-amber-50 border border-red-200 rounded-xl p-5 mb-5 flex items-start gap-4">
+                    <div class="w-12 h-12 rounded-xl bg-red-100 border border-red-200 flex items-center justify-center shrink-0 text-red-600">
+                        <span class="material-symbols-outlined text-3xl">psychology</span>
+                    </div>
+                    <div>
+                        <div class="flex items-center gap-2">
+                            <h4 class="font-bold text-red-900 text-sm sm:text-base">Restricted Access — Skills &amp; Competencies Profile</h4>
+                            <span class="text-[10px] font-extrabold bg-red-100 text-red-800 px-2 py-0.5 rounded border border-red-200 uppercase">Confidential</span>
+                        </div>
+                        <p class="text-xs text-red-800 mt-1.5 leading-relaxed">
+                            Staff skills assessment, specialized qualifications, and competency profiles registered during staff onboarding in <strong>Register New Staff</strong> are restricted. Access is reserved for <strong>Super Admin, HR Director, Finance Director, CEO, and Internal Risk &amp; Audits Director</strong>.
+                        </p>
+                        <div class="mt-3 flex items-center gap-2">
+                            <button type="button" onclick="promptElevatedAuth()" class="px-3.5 py-1.5 rounded-lg bg-red-600 hover:bg-red-700 text-white text-xs font-bold transition flex items-center gap-1.5 shadow-xs">
+                                <span class="material-symbols-outlined text-[16px]">key</span>
+                                Authenticate for Elevated Access
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div id="skills-admin-note" class="bg-blue-50 border border-blue-200 rounded-xl p-3.5 mb-4 text-blue-900 text-xs font-semibold hidden items-center gap-2">
+                    <span class="material-symbols-outlined text-[18px] text-blue-600">verified_user</span>
+                    <span>Authorized Access: Viewing competencies as <strong id="skills-role-label">Super Admin</strong>.</span>
+                </div>
+                <h3 class="font-bold text-tertiary mb-4">Skills &amp; Competencies</h3>
+                <div id="v-skills" class="flex flex-wrap gap-2"></div>
+            </div>
+
+            <!-- TAB 7: Finance -->
+            <div id="tab-7" class="tab-panel hidden-step">
+                <div id="finance-staff-lock" class="bg-gradient-to-r from-red-50 to-amber-50 border border-red-200 rounded-xl p-5 mb-5 flex items-start gap-4">
+                    <div class="w-12 h-12 rounded-xl bg-red-100 border border-red-200 flex items-center justify-center shrink-0 text-red-600">
+                        <span class="material-symbols-outlined text-3xl">lock</span>
+                    </div>
+                    <div>
+                        <div class="flex items-center gap-2">
+                            <h4 class="font-bold text-red-900 text-sm sm:text-base">Restricted Access — Banking &amp; Financial Information</h4>
+                            <span class="text-[10px] font-extrabold bg-red-100 text-red-800 px-2 py-0.5 rounded border border-red-200 uppercase">Confidential</span>
+                        </div>
+                        <p class="text-xs text-red-800 mt-1.5 leading-relaxed">
+                            Bank Name, Account Numbers, and BBAN numbers registered during staff onboarding in <strong>Register New Staff</strong> are strictly confidential under BCF-SL Financial Governance. Access is restricted to <strong>Super Admin, HR Director, Finance Director, CEO, and Internal Risk &amp; Audits Director</strong>.
+                        </p>
+                        <div class="mt-3 flex items-center gap-2">
+                            <button type="button" onclick="promptElevatedAuth()" class="px-3.5 py-1.5 rounded-lg bg-red-600 hover:bg-red-700 text-white text-xs font-bold transition flex items-center gap-1.5 shadow-xs">
+                                <span class="material-symbols-outlined text-[16px]">key</span>
+                                Authenticate for Elevated Access
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div id="finance-admin-note" class="bg-blue-50 border border-blue-200 rounded-xl p-3.5 mb-4 text-blue-900 text-xs font-semibold hidden items-center gap-2">
+                    <span class="material-symbols-outlined text-[18px] text-blue-600">verified_user</span>
+                    <span>Authorized Access: Viewing banking records as <strong id="finance-role-label">Super Admin</strong>.</span>
+                </div>
+                <h3 class="font-bold text-primary mb-4">Finance &amp; Banking</h3>
+                <div class="info-row"><span class="info-label">Bank Name</span><span class="info-val" id="v-bankname">-</span></div>
+                <div class="info-row"><span class="info-label">Account Name</span><span class="info-val font-semibold" id="v-accname">-</span></div>
+                <div class="info-row"><span class="info-label">Account Number</span><span class="info-val font-mono" id="v-accno">-</span></div>
+                <div class="info-row"><span class="info-label">Account Type</span><span class="info-val" id="v-acctype">-</span></div>
+                <div class="info-row"><span class="info-label">BBAN Number</span><span class="info-val font-mono" id="v-bban">-</span></div>
+            </div>
+
+            <!-- TAB 8: Payroll -->
+            <div id="tab-8" class="tab-panel hidden-step">
+                <div id="payroll-staff-lock" class="bg-gradient-to-r from-red-50 to-amber-50 border border-red-200 rounded-xl p-5 mb-5 flex items-start gap-4">
+                    <div class="w-12 h-12 rounded-xl bg-red-100 border border-red-200 flex items-center justify-center shrink-0 text-red-600">
+                        <span class="material-symbols-outlined text-3xl">payments</span>
+                    </div>
+                    <div>
+                        <div class="flex items-center gap-2">
+                            <h4 class="font-bold text-red-900 text-sm sm:text-base">Restricted Access — Compensation &amp; Payroll Records</h4>
+                            <span class="text-[10px] font-extrabold bg-red-100 text-red-800 px-2 py-0.5 rounded border border-red-200 uppercase">Confidential</span>
+                        </div>
+                        <p class="text-xs text-red-800 mt-1.5 leading-relaxed">
+                            Basic salaries, statutory deductions (NRA PAYE 30%), NASSIT employer &amp; employee contributions, salary advances, and net disbursements registered in <strong>Register New Staff</strong> are confidential. Access is restricted to <strong>Super Admin, HR Director, Finance Director, CEO, and Internal Risk &amp; Audits Director</strong>.
+                        </p>
+                        <div class="mt-3 flex items-center gap-2">
+                            <button type="button" onclick="promptElevatedAuth()" class="px-3.5 py-1.5 rounded-lg bg-red-600 hover:bg-red-700 text-white text-xs font-bold transition flex items-center gap-1.5 shadow-xs">
+                                <span class="material-symbols-outlined text-[16px]">key</span>
+                                Authenticate for Elevated Access
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div id="payroll-admin-note" class="bg-blue-50 border border-blue-200 rounded-xl p-3.5 mb-4 text-blue-900 text-xs font-semibold hidden items-center gap-2">
+                    <span class="material-symbols-outlined text-[18px] text-blue-600">verified_user</span>
+                    <span>Authorized Access: Viewing compensation and statutory deductions as <strong id="payroll-role-label">Super Admin</strong>.</span>
+                </div>
+                <h3 class="font-bold text-secondary mb-4">Salary &amp; Payroll</h3>
+                <div class="overflow-hidden rounded border border-outline">
+                    <table class="w-full text-left text-sm border-collapse bg-surface">
+                        <thead>
+                            <tr class="bg-primary text-white">
+                                <th class="p-2 border-r border-primary-dark">DESCRIPTION</th>
+                                <th class="p-2 border-r border-primary-dark">DETAILS</th>
+                                <th class="p-2 text-right border-r border-primary-dark">AMOUNT</th>
+                                <th class="p-2 text-right">FINAL</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-outline">
+                            <tr class="bg-surface-container font-bold text-primary"><td colspan="4" class="p-2">A. EARNINGS</td></tr>
+                            <tr><td class="p-2">Basic Salary</td><td class="p-2 text-xs text-on-surface-variant">Monthly Basic</td><td class="p-2 text-right" id="pv-basic">-</td><td class="p-2 text-right font-bold" id="pv-basic-f">-</td></tr>
+                            <tr><td class="p-2">% Increase</td><td class="p-2 text-xs" id="pv-inc-p">-</td><td class="p-2 text-right" id="pv-inc">-</td><td class="p-2 text-right"></td></tr>
+                            <tr class="font-bold bg-surface-container"><td class="p-2">Gross Monthly Salary</td><td class="p-2 text-xs text-on-surface-variant">Basic + Increase</td><td class="p-2 text-right" id="pv-gross">-</td><td class="p-2 text-right" id="pv-gross-f">-</td></tr>
+                            <tr class="bg-red-50 font-bold text-error"><td colspan="4" class="p-2">B. STATUTORY DEDUCTIONS</td></tr>
+                            <tr><td class="p-2 text-error">NRA — PAYE (30%)</td><td class="p-2 text-xs">Gross × 30%</td><td class="p-2 text-right text-error" id="pv-nra">-</td><td class="p-2 text-right font-bold text-error" id="pv-after">-</td></tr>
+                            <tr><td class="p-2">NASSIT Employer (10%)</td><td class="p-2 text-xs text-on-surface-variant">10% of Net</td><td class="p-2 text-right" id="pv-naser">-</td><td></td></tr>
+                            <tr><td class="p-2">NASSIT Employee (5%)</td><td class="p-2 text-xs text-on-surface-variant">5% of Net</td><td class="p-2 text-right text-error" id="pv-nasee">-</td><td></td></tr>
+                            <tr class="bg-surface-container font-bold"><td class="p-2">Total NASSIT</td><td class="p-2 text-xs text-on-surface-variant">10% + 5%</td><td class="p-2 text-right" id="pv-nastot">-</td><td class="p-2 text-right" id="pv-nastot-f">-</td></tr>
+                            <tr class="font-bold text-secondary bg-blue-50"><td colspan="4" class="p-2">C. MID-MONTH ADVANCE</td></tr>
+                            <tr><td class="p-2">Advance Applied</td><td class="p-2 text-xs" id="pv-adv-lbl">-</td><td class="p-2 text-right text-error" id="pv-adv">-</td><td class="p-2 text-right font-bold text-error" id="pv-adv-f">-</td></tr>
+                            <tr class="bg-red-50 font-bold text-error"><td colspan="4" class="p-2">D. OTHER DEDUCTIONS</td></tr>
+                            <tr><td class="p-2">Loan Deduction</td><td class="p-2 text-xs text-on-surface-variant">Monthly</td><td class="p-2 text-right text-error" id="pv-loan">-</td><td class="p-2 text-right text-error" id="pv-loan-f">-</td></tr>
+                            <tr class="bg-green-50 font-bold text-primary"><td colspan="4" class="p-2">E. ALLOWANCES</td></tr>
+                            <tr><td class="p-2">Duty Allowance (2%)</td><td class="p-2 text-xs text-on-surface-variant">Gross × 2%</td><td class="p-2 text-right text-primary" id="pv-duty">-</td><td class="p-2 text-right text-primary" id="pv-duty-f">-</td></tr>
+                            <tr class="bg-on-surface text-white"><td class="p-3 font-extrabold text-lg" colspan="2">TOTAL NET PAY</td><td class="p-3 text-right text-lg" id="pv-net-1">-</td><td class="p-3 text-right text-lg font-bold" style="color:#6cf8bb;" id="pv-net">-</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- EDIT MODAL - Full 9-Tab Editor -->
+<div id="editModal" class="hidden fixed inset-0 z-[200] bg-black/60 backdrop-blur-xs flex items-start justify-center p-3 sm:p-4 md:py-6 overflow-y-auto">
+    <div class="bg-surface rounded-2xl w-full max-w-4xl max-h-[88vh] md:max-h-[85vh] flex flex-col shadow-2xl overflow-hidden my-auto sm:my-3 border border-outline">
+        <div class="flex items-center justify-between px-6 py-4 border-b border-outline shrink-0">
+            <h3 class="text-lg font-bold">Edit Employee Profile</h3>
+            <button onclick="closeEditModal()" class="w-8 h-8 rounded-full hover:bg-surface-container flex items-center justify-center">
+                <span class="material-symbols-outlined text-[20px]">close</span>
+            </button>
+        </div>
+        <!-- Edit Tab Nav -->
+        <div class="flex overflow-x-auto border-b border-outline shrink-0 bg-surface-container">
+            <button class="edit-tab-btn active px-4 py-2.5 text-xs font-bold border-b-2 border-primary text-primary whitespace-nowrap" onclick="switchEditTab(0)">Personal</button>
+            <button class="edit-tab-btn px-4 py-2.5 text-xs font-semibold border-b-2 border-transparent text-on-surface-variant whitespace-nowrap" onclick="switchEditTab(1)">Emergency</button>
+            <button class="edit-tab-btn px-4 py-2.5 text-xs font-semibold border-b-2 border-transparent text-on-surface-variant whitespace-nowrap" onclick="switchEditTab(2)">Employment</button>
+            <button class="edit-tab-btn px-4 py-2.5 text-xs font-semibold border-b-2 border-transparent text-on-surface-variant whitespace-nowrap" onclick="switchEditTab(3)">Work Loc.</button>
+            <button class="edit-tab-btn px-4 py-2.5 text-xs font-semibold border-b-2 border-transparent text-on-surface-variant whitespace-nowrap" onclick="switchEditTab(4)">Education</button>
+            <button class="edit-tab-btn px-4 py-2.5 text-xs font-semibold border-b-2 border-transparent text-on-surface-variant whitespace-nowrap" onclick="switchEditTab(5)">Experience</button>
+            <button class="edit-tab-btn px-4 py-2.5 text-xs font-semibold border-b-2 border-transparent text-on-surface-variant whitespace-nowrap" onclick="switchEditTab(6)">Skills</button>
+            <button class="edit-tab-btn px-4 py-2.5 text-xs font-semibold border-b-2 border-transparent text-on-surface-variant whitespace-nowrap" onclick="switchEditTab(7)">Finance</button>
+            <button class="edit-tab-btn px-4 py-2.5 text-xs font-semibold border-b-2 border-transparent text-on-surface-variant whitespace-nowrap" onclick="switchEditTab(8)">Payroll</button>
+        </div>
+        <div class="px-6 py-5 overflow-y-auto flex-1 min-h-[300px] max-h-[calc(85vh-160px)]">
+            
+            <!-- Edit Tab 0: Personal -->
+            <div id="et-0" class="edit-tab-panel">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <label class="flex flex-col gap-1 text-sm font-semibold">Full Name<input type="text" id="edit-name" class="h-9 px-3 mt-0.5 rounded border border-outline focus:border-primary outline-none font-normal"></label>
+                    <label class="flex flex-col gap-1 text-sm font-semibold">Gender<select id="edit-gender" class="h-9 px-3 mt-0.5 rounded border border-outline focus:border-primary outline-none font-normal"><option>Male</option><option>Female</option><option>Other</option><option>Prefer not to say</option></select></label>
+                    <label class="flex flex-col gap-1 text-sm font-semibold">Date of Birth<input type="date" id="edit-dob" class="h-9 px-3 mt-0.5 rounded border border-outline focus:border-primary outline-none font-normal"></label>
+                    <label class="flex flex-col gap-1 text-sm font-semibold">Nationality<input type="text" id="edit-nation" class="h-9 px-3 mt-0.5 rounded border border-outline focus:border-primary outline-none font-normal"></label>
+                    <label class="flex flex-col gap-1 text-sm font-semibold">Phone Number<input type="tel" id="edit-phone" class="h-9 px-3 mt-0.5 rounded border border-outline focus:border-primary outline-none font-normal"></label>
+                    <label class="flex flex-col gap-1 text-sm font-semibold">Email Address<input type="email" id="edit-email" class="h-9 px-3 mt-0.5 rounded border border-outline focus:border-primary outline-none font-normal"></label>
+                    <label class="flex flex-col gap-1 text-sm font-semibold">Marital Status<select id="edit-marital" class="h-9 px-3 mt-0.5 rounded border border-outline focus:border-primary outline-none font-normal"><option>Single</option><option>Married</option><option>Divorced</option><option>Widowed</option><option>Separated</option></select></label>
+                    <label class="flex flex-col gap-1 text-sm font-semibold">No. of Children<input type="text" id="edit-children" class="h-9 px-3 mt-0.5 rounded border border-outline focus:border-primary outline-none font-normal"></label>
+                    <label class="flex flex-col gap-1 text-sm font-semibold">NIN / Passport
+    <input type="text" id="edit-nin" class="h-9 px-3 mt-0.5 rounded border border-outline focus:border-primary outline-none font-normal">
+    <div id="edit-nin-warn" class="hidden text-xs text-error font-semibold flex items-center gap-1 mt-1 bg-red-50 p-1.5 rounded border border-red-200">
+        <span class="material-symbols-outlined text-[16px] text-error shrink-0">warning</span>
+        <span id="edit-nin-warn-text">This has already been entered</span>
+    </div>
+</label>
+                    <label class="flex flex-col gap-1 text-sm font-semibold">NASSIT No.
+    <input type="text" id="edit-nassit" class="h-9 px-3 mt-0.5 rounded border border-outline focus:border-primary outline-none font-normal">
+    <div id="edit-nassit-warn" class="hidden text-xs text-error font-semibold flex items-center gap-1 mt-1 bg-red-50 p-1.5 rounded border border-red-200">
+        <span class="material-symbols-outlined text-[16px] text-error shrink-0">warning</span>
+        <span id="edit-nassit-warn-text">This has already been entered</span>
+    </div>
+</label>
+                    <label class="flex flex-col gap-1 text-sm font-semibold md:col-span-2">Residential Address<textarea id="edit-address" class="h-16 py-2 px-3 mt-0.5 rounded border border-outline focus:border-primary outline-none font-normal"></textarea></label>
+                </div>
+            </div>
+
+            <!-- Edit Tab 1: Emergency -->
+            <div id="et-1" class="edit-tab-panel hidden">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <label class="flex flex-col gap-1 text-sm font-semibold">Emergency Contact Person<input type="text" id="edit-emname" class="h-9 px-3 mt-0.5 rounded border border-outline focus:border-error outline-none font-normal"></label>
+                    <label class="flex flex-col gap-1 text-sm font-semibold">Relationship<select id="edit-emrel" class="h-9 px-3 mt-0.5 rounded border border-outline focus:border-error outline-none font-normal"><option>Spouse</option><option>Parent</option><option>Brother</option><option>Sister</option><option>Child</option><option>Relative</option><option>Friend</option><option>Guardian</option><option>Other</option></select></label>
+                    <label class="flex flex-col gap-1 text-sm font-semibold">Phone Number<input type="tel" id="edit-emphone" class="h-9 px-3 mt-0.5 rounded border border-outline focus:border-error outline-none font-normal"></label>
+                    <label class="flex flex-col gap-1 text-sm font-semibold">Email (Optional)<input type="email" id="edit-ememail" class="h-9 px-3 mt-0.5 rounded border border-outline focus:border-primary outline-none font-normal"></label>
+                    <label class="flex flex-col gap-1 text-sm font-semibold md:col-span-2">Address<textarea id="edit-emaddress" class="h-16 py-2 px-3 mt-0.5 rounded border border-outline focus:border-error outline-none font-normal"></textarea></label>
+                </div>
+            </div>
+
+            <!-- Edit Tab 2: Employment -->
+            <div id="et-2" class="edit-tab-panel hidden">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <label class="flex flex-col gap-1 text-sm font-semibold">Department<select id="edit-dept" class="h-9 px-3 mt-0.5 rounded border border-outline focus:border-secondary outline-none font-normal"><option>Executive Management</option><option>Finance Department</option><option>Health &amp; Safety Department</option><option>Human Resources Management Department</option><option>Information Technology (IT) Department</option><option>Internal Risk &amp; Audits Department</option><option>Legal &amp; Communication Department</option><option>Procurement Department</option><option>Programs Department</option></select></label>
+                    <label class="flex flex-col gap-1 text-sm font-semibold">Position / Title<input type="text" id="edit-title" class="h-9 px-3 mt-0.5 rounded border border-outline focus:border-secondary outline-none font-normal"></label>
+                    <label class="flex flex-col gap-1 text-sm font-semibold">Unit<input type="text" id="edit-unit" class="h-9 px-3 mt-0.5 rounded border border-outline focus:border-secondary outline-none font-normal"></label>
+                    <label class="flex flex-col gap-1 text-sm font-semibold">Management Level<select id="edit-mgmt" class="h-9 px-3 mt-0.5 rounded border border-outline focus:border-secondary outline-none font-normal"><option>Governing Board</option><option>Board of Trustees</option><option>Board of Directors</option><option>Top Management</option><option>Middle Management</option><option>Lower Management</option><option>Employee</option><option>Volunteer</option><option>Intern</option></select></label>
+                    <label class="flex flex-col gap-1 text-sm font-semibold">Classification Type<select id="edit-class" onchange="toggleEditContract()" class="h-9 px-3 mt-0.5 rounded border border-outline focus:border-secondary outline-none font-normal"><option>Permanent</option><option>Fixed-Term Contract</option><option>Part-Time</option><option>Casual</option><option>Consultant</option><option>Volunteer</option><option>Intern</option></select></label>
+                    <label class="flex flex-col gap-1 text-sm font-semibold">Job Level<select id="edit-joblevel" class="h-9 px-3 mt-0.5 rounded border border-outline focus:border-secondary outline-none font-normal"><option>Executive</option><option>Director</option><option>Manager</option><option>Assistant Manager</option><option>Officer</option><option>Assistant</option><option>Support Staff</option></select></label>
+                    <label class="flex flex-col gap-1 text-sm font-semibold">Employment Date<input type="date" id="edit-empdate" class="h-9 px-3 mt-0.5 rounded border border-outline focus:border-secondary outline-none font-normal"></label>
+                    <label class="flex flex-col gap-1 text-sm font-semibold">Current Status<select id="edit-status" class="h-9 px-3 mt-0.5 rounded border border-outline focus:border-secondary outline-none font-normal"><option>Active</option><option>Probation</option><option>Leave</option><option>Suspended</option><option>Resigned</option><option>Terminated</option><option>Retired</option><option>Inactive</option></select></label>
+                    <div id="edit-contract-wrap" class="contents">
+                    <label class="flex flex-col gap-1 text-sm font-semibold">Contract Start Date<input type="date" id="edit-constart" class="h-9 px-3 mt-0.5 rounded border border-outline focus:border-secondary outline-none font-normal"></label>
+                    <label class="flex flex-col gap-1 text-sm font-semibold">Contract End Date<input type="date" id="edit-conend" class="h-9 px-3 mt-0.5 rounded border border-outline focus:border-secondary outline-none font-normal"></label>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Edit Tab 3: Work Location -->
+            <div id="et-3" class="edit-tab-panel hidden">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <label class="flex flex-col gap-1 text-sm font-semibold md:col-span-2">Working Location / Address<input type="text" id="edit-workloc" class="h-9 px-3 mt-0.5 rounded border border-outline focus:border-primary outline-none font-normal"></label>
+                    <label class="flex flex-col gap-1 text-sm font-semibold">Reports To<input type="text" id="edit-reports" class="h-9 px-3 mt-0.5 rounded border border-outline focus:border-primary outline-none font-normal"></label>
+                    <label class="flex flex-col gap-1 text-sm font-semibold">Working Phone<input type="tel" id="edit-workphone" class="h-9 px-3 mt-0.5 rounded border border-outline focus:border-primary outline-none font-normal"></label>
+                    <label class="flex flex-col gap-1 text-sm font-semibold md:col-span-2">Working Email<input type="email" id="edit-workemail" class="h-9 px-3 mt-0.5 rounded border border-outline focus:border-primary outline-none font-normal"></label>
+                    <label class="flex flex-col gap-1 text-sm font-semibold">Probation Start Date<input type="date" id="edit-probstart" onchange="editCalcProbation()" class="h-9 px-3 mt-0.5 rounded border border-outline focus:border-primary outline-none font-normal"></label>
+                    <label class="flex flex-col gap-1 text-sm font-semibold text-on-surface-variant">Probation End Date (Auto)<input type="date" id="edit-probend" class="h-9 px-3 mt-0.5 rounded border border-outline bg-surface-container outline-none font-bold text-primary" readonly></label>
+                </div>
+            </div>
+
+            <!-- Edit Tab 4: Education -->
+            <div id="et-4" class="edit-tab-panel hidden">
+                <div class="flex items-center justify-between mb-4">
+                    <p class="text-sm text-on-surface-variant">Add or edit educational qualifications.</p>
+                    <button type="button" onclick="addEditEdu()" class="bg-primary text-white px-3 py-1.5 rounded text-xs font-bold hover:bg-primary-dark transition">+ Add Qualification</button>
+                </div>
+                <div id="edit-edu-container" class="flex flex-col gap-4"></div>
+            </div>
+
+            <!-- Edit Tab 5: Experience -->
+            <div id="et-5" class="edit-tab-panel hidden">
+                <div class="flex items-center justify-between mb-4">
+                    <p class="text-sm text-on-surface-variant">Add or edit work experience records.</p>
+                    <button type="button" onclick="addEditExp()" class="bg-secondary text-white px-3 py-1.5 rounded text-xs font-bold hover:bg-blue-700 transition">+ Add Experience</button>
+                </div>
+                <div id="edit-exp-container" class="flex flex-col gap-4"></div>
+            </div>
+
+            <!-- Edit Tab 6: Skills -->
+            <div id="et-6" class="edit-tab-panel hidden">
+                <label class="flex flex-col gap-1 text-sm font-semibold">Skills (comma separated)
+                    <textarea id="edit-skills" class="h-32 py-3 px-4 mt-1 rounded border border-outline focus:border-tertiary outline-none font-normal" placeholder="Microsoft Excel, Power BI, Python, Project Management..."></textarea>
+                </label>
+            </div>
+
+            <!-- Edit Tab 7: Finance -->
+            <div id="et-7" class="edit-tab-panel hidden">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <label class="flex flex-col gap-1 text-sm font-semibold">Bank Name<input type="text" id="edit-bankname" class="h-9 px-3 mt-0.5 rounded border border-outline focus:border-primary outline-none font-normal"></label>
+                    <label class="flex flex-col gap-1 text-sm font-semibold">Account Name<input type="text" id="edit-accname" class="h-9 px-3 mt-0.5 rounded border border-outline focus:border-primary outline-none font-normal"></label>
+                    <label class="flex flex-col gap-1 text-sm font-semibold">Account Number
+    <input type="text" id="edit-accno" class="h-9 px-3 mt-0.5 rounded border border-outline focus:border-primary outline-none font-normal">
+    <div id="edit-accno-warn" class="hidden text-xs text-error font-semibold flex items-center gap-1 mt-1 bg-red-50 p-1.5 rounded border border-red-200">
+        <span class="material-symbols-outlined text-[16px] text-error shrink-0">warning</span>
+        <span id="edit-accno-warn-text">This has already been entered</span>
+    </div>
+</label>
+                    <label class="flex flex-col gap-1 text-sm font-semibold">Account Type<select id="edit-acctype" class="h-9 px-3 mt-0.5 rounded border border-outline focus:border-primary outline-none font-normal"><option>Savings</option><option>Fixed</option><option>Current</option></select></label>
+                    <label class="flex flex-col gap-1 text-sm font-semibold">BBAN Number
+    <input type="text" id="edit-bban" class="h-9 px-3 mt-0.5 rounded border border-outline focus:border-primary outline-none font-normal">
+    <div id="edit-bban-warn" class="hidden text-xs text-error font-semibold flex items-center gap-1 mt-1 bg-red-50 p-1.5 rounded border border-red-200">
+        <span class="material-symbols-outlined text-[16px] text-error shrink-0">warning</span>
+        <span id="edit-bban-warn-text">This has already been entered</span>
+    </div>
+</label>
+                </div>
+            </div>
+
+            <!-- Edit Tab 8: Payroll -->
+            <div id="et-8" class="edit-tab-panel hidden">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <label class="flex flex-col gap-1 text-sm font-semibold">Basic Salary (NLe)<input type="number" id="edit-paybasic" oninput="previewPayroll()" class="h-9 px-3 mt-0.5 rounded border border-outline focus:border-secondary outline-none font-normal"></label>
+                    <label class="flex flex-col gap-1 text-sm font-semibold">% Salary Increase<input type="number" id="edit-payinc" oninput="previewPayroll()" class="h-9 px-3 mt-0.5 rounded border border-outline focus:border-secondary outline-none font-normal"></label>
+                    <label class="flex flex-col gap-1 text-sm font-semibold">Mid-Month Advance<select id="edit-payadv" onchange="previewPayroll()" class="h-9 px-3 mt-0.5 rounded border border-outline focus:border-secondary outline-none font-normal"><option value="10">10%</option><option value="5">5%</option><option value="0">None</option></select></label>
+                    <label class="flex flex-col gap-1 text-sm font-semibold">Loan Deduction (Monthly NLe)<input type="number" id="edit-payloan" oninput="previewPayroll()" class="h-9 px-3 mt-0.5 rounded border border-outline focus:border-secondary outline-none font-normal"></label>
+                    <label class="flex flex-col gap-1 text-sm font-semibold md:col-span-2 text-secondary">Live Net Pay: <span id="edit-net-preview" class="text-2xl font-extrabold">0.00</span></label>
+                </div>
+            </div>
+        </div>
+        <div class="px-6 py-4 border-t border-outline flex justify-end gap-3 shrink-0">
+            <button onclick="closeEditModal()" class="px-4 py-2 rounded border border-outline text-sm font-semibold hover:bg-surface-container transition">Cancel</button>
+            <button onclick="saveEdits()" class="px-6 py-2 rounded bg-primary text-white text-sm font-bold hover:bg-primary-dark transition shadow">Save All Changes</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    let registry = [];
+    try {
+        const raw = localStorage.getItem('bcf_staff_registry');
+        if (raw) registry = JSON.parse(raw);
+    } catch (_) { registry = []; }
+    let currentEmployee = null;
+    let currentTab = 0;
+
+    // Asynchronously load staff registry directly from MongoDB Atlas backend
+    async function loadEmployees() {
+        try {
+            // Check parent frame storage if local is empty
+            if ((!registry || registry.length === 0) && typeof window !== 'undefined' && window.parent && window.parent !== window) {
+                try {
+                    const pRaw = window.parent.localStorage.getItem('bcf_staff_registry');
+                    if (pRaw) {
+                        const parsed = JSON.parse(pRaw);
+                        if (Array.isArray(parsed) && parsed.length > 0) {
+                            registry = parsed;
+                            renderList(registry);
+                        }
+                    }
+                } catch (_) {}
+            }
+
+            const res = await fetch('/api/employees');
+            const json = await res.json();
+            let liveList = [];
+            if (json && json.success && Array.isArray(json.data)) {
+                liveList = json.data;
+            } else if (Array.isArray(json)) {
+                liveList = json;
+            }
+
+            if (liveList.length > 0) {
+                const map = new Map();
+                // Retain local records (photo data, etc.)
+                (registry || []).forEach(item => {
+                    const key = (item.employeeId || item.id || '').toUpperCase();
+                    if (key) map.set(key, item);
+                });
+                // Merge live MongoDB Atlas records
+                liveList.forEach(item => {
+                    const key = (item.employeeId || item.id || '').toUpperCase();
+                    if (key) {
+                        const existing = map.get(key) || {};
+                        map.set(key, { ...existing, ...item });
+                    }
+                });
+
+                registry = Array.from(map.values());
+                try {
+                    localStorage.setItem('bcf_staff_registry', JSON.stringify(registry));
+                    if (window.parent && window.parent !== window && window.parent.localStorage) {
+                        window.parent.localStorage.setItem('bcf_staff_registry', JSON.stringify(registry));
+                    }
+                } catch (_) {}
+
+                renderList(registry);
+                updateExportStaffCounts();
+
+                // If a profile is currently open, refresh it with latest DB updates
+                if (currentEmployee) {
+                    const fresh = registry.find(r => r.employeeId === currentEmployee.employeeId || r.id === currentEmployee.employeeId);
+                    if (fresh) {
+                        currentEmployee = fresh;
+                        populateProfile(fresh);
+                    }
+                }
+            }
+        } catch (err) {
+            console.warn('Backend load notice (using cache):', err);
+        }
+    }
+
+    // ─── UNIQUE FIELD VALIDATION & DUPLICATE WARNINGS ───────────────────
+    const UNIQUE_EDIT_FIELDS = [
+        { id: 'edit-nin', key: 'nin', label: 'NIN / Passport', warnId: 'edit-nin-warn', textId: 'edit-nin-warn-text', tabIdx: 0 },
+        { id: 'edit-nassit', key: 'nassit', label: 'NASSIT No.', warnId: 'edit-nassit-warn', textId: 'edit-nassit-warn-text', tabIdx: 0 },
+        { id: 'edit-accno', key: 'accNo', label: 'Account Number', warnId: 'edit-accno-warn', textId: 'edit-accno-warn-text', tabIdx: 7 },
+        { id: 'edit-bban', key: 'bban', label: 'BBAN Number', warnId: 'edit-bban-warn', textId: 'edit-bban-warn-text', tabIdx: 7 }
+    ];
+
+    function getEmpFieldValue(emp, key) {
+        if (!emp) return '';
+        if (key === 'nin') return emp.nin || emp.passport || emp.ninPassport || '';
+        if (key === 'nassit') return emp.nassit || emp.nassitNo || '';
+        if (key === 'accNo') return emp.accNo || emp.accountNumber || emp.bankAcc || '';
+        if (key === 'bban') return emp.bban || emp.bbanNo || emp.bbanNumber || '';
+        return emp[key] || '';
+    }
+
+    function checkEditFieldDuplicate(fieldConfig) {
+        const el = document.getElementById(fieldConfig.id);
+        if (!el) return null;
+        const val = (el.value || '').trim();
+        if (!val) {
+            clearEditFieldWarning(fieldConfig);
+            return null;
+        }
+
+        const currId = currentEmployee ? currentEmployee.employeeId : null;
+        const reg = JSON.parse(localStorage.getItem('bcf_staff_registry') || '[]');
+        const match = reg.find(e => {
+            if (currId && e.employeeId === currId) return false;
+            const existVal = (getEmpFieldValue(e, fieldConfig.key) || '').trim();
+            return existVal.length > 0 && existVal.toLowerCase() === val.toLowerCase();
+        });
+
+        if (match) {
+            setEditFieldWarning(fieldConfig, match, val);
+            return { field: fieldConfig.label, value: val, match: match, config: fieldConfig };
+        } else {
+            clearEditFieldWarning(fieldConfig);
+            return null;
+        }
+    }
+
+    function setEditFieldWarning(fieldConfig, match, val) {
+        const el = document.getElementById(fieldConfig.id);
+        const warn = document.getElementById(fieldConfig.warnId);
+        const warnText = document.getElementById(fieldConfig.textId);
+        if (el) {
+            el.classList.add('border-error', 'bg-red-50/20', 'ring-1', 'ring-error');
+        }
+        if (warn && warnText) {
+            warn.classList.remove('hidden');
+            warnText.innerHTML = `⚠️ <strong>This has already been entered!</strong> (${fieldConfig.label} &quot;${val}&quot; belongs to <em>${match.fullName || 'Employee'}</em> [${match.employeeId || 'ID'}])`;
+        }
+    }
+
+    function clearEditFieldWarning(fieldConfig) {
+        const el = document.getElementById(fieldConfig.id);
+        const warn = document.getElementById(fieldConfig.warnId);
+        if (el) {
+            el.classList.remove('border-error', 'bg-red-50/20', 'ring-1', 'ring-error');
+        }
+        if (warn) {
+            warn.classList.add('hidden');
+        }
+    }
+
+    function checkAllEditDuplicates() {
+        const duplicates = [];
+        UNIQUE_EDIT_FIELDS.forEach(f => {
+            const dup = checkEditFieldDuplicate(f);
+            if (dup) duplicates.push(dup);
+        });
+        return duplicates;
+    }
+
+    function showDuplicateAlertModal(duplicates) {
+        const list = document.getElementById('dup-modal-list');
+        if (!list) {
+            const msg = duplicates.map(d => `• ${d.field}: "${d.value}"\n  This has already been entered for: ${d.match.fullName || 'Employee'} (${d.match.employeeId || 'ID'})`).join('\n\n');
+            alert("⚠️ Duplicate Entry Warning!\n\nThis has already been entered:\n" + msg + "\n\nPlease enter unique information for each employee.");
+            return;
+        }
+        list.innerHTML = duplicates.map(d => `
+            <div class="p-3 bg-white rounded-lg border border-red-200 shadow-xs">
+                <div class="flex items-center justify-between text-xs font-bold text-red-700 uppercase tracking-wide mb-1">
+                    <span>${d.field}</span>
+                    <span class="bg-red-100 text-red-800 px-2 py-0.5 rounded font-mono">${d.value}</span>
+                </div>
+                <div class="text-xs text-slate-700 font-medium">
+                    ⚠️ <strong>This has already been entered</strong> for:
+                </div>
+                <div class="text-xs text-slate-900 font-bold mt-0.5 flex items-center gap-1.5">
+                    <span class="material-symbols-outlined text-[15px] text-slate-400">person</span>
+                    <span>${d.match.fullName || 'Registered Employee'}</span>
+                    <span class="text-slate-500 font-mono text-[11px]">(${d.match.employeeId || '-'})</span>
+                </div>
+            </div>
+        `).join('');
+        document.getElementById('dup-warning-modal').classList.remove('hidden');
+    }
+
+    function closeDupModal() {
+        document.getElementById('dup-warning-modal').classList.add('hidden');
+        for (const f of UNIQUE_EDIT_FIELDS) {
+            const dup = checkEditFieldDuplicate(f);
+            if (dup) {
+                switchEditTab(f.tabIdx);
+                setTimeout(() => {
+                    const el = document.getElementById(f.id);
+                    if (el) el.focus();
+                }, 100);
+                break;
+            }
+        }
+    }
+
+    // Attach live validation on load
+    document.addEventListener('DOMContentLoaded', () => {
+        UNIQUE_EDIT_FIELDS.forEach(f => {
+            const el = document.getElementById(f.id);
+            if (el) {
+                el.addEventListener('input', () => checkEditFieldDuplicate(f));
+                el.addEventListener('blur', () => checkEditFieldDuplicate(f));
+            }
+        });
+    });
+
+
+    // SELECTOR VIEW
+    function filterEmployees() {
+        const q = (document.getElementById('sel-search').value||'').toLowerCase();
+        const dept = document.getElementById('sel-dept').value;
+        const cls = document.getElementById('sel-class').value;
+        const status = document.getElementById('sel-status').value;
+
+        const filtered = registry.filter(e => {
+            const matchQ = !q || (e.fullName||'').toLowerCase().includes(q) || (e.employeeId||'').toLowerCase().includes(q) || (e.title||'').toLowerCase().includes(q) || (e.department||'').toLowerCase().includes(q);
+            return matchQ && (!dept||e.department===dept) && (!cls||e.classification===cls) && (!status||e.status===status);
+        });
+        renderList(filtered);
+    }
+
+    function clearFilters() {
+        ['sel-search','sel-dept','sel-class','sel-status'].forEach(id => { document.getElementById(id).value=''; });
+        renderList(registry);
+    }
+
+    const statusColors = {'Active':'bg-green-100 text-green-800','Probation':'bg-yellow-100 text-yellow-800','Leave':'bg-blue-100 text-blue-800','Suspended':'bg-red-100 text-red-800','Resigned':'bg-gray-100 text-gray-700','Terminated':'bg-red-200 text-red-900','Retired':'bg-purple-100 text-purple-800'};
+
+    function renderList(data) {
+        const list = document.getElementById('emp-list');
+        const empty = document.getElementById('emp-empty');
+        if(!data.length) { list.innerHTML=''; empty.classList.remove('hidden'); return; }
+        empty.classList.add('hidden');
+        // Store reference so openProfileByIndex can look up full employee (including large base64 photo)
+        window._profileListData = data;
+        list.innerHTML = data.map((e, i) => {
+            const initials = (e.fullName||'?').split(' ').map(w=>w[0]).join('').substring(0,2).toUpperCase();
+            const photoSrc = e.photo || e.passportPhoto || '';
+            const avatarHtml = photoSrc
+                ? `<img src="${photoSrc}" class="w-12 h-14 rounded-lg object-cover border-2 border-primary/30 shrink-0 shadow-sm bg-white" alt="Photo"/>`
+                : `<div class="w-12 h-14 rounded-lg bg-primary/10 text-primary flex items-center justify-center font-extrabold text-lg shrink-0 border-2 border-primary/20">${initials}</div>`;
+            const dept = (e.department||'-').replace(' Department','');
+            const statusColor = {'Active':'bg-green-100 text-green-800','Probation':'bg-yellow-100 text-yellow-800','Leave':'bg-blue-100 text-blue-800','Suspended':'bg-red-100 text-red-800','Resigned':'bg-gray-100 text-gray-700','Terminated':'bg-red-200 text-red-900','Retired':'bg-purple-100 text-purple-800'}[e.status||'Active'] || 'bg-gray-100 text-gray-700';
+            return `
+                <button onclick="openProfileByIndex(${i})" class="bg-surface border border-gray-200 rounded-xl px-4 py-3.5 flex items-center gap-4 w-full text-left hover:border-primary hover:bg-primary/5 hover:shadow-md transition group">
+                    ${avatarHtml}
+                    <div class="flex-1 min-w-0">
+                        <div class="font-bold text-on-surface text-[12pt] group-hover:text-primary transition truncate">${e.fullName||'[Employee Name]'}</div>
+                        <div class="text-xs text-on-surface-variant mt-0.5 truncate">${e.title||''} ${e.title && dept ? '·' : ''} ${dept}</div>
+                        <div class="flex items-center gap-2 mt-1">
+                            <span class="text-[10px] font-mono text-slate-500">${e.employeeId||''}</span>
+                            <span class="text-[10px] font-bold px-1.5 py-0.5 rounded-full ${statusColor}">${e.status||'Active'}</span>
+                        </div>
+                    </div>
+                    <span class="text-on-surface-variant group-hover:text-primary text-xl transition shrink-0">→</span>
+                </button>
+            `;
+        }).join('');
+    }
+
+    function openProfileByIndex(i) {
+        const data = window._profileListData || registry;
+        const emp = data[i];
+        if (!emp) return;
+        openProfile(emp);
+    }
+
+    function openProfile(emp) {
+        // Always re-fetch the full record from registry to ensure the photo is intact
+        const reg = JSON.parse(localStorage.getItem('bcf_staff_registry') || '[]');
+        const fullEmp = reg.find(r => r.employeeId === emp.employeeId) || emp;
+        currentEmployee = fullEmp;
+        localStorage.setItem('bcf_selected_profile', JSON.stringify(fullEmp));
+        document.getElementById('selector-view').classList.add('hidden');
+        document.getElementById('profile-view').classList.remove('hidden');
+        document.getElementById('profile-view').classList.add('flex');
+        populateProfile(fullEmp);
+        showTab(0);
+    }
+
+    function backToSelector() {
+        document.getElementById('profile-view').classList.add('hidden');
+        document.getElementById('profile-view').classList.remove('flex');
+        document.getElementById('selector-view').classList.remove('hidden');
+        renderList(registry);
+    }
+
+    function showTab(idx) {
+        const panels = document.querySelectorAll('.tab-panel');
+        const btns = document.querySelectorAll('.tab-btn');
+        panels.forEach((p,i) => p.classList.toggle('hidden-step', i!==idx));
+        btns.forEach((b,i) => { b.classList.toggle('active', i===idx); if(i!==idx) b.classList.add('text-on-surface-variant'); else b.classList.remove('text-on-surface-variant'); });
+        currentTab = idx;
+    }
+
+    function fmt(n) { return Number(n||0).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2}); }
+
+    function populateProfile(emp) {
+        // Header
+        const photoEl = document.getElementById('prof-photo');
+        const initialsEl = document.getElementById('prof-initials');
+        const staffPhoto = emp.photo || emp.passportPhoto;
+        if (staffPhoto) {
+            photoEl.src = staffPhoto;
+            photoEl.style.display = 'block';
+            if (initialsEl) initialsEl.style.display = 'none';
+        } else {
+            photoEl.src = '';
+            photoEl.style.display = 'none';
+            if (initialsEl) initialsEl.style.display = 'block';
+        }
+        const initials = (emp.fullName||'?').split(' ').map(w=>w[0]).join('').substring(0,2).toUpperCase();
+        if (initialsEl) initialsEl.textContent = initials;
+        document.getElementById('prof-name').textContent = emp.fullName||'-';
+        document.getElementById('prof-title').textContent = emp.title||'-';
+        document.getElementById('prof-id').textContent = emp.employeeId||'-';
+        document.getElementById('prof-dept').textContent = (emp.department||'-').replace(' Department','');
+        document.getElementById('prof-class').textContent = emp.classification||'-';
+        document.getElementById('prof-status-badge').textContent = emp.status||'-';
+
+        const isStaff = !(ROLES[activeRole] || ROLES['staff']).canViewConfidential;
+
+        // Personal
+        document.getElementById('v-name').textContent = emp.fullName||'-';
+        document.getElementById('v-empid').textContent = emp.employeeId||'-';
+        document.getElementById('v-gender').textContent = emp.gender||'-';
+        document.getElementById('v-nation').textContent = emp.nationality||emp.nation||'-';
+        document.getElementById('v-phone').textContent = emp.phone||'-';
+        document.getElementById('v-email').textContent = emp.email||'-';
+        document.getElementById('v-marital').textContent = emp.marital||'-';
+        
+        if (isStaff) {
+            document.getElementById('v-dob').innerHTML = '<span class="font-mono text-slate-400 font-bold tracking-wider">••••••••••••</span> <span class="text-[10px] bg-red-100 text-red-800 font-extrabold px-2 py-0.5 rounded-md border border-red-200 ml-2">🔒 Restricted for Staff</span>';
+            document.getElementById('v-children').innerHTML = '<span class="font-mono text-slate-400 font-bold tracking-wider">••••</span> <span class="text-[10px] bg-red-100 text-red-800 font-extrabold px-2 py-0.5 rounded-md border border-red-200 ml-2">🔒 Restricted for Staff</span>';
+            document.getElementById('v-nin').innerHTML = '<span class="font-mono text-slate-400 font-bold tracking-wider">••••••••••••</span> <span class="text-[10px] bg-red-100 text-red-800 font-extrabold px-2 py-0.5 rounded-md border border-red-200 ml-2">🔒 Restricted for Staff</span>';
+            document.getElementById('v-nassit').innerHTML = '<span class="font-mono text-slate-400 font-bold tracking-wider">••••••••••••</span> <span class="text-[10px] bg-red-100 text-red-800 font-extrabold px-2 py-0.5 rounded-md border border-red-200 ml-2">🔒 Restricted for Staff</span>';
+            document.getElementById('v-address').innerHTML = '<span class="font-mono text-slate-400 font-bold tracking-wider">••••••••••••••••••••</span> <span class="text-[10px] bg-slate-100 text-slate-700 font-bold px-2 py-0.5 rounded border border-slate-200 ml-2">🔒 Private Record</span>';
+        } else {
+            document.getElementById('v-dob').textContent = emp.dob||'-';
+            document.getElementById('v-children').textContent = emp.children||'-';
+            document.getElementById('v-nin').textContent = emp.nin||'-';
+            document.getElementById('v-nassit').textContent = emp.nassit||'-';
+            document.getElementById('v-address').textContent = emp.address||'-';
+        }
+
+        // Emergency
+        const emLock = document.getElementById('emergency-staff-lock');
+        if(emLock) emLock.style.display = isStaff ? 'flex' : 'none';
+
+        if (isStaff) {
+            document.getElementById('v-emname').innerHTML = '<span class="font-mono text-slate-400 font-bold">••••••••••••</span> <span class="text-[10px] bg-red-100 text-red-800 font-bold px-2 py-0.5 rounded ml-2">🔒 Restricted</span>';
+            document.getElementById('v-emrel').innerHTML = '<span class="font-mono text-slate-400 font-bold">••••••••</span>';
+            document.getElementById('v-emphone').innerHTML = '<span class="font-mono text-slate-400 font-bold">••••••••••••</span> <span class="text-[10px] bg-red-100 text-red-800 font-bold px-2 py-0.5 rounded ml-2">🔒 Restricted</span>';
+            document.getElementById('v-ememail').innerHTML = '<span class="font-mono text-slate-400 font-bold">••••••••••••</span>';
+            document.getElementById('v-emaddress').innerHTML = '<span class="font-mono text-slate-400 font-bold">••••••••••••••••••••</span> <span class="text-[10px] bg-red-100 text-red-800 font-bold px-2 py-0.5 rounded ml-2">🔒 Restricted</span>';
+        } else {
+            document.getElementById('v-emname').textContent = emp.emName||'-';
+            document.getElementById('v-emrel').textContent = emp.emRel||'-';
+            document.getElementById('v-emphone').textContent = emp.emPhone||'-';
+            document.getElementById('v-ememail').textContent = emp.emEmail||'-';
+            document.getElementById('v-emaddress').textContent = emp.emAddress||'-';
+        }
+
+        // Employment
+        document.getElementById('v-dept').textContent = emp.department||'-';
+        document.getElementById('v-title').textContent = emp.title||'-';
+        document.getElementById('v-unit').textContent = emp.unit||'-';
+        document.getElementById('v-mgmt').textContent = emp.mgmtLevel||'-';
+        document.getElementById('v-class').textContent = emp.classification||'-';
+        document.getElementById('v-joblevel').textContent = emp.jobLevel||'-';
+        document.getElementById('v-empdate').textContent = emp.empDate||'-';
+        document.getElementById('v-contract').textContent = emp.conStart && emp.conEnd ? `${emp.conStart} to ${emp.conEnd}` : 'N/A';
+        document.getElementById('v-status').textContent = emp.status||'-';
+
+        // Work Loc
+        document.getElementById('v-workloc').textContent = emp.workLoc||'-';
+        document.getElementById('v-reports').textContent = emp.reportsTo||'-';
+        document.getElementById('v-workphone').textContent = emp.workPhone||'-';
+        document.getElementById('v-workemail').textContent = emp.workEmail||'-';
+        document.getElementById('v-probstart').textContent = emp.probStart||'-';
+        document.getElementById('v-probend').textContent = emp.probEnd ? emp.probEnd + ' (3 Months)' : '-';
+
+        // Education
+        const eduLock = document.getElementById('edu-staff-lock');
+        const eduNote = document.getElementById('edu-admin-note');
+        const eduRoleLbl = document.getElementById('edu-role-label');
+        if(eduLock) eduLock.style.display = isStaff ? 'flex' : 'none';
+        if(eduNote) eduNote.style.display = isStaff ? 'none' : 'flex';
+        if(eduRoleLbl) eduRoleLbl.textContent = (ROLES[activeRole]||{}).name || 'Authorized Role';
+
+        const eduList = document.getElementById('v-edu-list');
+        const edus = Array.isArray(emp.education) ? emp.education : [];
+        if (isStaff) {
+            eduList.innerHTML = `
+                <div class="border border-red-200 rounded-xl p-5 bg-red-50/50 flex flex-col gap-2">
+                    <div class="flex items-center justify-between">
+                        <span class="font-bold text-red-900 text-sm flex items-center gap-1.5"><span class="material-symbols-outlined text-[18px]">lock</span> Academic Qualifications Protected</span>
+                        <span class="text-[10px] bg-red-100 text-red-800 font-extrabold px-2 py-0.5 rounded border border-red-200">Restricted</span>
+                    </div>
+                    <p class="text-xs text-slate-600">Educational qualifications, institution certificates, and degree records are confidential under BCF-SL Staff Privacy Policy.</p>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 mt-2 text-xs font-mono text-slate-400">
+                        <div>Institution: <span class="tracking-widest">••••••••••••••••••••</span></div>
+                        <div>Programme: <span class="tracking-widest">••••••••••••••••</span></div>
+                        <div>Grade: <span class="tracking-widest">••••••••</span></div>
+                        <div>Period: <span class="tracking-widest">•••• – ••••</span></div>
+                    </div>
+                </div>
+            `;
+        } else if(edus.length === 0) {
+            eduList.innerHTML = '<p class="text-on-surface-variant italic">No education records.</p>';
+        } else {
+            eduList.innerHTML = edus.map((e,i) => `
+                <div class="border border-outline rounded p-4 bg-surface-container">
+                    <div class="font-bold text-primary mb-2">Qualification ${i+1}: ${e.qual||'-'}</div>
+                    <div class="grid grid-cols-2 gap-1 text-sm">
+                        <span class="text-on-surface-variant">Institution Type:</span><span>${e.type||'-'}</span>
+                        <span class="text-on-surface-variant">Institution:</span><span>${e.inst||'-'}</span>
+                        <span class="text-on-surface-variant">Programme:</span><span>${e.prog||'-'}</span>
+                        <span class="text-on-surface-variant">Grade:</span><span>${e.grade||'-'}</span>
+                        <span class="text-on-surface-variant">Period:</span><span>${e.sy||'-'} – ${e.ey||'-'}</span>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Experience
+        const expLock = document.getElementById('exp-staff-lock');
+        const expNote = document.getElementById('exp-admin-note');
+        const expRoleLbl = document.getElementById('exp-role-label');
+        if(expLock) expLock.style.display = isStaff ? 'flex' : 'none';
+        if(expNote) expNote.style.display = isStaff ? 'none' : 'flex';
+        if(expRoleLbl) expRoleLbl.textContent = (ROLES[activeRole]||{}).name || 'Authorized Role';
+
+        const expList = document.getElementById('v-exp-list');
+        const exps = Array.isArray(emp.experience) ? emp.experience : [];
+        if (isStaff) {
+            expList.innerHTML = `
+                <div class="border border-red-200 rounded-xl p-5 bg-red-50/50 flex flex-col gap-2">
+                    <div class="flex items-center justify-between">
+                        <span class="font-bold text-red-900 text-sm flex items-center gap-1.5"><span class="material-symbols-outlined text-[18px]">lock</span> Work Experience Records Protected</span>
+                        <span class="text-[10px] bg-red-100 text-red-800 font-extrabold px-2 py-0.5 rounded border border-red-200">Restricted</span>
+                    </div>
+                    <p class="text-xs text-slate-600">Previous employment history, duration of service, and supervisor references are confidential under BCF-SL Staff Privacy Policy.</p>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 mt-2 text-xs font-mono text-slate-400">
+                        <div>Past Employer: <span class="tracking-widest">••••••••••••••••••••</span></div>
+                        <div>Position / Role: <span class="tracking-widest">••••••••••••••••</span></div>
+                        <div>Duration: <span class="tracking-widest">••••••••</span></div>
+                        <div>Supervisor: <span class="tracking-widest">••••••••••••••••</span></div>
+                    </div>
+                </div>
+            `;
+        } else if(exps.length === 0) {
+            expList.innerHTML = '<p class="text-on-surface-variant italic">No experience records.</p>';
+        } else {
+            expList.innerHTML = exps.map((e,i) => `
+                <div class="border border-outline rounded p-4 bg-surface-container">
+                    <div class="font-bold text-secondary mb-2">${e.role||'Position'} @ ${e.inst||'-'}</div>
+                    <div class="grid grid-cols-2 gap-1 text-sm">
+                        <span class="text-on-surface-variant">Period:</span><span>${e.sd||'-'} → ${e.curr ? 'Present' : (e.ed||'-')}</span>
+                        <span class="text-on-surface-variant">Duration:</span><span class="font-semibold text-secondary">${e.dur||'-'}</span>
+                        ${e.supName ? `<span class="text-on-surface-variant">Supervisor:</span><span>${e.supName}</span>` : ''}
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Skills
+        const skillsLock = document.getElementById('skills-staff-lock');
+        const skillsNote = document.getElementById('skills-admin-note');
+        const skillsRoleLbl = document.getElementById('skills-role-label');
+        if(skillsLock) skillsLock.style.display = isStaff ? 'flex' : 'none';
+        if(skillsNote) skillsNote.style.display = isStaff ? 'none' : 'flex';
+        if(skillsRoleLbl) skillsRoleLbl.textContent = (ROLES[activeRole]||{}).name || 'Authorized Role';
+
+        const skillsEl = document.getElementById('v-skills');
+        const skills = Array.isArray(emp.skills) ? emp.skills : (typeof emp.skills === 'string' ? emp.skills.split(',').map(s=>s.trim()).filter(s=>s) : []);
+        if (isStaff) {
+            skillsEl.innerHTML = `
+                <div class="w-full border border-red-200 rounded-xl p-5 bg-red-50/50 flex flex-col gap-2">
+                    <div class="flex items-center justify-between">
+                        <span class="font-bold text-red-900 text-sm flex items-center gap-1.5"><span class="material-symbols-outlined text-[18px]">lock</span> Technical Competencies Protected</span>
+                        <span class="text-[10px] bg-red-100 text-red-800 font-extrabold px-2 py-0.5 rounded border border-red-200">Restricted</span>
+                    </div>
+                    <p class="text-xs text-slate-600">Staff competency ratings and specialized skills evaluations are restricted to authorized personnel.</p>
+                    <div class="flex flex-wrap gap-2 mt-2">
+                        <span class="px-3 py-1 rounded-full bg-slate-100 text-slate-400 font-mono text-xs border border-slate-200">•••••••• [Restricted]</span>
+                        <span class="px-3 py-1 rounded-full bg-slate-100 text-slate-400 font-mono text-xs border border-slate-200">•••••••• [Restricted]</span>
+                        <span class="px-3 py-1 rounded-full bg-slate-100 text-slate-400 font-mono text-xs border border-slate-200">•••••••• [Restricted]</span>
+                    </div>
+                </div>
+            `;
+        } else if(skills.length === 0) {
+            skillsEl.innerHTML = '<p class="text-on-surface-variant italic">No skills listed.</p>';
+        } else {
+            skillsEl.innerHTML = skills.map(s => `<span class="px-3 py-1 rounded-full bg-tertiary/10 text-tertiary font-semibold text-sm border border-tertiary/20">${s}</span>`).join('');
+        }
+
+        // Finance
+        const finLock = document.getElementById('finance-staff-lock');
+        const finNote = document.getElementById('finance-admin-note');
+        const finRoleLbl = document.getElementById('finance-role-label');
+        if(finLock) finLock.style.display = isStaff ? 'flex' : 'none';
+        if(finNote) finNote.style.display = isStaff ? 'none' : 'flex';
+        if(finRoleLbl) finRoleLbl.textContent = (ROLES[activeRole]||{}).name || 'Authorized Role';
+
+        if(isStaff) {
+            document.getElementById('v-bankname').innerHTML = '<span class="font-mono text-slate-400 font-bold">••••••••••••</span> <span class="text-[10px] bg-red-100 text-red-800 font-bold px-2 py-0.5 rounded ml-2">🔒 Restricted</span>';
+            const accNameEl = document.getElementById('v-accname');
+            if (accNameEl) accNameEl.innerHTML = '<span class="font-mono text-slate-400 font-bold">••••••••••••</span> <span class="text-[10px] bg-red-100 text-red-800 font-bold px-2 py-0.5 rounded ml-2">🔒 Restricted</span>';
+            document.getElementById('v-accno').innerHTML = '<span class="font-mono text-slate-400 font-bold">••••••••••••••••</span> <span class="text-[10px] bg-red-100 text-red-800 font-bold px-2 py-0.5 rounded ml-2">🔒 Restricted</span>';
+            document.getElementById('v-acctype').innerHTML = '<span class="font-mono text-slate-400 font-bold">••••••••</span> <span class="text-[10px] bg-red-100 text-red-800 font-bold px-2 py-0.5 rounded ml-2">🔒 Restricted</span>';
+            document.getElementById('v-bban').innerHTML = '<span class="font-mono text-slate-400 font-bold">••••••••••••••••••••••••</span> <span class="text-[10px] bg-red-100 text-red-800 font-bold px-2 py-0.5 rounded ml-2">🔒 Restricted</span>';
+        } else {
+            document.getElementById('v-bankname').textContent = emp.bankName||'-';
+            const accNameEl = document.getElementById('v-accname');
+            if (accNameEl) accNameEl.textContent = emp.accountName||emp.accName||emp.fullName||'-';
+            document.getElementById('v-accno').textContent = emp.accNo||'-';
+            document.getElementById('v-acctype').textContent = emp.accType||'-';
+            document.getElementById('v-bban').textContent = emp.bban||'-';
+        }
+
+        // Payroll
+        populatePayroll(emp);
+    }
+
+    function populatePayroll(emp) {
+        const isStaff = !(ROLES[activeRole] || ROLES['staff']).canViewConfidential;
+
+        const payLock = document.getElementById('payroll-staff-lock');
+        const payNote = document.getElementById('payroll-admin-note');
+        const payRoleLbl = document.getElementById('payroll-role-label');
+        if(payLock) payLock.style.display = isStaff ? 'flex' : 'none';
+        if(payNote) payNote.style.display = isStaff ? 'none' : 'flex';
+        if(payRoleLbl) payRoleLbl.textContent = (ROLES[activeRole]||{}).name || 'Authorized Role';
+
+        if (isStaff) {
+            const maskedPill = '<span class="font-mono text-slate-400 font-bold tracking-widest">••••••••</span>';
+            ['pv-basic', 'pv-basic-f', 'pv-inc', 'pv-gross', 'pv-gross-f', 'pv-nra', 'pv-after', 'pv-naser', 'pv-nasee', 'pv-nastot', 'pv-nastot-f', 'pv-adv', 'pv-adv-f', 'pv-loan', 'pv-loan-f', 'pv-duty', 'pv-duty-f', 'pv-net-1', 'pv-net'].forEach(id => {
+                const el = document.getElementById(id);
+                if(el) el.innerHTML = maskedPill;
+            });
+            const incP = document.getElementById('pv-inc-p');
+            if(incP) incP.innerHTML = '<span class="font-mono text-slate-400 font-bold">•%</span>';
+            const advLbl = document.getElementById('pv-adv-lbl');
+            if(advLbl) advLbl.textContent = 'Advance (Restricted)';
+            return;
+        }
+
+        const basic = Number(emp.payBasic)||0;
+        const incPct = Number(emp.payInc)||0;
+        const advPct = Number(emp.payAdvType)||0;
+        const loan = Number(emp.payLoan)||0;
+
+        const incAmt = basic*(incPct/100);
+        const gross = basic+incAmt;
+        const paye = gross*0.30;
+        const afterTax = gross-paye;
+        const nassitEr = afterTax*0.10;
+        const nassitEe = afterTax*0.05;
+        const totNas = nassitEr+nassitEe;
+        const advAmt = afterTax*(advPct/100);
+        const duty = gross*0.02;
+        const net = afterTax - nassitEe - advAmt - loan + duty;
+
+        document.getElementById('pv-basic').textContent = fmt(basic);
+        document.getElementById('pv-basic-f').textContent = fmt(basic);
+        document.getElementById('pv-inc-p').textContent = incPct + '%';
+        document.getElementById('pv-inc').textContent = fmt(incAmt);
+        document.getElementById('pv-gross').textContent = fmt(gross);
+        document.getElementById('pv-gross-f').textContent = fmt(gross);
+        document.getElementById('pv-nra').textContent = fmt(paye);
+        document.getElementById('pv-after').textContent = fmt(afterTax);
+        document.getElementById('pv-naser').textContent = fmt(nassitEr);
+        document.getElementById('pv-nasee').textContent = fmt(nassitEe);
+        document.getElementById('pv-nastot').textContent = fmt(totNas);
+        document.getElementById('pv-nastot-f').textContent = fmt(totNas);
+        document.getElementById('pv-adv-lbl').textContent = advPct + '% Advance';
+        document.getElementById('pv-adv').textContent = fmt(advAmt);
+        document.getElementById('pv-adv-f').textContent = fmt(advAmt);
+        document.getElementById('pv-loan').textContent = fmt(loan);
+        document.getElementById('pv-loan-f').textContent = fmt(loan);
+        document.getElementById('pv-duty').textContent = fmt(duty);
+        document.getElementById('pv-duty-f').textContent = fmt(duty);
+        document.getElementById('pv-net-1').textContent = fmt(net);
+        document.getElementById('pv-net').textContent = fmt(net);
+    }
+
+    // ── EDIT MODAL ──────────────────────────────────────────────────────────
+    let editEduCount = 0;
+    let editExpCount = 0;
+
+    function switchEditTab(idx) {
+        document.querySelectorAll('.edit-tab-panel').forEach((p,i) => p.classList.toggle('hidden', i!==idx));
+        document.querySelectorAll('.edit-tab-btn').forEach((b,i) => {
+            if(i===idx) { b.classList.add('active','border-primary','text-primary'); b.classList.remove('border-transparent','text-on-surface-variant'); }
+            else { b.classList.remove('active','border-primary','text-primary'); b.classList.add('border-transparent','text-on-surface-variant'); }
+        });
+    }
+
+    function editCalcProbation() {
+        const start = document.getElementById('edit-probstart').value;
+        if(!start) { document.getElementById('edit-probend').value = ''; return; }
+        const d = new Date(start); d.setMonth(d.getMonth()+3);
+        document.getElementById('edit-probend').value = d.toISOString().split('T')[0];
+    }
+
+    function toggleEditContract() {
+        const cls = document.getElementById('edit-class').value;
+        const wrap = document.getElementById('edit-contract-wrap');
+        if(cls === 'Permanent' || cls === 'Volunteer') {
+            wrap.style.display = 'none';
+            document.getElementById('edit-constart').value = '';
+            document.getElementById('edit-conend').value = '';
+        } else {
+            wrap.style.display = 'contents';
+        }
+    }
+
+    function addEditEdu(eduData) {
+        editEduCount++;
+        const id = editEduCount;
+        const d = eduData || {};
+        const unis = ["Njala University","Fourah Bay College (FBC)","COMAHS","IPAM","Milton Margai Technical University (MMTU)","Eastern Technical University (ETU)","EBKUST","University of Makeni (UNIMAK)","UNIMTECH","UMU/UMUSL","Limkokwing University","University of Lunsar (UoL)","Freetown Polytechnic"];
+        const uniOpts = unis.map(u=>`<option value="${u}" ${d.inst===u?'selected':''}>${u}</option>`).join('');
+        const div = document.createElement('div');
+        div.className = 'border border-outline rounded p-4 bg-surface-container relative';
+        div.id = `edit-edu-${id}`;
+        div.innerHTML = `
+            <button type="button" onclick="document.getElementById('edit-edu-${id}').remove()" class="absolute top-3 right-3 text-error text-xs font-bold">Remove</button>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                <label class="flex flex-col gap-1 text-xs font-semibold">Institution Type
+                    <select id="ee-type-${id}" onchange="handleEditEduType(${id})" class="h-9 px-2 rounded border border-outline outline-none font-normal">
+                        <option value="">Select...</option><option ${d.type==='University'?'selected':''}>University</option><option ${d.type==='School'?'selected':''}>School</option><option ${d.type==='Technical Vocational Institution'?'selected':''}>Technical Vocational Institution</option>
+                    </select>
+                </label>
+                <div id="ee-inst-wrap-${id}"></div>
+                <label class="flex flex-col gap-1 text-xs font-semibold">Highest Qualification
+                    <select id="ee-qual-${id}" class="h-9 px-2 rounded border border-outline outline-none font-normal">
+                        <option value="">Select...</option><option ${d.qual==="BECE"?'selected':''}>BECE</option><option ${d.qual==="WASSCE"?'selected':''}>WASSCE</option><option ${d.qual==="Certificate"?'selected':''}>Certificate</option><option ${d.qual==="Diploma (OD)"?'selected':''}>Diploma (OD)</option><option ${d.qual==="Higher National Diploma (HND)"?'selected':''}>Higher National Diploma (HND)</option><option ${d.qual==="Bachelor's Degree"?'selected':''}>Bachelor's Degree</option><option ${d.qual==="Postgraduate Diploma (PGD)"?'selected':''}>Postgraduate Diploma (PGD)</option><option ${d.qual==="Master's Degree"?'selected':''}>Master's Degree</option><option ${d.qual==="MBA"?'selected':''}>MBA</option><option ${d.qual==="PhD/Doctorate"?'selected':''}>PhD/Doctorate</option><option ${d.qual==="Professional Certificate"?'selected':''}>Professional Certificate</option>
+                    </select>
+                </label>
+                <label class="flex flex-col gap-1 text-xs font-semibold">Field / Programme of Study
+                    <input type="text" id="ee-prog-${id}" value="${d.prog||''}" class="h-9 px-2 rounded border border-outline focus:border-primary outline-none font-normal">
+                </label>
+                <label class="flex flex-col gap-1 text-xs font-semibold">Classification / Grade
+                    <select id="ee-class-${id}" class="h-9 px-2 rounded border border-outline outline-none font-normal">
+                        <option value="">Select...</option><option ${d.grade==='First Class'?'selected':''}>First Class</option><option ${d.grade==='Second Class First Division'?'selected':''}>Second Class First Division</option><option ${d.grade==='Second Class Second Division'?'selected':''}>Second Class Second Division</option><option ${d.grade==='Third Class'?'selected':''}>Third Class</option><option ${d.grade==='Distinction'?'selected':''}>Distinction</option><option ${d.grade==='Credit'?'selected':''}>Credit</option><option ${d.grade==='Pass'?'selected':''}>Pass</option><option ${d.grade==='N/A'?'selected':''}>N/A</option>
+                    </select>
+                </label>
+                <label class="flex flex-col gap-1 text-xs font-semibold">Start Year
+                    <input type="number" id="ee-sy-${id}" value="${d.sy||''}" placeholder="YYYY" class="h-9 px-2 rounded border border-outline focus:border-primary outline-none font-normal">
+                </label>
+                <label class="flex flex-col gap-1 text-xs font-semibold">End Year
+                    <input type="number" id="ee-ey-${id}" value="${d.ey||''}" placeholder="YYYY" class="h-9 px-2 rounded border border-outline focus:border-primary outline-none font-normal">
+                </label>
+            </div>
+        `;
+        document.getElementById('edit-edu-container').appendChild(div);
+        if(d.type) { document.getElementById(`ee-type-${id}`).value = d.type; handleEditEduType(id, d.inst); }
+    }
+
+    function handleEditEduType(id, preselected) {
+        const type = document.getElementById(`ee-type-${id}`).value;
+        const wrap = document.getElementById(`ee-inst-wrap-${id}`);
+        const unis = ["Njala University","Fourah Bay College (FBC)","COMAHS","IPAM","Milton Margai Technical University (MMTU)","Eastern Technical University (ETU)","EBKUST","University of Makeni (UNIMAK)","UNIMTECH","UMU/UMUSL","Limkokwing University","University of Lunsar (UoL)","Freetown Polytechnic","Other"];
+        const uniOpts = unis.map(u=>`<option value="${u}" ${preselected===u?'selected':''}>${u}</option>`).join('');
+        if(type==='University') {
+            wrap.innerHTML = `<label class="flex flex-col gap-1 text-xs font-semibold">University Name<select id="ee-inst-${id}" class="h-9 px-2 rounded border border-outline outline-none font-normal"><option value="">Select...</option>${uniOpts}</select></label>`;
+        } else if(type==='School') {
+            wrap.innerHTML = `<label class="flex flex-col gap-1 text-xs font-semibold">School Name<input type="text" id="ee-inst-${id}" value="${preselected||''}" class="h-9 px-2 rounded border border-outline outline-none font-normal"></label>`;
+        } else if(type==='Technical Vocational Institution') {
+            wrap.innerHTML = `<label class="flex flex-col gap-1 text-xs font-semibold">Institution Name<input type="text" id="ee-inst-${id}" value="${preselected||''}" class="h-9 px-2 rounded border border-outline outline-none font-normal"></label>`;
+        } else { wrap.innerHTML = ''; }
+    }
+
+    function addEditExp(expData) {
+        editExpCount++;
+        const id = editExpCount;
+        const d = expData || {};
+        const div = document.createElement('div');
+        div.className = 'border border-outline rounded p-4 bg-surface-container relative';
+        div.id = `edit-exp-${id}`;
+        div.innerHTML = `
+            <button type="button" onclick="document.getElementById('edit-exp-${id}').remove()" class="absolute top-3 right-3 text-error text-xs font-bold">Remove</button>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                <label class="flex flex-col gap-1 text-xs font-semibold md:col-span-2">Institution / Company Name
+                    <input type="text" id="ee2-inst-${id}" value="${d.inst||''}" class="h-9 px-2 rounded border border-outline focus:border-secondary outline-none font-normal">
+                </label>
+                <label class="flex flex-col gap-1 text-xs font-semibold">Position / Role
+                    <input type="text" id="ee2-role-${id}" value="${d.role||''}" class="h-9 px-2 rounded border border-outline focus:border-secondary outline-none font-normal">
+                </label>
+                <label class="flex items-center gap-2 font-semibold text-xs mt-5 cursor-pointer">
+                    <input type="checkbox" id="ee2-curr-${id}" ${d.curr?'checked':''} onchange="handleEditExpDates(${id})" class="w-4 h-4">
+                    Currently Working Here
+                </label>
+                <label class="flex flex-col gap-1 text-xs font-semibold">Start Date
+                    <input type="date" id="ee2-sd-${id}" value="${d.sd||''}" onchange="calcEditExp(${id})" class="h-9 px-2 rounded border border-outline focus:border-secondary outline-none font-normal">
+                </label>
+                <label class="flex flex-col gap-1 text-xs font-semibold">End Date
+                    <input type="date" id="ee2-ed-${id}" value="${d.ed||''}" onchange="calcEditExp(${id})" class="h-9 px-2 rounded border border-outline focus:border-secondary outline-none font-normal" ${d.curr?'disabled':''}>
+                </label>
+                <label class="flex flex-col gap-1 text-xs font-semibold text-secondary md:col-span-2">Duration (Auto)
+                    <input type="text" id="ee2-dur-${id}" value="${d.dur||''}" class="h-9 px-2 rounded border border-outline bg-surface-container outline-none font-bold text-secondary" readonly>
+                </label>
+                <label class="flex flex-col gap-1 text-xs font-semibold">Supervisor Name
+                    <input type="text" id="ee2-sup-${id}" value="${d.supName||''}" class="h-9 px-2 rounded border border-outline focus:border-secondary outline-none font-normal">
+                </label>
+                <label class="flex flex-col gap-1 text-xs font-semibold">Supervisor Phone
+                    <input type="tel" id="ee2-suph-${id}" value="${d.supPhone||''}" class="h-9 px-2 rounded border border-outline focus:border-secondary outline-none font-normal">
+                </label>
+                <label class="flex flex-col gap-1 text-xs font-semibold">Supervisor Email
+                    <input type="email" id="ee2-supe-${id}" value="${d.supEmail||''}" class="h-9 px-2 rounded border border-outline focus:border-secondary outline-none font-normal">
+                </label>
+            </div>
+        `;
+        document.getElementById('edit-exp-container').appendChild(div);
+    }
+
+    function handleEditExpDates(id) {
+        const curr = document.getElementById(`ee2-curr-${id}`).checked;
+        document.getElementById(`ee2-ed-${id}`).disabled = curr;
+        if(curr) document.getElementById(`ee2-ed-${id}`).value = '';
+        calcEditExp(id);
+    }
+
+    function calcEditExp(id) {
+        const sd = document.getElementById(`ee2-sd-${id}`).value;
+        const ed = document.getElementById(`ee2-ed-${id}`).value;
+        const curr = document.getElementById(`ee2-curr-${id}`).checked;
+        const out = document.getElementById(`ee2-dur-${id}`);
+        if(!sd) { out.value=''; return; }
+        let d1 = new Date(sd), d2 = curr ? new Date() : (ed ? new Date(ed) : null);
+        if(!d2 || d2<d1) { out.value=''; return; }
+        let years = d2.getFullYear()-d1.getFullYear(), months = d2.getMonth()-d1.getMonth();
+        if(d2.getDate()<d1.getDate()) months--;
+        if(months<0) { years--; months+=12; }
+        let res=[];
+        if(years>0) res.push(years+' Year'+(years>1?'s':''));
+        if(months>0) res.push(months+' Month'+(months>1?'s':''));
+        out.value = res.join(', ') || '< 1 Month';
+    }
+
+    function isAuthorizedToEdit() {
+        const eff = getEffectiveSystemRole();
+        const config = ROLES[eff] || ROLES[activeRole] || ROLES['super_admin'];
+        return config && config.canEdit === true;
+    }
+
+    function openEditModal() {
+        if(!isAuthorizedToEdit()) {
+            alert('Access Restricted: Only Super Admin and HR Director have authorization to edit employee profiles.');
+            return;
+        }
+
+        if(!currentEmployee) {
+            var stored = localStorage.getItem('bcf_selected_profile');
+            if(stored) { try { currentEmployee = JSON.parse(stored); } catch(ex) {} }
+        }
+        if(!currentEmployee) {
+            if (Array.isArray(registry) && registry.length > 0) {
+                currentEmployee = registry[0];
+            } else {
+                alert('No employee selected. Please select an employee from the directory first.');
+                return;
+            }
+        }
+        const e = currentEmployee;
+        try {
+        // Personal
+        document.getElementById('edit-name').value = e.fullName||'';
+        document.getElementById('edit-gender').value = e.gender||'Male';
+        document.getElementById('edit-dob').value = e.dob||'';
+        document.getElementById('edit-nation').value = e.nationality||e.nation||'';
+        document.getElementById('edit-phone').value = e.phone||'';
+        document.getElementById('edit-email').value = e.email||'';
+        document.getElementById('edit-marital').value = e.marital||'Single';
+        document.getElementById('edit-children').value = e.children||'0';
+        document.getElementById('edit-nin').value = e.nin||'';
+        document.getElementById('edit-nassit').value = e.nassit||'';
+        document.getElementById('edit-address').value = e.address||'';
+
+        // Emergency
+        document.getElementById('edit-emname').value = e.emName||'';
+        document.getElementById('edit-emrel').value = e.emRel||'Spouse';
+        document.getElementById('edit-emphone').value = e.emPhone||'';
+        document.getElementById('edit-ememail').value = e.emEmail||'';
+        document.getElementById('edit-emaddress').value = e.emAddress||'';
+
+        // Employment
+        document.getElementById('edit-dept').value = e.department||'Executive Management';
+        document.getElementById('edit-title').value = e.title||'';
+        document.getElementById('edit-unit').value = e.unit||'';
+        document.getElementById('edit-mgmt').value = e.mgmtLevel||'Employee';
+        document.getElementById('edit-class').value = e.classification||'Permanent';
+        document.getElementById('edit-joblevel').value = e.jobLevel||'Officer';
+        document.getElementById('edit-empdate').value = e.empDate||'';
+        document.getElementById('edit-status').value = e.status||'Active';
+        document.getElementById('edit-constart').value = e.conStart||'';
+        document.getElementById('edit-conend').value = e.conEnd||'';
+
+        // Work Loc
+        document.getElementById('edit-workloc').value = e.workLoc||'';
+        document.getElementById('edit-reports').value = e.reportsTo||'';
+        document.getElementById('edit-workphone').value = e.workPhone||'';
+        document.getElementById('edit-workemail').value = e.workEmail||'';
+        document.getElementById('edit-probstart').value = e.probStart||'';
+        document.getElementById('edit-probend').value = e.probEnd||'';
+
+        // Education — rebuild
+        document.getElementById('edit-edu-container').innerHTML = '';
+        editEduCount = 0;
+        var eduArr = Array.isArray(e.education) ? e.education : [];
+        eduArr.forEach(edu => addEditEdu(edu));
+
+        // Experience — rebuild
+        document.getElementById('edit-exp-container').innerHTML = '';
+        editExpCount = 0;
+        var expArr = Array.isArray(e.experience) ? e.experience : [];
+        expArr.forEach(exp => addEditExp(exp));
+
+        // Skills
+        var skillsArr = Array.isArray(e.skills) ? e.skills : (typeof e.skills === 'string' ? e.skills.split(',').map(s=>s.trim()).filter(s=>s) : []);
+        document.getElementById('edit-skills').value = skillsArr.join(', ');
+
+        // Finance
+        document.getElementById('edit-bankname').value = e.bankName||'';
+        document.getElementById('edit-accname').value = e.accountName||e.accName||e.fullName||'';
+        document.getElementById('edit-accno').value = e.accNo||'';
+        document.getElementById('edit-acctype').value = e.accType||'Savings';
+        document.getElementById('edit-bban').value = e.bban||'';
+
+        // Payroll
+        document.getElementById('edit-paybasic').value = e.payBasic||'';
+        document.getElementById('edit-payinc').value = e.payInc||'';
+        document.getElementById('edit-payadv').value = e.payAdvType||'10';
+        document.getElementById('edit-payloan').value = e.payLoan||'';
+        previewPayroll();
+        toggleEditContract();
+
+        switchEditTab(0);
+        var modal = document.getElementById('editModal');
+        modal.classList.remove('hidden');
+        modal.style.display = 'flex';
+        document.body.style.overflow = 'hidden';
+        try {
+            modal.scrollTop = 0;
+            window.scrollTo({ top: 0, behavior: 'instant' });
+            if (window.parent && window.parent !== window) {
+                window.parent.scrollTo({ top: 0, behavior: 'instant' });
+            }
+        } catch (_) {}
+        } catch(err) { console.error('openEditModal error:', err); alert('Edit error: ' + err.message); }
+    }
+
+    function closeEditModal() {
+        var modal = document.getElementById('editModal');
+        modal.classList.add('hidden');
+        modal.style.display = 'none';
+        document.body.style.overflow = '';
+    }
+
+    function previewPayroll() {
+        const basic = Number(document.getElementById('edit-paybasic').value)||0;
+        const incPct = Number(document.getElementById('edit-payinc').value)||0;
+        const advPct = Number(document.getElementById('edit-payadv').value)||0;
+        const loan = Number(document.getElementById('edit-payloan').value)||0;
+        const gross = basic + basic*(incPct/100);
+        const afterTax = gross - gross*0.30;
+        const net = afterTax - afterTax*0.05 - afterTax*(advPct/100) - loan + gross*0.02;
+        document.getElementById('edit-net-preview').textContent = 'NLe ' + fmt(net);
+    }
+
+    async function saveEdits() {
+        if(!currentEmployee) {
+            var stored = localStorage.getItem('bcf_selected_profile');
+            if(stored) { try { currentEmployee = JSON.parse(stored); } catch(ex) {} }
+        }
+        if(!currentEmployee) { alert('Error: no employee loaded.'); return; }
+        const duplicates = checkAllEditDuplicates();
+        if(duplicates.length > 0) {
+            showDuplicateAlertModal(duplicates);
+            return;
+        }
+
+        const saveBtn = document.getElementById('btn-save-edits') || document.querySelector('#editModal button[onclick="saveEdits()"]');
+        const origBtnText = saveBtn ? saveBtn.innerHTML : 'Save All Changes';
+        if (saveBtn) {
+            saveBtn.disabled = true;
+            saveBtn.innerHTML = '<span class="inline-block animate-spin mr-2">⏳</span> Persisting to Database...';
+        }
+
+        try {
+            const e = { ...currentEmployee };
+
+            // Personal
+            e.fullName = (document.getElementById('edit-name').value || '').trim();
+            e.name = e.fullName;
+            e.gender = document.getElementById('edit-gender').value;
+            e.dob = document.getElementById('edit-dob').value;
+            e.nationality = (document.getElementById('edit-nation').value || '').trim();
+            e.nation = e.nationality;
+            e.phone = (document.getElementById('edit-phone').value || '').trim();
+            e.email = (document.getElementById('edit-email').value || '').trim().toLowerCase();
+            e.marital = document.getElementById('edit-marital').value;
+            e.children = document.getElementById('edit-children').value;
+            e.nin = (document.getElementById('edit-nin').value || '').trim();
+            e.nassit = (document.getElementById('edit-nassit').value || '').trim();
+            e.address = (document.getElementById('edit-address').value || '').trim();
+
+            // Emergency
+            e.emName = (document.getElementById('edit-emname').value || '').trim();
+            e.emRel = document.getElementById('edit-emrel').value;
+            e.emPhone = (document.getElementById('edit-emphone').value || '').trim();
+            e.emEmail = (document.getElementById('edit-ememail').value || '').trim().toLowerCase();
+            e.emAddress = (document.getElementById('edit-emaddress').value || '').trim();
+
+            // Employment
+            e.department = document.getElementById('edit-dept').value;
+            e.dept = e.department;
+            e.title = (document.getElementById('edit-title').value || '').trim();
+            e.position = e.title;
+            e.unit = (document.getElementById('edit-unit').value || '').trim();
+            e.mgmtLevel = document.getElementById('edit-mgmt').value;
+            e.classification = document.getElementById('edit-class').value;
+            e.jobLevel = document.getElementById('edit-joblevel').value;
+            e.empDate = document.getElementById('edit-empdate').value;
+            e.status = document.getElementById('edit-status').value;
+            e.conStart = document.getElementById('edit-constart').value;
+            e.conEnd = document.getElementById('edit-conend').value;
+
+            // Work Loc
+            e.workLoc = (document.getElementById('edit-workloc').value || '').trim();
+            e.reportsTo = (document.getElementById('edit-reports').value || '').trim();
+            e.workPhone = (document.getElementById('edit-workphone').value || '').trim();
+            e.workEmail = (document.getElementById('edit-workemail').value || '').trim().toLowerCase();
+            e.probStart = document.getElementById('edit-probstart').value;
+            e.probEnd = document.getElementById('edit-probend').value;
+
+            // Education
+            const eduItems = [];
+            for(let i=1; i<=editEduCount; i++) {
+                if(document.getElementById(`edit-edu-${i}`)) {
+                    const instEl = document.getElementById(`ee-inst-${i}`);
+                    eduItems.push({
+                        type: document.getElementById(`ee-type-${i}`).value,
+                        inst: instEl ? instEl.value : '',
+                        qual: document.getElementById(`ee-qual-${i}`).value,
+                        prog: document.getElementById(`ee-prog-${i}`).value,
+                        grade: document.getElementById(`ee-class-${i}`) ? document.getElementById(`ee-class-${i}`).value : '',
+                        sy: document.getElementById(`ee-sy-${i}`) ? document.getElementById(`ee-sy-${i}`).value : '',
+                        ey: document.getElementById(`ee-ey-${i}`) ? document.getElementById(`ee-ey-${i}`).value : ''
+                    });
+                }
+            }
+            e.education = eduItems;
+
+            // Experience
+            const expItems = [];
+            for(let i=1; i<=editExpCount; i++) {
+                if(document.getElementById(`edit-exp-${i}`)) {
+                    expItems.push({
+                        inst: document.getElementById(`ee2-inst-${i}`).value,
+                        role: document.getElementById(`ee2-role-${i}`).value,
+                        curr: document.getElementById(`ee2-curr-${i}`).checked,
+                        sd: document.getElementById(`ee2-sd-${i}`).value,
+                        ed: document.getElementById(`ee2-ed-${i}`).value,
+                        dur: document.getElementById(`ee2-dur-${i}`).value,
+                        supName: document.getElementById(`ee2-sup-${i}`).value,
+                        supPhone: document.getElementById(`ee2-suph-${i}`).value,
+                        supEmail: document.getElementById(`ee2-supe-${i}`).value
+                    });
+                }
+            }
+            e.experience = expItems;
+
+            // Skills
+            e.skills = document.getElementById('edit-skills').value.split(',').map(s=>s.trim()).filter(Boolean);
+
+            // Finance
+            e.bankName = (document.getElementById('edit-bankname').value || '').trim();
+            e.accountName = (document.getElementById('edit-accname').value || '').trim();
+            e.accName = e.accountName;
+            e.accNo = (document.getElementById('edit-accno').value || '').trim();
+            e.accType = document.getElementById('edit-acctype').value;
+            e.bban = (document.getElementById('edit-bban').value || '').trim();
+
+            // Payroll
+            e.payBasic = document.getElementById('edit-paybasic').value;
+            e.payInc = document.getElementById('edit-payinc').value;
+            e.payAdvType = document.getElementById('edit-payadv').value;
+            e.payLoan = document.getElementById('edit-payloan').value;
+
+            // ── Dynamic Network Persistence: POST to MongoDB Atlas API ──
+            const res = await fetch('/api/employees', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(e)
+            });
+
+            const json = await res.json();
+            if (!json.success && json.error) {
+                throw new Error(json.error);
+            }
+
+            // Sync with local memory and persistence caches
+            const idx = registry.findIndex(r => r.employeeId === e.employeeId || r.id === e.employeeId);
+            if(idx !== -1) {
+                registry[idx] = e;
+            } else {
+                registry.push(e);
+            }
+
+            try {
+                localStorage.setItem('bcf_staff_registry', JSON.stringify(registry));
+                localStorage.setItem('bcf_selected_profile', JSON.stringify(e));
+                sessionStorage.setItem('bcf_selected_profile', JSON.stringify(e));
+                if (window.parent && window.parent !== window && window.parent.localStorage) {
+                    window.parent.localStorage.setItem('bcf_staff_registry', JSON.stringify(registry));
+                    window.parent.localStorage.setItem('bcf_selected_profile', JSON.stringify(e));
+                }
+            } catch (_) {}
+
+            // Broadcast to other tabs & parent frame
+            try {
+                const bc = new BroadcastChannel('bcf_staff_channel');
+                bc.postMessage({ type: 'STAFF_UPDATED', employee: e });
+            } catch (_) {}
+
+            currentEmployee = e;
+            closeEditModal();
+            populateProfile(e);
+            updateExportStaffCounts();
+            showExportToast('Staff profile for ' + (e.fullName || 'employee') + ' saved and synced to database successfully!');
+        } catch (err) {
+            console.error('Error saving profile to database:', err);
+            alert('Failed to save profile to database: ' + err.message);
+        } finally {
+            if (saveBtn) {
+                saveBtn.disabled = false;
+                saveBtn.innerHTML = origBtnText;
+            }
+        }
+    }
+
+    // EXPORT
+    function exportProfile() {
+        const el = document.getElementById('profile-content');
+        const tab_nav = document.getElementById('tab-nav');
+        const header = document.getElementById('prof-header');
+
+        // Reveal all tab panels
+        const panels = el.querySelectorAll('.tab-panel');
+        panels.forEach(p => p.classList.remove('hidden-step'));
+        tab_nav.style.display = 'none';
+        header.style.display = 'none';
+
+        const opt = {
+            margin: 0.5,
+            filename: (currentEmployee?.fullName||'Employee') + ' - BCF Profile.pdf',
+            image: { type:'jpeg', quality:0.98 },
+            html2canvas: { scale:2, useCORS:true, scrollY:0 },
+            jsPDF: { unit:'in', format:'letter', orientation:'portrait' }
+        };
+
+        setTimeout(() => {
+            html2pdf().set(opt).from(el).save().then(() => {
+                panels.forEach(p => p.classList.add('hidden-step'));
+                showTab(currentTab);
+                tab_nav.style.display = '';
+                header.style.display = '';
+            });
+        }, 300);
+    }
+
+    // ── RBAC ENGINE & RESTRICTIONS SYSTEM (INHERITED DIRECTLY FROM BCF-SL SYSTEM AUTH) ───
+    const ROLES = {
+        'staff': {
+            name: 'Staff',
+            level: 'General Staff View',
+            canEdit: false,
+            canViewConfidential: false
+        },
+        'super_admin': {
+            name: 'Super Admin',
+            level: 'Full Access',
+            canEdit: true,
+            canViewConfidential: true
+        },
+        'sa': {
+            name: 'Super Admin',
+            level: 'Full Access',
+            canEdit: true,
+            canViewConfidential: true
+        },
+        'admin': {
+            name: 'Super Admin',
+            level: 'Full Access',
+            canEdit: true,
+            canViewConfidential: true
+        },
+        'administrator': {
+            name: 'Administrator',
+            level: 'Full Access',
+            canEdit: true,
+            canViewConfidential: true
+        },
+        'hr_director': {
+            name: 'HR Director',
+            level: 'Full Access',
+            canEdit: true,
+            canViewConfidential: true
+        },
+        'hr': {
+            name: 'HR Director',
+            level: 'Full Access',
+            canEdit: true,
+            canViewConfidential: true
+        },
+        'ceo': {
+            name: 'CEO',
+            level: 'Executive View Access',
+            canEdit: true,
+            canViewConfidential: true
+        },
+        'finance_director': {
+            name: 'Finance Director',
+            level: 'Executive View Access',
+            canEdit: false,
+            canViewConfidential: true
+        },
+        'audit_director': {
+            name: 'Internal Risk & Audits Director',
+            level: 'Executive View Access',
+            canEdit: false,
+            canViewConfidential: true
+        }
+    };
+
+    function getEffectiveSystemRole() {
+        let auth = null;
+        try {
+            if (typeof window !== 'undefined' && window.parent && window.parent !== window) {
+                const raw = window.parent.sessionStorage.getItem('bcf_sl_auth') || window.parent.localStorage.getItem('bcf_sl_auth');
+                if (raw) auth = typeof raw === 'string' ? JSON.parse(raw) : raw;
+            }
+        } catch (_) {}
+        if (!auth) {
+            try {
+                const raw = sessionStorage.getItem('bcf_sl_auth') || localStorage.getItem('bcf_sl_auth');
+                if (raw) auth = typeof raw === 'string' ? JSON.parse(raw) : raw;
+            } catch (_) {}
+        }
+        const user = auth && auth.user ? auth.user : auth;
+
+        // Check if admin session flag is present
+        let hasAdminFlag = false;
+        try {
+            hasAdminFlag = 
+                sessionStorage.getItem('bcf_admin_session') === 'true' ||
+                localStorage.getItem('bcf_admin_session') === 'true' ||
+                (window.parent && (
+                    window.parent.sessionStorage.getItem('bcf_admin_session') === 'true' ||
+                    window.parent.localStorage.getItem('bcf_admin_session') === 'true'
+                ));
+        } catch (_) {}
+        if (hasAdminFlag) return 'super_admin';
+
+        if (!user) {
+            let savedRole = '';
+            try {
+                savedRole = sessionStorage.getItem('bcf_user_role') || localStorage.getItem('bcf_user_role') || '';
+                if (!savedRole && window.parent) {
+                    savedRole = window.parent.sessionStorage.getItem('bcf_user_role') || window.parent.localStorage.getItem('bcf_user_role') || '';
+                }
+            } catch (_) {}
+            if (savedRole) {
+                const sr = savedRole.toLowerCase().trim();
+                if (sr === 'sa' || sr.includes('admin') || sr.includes('super')) return 'super_admin';
+                if (sr === 'hr' || sr.includes('hr')) return 'hr_director';
+                if (ROLES[sr]) return sr;
+            }
+            return 'staff';
+        }
+
+        const r = (user.role || '').toUpperCase().trim();
+        const u = (user.username || '').toLowerCase().trim();
+        const em = (user.email || '').toLowerCase().trim();
+        const name = (user.name || '').toLowerCase().trim();
+        const id = (user.employeeId || '').toUpperCase().trim();
+        const dept = (user.department || user.dept || '').toUpperCase().trim();
+
+        if (
+            r === 'SA' ||
+            r === 'SUPER ADMIN' ||
+            r === 'SUPER ADMINISTRATOR' ||
+            r === 'ADMIN' ||
+            r === 'ADMINISTRATOR' ||
+            r === 'SYSTEM ADMINISTRATOR' ||
+            r.includes('SUPER') ||
+            r.includes('ADMIN') ||
+            u === 'admin' ||
+            u === 'abandama' ||
+            u === 'superadmin' ||
+            em.includes('admin') ||
+            em === 'albertjosephhassanbandama@gmail.com' ||
+            name.includes('bandama') ||
+            id === 'BCF-PTE-2026-0001'
+        ) {
+            return 'super_admin';
+        }
+        if (
+            r === 'HR' ||
+            r === 'HR DIRECTOR' ||
+            r === 'HRM DIRECTOR' ||
+            r.includes('HUMAN RESOURCES') ||
+            r.includes('HR') ||
+            dept.includes('HUMAN RESOURCES') ||
+            u === 'hr_director' ||
+            u === 'jconteh' ||
+            u === 'ssesay' ||
+            id === 'BCF-PTE-2026-0002' ||
+            id === 'BCF-SL-1002'
+        ) {
+            return 'hr_director';
+        }
+        if (r === 'CEO' || r.includes('CHIEF EXECUTIVE') || u === 'ceo_user') {
+            return 'ceo';
+        }
+        if (r === 'FIN' || r === 'FINANCE' || r.includes('FINANCE') || u === 'fin_director' || u === 'mbangura' || u === 'aturay') {
+            return 'finance_director';
+        }
+        if (r === 'IAR' || r.includes('INTERNAL AUDIT') || r.includes('RISK') || u === 'iar_director') {
+            return 'audit_director';
+        }
+        return 'staff';
+    }
+
+    let activeRole = getEffectiveSystemRole();
+
+    function onRoleDropdownChange(selectedRole) {
+        if(typeof applyRole === 'function') {
+            applyRole(selectedRole);
+        }
+    }
+
+    function resetToStaff() {
+        applyRole('staff');
+    }
+
+    function applyRole(roleKey) {
+        activeRole = roleKey || getEffectiveSystemRole();
+        const config = ROLES[activeRole] || ROLES['super_admin'];
+
+        // Edit button
+        const editBtn = document.getElementById('btn-edit-profile');
+        if(editBtn) {
+            editBtn.style.display = config.canEdit ? 'inline-flex' : 'none';
+        }
+
+        // Tab lock icons
+        const isStaff = !config.canViewConfidential;
+        ['tlock-1', 'tlock-4', 'tlock-5', 'tlock-6', 'tlock-7', 'tlock-8'].forEach(id => {
+            const el = document.getElementById(id);
+            if(el) el.style.display = isStaff ? 'inline' : 'none';
+        });
+
+        // Refresh profile if displayed
+        if(currentEmployee) {
+            populateProfile(currentEmployee);
+        }
+    }
+
+    // Real-time synchronization when parent Next.js session updates
+    window.addEventListener('message', function(e) {
+        if (e.data && e.data.type === 'BCF_AUTH_SYNC') {
+            applyRole(getEffectiveSystemRole());
+        }
+    });
+
+    // ─── EXPORT ALL STAFF DATA ENGINE (EXCEL, CSV, JSON & PRINT) ───────────────────
+    function toggleExportStaffMenu(menuId, e) {
+        if (e) {
+            e.preventDefault();
+            e.stopPropagation();
+        }
+        const target = document.getElementById(menuId);
+        if (!target) return;
+        const willOpen = target.classList.contains('hidden');
+        closeAllExportMenus();
+        if (willOpen) {
+            updateExportStaffCounts();
+            target.classList.remove('hidden');
+        }
+    }
+
+    function closeAllExportMenus() {
+        document.querySelectorAll('.export-dropdown-menu').forEach(m => m.classList.add('hidden'));
+    }
+
+    // Close on any click outside
+    document.addEventListener('click', function(e) {
+        if (!e.target.closest('#export-dropdown-selector-top') &&
+            !e.target.closest('#export-dropdown-selector-banner') &&
+            !e.target.closest('#export-dropdown-profile-wrap')) {
+            closeAllExportMenus();
+        }
+    });
+
+    function getAllStaffData() {
+        let list = [];
+        try {
+            const raw = localStorage.getItem('bcf_staff_registry');
+            if (raw) list = JSON.parse(raw);
+        } catch (_) {}
+        if (!list || list.length === 0) {
+            try {
+                if (typeof window !== 'undefined' && window.parent && window.parent !== window) {
+                    const parentRaw = window.parent.localStorage.getItem('bcf_staff_registry');
+                    if (parentRaw) list = JSON.parse(parentRaw);
+                }
+            } catch (_) {}
+        }
+        if ((!list || list.length === 0) && typeof registry !== 'undefined' && Array.isArray(registry)) {
+            list = registry;
+        }
+        return Array.isArray(list) ? list : [];
+    }
+
+    function updateExportStaffCounts() {
+        const staff = getAllStaffData();
+        const countTxt = `Download complete records for all ${staff.length} staff`;
+        ['export-count-top', 'export-count-banner', 'export-count-profile'].forEach(id => {
+            const el = document.getElementById(id);
+            if (el) el.textContent = countTxt;
+        });
+    }
+
+    function formatStaffRow(e, isStaffRole) {
+        const formatEdus = (edus) => {
+            if (!Array.isArray(edus) || edus.length === 0) return '-';
+            return edus.map(ed => `${ed.qual || 'Qualification'} at ${ed.inst || 'Institution'} (${ed.prog || ''} ${ed.ey || ''})`).join('; ');
+        };
+        const formatExps = (exps) => {
+            if (!Array.isArray(exps) || exps.length === 0) return '-';
+            return exps.map(x => `${x.role || 'Role'} at ${x.inst || 'Organization'} (${x.sd || ''} to ${x.curr ? 'Present' : (x.ed || '')})`).join('; ');
+        };
+        const formatSkills = (s) => {
+            if (Array.isArray(s)) return s.join(', ');
+            if (typeof s === 'string') return s;
+            return '-';
+        };
+
+        return {
+            employeeId: e.employeeId || '',
+            fullName: e.fullName || '',
+            title: e.title || '',
+            department: e.department || '',
+            unit: e.unit || '',
+            mgmtLevel: e.mgmtLevel || '',
+            classification: e.classification || '',
+            jobLevel: e.jobLevel || '',
+            status: e.status || 'Active',
+            empDate: e.empDate || '',
+            contractPeriod: (e.conStart && e.conEnd) ? `${e.conStart} to ${e.conEnd}` : '',
+            probationPeriod: (e.probStart && e.probEnd) ? `${e.probStart} to ${e.probEnd}` : '',
+            workEmail: e.workEmail || '',
+            workPhone: e.workPhone || '',
+            workLoc: e.workLoc || '',
+            reportsTo: e.reportsTo || '',
+            gender: e.gender || '',
+            dob: isStaffRole ? '[Protected]' : (e.dob || ''),
+            nationality: e.nationality || e.nation || '',
+            marital: e.marital || '',
+            children: isStaffRole ? '[Protected]' : (e.children ?? ''),
+            address: isStaffRole ? '[Protected]' : (e.address || ''),
+            personalPhone: e.phone || '',
+            personalEmail: e.email || '',
+            nin: isStaffRole ? '[Protected]' : (e.nin || e.passport || ''),
+            nassit: isStaffRole ? '[Protected]' : (e.nassit || ''),
+            bankName: e.bankName || '',
+            accName: e.accName || e.accountName || e.fullName || '',
+            accNo: isStaffRole ? '[Protected]' : (e.accNo || e.accountNumber || ''),
+            accType: e.accType || '',
+            bban: isStaffRole ? '[Protected]' : (e.bban || ''),
+            payBasic: isStaffRole ? '[Protected]' : (e.payBasic || ''),
+            emName: isStaffRole ? '[Protected]' : (e.emName || ''),
+            emRel: isStaffRole ? '[Protected]' : (e.emRel || ''),
+            emPhone: isStaffRole ? '[Protected]' : (e.emPhone || ''),
+            emEmail: isStaffRole ? '[Protected]' : (e.emEmail || ''),
+            emAddress: isStaffRole ? '[Protected]' : (e.emAddress || ''),
+            education: isStaffRole ? '[Protected]' : formatEdus(e.education),
+            experience: isStaffRole ? '[Protected]' : formatExps(e.experience),
+            skills: isStaffRole ? '[Protected]' : formatSkills(e.skills)
+        };
+    }
+
+    function downloadStaffCSV() {
+        const staff = getAllStaffData();
+        if (!staff || staff.length === 0) {
+            showExportToast('⚠️ No staff records available to export.', 'warning');
+            return;
+        }
+        const isStaffRole = !(ROLES[activeRole] || ROLES['staff']).canViewConfidential;
+        const today = new Date().toISOString().split('T')[0];
+
+        const headers = [
+            'Employee ID', 'Full Name', 'Job Title / Position', 'Department', 'Unit / Section',
+            'Management Level', 'Classification', 'Job Level', 'Status', 'Employment Date',
+            'Contract Period', 'Probation Period', 'Work Location', 'Reports To', 'Work Email',
+            'Work Phone', 'Personal Phone', 'Personal Email', 'Gender', 'Date of Birth',
+            'Nationality', 'Marital Status', 'Children', 'Residential Address', 'NIN / Passport',
+            'NASSIT No.', 'Bank Name', 'Account Name', 'Account Number', 'Account Type',
+            'BBAN Number', 'Basic Salary (NLe)', 'Emergency Contact Name', 'Emergency Contact Relation',
+            'Emergency Contact Phone', 'Emergency Contact Email', 'Emergency Contact Address',
+            'Qualifications Summary', 'Experience Summary', 'Skills'
+        ];
+
+        const escapeCsv = (str) => {
+            if (str === null || str === undefined) return '""';
+            const s = String(str).replace(/"/g, '""');
+            return `"${s}"`;
+        };
+
+        let csv = '\uFEFF'; // UTF-8 BOM for Microsoft Excel
+        csv += `"BANDAMA CHARITY FOUNDATION SIERRA LEONE - OFFICIAL STAFF DIRECTORY DATABASE"\n`;
+        csv += `"Export Date:","${new Date().toLocaleString('en-GB')}"\n`;
+        csv += `"Total Records:","${staff.length}"\n`;
+        csv += `"Exported By:","${activeRole.toUpperCase()}"\n\n`;
+
+        csv += headers.map(h => escapeCsv(h)).join(',') + '\n';
+
+        staff.forEach(emp => {
+            const row = formatStaffRow(emp, isStaffRole);
+            const values = [
+                row.employeeId, row.fullName, row.title, row.department, row.unit,
+                row.mgmtLevel, row.classification, row.jobLevel, row.status, row.empDate,
+                row.contractPeriod, row.probationPeriod, row.workLoc, row.reportsTo, row.workEmail,
+                row.workPhone, row.personalPhone, row.personalEmail, row.gender, row.dob,
+                row.nationality, row.marital, row.children, row.address, row.nin,
+                row.nassit, row.bankName, row.accName, row.accNo, row.accType,
+                row.bban, row.payBasic, row.emName, row.emRel,
+                row.emPhone, row.emEmail, row.emAddress,
+                row.education, row.experience, row.skills
+            ];
+            csv += values.map(v => escapeCsv(v)).join(',') + '\n';
+        });
+
+        const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `BCF-SL_All_Staff_Database_${today}.csv`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+
+        showExportToast(`✅ Successfully downloaded ${staff.length} staff records (CSV)!`);
+    }
+
+    function downloadStaffExcel() {
+        const staff = getAllStaffData();
+        if (!staff || staff.length === 0) {
+            showExportToast('⚠️ No staff records available to export.', 'warning');
+            return;
+        }
+        const isStaffRole = !(ROLES[activeRole] || ROLES['staff']).canViewConfidential;
+        const today = new Date().toISOString().split('T')[0];
+        const escapeXml = (str) => {
+            if (str === null || str === undefined) return '';
+            return String(str)
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&apos;');
+        };
+
+        let xml = `<?xml version="1.0"?>
+<?mso-application progid="Excel.Sheet"?>
+<Workbook xmlns="urn:schemas-microsoft-com:office:spreadsheet"
+ xmlns:o="urn:schemas-microsoft-com:office:office"
+ xmlns:x="urn:schemas-microsoft-com:office:excel"
+ xmlns:ss="urn:schemas-microsoft-com:office:spreadsheet"
+ xmlns:html="http://www.w3.org/TR/REC-html40">
+ <Styles>
+  <Style ss:ID="Default" ss:Name="Normal">
+   <Alignment ss:Vertical="Center"/>
+   <Font ss:FontName="Calibri" ss:Size="11" ss:Color="#111827"/>
+  </Style>
+  <Style ss:ID="TitleStyle">
+   <Alignment ss:Horizontal="Left" ss:Vertical="Center"/>
+   <Font ss:FontName="Calibri" ss:Size="14" ss:Bold="1" ss:Color="#FFFFFF"/>
+   <Interior ss:Color="#16A34A" ss:Pattern="Solid"/>
+  </Style>
+  <Style ss:ID="SubTitleStyle">
+   <Alignment ss:Horizontal="Left" ss:Vertical="Center"/>
+   <Font ss:FontName="Calibri" ss:Size="10" ss:Color="#FFFFFF" ss:Italic="1"/>
+   <Interior ss:Color="#15803D" ss:Pattern="Solid"/>
+  </Style>
+  <Style ss:ID="HeaderStyle">
+   <Alignment ss:Horizontal="Center" ss:Vertical="Center" ss:WrapText="1"/>
+   <Font ss:FontName="Calibri" ss:Size="11" ss:Bold="1" ss:Color="#FFFFFF"/>
+   <Interior ss:Color="#15803D" ss:Pattern="Solid"/>
+   <Borders>
+    <Border ss:Position="Bottom" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#D1D5DB"/>
+    <Border ss:Position="Left" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#D1D5DB"/>
+    <Border ss:Position="Right" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#D1D5DB"/>
+    <Border ss:Position="Top" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#D1D5DB"/>
+   </Borders>
+  </Style>
+  <Style ss:ID="DataStyle">
+   <Alignment ss:Vertical="Center"/>
+   <Borders>
+    <Border ss:Position="Bottom" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#E5E7EB"/>
+    <Border ss:Position="Left" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#E5E7EB"/>
+    <Border ss:Position="Right" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#E5E7EB"/>
+    <Border ss:Position="Top" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#E5E7EB"/>
+   </Borders>
+  </Style>
+  <Style ss:ID="DataStyleCenter">
+   <Alignment ss:Horizontal="Center" ss:Vertical="Center"/>
+   <Borders>
+    <Border ss:Position="Bottom" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#E5E7EB"/>
+    <Border ss:Position="Left" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#E5E7EB"/>
+    <Border ss:Position="Right" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#E5E7EB"/>
+    <Border ss:Position="Top" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#E5E7EB"/>
+   </Borders>
+  </Style>
+ </Styles>
+
+ <!-- SHEET 1: All Staff Directory -->
+ <Worksheet ss:Name="Staff Directory">
+  <Table>
+   <Column ss:Width="120"/>
+   <Column ss:Width="160"/>
+   <Column ss:Width="180"/>
+   <Column ss:Width="180"/>
+   <Column ss:Width="120"/>
+   <Column ss:Width="110"/>
+   <Column ss:Width="90"/>
+   <Column ss:Width="90"/>
+   <Column ss:Width="110"/>
+   <Column ss:Width="150"/>
+   <Column ss:Width="110"/>
+   <Column ss:Width="140"/>
+   <Column ss:Width="140"/>
+   <Column ss:Width="160"/>
+   <Row ss:Height="26">
+    <Cell ss:MergeAcross="13" ss:StyleID="TitleStyle"><Data ss:Type="String">BANDAMA CHARITY FOUNDATION SIERRA LEONE - MASTER STAFF DIRECTORY</Data></Cell>
+   </Row>
+   <Row ss:Height="18">
+    <Cell ss:MergeAcross="13" ss:StyleID="SubTitleStyle"><Data ss:Type="String">Export Date: ${new Date().toLocaleString('en-GB')} | Total Staff Records: ${staff.length} | Access Level: ${activeRole.toUpperCase()}</Data></Cell>
+   </Row>
+   <Row ss:Height="24" ss:StyleID="HeaderStyle">
+    <Cell><Data ss:Type="String">Employee ID</Data></Cell>
+    <Cell><Data ss:Type="String">Full Name</Data></Cell>
+    <Cell><Data ss:Type="String">Job Title</Data></Cell>
+    <Cell><Data ss:Type="String">Department</Data></Cell>
+    <Cell><Data ss:Type="String">Unit / Section</Data></Cell>
+    <Cell><Data ss:Type="String">Classification</Data></Cell>
+    <Cell><Data ss:Type="String">Job Level</Data></Cell>
+    <Cell><Data ss:Type="String">Status</Data></Cell>
+    <Cell><Data ss:Type="String">Employment Date</Data></Cell>
+    <Cell><Data ss:Type="String">Work Email</Data></Cell>
+    <Cell><Data ss:Type="String">Work Phone</Data></Cell>
+    <Cell><Data ss:Type="String">Work Location</Data></Cell>
+    <Cell><Data ss:Type="String">Reports To</Data></Cell>
+    <Cell><Data ss:Type="String">Personal Phone</Data></Cell>
+   </Row>`;
+
+        staff.forEach(emp => {
+            const row = formatStaffRow(emp, isStaffRole);
+            xml += `
+   <Row ss:Height="20">
+    <Cell ss:StyleID="DataStyleCenter"><Data ss:Type="String">${escapeXml(row.employeeId)}</Data></Cell>
+    <Cell ss:StyleID="DataStyle"><Data ss:Type="String">${escapeXml(row.fullName)}</Data></Cell>
+    <Cell ss:StyleID="DataStyle"><Data ss:Type="String">${escapeXml(row.title)}</Data></Cell>
+    <Cell ss:StyleID="DataStyle"><Data ss:Type="String">${escapeXml(row.department)}</Data></Cell>
+    <Cell ss:StyleID="DataStyle"><Data ss:Type="String">${escapeXml(row.unit)}</Data></Cell>
+    <Cell ss:StyleID="DataStyleCenter"><Data ss:Type="String">${escapeXml(row.classification)}</Data></Cell>
+    <Cell ss:StyleID="DataStyleCenter"><Data ss:Type="String">${escapeXml(row.jobLevel)}</Data></Cell>
+    <Cell ss:StyleID="DataStyleCenter"><Data ss:Type="String">${escapeXml(row.status)}</Data></Cell>
+    <Cell ss:StyleID="DataStyleCenter"><Data ss:Type="String">${escapeXml(row.empDate)}</Data></Cell>
+    <Cell ss:StyleID="DataStyle"><Data ss:Type="String">${escapeXml(row.workEmail)}</Data></Cell>
+    <Cell ss:StyleID="DataStyleCenter"><Data ss:Type="String">${escapeXml(row.workPhone)}</Data></Cell>
+    <Cell ss:StyleID="DataStyle"><Data ss:Type="String">${escapeXml(row.workLoc)}</Data></Cell>
+    <Cell ss:StyleID="DataStyle"><Data ss:Type="String">${escapeXml(row.reportsTo)}</Data></Cell>
+    <Cell ss:StyleID="DataStyleCenter"><Data ss:Type="String">${escapeXml(row.personalPhone)}</Data></Cell>
+   </Row>`;
+        });
+
+        xml += `
+  </Table>
+ </Worksheet>
+
+ <!-- SHEET 2: Banking & Payroll Information -->
+ <Worksheet ss:Name="Banking &amp; Payroll">
+  <Table>
+   <Column ss:Width="120"/>
+   <Column ss:Width="160"/>
+   <Column ss:Width="180"/>
+   <Column ss:Width="180"/>
+   <Column ss:Width="160"/>
+   <Column ss:Width="150"/>
+   <Column ss:Width="160"/>
+   <Column ss:Width="120"/>
+   <Row ss:Height="26">
+    <Cell ss:MergeAcross="7" ss:StyleID="TitleStyle"><Data ss:Type="String">BCF-SL STAFF BANKING &amp; REMUNERATION SCHEDULE</Data></Cell>
+   </Row>
+   <Row ss:Height="24" ss:StyleID="HeaderStyle">
+    <Cell><Data ss:Type="String">Employee ID</Data></Cell>
+    <Cell><Data ss:Type="String">Full Name</Data></Cell>
+    <Cell><Data ss:Type="String">Department</Data></Cell>
+    <Cell><Data ss:Type="String">Bank Name</Data></Cell>
+    <Cell><Data ss:Type="String">Account Name</Data></Cell>
+    <Cell><Data ss:Type="String">Account Number</Data></Cell>
+    <Cell><Data ss:Type="String">BBAN Number</Data></Cell>
+    <Cell><Data ss:Type="String">Basic Salary (NLe)</Data></Cell>
+   </Row>`;
+
+        staff.forEach(emp => {
+            const row = formatStaffRow(emp, isStaffRole);
+            xml += `
+   <Row ss:Height="20">
+    <Cell ss:StyleID="DataStyleCenter"><Data ss:Type="String">${escapeXml(row.employeeId)}</Data></Cell>
+    <Cell ss:StyleID="DataStyle"><Data ss:Type="String">${escapeXml(row.fullName)}</Data></Cell>
+    <Cell ss:StyleID="DataStyle"><Data ss:Type="String">${escapeXml(row.department)}</Data></Cell>
+    <Cell ss:StyleID="DataStyle"><Data ss:Type="String">${escapeXml(row.bankName)}</Data></Cell>
+    <Cell ss:StyleID="DataStyle"><Data ss:Type="String">${escapeXml(row.accName)}</Data></Cell>
+    <Cell ss:StyleID="DataStyleCenter"><Data ss:Type="String">${escapeXml(row.accNo)}</Data></Cell>
+    <Cell ss:StyleID="DataStyleCenter"><Data ss:Type="String">${escapeXml(row.bban)}</Data></Cell>
+    <Cell ss:StyleID="DataStyleCenter"><Data ss:Type="String">${escapeXml(row.payBasic)}</Data></Cell>
+   </Row>`;
+        });
+
+        xml += `
+  </Table>
+ </Worksheet>
+
+ <!-- SHEET 3: Qualifications & Skills -->
+ <Worksheet ss:Name="Qualifications &amp; Skills">
+  <Table>
+   <Column ss:Width="120"/>
+   <Column ss:Width="160"/>
+   <Column ss:Width="180"/>
+   <Column ss:Width="280"/>
+   <Column ss:Width="280"/>
+   <Column ss:Width="220"/>
+   <Row ss:Height="26">
+    <Cell ss:MergeAcross="5" ss:StyleID="TitleStyle"><Data ss:Type="String">BCF-SL STAFF QUALIFICATIONS &amp; COMPETENCIES</Data></Cell>
+   </Row>
+   <Row ss:Height="24" ss:StyleID="HeaderStyle">
+    <Cell><Data ss:Type="String">Employee ID</Data></Cell>
+    <Cell><Data ss:Type="String">Full Name</Data></Cell>
+    <Cell><Data ss:Type="String">Department</Data></Cell>
+    <Cell><Data ss:Type="String">Academic Qualifications</Data></Cell>
+    <Cell><Data ss:Type="String">Work Experience</Data></Cell>
+    <Cell><Data ss:Type="String">Technical Skills</Data></Cell>
+   </Row>`;
+
+        staff.forEach(emp => {
+            const row = formatStaffRow(emp, isStaffRole);
+            xml += `
+   <Row ss:Height="20">
+    <Cell ss:StyleID="DataStyleCenter"><Data ss:Type="String">${escapeXml(row.employeeId)}</Data></Cell>
+    <Cell ss:StyleID="DataStyle"><Data ss:Type="String">${escapeXml(row.fullName)}</Data></Cell>
+    <Cell ss:StyleID="DataStyle"><Data ss:Type="String">${escapeXml(row.department)}</Data></Cell>
+    <Cell ss:StyleID="DataStyle"><Data ss:Type="String">${escapeXml(row.education)}</Data></Cell>
+    <Cell ss:StyleID="DataStyle"><Data ss:Type="String">${escapeXml(row.experience)}</Data></Cell>
+    <Cell ss:StyleID="DataStyle"><Data ss:Type="String">${escapeXml(row.skills)}</Data></Cell>
+   </Row>`;
+        });
+
+        xml += `
+  </Table>
+ </Worksheet>
+</Workbook>`;
+
+        const blob = new Blob([xml], { type: 'application/vnd.ms-excel;charset=utf-8;' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `BCF-SL_All_Staff_Workbook_${today}.xls`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+
+        showExportToast(`✅ Successfully exported ${staff.length} staff profiles to Excel!`);
+    }
+
+    function downloadStaffJSON() {
+        const staff = getAllStaffData();
+        if (!staff || staff.length === 0) {
+            showExportToast('⚠️ No staff records available to export.', 'warning');
+            return;
+        }
+        const today = new Date().toISOString().split('T')[0];
+        const isStaffRole = !(ROLES[activeRole] || ROLES['staff']).canViewConfidential;
+
+        const sanitized = staff.map(e => {
+            const copy = { ...e };
+            if (isStaffRole) {
+                delete copy.nin;
+                delete copy.nassit;
+                delete copy.payBasic;
+                delete copy.accNo;
+                delete copy.bban;
+                delete copy.dob;
+                delete copy.address;
+                delete copy.emPhone;
+                copy._restrictedNotice = "Confidential fields protected under BCF-SL Privacy Policy.";
+            }
+            return copy;
+        });
+
+        const payload = {
+            organization: "Bandama Charity Foundation Sierra Leone (BCF-SL)",
+            exportDate: new Date().toISOString(),
+            totalStaff: staff.length,
+            exportedByRole: activeRole,
+            staff: sanitized
+        };
+
+        const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `BCF-SL_All_Staff_Records_${today}.json`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+
+        showExportToast(`✅ Successfully downloaded ${staff.length} staff records (JSON)!`);
+    }
+
+    function printStaffSummary() {
+        const staff = getAllStaffData();
+        if (!staff || staff.length === 0) {
+            showExportToast('⚠️ No staff records available to print.', 'warning');
+            return;
+        }
+        const today = new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' });
+        const printWin = window.open('', '_blank');
+        if (!printWin) {
+            alert('Please allow popups to print the staff roster.');
+            return;
+        }
+
+        const rowsHtml = staff.map((e, idx) => `
+            <tr style="border-bottom: 1px solid #e2e8f0; font-size: 11px;">
+                <td style="padding: 8px 6px; text-align: center; font-weight: bold; color: #64748b;">${idx + 1}</td>
+                <td style="padding: 8px 6px; font-family: monospace; font-weight: bold; color: #15803d;">${e.employeeId || '-'}</td>
+                <td style="padding: 8px 6px; font-weight: bold; color: #0f172a;">${e.fullName || '-'}</td>
+                <td style="padding: 8px 6px; color: #334155;">${e.title || '-'}</td>
+                <td style="padding: 8px 6px; color: #475569;">${(e.department || '-').replace(' Department', '')}</td>
+                <td style="padding: 8px 6px; text-align: center;"><span style="display:inline-block; padding: 2px 6px; border-radius: 4px; font-size: 10px; font-weight: bold; background: #dcfce7; color: #166534;">${e.status || 'Active'}</span></td>
+                <td style="padding: 8px 6px; color: #475569;">${e.phone || e.workPhone || '-'}</td>
+                <td style="padding: 8px 6px; color: #475569;">${e.email || e.workEmail || '-'}</td>
+            </tr>
+        `).join('');
+
+        printWin.document.write(`
+            <!DOCTYPE html>
+            <html>
+            <head>
+                <title>BCF-SL Official Staff Roster - ${today}</title>
+                <style>
+                    body { font-family: Calibri, 'Segoe UI', sans-serif; margin: 20px; color: #1e293b; }
+                    @media print { body { margin: 10mm; } button { display: none; } }
+                </style>
+            </head>
+            <body>
+                <div style="display: flex; align-items: center; justify-content: space-between; border-bottom: 2px solid #16a34a; padding-bottom: 12px; margin-bottom: 16px;">
+                    <div>
+                        <h1 style="font-size: 18px; margin: 0; color: #15803d; font-weight: 800;">BANDAMA CHARITY FOUNDATION SIERRA LEONE</h1>
+                        <p style="font-size: 11px; margin: 3px 0 0; color: #2563eb; font-weight: 600;">OFFICIAL STAFF DIRECTORY &amp; EMPLOYEE ROSTER</p>
+                    </div>
+                    <div style="text-align: right; font-size: 11px; color: #64748b;">
+                        <div>Date: <strong>${today}</strong></div>
+                        <div>Total Staff: <strong>${staff.length}</strong></div>
+                    </div>
+                </div>
+                <table style="width: 100%; border-collapse: collapse; text-align: left;">
+                    <thead>
+                        <tr style="background: #15803d; color: white; font-size: 11px;">
+                            <th style="padding: 8px 6px; text-align: center;">#</th>
+                            <th style="padding: 8px 6px;">Staff ID</th>
+                            <th style="padding: 8px 6px;">Employee Name</th>
+                            <th style="padding: 8px 6px;">Position</th>
+                            <th style="padding: 8px 6px;">Department</th>
+                            <th style="padding: 8px 6px; text-align: center;">Status</th>
+                            <th style="padding: 8px 6px;">Phone</th>
+                            <th style="padding: 8px 6px;">Email</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${rowsHtml}
+                    </tbody>
+                </table>
+                <div style="margin-top: 24px; font-size: 10px; color: #94a3b8; text-align: center; border-top: 1px solid #e2e8f0; padding-top: 8px;">
+                    Bandama Charity Foundation Sierra Leone • Confidential Internal Administrative Record • Generated by BCF-SL System
+                </div>
+                <script>
+                    window.onload = function() { window.print(); };
+                <\/script>
+            </body>
+            </html>
+        `);
+        printWin.document.close();
+    }
+
+    let toastTimer = null;
+    function showExportToast(msg, type = 'success') {
+        const toast = document.getElementById('export-toast');
+        const msgEl = document.getElementById('export-toast-msg');
+        const iconEl = document.getElementById('export-toast-icon');
+        if (!toast || !msgEl) {
+            alert(msg);
+            return;
+        }
+        msgEl.textContent = msg;
+        if (iconEl) {
+            iconEl.textContent = type === 'warning' ? 'warning' : 'check_circle';
+            iconEl.className = type === 'warning' ? 'material-symbols-outlined text-amber-400 text-[20px]' : 'material-symbols-outlined text-emerald-400 text-[20px]';
+        }
+        toast.classList.remove('hidden');
+        setTimeout(() => {
+            toast.classList.remove('translate-y-2', 'opacity-0');
+            toast.classList.add('translate-y-0', 'opacity-100');
+        }, 10);
+        if (toastTimer) clearTimeout(toastTimer);
+        toastTimer = setTimeout(() => {
+            toast.classList.remove('translate-y-0', 'opacity-100');
+            toast.classList.add('translate-y-2', 'opacity-0');
+            setTimeout(() => toast.classList.add('hidden'), 300);
+        }, 3500);
+    }
+
+    window.onload = function() {
+        activeRole = getEffectiveSystemRole();
+        applyRole(activeRole);
+        renderList(registry);
+        updateExportStaffCounts();
+
+        // Check if employee ID is passed via URL query parameter
+        const urlParams = new URLSearchParams(window.location.search);
+        const empIdParam = (urlParams.get('id') || urlParams.get('employeeId') || urlParams.get('emp') || '').trim();
+
+        let initialProfile = null;
+        if (empIdParam && Array.isArray(registry)) {
+            initialProfile = registry.find(r => (r.employeeId && r.employeeId.toUpperCase() === empIdParam.toUpperCase()) || (r.id && r.id.toUpperCase() === empIdParam.toUpperCase()));
+        }
+        if (!initialProfile) {
+            const stored = localStorage.getItem('bcf_selected_profile');
+            if(stored) {
+                try { initialProfile = JSON.parse(stored); } catch(e) {}
+            }
+        }
+
+        if (initialProfile) {
+            openProfile(initialProfile);
+        }
+
+        // Live synchronisation with MongoDB Atlas backend
+        loadEmployees().then(() => {
+            if (empIdParam && !currentEmployee) {
+                const liveMatch = registry.find(r => (r.employeeId && r.employeeId.toUpperCase() === empIdParam.toUpperCase()) || (r.id && r.id.toUpperCase() === empIdParam.toUpperCase()));
+                if (liveMatch) openProfile(liveMatch);
+            }
+        });
+    };
+</script>
+<!-- DUPLICATE ENTRY WARNING MODAL -->
+<div id="dup-warning-modal" class="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs hidden flex items-center justify-center p-4">
+    <div class="bg-surface rounded-2xl max-w-lg w-full p-6 shadow-2xl border border-red-300 transform transition-all">
+        <div class="flex items-center gap-3 text-red-600 mb-4 pb-3 border-b border-red-100">
+            <div class="w-12 h-12 rounded-full bg-red-100 flex items-center justify-center shrink-0">
+                <span class="material-symbols-outlined text-3xl text-red-600">error</span>
+            </div>
+            <div>
+                <h3 class="text-lg font-bold text-slate-900">Duplicate Record Detected</h3>
+                <p class="text-xs text-red-600 font-semibold uppercase tracking-wider">Uniqueness Policy Warning</p>
+            </div>
+        </div>
+        <p class="text-sm text-slate-600 mb-3">
+            The following information <strong>has already been entered</strong> for another employee in the database. Each employee must have a unique <strong>NIN / Passport, NASSIT No., Account Number, and BBAN Number</strong>:
+        </p>
+        <div id="dup-modal-list" class="space-y-2.5 mb-6 bg-red-50/70 p-3.5 rounded-xl border border-red-200 text-sm max-h-60 overflow-y-auto">
+            <!-- Dynamic entries inserted here -->
+        </div>
+        <div class="flex justify-end gap-3 pt-2">
+            <button type="button" onclick="closeDupModal()" class="px-5 py-2.5 rounded-xl bg-red-600 hover:bg-red-700 text-white font-bold text-sm shadow transition flex items-center gap-2">
+                <span class="material-symbols-outlined text-[18px]">edit</span>
+                Review &amp; Correct
+            </button>
+        </div>
+    </div>
+</div>
+
+
+<script>
+    function navToApp(nextRoute, fallbackPath, e) {
+        if (e) e.preventDefault();
+        try {
+            if (window.top && window.top !== window && window.top.location) {
+                window.top.location.href = nextRoute;
+                return;
+            }
+        } catch(err) {}
+        window.location.href = fallbackPath;
+    }
+</script>
+
+
+
+
+<!-- TOAST NOTIFICATION CONTAINER -->
+<div id="export-toast" class="fixed bottom-6 right-6 z-50 hidden transition-all duration-300 transform translate-y-2 opacity-0">
+    <div class="bg-slate-900/95 text-white text-xs sm:text-sm font-medium py-3 px-5 rounded-xl shadow-2xl border border-slate-700 flex items-center gap-3 backdrop-blur-md">
+        <span class="material-symbols-outlined text-emerald-400 text-[20px]" id="export-toast-icon">check_circle</span>
+        <span id="export-toast-msg">Staff data exported successfully.</span>
+    </div>
+</div>
+
+</body>
+</html>

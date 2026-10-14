@@ -1,0 +1,1574 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" name="viewport"/>
+  <title>Donor Dossier &amp; Grant Compliance Ledger - BCF-SL DonorLog CRM</title>
+  <link href="https://fonts.googleapis.com" rel="preconnect"/>
+  <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..24,400..600,0..1,0" rel="stylesheet"/>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script id="tailwind-config">
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            primary: '#0f766e',
+            'primary-dark': '#0d5d56',
+            'primary-light': '#ccfbf1',
+            secondary: '#006c49',
+            'secondary-container': '#d1fae5',
+            surface: '#f8fafc',
+            'surface-card': '#ffffff',
+            'on-surface': '#0f172a',
+            'on-surface-variant': '#64748b',
+            outline: '#e2e8f0'
+          },
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+            display: ['Plus Jakarta Sans', 'sans-serif']
+          }
+        }
+      }
+    };
+  </script>
+  <style>
+    @layer base {
+      html, body {
+        width: 100%;
+        margin: 0;
+        padding: 0;
+        font-family: 'Inter', sans-serif;
+      }
+      body {
+        overscroll-behavior-y: none;
+      }
+    }
+    .custom-scrollbar::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-track {
+      background: #f1f5f9;
+    }
+    .custom-scrollbar::-webkit-scrollbar-thumb {
+      background: #cbd5e1;
+      border-radius: 4px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+      background: #94a3b8;
+    }
+    @keyframes pulse-ring {
+      0% { box-shadow: 0 0 0 0 rgba(15, 118, 110, 0.4); }
+      70% { box-shadow: 0 0 0 8px rgba(15, 118, 110, 0); }
+      100% { box-shadow: 0 0 0 0 rgba(15, 118, 110, 0); }
+    }
+    .card-highlight {
+      animation: pulse-ring 2s cubic-bezier(0.4, 0, 0.6, 1) 2;
+      border-color: #0f766e !important;
+    }
+    @media print {
+      .no-print, header, nav, #toast-container, .modal-backdrop {
+        display: none !important;
+      }
+      body {
+        background: white !important;
+        color: black !important;
+        padding: 0 !important;
+      }
+      .print-visible {
+        display: block !important;
+      }
+      .card-dossier {
+        break-inside: avoid;
+        border: 1px solid #ccc !important;
+        margin-bottom: 20px !important;
+        box-shadow: none !important;
+      }
+    }
+  </style>
+</head>
+<body class="bg-slate-50 text-slate-800 antialiased min-h-screen flex flex-col pb-20">
+
+  <!-- TOP EXECUTIVE BANNER -->
+  <header class="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-slate-200 shadow-2xs no-print">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 flex flex-col md:flex-row md:items-center justify-between gap-3">
+      
+      <!-- Organization Logo & Title -->
+      <div class="flex items-center gap-3">
+        <a href="../donors_directory_log/code.html" class="w-10 h-10 rounded-xl bg-teal-800 hover:bg-teal-900 text-white flex items-center justify-center shrink-0 shadow-sm transition" title="Back to Directory">
+          <span class="material-symbols-outlined text-[22px]">folder_shared</span>
+        </a>
+        <div>
+          <div class="flex items-center gap-2">
+            <span class="text-[10px] font-black uppercase tracking-widest text-teal-800 bg-teal-50 px-2 py-0.5 rounded border border-teal-200">
+              BCF-SL Central Ledger
+            </span>
+            <span class="text-[10px] font-mono font-bold text-slate-400">SL-NNGO-2023-084</span>
+          </div>
+          <h1 class="text-base sm:text-lg font-black text-slate-900 tracking-tight font-display">
+            BANDAMA CHARITY FOUNDATION &ndash; SIERRA LEONE
+          </h1>
+          <p class="text-xs text-slate-500 font-medium">
+            Donor Dossier Master Console &bull; Real-Time Intake Tracking
+          </p>
+        </div>
+      </div>
+
+      <!-- Action Toolbar -->
+      <div class="flex items-center gap-2 flex-wrap justify-end">
+        <a href="../log_new_donation/code.html" class="px-3 py-1.5 rounded-lg bg-teal-700 hover:bg-teal-800 text-white text-xs font-bold inline-flex items-center gap-1.5 transition shadow-2xs">
+          <span class="material-symbols-outlined text-[16px]">add_circle</span>
+          <span>Log New Donation</span>
+        </a>
+
+        <a href="../donors_directory_log/code.html" class="px-3 py-1.5 rounded-lg border border-slate-300 hover:bg-slate-100 text-slate-700 text-xs font-bold inline-flex items-center gap-1.5 transition">
+          <span class="material-symbols-outlined text-[16px] text-teal-700">group</span>
+          <span>Directory</span>
+        </a>
+
+        <button type="button" onclick="printAllDonorsReport()" class="px-3 py-1.5 rounded-lg border border-slate-300 hover:bg-slate-100 text-slate-800 text-xs font-bold inline-flex items-center gap-1.5 transition shadow-2xs">
+          <span class="material-symbols-outlined text-[16px] text-slate-600">print</span>
+          <span>Print All</span>
+        </button>
+
+        <button type="button" onclick="exportDossiersCSV()" class="px-3 py-1.5 rounded-lg bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-bold inline-flex items-center gap-1.5 transition shadow-2xs">
+          <span class="material-symbols-outlined text-[16px]">download</span>
+          <span>Export All Donors (CSV)</span>
+        </button>
+      </div>
+
+    </div>
+  </header>
+
+  <!-- PRINT ONLY LETTERHEAD -->
+  <div class="hidden print-visible p-6 text-center border-b-2 border-slate-300 mb-6">
+    <div class="text-[11px] font-bold tracking-widest uppercase text-teal-800">Non-Governmental Organization &bull; Sierra Leone</div>
+    <h1 class="text-xl font-black text-slate-900 mt-1">BANDAMA CHARITY FOUNDATION &ndash; SIERRA LEONE (BCF-SL)</h1>
+    <div class="text-xs font-bold text-slate-600">BCF-SL &bull; REG. NO: SL-NNGO-2023-084</div>
+    <div class="text-xs text-slate-500 mt-1">
+      Southern Region Office: 2 Ernest Gborie Street Off Gerihun Road Bo, Sierra Leone &bull; Headquarters: Freetown, Sierra Leone
+    </div>
+    <div class="text-xs font-semibold text-teal-800">
+      bandamacharityfoundationsl@gmail.com &bull; +23278242826
+    </div>
+    <div class="text-sm font-black uppercase tracking-wider text-slate-800 mt-3 pt-2 border-t border-slate-200">
+      OFFICIAL DONOR DOSSIER &amp; REGISTRATION MASTER REPORT
+    </div>
+  </div>
+
+  <!-- MAIN VIEW CONTAINER -->
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 w-full space-y-6">
+
+    <!-- KPI SUMMARY CARDS -->
+    <section class="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 no-print">
+      <!-- Total Funds Tracked -->
+      <div class="bg-white rounded-2xl p-4 sm:p-5 border border-slate-200 shadow-2xs relative overflow-hidden">
+        <div class="flex items-center justify-between">
+          <span class="text-xs font-bold uppercase tracking-wider text-slate-500">Total Tracked Value</span>
+          <div class="w-8 h-8 rounded-lg bg-teal-50 text-teal-700 flex items-center justify-center">
+            <span class="material-symbols-outlined text-[18px]">payments</span>
+          </div>
+        </div>
+        <div class="mt-2">
+          <div id="kpi-total-val" class="text-xl sm:text-2xl font-black text-teal-900 font-display">NLe 0.00</div>
+          <div id="kpi-total-count" class="text-xs text-slate-500 mt-0.5">0 Active Donor Dossiers</div>
+        </div>
+      </div>
+
+      <!-- Verified Donors -->
+      <div class="bg-white rounded-2xl p-4 sm:p-5 border border-slate-200 shadow-2xs relative overflow-hidden">
+        <div class="flex items-center justify-between">
+          <span class="text-xs font-bold uppercase tracking-wider text-slate-500">Verified Dossiers</span>
+          <div class="w-8 h-8 rounded-lg bg-emerald-50 text-emerald-700 flex items-center justify-center">
+            <span class="material-symbols-outlined text-[18px]">verified_user</span>
+          </div>
+        </div>
+        <div class="mt-2">
+          <div id="kpi-verified-count" class="text-xl sm:text-2xl font-black text-slate-900 font-display">0</div>
+          <div id="kpi-verified-pct" class="text-xs text-emerald-700 font-bold mt-0.5">100% Audit Verified</div>
+        </div>
+      </div>
+
+      <!-- Official Receipts / Acknowledged -->
+      <div class="bg-white rounded-2xl p-4 sm:p-5 border border-slate-200 shadow-2xs relative overflow-hidden">
+        <div class="flex items-center justify-between">
+          <span class="text-xs font-bold uppercase tracking-wider text-slate-500">Receipts &amp; Tax Slips</span>
+          <div class="w-8 h-8 rounded-lg bg-teal-50 text-teal-700 flex items-center justify-center">
+            <span class="material-symbols-outlined text-[18px]">receipt_long</span>
+          </div>
+        </div>
+        <div class="mt-2">
+          <div id="kpi-receipt-count" class="text-xl sm:text-2xl font-black text-slate-900 font-display">0</div>
+          <div class="text-xs text-slate-500 mt-0.5">Official BCF-SL Vouchers</div>
+        </div>
+      </div>
+
+      <!-- Automated Email Confirmations -->
+      <div class="bg-white rounded-2xl p-4 sm:p-5 border border-slate-200 shadow-2xs relative overflow-hidden">
+        <div class="flex items-center justify-between">
+          <span class="text-xs font-bold uppercase tracking-wider text-slate-500">Emails Dispatched</span>
+          <div class="w-8 h-8 rounded-lg bg-red-50 text-red-600 flex items-center justify-center">
+            <span class="material-symbols-outlined text-[18px]">mark_email_read</span>
+          </div>
+        </div>
+        <div class="mt-2">
+          <div id="kpi-email-count" class="text-xl sm:text-2xl font-black text-slate-900 font-display">0</div>
+          <div class="text-xs text-slate-500 mt-0.5">via bandamacharityfoundationsl@gmail.com</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SEARCH & TACTICAL FILTER BAR -->
+    <section class="bg-white rounded-2xl p-4 border border-slate-200 shadow-2xs space-y-3 no-print">
+      <div class="flex flex-col md:flex-row md:items-center justify-between gap-3">
+        
+        <!-- Search Input -->
+        <div class="relative flex-1">
+          <span class="material-symbols-outlined absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-[18px]">
+            search
+          </span>
+          <input type="text" id="dossier-search" oninput="renderDossiersList()"
+                 placeholder="Search by Donor Name, Organization, CEO, Donation ID, Tracking ID, Program..."
+                 class="w-full pl-10 pr-4 py-2.5 bg-slate-50 border border-slate-300 rounded-xl text-xs font-medium placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-teal-700/20 focus:border-teal-700 transition"/>
+        </div>
+
+        <!-- Real-Time Sync Indicator -->
+        <div class="flex items-center gap-2 shrink-0 text-xs font-bold text-slate-600 bg-slate-50 px-3 py-2 rounded-xl border border-slate-200">
+          <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
+          <span>Live Auto-Sync from Log New Donation</span>
+        </div>
+
+      </div>
+
+      <!-- Filter Chips -->
+      <div class="flex items-center gap-2 overflow-x-auto pb-1 text-xs custom-scrollbar" id="filter-chips-container">
+        <button type="button" onclick="setDossierFilter('all')" data-filter="all" class="dossier-chip active px-3 py-1 rounded-full text-xs font-bold transition bg-teal-700 text-white shadow-xs">
+          All Donors (<span id="count-all">0</span>)
+        </button>
+        <button type="button" onclick="setDossierFilter('Corporate')" data-filter="Corporate" class="dossier-chip px-3 py-1 rounded-full text-xs font-bold transition bg-slate-100 hover:bg-slate-200 text-slate-700">
+          Corporate (<span id="count-corporate">0</span>)
+        </button>
+        <button type="button" onclick="setDossierFilter('NGO/Foundation')" data-filter="NGO/Foundation" class="dossier-chip px-3 py-1 rounded-full text-xs font-bold transition bg-slate-100 hover:bg-slate-200 text-slate-700">
+          NGO / Foundation (<span id="count-ngo">0</span>)
+        </button>
+        <button type="button" onclick="setDossierFilter('Government')" data-filter="Government" class="dossier-chip px-3 py-1 rounded-full text-xs font-bold transition bg-slate-100 hover:bg-slate-200 text-slate-700">
+          Government / Multilateral (<span id="count-gov">0</span>)
+        </button>
+        <button type="button" onclick="setDossierFilter('Individual')" data-filter="Individual" class="dossier-chip px-3 py-1 rounded-full text-xs font-bold transition bg-slate-100 hover:bg-slate-200 text-slate-700">
+          Individual (<span id="count-individual">0</span>)
+        </button>
+        <button type="button" onclick="setDossierFilter('Restricted')" data-filter="Restricted" class="dossier-chip px-3 py-1 rounded-full text-xs font-bold transition bg-slate-100 hover:bg-slate-200 text-slate-700">
+          Restricted (<span id="count-restricted">0</span>)
+        </button>
+        <button type="button" onclick="setDossierFilter('In-Kind')" data-filter="In-Kind" class="dossier-chip px-3 py-1 rounded-full text-xs font-bold transition bg-slate-100 hover:bg-slate-200 text-slate-700">
+          In-Kind (<span id="count-inkind">0</span>)
+        </button>
+      </div>
+    </section>
+
+    <!-- CARD LIST FOR ALL DONORS CONTAINER -->
+    <section id="dossiers-list-container" class="space-y-4">
+      <!-- Dynamic Donor Dossier Cards populated via JavaScript -->
+    </section>
+
+  </main>
+
+  <!-- FULL DOSSIER RECORD MODAL (VIEW & SAVE & PRINT) -->
+  <div id="dossier-full-modal" class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-3 sm:p-4 hidden no-print">
+    <div class="bg-white rounded-2xl border border-slate-200 shadow-2xl max-w-4xl w-full max-h-[92vh] flex flex-col overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+      
+      <!-- Modal Header -->
+      <div class="px-5 py-4 bg-teal-800 text-white flex items-center justify-between">
+        <div class="flex items-center gap-2.5">
+          <div class="w-8 h-8 rounded-lg bg-teal-700 flex items-center justify-center text-teal-100 shadow-2xs">
+            <span class="material-symbols-outlined text-[20px]">folder_shared</span>
+          </div>
+          <div>
+            <h3 class="text-sm font-black uppercase tracking-wide">Donor Dossier Full Audit Record</h3>
+            <p class="text-[11px] text-teal-200">Complete details obtained from Log New Donation &bull; Editable Compliance Dossier</p>
+          </div>
+        </div>
+        <button type="button" onclick="closeDossierModal()" class="w-8 h-8 rounded-full flex items-center justify-center hover:bg-teal-700 text-teal-100 transition">
+          <span class="material-symbols-outlined text-[18px]">close</span>
+        </button>
+      </div>
+
+      <!-- Modal Body (Comprehensive 5-Section View & Edit Form) -->
+      <div class="p-5 overflow-y-auto flex-1 custom-scrollbar space-y-5 bg-slate-50/50" id="dossier-modal-body">
+        <!-- Injected via JavaScript -->
+      </div>
+
+      <!-- Modal Footer -->
+      <div class="px-5 py-3 border-t border-slate-200 bg-white flex flex-col sm:flex-row items-center justify-between gap-3 text-xs">
+        <div class="flex items-center gap-2 w-full sm:w-auto">
+          <button type="button" onclick="printSingleDossier()" class="px-3.5 py-2 rounded-lg border border-slate-300 hover:bg-slate-100 text-slate-800 font-bold inline-flex items-center gap-1.5 transition">
+            <span class="material-symbols-outlined text-[16px] text-slate-600">print</span>
+            <span>Print Dossier</span>
+          </button>
+          <button type="button" id="btn-save-dossier" onclick="saveActiveDossierChanges()" class="px-4 py-2 rounded-lg bg-teal-700 hover:bg-teal-800 text-white font-bold inline-flex items-center gap-1.5 transition shadow-xs">
+            <span class="material-symbols-outlined text-[16px]">save</span>
+            <span>Save Dossier Changes</span>
+          </button>
+        </div>
+
+        <div class="flex items-center gap-2 w-full sm:w-auto justify-end">
+          <button type="button" onclick="closeDossierModal()" class="px-4 py-2 rounded-lg bg-slate-800 hover:bg-slate-900 text-white font-bold transition">
+            Close
+          </button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- EMAIL ACKNOWLEDGMENT MODAL (GMAIL & MAILTO) -->
+  <div id="dossier-email-modal" class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4 hidden no-print">
+    <div class="bg-white rounded-2xl border border-slate-200 shadow-2xl max-w-3xl w-full max-h-[90vh] flex flex-col overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+      
+      <!-- Modal Header -->
+      <div class="px-5 py-3.5 bg-teal-800 text-white flex items-center justify-between">
+        <div class="flex items-center gap-2.5">
+          <div class="w-8 h-8 rounded-lg bg-teal-700 flex items-center justify-center text-teal-100 shadow-2xs">
+            <span class="material-symbols-outlined text-[20px]">mark_email_read</span>
+          </div>
+          <div>
+            <h3 class="text-sm font-black uppercase tracking-wide">Official Email Notification Dispatched</h3>
+            <p class="text-[11px] text-teal-200">Acknowledgment transmitted to Organization Email &amp; tracked in BCF-SL Database</p>
+          </div>
+        </div>
+        <button type="button" onclick="closeEmailModal()" class="w-8 h-8 rounded-full flex items-center justify-center hover:bg-teal-700 text-teal-100 transition">
+          <span class="material-symbols-outlined text-[18px]">close</span>
+        </button>
+      </div>
+
+      <!-- Transmission Metadata Banner -->
+      <div class="bg-slate-50 border-b border-slate-200 px-5 py-2.5 text-xs space-y-1">
+        <div class="flex items-center justify-between gap-2 flex-wrap">
+          <div class="flex items-center gap-2">
+            <span class="text-slate-400 font-bold uppercase text-[10px]">To:</span>
+            <span id="dossier-modal-email-recipient" class="font-bold text-slate-900 font-mono"></span>
+          </div>
+          <div class="flex items-center gap-1.5 text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200 text-[10px] font-extrabold uppercase">
+            <span class="w-1.5 h-1.5 rounded-full bg-emerald-600 animate-pulse"></span>
+            <span>Recorded in BCF-SL Database</span>
+          </div>
+        </div>
+        <div class="flex items-center gap-2 text-slate-500">
+          <span class="text-slate-400 font-bold uppercase text-[10px]">From:</span>
+          <span>BANDAMA CHARITY FOUNDATION – SIERRA LEONE &lt;<strong class="text-slate-700">bandamacharityfoundationsl@gmail.com</strong>&gt;</span>
+        </div>
+        <div class="flex items-center gap-2 text-slate-500">
+          <span class="text-slate-400 font-bold uppercase text-[10px]">Subject:</span>
+          <span id="dossier-modal-email-subject" class="font-bold text-slate-800"></span>
+        </div>
+      </div>
+
+      <!-- Rendered Email Letterhead Body Container -->
+      <div class="p-5 overflow-y-auto flex-1 custom-scrollbar bg-slate-100/70">
+        <div id="dossier-modal-email-body" class="bg-white rounded-xl border border-slate-200 p-6 shadow-xs text-xs space-y-4 text-slate-700">
+          <!-- Populated dynamically via JS -->
+        </div>
+      </div>
+
+      <!-- Modal Footer Action Bar -->
+      <div class="px-5 py-3 border-t border-slate-200 bg-white flex flex-col sm:flex-row items-center justify-between gap-3 text-xs">
+        <div class="flex items-center gap-2 w-full sm:w-auto flex-wrap">
+          <button type="button" id="btn-dossier-gmail" class="px-3.5 py-2 rounded-lg bg-red-600 hover:bg-red-700 text-white font-bold inline-flex items-center gap-1.5 transition shadow-xs" title="Send official confirmation from bandamacharityfoundationsl@gmail.com">
+            <span class="material-symbols-outlined text-[16px]">mail</span>
+            <span>Send from Gmail</span>
+          </button>
+          <button type="button" id="btn-dossier-mailto" class="px-3 py-2 rounded-lg bg-teal-700 hover:bg-teal-800 text-white font-bold inline-flex items-center gap-1.5 transition shadow-xs">
+            <span class="material-symbols-outlined text-[16px]">open_in_browser</span>
+            <span>Mail Client</span>
+          </button>
+          <button type="button" onclick="copyDossierEmailText()" class="px-3 py-2 rounded-lg border border-slate-300 hover:bg-slate-50 text-slate-700 font-bold inline-flex items-center gap-1.5 transition">
+            <span class="material-symbols-outlined text-[16px] text-slate-500">content_copy</span>
+            <span>Copy Text</span>
+          </button>
+        </div>
+
+        <div class="flex items-center gap-2 w-full sm:w-auto justify-end">
+          <button type="button" onclick="closeEmailModal()" class="px-4 py-2 rounded-lg bg-slate-800 hover:bg-slate-900 text-white font-bold transition">
+            Close
+          </button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- TOAST CONTAINER -->
+  <div id="toast-container" class="fixed bottom-20 right-4 z-50 space-y-2 pointer-events-none no-print"></div>
+
+  <!-- BOTTOM DONORLOG NAVIGATION BAR -->
+  <nav class="fixed bottom-0 w-full z-40 bg-white border-t border-slate-200 shadow-md no-print">
+    <div class="max-w-md mx-auto flex items-center justify-around h-14 px-4 text-xs font-semibold">
+      <a href="../donors_directory_log/code.html" class="flex flex-col items-center justify-center text-slate-500 hover:text-teal-700 transition">
+        <span class="material-symbols-outlined text-[20px]">group</span>
+        <span class="text-[10px]">Directory</span>
+      </a>
+      <a href="code.html" class="flex flex-col items-center justify-center text-teal-700 font-bold">
+        <div class="w-6 h-6 rounded-full bg-teal-100 flex items-center justify-center">
+          <span class="material-symbols-outlined text-[16px]">folder_shared</span>
+        </div>
+        <span class="text-[10px]">Dossiers</span>
+      </a>
+      <a href="../log_new_donation/code.html" class="flex flex-col items-center justify-center text-slate-500 hover:text-teal-700 transition">
+        <span class="material-symbols-outlined text-[20px]">volunteer_activism</span>
+        <span class="text-[10px]">Log Gift</span>
+      </a>
+      <a href="../giving_analytics_reports/code.html" class="flex flex-col items-center justify-center text-slate-500 hover:text-teal-700 transition">
+        <span class="material-symbols-outlined text-[20px]">insights</span>
+        <span class="text-[10px]">Analytics</span>
+      </a>
+    </div>
+  </nav>
+
+  <!-- JAVASCRIPT LOGIC ENGINE -->
+  <script>
+    // Initial Benchmark Data (Matches realistic BCF-SL donors and Log New Donation fields)
+    const DEFAULT_DONATIONS_BENCHMARK = [
+      {
+        id: "DON-2025-001",
+        donorId: "DNR-SL-0104",
+        registeredBy: "Amadu Kamara (Grants Officer)",
+        dateRegistered: "2025-01-15",
+        donorType: "Corporate",
+        ceo: "Dr. Haja Fatima Sesay",
+        contactPerson: "Sahr Emmanuel Bangura (CSR Director)",
+        orgName: "Sierra Leone Commercial Bank CSR Trust",
+        email: "csr@slcb-freetown.com",
+        phone: "+232 76 543210",
+        address: "29 Siaka Stevens Street, Freetown, Sierra Leone",
+        country: "Sierra Leone",
+        website: "https://www.slcb.com",
+        logoAttached: true,
+        logoRef: "LOGO_SLCB_2025.PNG",
+        dateReceived: "2025-01-15",
+        itemType: "Money",
+        moneyAmount: 350000,
+        currency: "SLE",
+        restriction: "Restricted",
+        frequency: "One-time",
+        campaign: "2025 Maternal Health Care Drive",
+        programCode: "BCF-H01",
+        programCategory: "Health",
+        programTitle: "Rural Maternal Health Outreach Bo",
+        projectTrackingId: "BCF-H01-01-2025",
+        paymentMethod: "Bank Transfer",
+        receiptNo: "REC-2025-0814",
+        txRef: "TX-SLCB-998240",
+        voucherNo: "PV-2025-044",
+        datePayment: "2025-01-15",
+        estimatedValue: "350,000.00",
+        beneficiaryAck: "Yes",
+        supportingDocAttached: "Yes",
+        docRef: "SLCB_TRANSFER_SLIP_0814.PDF",
+        status: "Verified",
+        verifiedBy: "Josephine Koroma (Finance Director)",
+        verifiedDate: "2025-01-15",
+        ackLetterSent: "Yes",
+        taxReceiptIssued: "Yes",
+        notes: "Donation approved for the Bo District Maternal Clinic equipment overhaul. Quarter 1 impact report and photographic documentation requested prior to tranche 2 disbursement.",
+        preparedBy: "Amadu Kamara, Compliance Officer",
+        approvedBy: "Josephine Koroma, Director of Finance",
+        emailDispatched: true,
+        emailSentTo: "csr@slcb-freetown.com",
+        emailSentAt: "2025-01-15T10:30:00.000Z",
+        timestamp: Date.now() - 86400000 * 2
+      },
+      {
+        id: "DON-2025-002",
+        donorId: "DNR-INT-0088",
+        registeredBy: "Fatmata Turay (Program Assistant)",
+        dateRegistered: "2025-01-18",
+        donorType: "Multilateral",
+        ceo: "Rudolf Schwenk (Country Representative)",
+        contactPerson: "Mariama Jalloh (Child Health Specialist)",
+        orgName: "UNICEF Sierra Leone Country Office",
+        email: "freetown@unicef.org",
+        phone: "+232 22 235555",
+        address: "Medical Stores Compound, New England Ville, Freetown",
+        country: "Sierra Leone / International",
+        website: "https://www.unicef.org/sierraleone",
+        logoAttached: true,
+        logoRef: "UNICEF_SL_OFFICIAL.PNG",
+        dateReceived: "2025-01-18",
+        itemType: "In-Kind",
+        moneyAmount: 0,
+        currency: "SLE",
+        inkindName: "Medical Refrigerators & Solar Vaccine Coolers",
+        inkindQty: "45 Units",
+        inkindCost: 220000,
+        restriction: "Restricted",
+        frequency: "Quarterly",
+        campaign: "Immunization Cold-Chain Rollout",
+        programCode: "BCF-H01",
+        programCategory: "Health",
+        programTitle: "District Vaccine Cold-Chain Solar Facility",
+        projectTrackingId: "BCF-H01-11-2025",
+        paymentMethod: "In-Kind Support",
+        receiptNo: "REC-2025-0902",
+        txRef: "UN-AWB-883192",
+        voucherNo: "PV-2025-051",
+        datePayment: "2025-01-18",
+        estimatedValue: "220,000.00",
+        beneficiaryAck: "Yes",
+        supportingDocAttached: "Yes",
+        docRef: "WAYBILL_UNICEF_REFRIGERATORS.PDF",
+        status: "Verified",
+        verifiedBy: "Josephine Koroma (Finance Director)",
+        verifiedDate: "2025-01-19",
+        ackLetterSent: "Yes",
+        taxReceiptIssued: "Yes",
+        notes: "Cold-chain units allocated directly to 16 Peripheral Health Units in Southern Region. Maintenance handover supervised by District Medical Officer.",
+        preparedBy: "Fatmata Turay, Program Assistant",
+        approvedBy: "Josephine Koroma, Director of Finance",
+        emailDispatched: true,
+        emailSentTo: "freetown@unicef.org",
+        emailSentAt: "2025-01-18T14:15:00.000Z",
+        timestamp: Date.now() - 86400000 * 5
+      },
+      {
+        id: "DON-2025-003",
+        donorId: "DNR-US-0045",
+        registeredBy: "Amadu Kamara (Grants Officer)",
+        dateRegistered: "2025-01-22",
+        donorType: "NGO/Foundation",
+        ceo: "Jacquelline Fuller (President)",
+        contactPerson: "Kevin O'Connor (Africa Tech Grants Lead)",
+        orgName: "Google.org & USAID Tech Equity Fund",
+        email: "grants@google.org",
+        phone: "+1 650 253 0000",
+        address: "1600 Amphitheatre Pkwy, Mountain View, CA, USA",
+        country: "United States",
+        website: "https://www.google.org",
+        logoAttached: true,
+        logoRef: "GOOGLE_ORG_LOGO.SVG",
+        dateReceived: "2025-01-22",
+        itemType: "Money",
+        moneyAmount: 280000,
+        currency: "USD",
+        restriction: "Restricted",
+        frequency: "One-time",
+        campaign: "Youth Digital Economy Accelerator",
+        programCode: "BCF-I06",
+        programCategory: "Innovation",
+        programTitle: "Youth Digital Coding Hub Freetown",
+        projectTrackingId: "BCF-I06-06-2025",
+        paymentMethod: "Electronic Payment",
+        receiptNo: "REC-2025-1044",
+        txRef: "SWIFT-CHASUS33-772190",
+        voucherNo: "PV-2025-068",
+        datePayment: "2025-01-22",
+        estimatedValue: "280,000.00",
+        beneficiaryAck: "Yes",
+        supportingDocAttached: "Yes",
+        docRef: "SWIFT_CONFIRMATION_TECH_HUB.PDF",
+        status: "Verified",
+        verifiedBy: "Josephine Koroma (Finance Director)",
+        verifiedDate: "2025-01-23",
+        ackLetterSent: "Yes",
+        taxReceiptIssued: "Yes",
+        notes: "Tranche 1 funding for Freetown Youth Coding Hub setup, 60 laptops, and solar inverter setup. Bi-monthly milestones tracked in project portal.",
+        preparedBy: "Amadu Kamara, Compliance Officer",
+        approvedBy: "Josephine Koroma, Director of Finance",
+        emailDispatched: true,
+        emailSentTo: "grants@google.org",
+        emailSentAt: "2025-01-22T09:00:00.000Z",
+        timestamp: Date.now() - 86400000 * 9
+      },
+      {
+        id: "DON-2025-004",
+        donorId: "DNR-IND-0771",
+        registeredBy: "Amadu Kamara (Grants Officer)",
+        dateRegistered: "2025-02-01",
+        donorType: "Individual",
+        ceo: "N/A (Individual Contributor)",
+        contactPerson: "Dr. Mohamed S. Bangura",
+        orgName: "Dr. Mohamed S. Bangura Diaspora Endowment",
+        email: "m.bangura.md@gmail.com",
+        phone: "+44 7911 123456",
+        address: "74 Marylebone High St, London W1U 5JW, UK",
+        country: "United Kingdom / Sierra Leonean Diaspora",
+        website: "",
+        logoAttached: false,
+        logoRef: "",
+        dateReceived: "2025-02-01",
+        itemType: "Money",
+        moneyAmount: 180000,
+        currency: "SLE",
+        restriction: "Restricted",
+        frequency: "Monthly",
+        campaign: "Bo Community School Expansion",
+        programCode: "BCF-E02",
+        programCategory: "Education",
+        programTitle: "Primary School Literacy & Tech Kits",
+        projectTrackingId: "BCF-E02-02-2025",
+        paymentMethod: "Orange Money",
+        receiptNo: "REC-2025-1108",
+        txRef: "OM-SL-8849201",
+        voucherNo: "PV-2025-074",
+        datePayment: "2025-02-01",
+        estimatedValue: "180,000.00",
+        beneficiaryAck: "Yes",
+        supportingDocAttached: "Yes",
+        docRef: "ORANGE_MONEY_RECEIPT.PDF",
+        status: "Verified",
+        verifiedBy: "Josephine Koroma (Finance Director)",
+        verifiedDate: "2025-02-01",
+        ackLetterSent: "Yes",
+        taxReceiptIssued: "Yes",
+        notes: "Monthly pledge for community education solar kits and digital learning tablets.",
+        preparedBy: "Amadu Kamara, Compliance Officer",
+        approvedBy: "Josephine Koroma, Director of Finance",
+        emailDispatched: true,
+        emailSentTo: "m.bangura.md@gmail.com",
+        emailSentAt: "2025-02-01T16:20:00.000Z",
+        timestamp: Date.now() - 86400000 * 12
+      }
+    ];
+
+    let currentDonations = [];
+    let currentFilter = 'all';
+    let activeDossierId = null;
+    let activeEmailText = '';
+
+    // Load Dossiers from LocalStorage or Benchmark
+    function loadDossiers() {
+      try {
+        const stored = localStorage.getItem('bcf_donorlog_donations');
+        if (stored) {
+          const parsed = JSON.parse(stored);
+          if (Array.isArray(parsed) && parsed.length > 0) {
+            const map = new Map();
+            parsed.forEach(d => {
+              if (d && d.id) map.set(d.id, d);
+            });
+            DEFAULT_DONATIONS_BENCHMARK.forEach(bm => {
+              if (!map.has(bm.id) && !Array.from(map.values()).some(v => v.orgName && v.orgName.toLowerCase() === bm.orgName.toLowerCase())) {
+                map.set(bm.id, bm);
+              }
+            });
+            currentDonations = Array.from(map.values());
+            localStorage.setItem('bcf_donorlog_donations', JSON.stringify(currentDonations));
+          } else {
+            currentDonations = [...DEFAULT_DONATIONS_BENCHMARK];
+            localStorage.setItem('bcf_donorlog_donations', JSON.stringify(currentDonations));
+          }
+        } else {
+          currentDonations = [...DEFAULT_DONATIONS_BENCHMARK];
+          localStorage.setItem('bcf_donorlog_donations', JSON.stringify(currentDonations));
+        }
+      } catch(e) {
+        currentDonations = [...DEFAULT_DONATIONS_BENCHMARK];
+      }
+      renderDossiersList();
+      updateKPISummary();
+    }
+
+    // Update KPI Summary Metrics
+    function updateKPISummary() {
+      let totalVal = 0;
+      let verifiedCount = 0;
+      let receiptCount = 0;
+      let emailCount = 0;
+
+      currentDonations.forEach(d => {
+        const val = parseFloat(String(d.estimatedValue || d.moneyAmount || 0).replace(/[^0-9.-]/g, '')) || 0;
+        totalVal += val;
+        if (d.status === 'Verified') verifiedCount++;
+        if (d.receiptNo || d.taxReceiptIssued === 'Yes') receiptCount++;
+        if (d.emailSentTo || d.emailDispatched || d.email) emailCount++;
+      });
+
+      const totalCount = currentDonations.length;
+      const verifiedPct = totalCount > 0 ? ((verifiedCount / totalCount) * 100).toFixed(0) : "100";
+
+      document.getElementById('kpi-total-val').textContent = `NLe ${totalVal.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+      document.getElementById('kpi-total-count').textContent = `${totalCount} Registered Donor Dossiers`;
+      document.getElementById('kpi-verified-count').textContent = `${verifiedCount}`;
+      document.getElementById('kpi-verified-pct').textContent = `${verifiedPct}% Audit Verified`;
+      document.getElementById('kpi-receipt-count').textContent = `${receiptCount}`;
+      document.getElementById('kpi-email-count').textContent = `${emailCount}`;
+
+      try {
+        const bc = new BroadcastChannel("bcf_donors_channel");
+        bc.postMessage({ type: "DONORS_UPDATED", verifiedCount: verifiedCount });
+        setTimeout(() => bc.close(), 200);
+      } catch (e) {}
+
+      // Update Filter counts
+      document.getElementById('count-all').textContent = totalCount;
+      document.getElementById('count-corporate').textContent = currentDonations.filter(d => (d.donorType || '').toLowerCase() === 'corporate').length;
+      document.getElementById('count-ngo').textContent = currentDonations.filter(d => (d.donorType || '').toLowerCase().includes('ngo') || (d.donorType || '').toLowerCase().includes('foundation')).length;
+      document.getElementById('count-gov').textContent = currentDonations.filter(d => (d.donorType || '').toLowerCase() === 'government' || (d.donorType || '').toLowerCase() === 'multilateral').length;
+      document.getElementById('count-individual').textContent = currentDonations.filter(d => (d.donorType || '').toLowerCase() === 'individual').length;
+      document.getElementById('count-restricted').textContent = currentDonations.filter(d => (d.restriction || '').toLowerCase() === 'restricted').length;
+      document.getElementById('count-inkind').textContent = currentDonations.filter(d => (d.itemType || '').toLowerCase() === 'in-kind').length;
+    }
+
+    // Filter Trigger
+    function setDossierFilter(filterType) {
+      currentFilter = filterType;
+      const chips = document.querySelectorAll('#filter-chips-container .dossier-chip');
+      chips.forEach(chip => {
+        if (chip.getAttribute('data-filter') === filterType) {
+          chip.className = "dossier-chip active px-3 py-1 rounded-full text-xs font-bold transition bg-teal-700 text-white shadow-xs";
+        } else {
+          chip.className = "dossier-chip px-3 py-1 rounded-full text-xs font-bold transition bg-slate-100 hover:bg-slate-200 text-slate-700";
+        }
+      });
+      renderDossiersList();
+    }
+
+    // Render Cards for All Donors
+    function renderDossiersList() {
+      const container = document.getElementById('dossiers-list-container');
+      if (!container) return;
+
+      const q = (document.getElementById('dossier-search')?.value || '').trim().toLowerCase();
+
+      let filtered = currentDonations.filter(d => {
+        // Category Filter
+        if (currentFilter !== 'all') {
+          if (currentFilter === 'Restricted' && (d.restriction || '').toLowerCase() !== 'restricted') return false;
+          if (currentFilter === 'In-Kind' && (d.itemType || '').toLowerCase() !== 'in-kind') return false;
+          if (currentFilter === 'Government' && (d.donorType || '').toLowerCase() !== 'government' && (d.donorType || '').toLowerCase() !== 'multilateral') return false;
+          if (currentFilter === 'NGO/Foundation' && !(d.donorType || '').toLowerCase().includes('ngo') && !(d.donorType || '').toLowerCase().includes('foundation')) return false;
+          if (currentFilter === 'Corporate' && (d.donorType || '').toLowerCase() !== 'corporate') return false;
+          if (currentFilter === 'Individual' && (d.donorType || '').toLowerCase() !== 'individual') return false;
+        }
+
+        // Search Query
+        if (q) {
+          const matchOrg = (d.orgName || '').toLowerCase().includes(q);
+          const matchContact = (d.contactPerson || '').toLowerCase().includes(q);
+          const matchCEO = (d.ceo || '').toLowerCase().includes(q);
+          const matchId = (d.id || '').toLowerCase().includes(q);
+          const matchDnrId = (d.donorId || '').toLowerCase().includes(q);
+          const matchProg = (d.programCode || '').toLowerCase().includes(q);
+          const matchTracking = (d.projectTrackingId || '').toLowerCase().includes(q);
+          const matchCampaign = (d.campaign || '').toLowerCase().includes(q);
+          const matchNotes = (d.notes || '').toLowerCase().includes(q);
+          if (!matchOrg && !matchContact && !matchCEO && !matchId && !matchDnrId && !matchProg && !matchTracking && !matchCampaign && !matchNotes) {
+            return false;
+          }
+        }
+        return true;
+      });
+
+      if (filtered.length === 0) {
+        container.innerHTML = `
+          <div class="bg-white rounded-2xl p-12 text-center border border-slate-200 shadow-xs space-y-3">
+            <span class="material-symbols-outlined text-5xl text-slate-300">folder_off</span>
+            <h3 class="text-sm font-bold text-slate-800">No donor dossiers found matching your criteria</h3>
+            <p class="text-xs text-slate-500 max-w-sm mx-auto">Try clearing search terms or log a new donation intake to populate the ledger.</p>
+            <button type="button" onclick="setDossierFilter('all'); document.getElementById('dossier-search').value='';" 
+                    class="px-4 py-2 rounded-lg bg-teal-700 hover:bg-teal-800 text-white text-xs font-bold inline-flex items-center gap-1.5 transition">
+              <span class="material-symbols-outlined text-[16px]">restart_alt</span>
+              <span>Reset Filters</span>
+            </button>
+          </div>
+        `;
+        return;
+      }
+
+      container.innerHTML = filtered.map((d, idx) => {
+        const initials = getInitials(d.orgName || d.contactPerson || "Donor");
+        const statusBadge = getStatusBadge(d.status || 'Verified');
+        const amountDisplay = d.estimatedValue ? `NLe ${d.estimatedValue}` : (d.moneyAmount ? `NLe ${d.moneyAmount.toLocaleString('en-US', { minimumFractionDigits: 2 })}` : 'NLe 0.00');
+        const isHighlight = d._justAdded ? 'card-highlight' : '';
+        const recipientEmail = d.emailSentTo || d.email || '';
+
+        return `
+          <article class="card-dossier bg-white rounded-2xl border border-slate-200 p-5 shadow-xs hover:shadow-md transition-all duration-200 space-y-4 ${isHighlight}">
+            
+            <!-- CARD TOP HEADER -->
+            <div class="flex flex-col sm:flex-row sm:items-start justify-between gap-4 pb-3 border-b border-slate-100">
+              
+              <!-- Donor Identity -->
+              <div class="flex items-start gap-3.5 min-w-0">
+                <div class="w-12 h-12 rounded-xl bg-teal-800 text-white font-display font-extrabold text-base flex items-center justify-center shrink-0 shadow-2xs">
+                  ${initials}
+                </div>
+                <div class="min-w-0">
+                  <div class="flex items-center gap-2 flex-wrap mb-1">
+                    <h2 class="text-base font-black text-slate-900 truncate" title="${d.orgName || 'Anonymous Donor'}">
+                      ${d.orgName || 'Anonymous Donor'}
+                    </h2>
+                    <span class="px-2 py-0.5 rounded-full text-[10px] font-extrabold uppercase tracking-wider bg-slate-100 text-slate-700 border border-slate-200">
+                      ${d.donorType || 'Donor'}
+                    </span>
+                    ${statusBadge}
+                    ${recipientEmail ? `
+                      <span class="px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-emerald-50 text-emerald-800 border border-emerald-200 inline-flex items-center gap-1 shadow-2xs" title="Official confirmation email dispatched to ${recipientEmail}">
+                        <span class="material-symbols-outlined text-[12px] text-emerald-600">mark_email_read</span>
+                        <span>Email Sent: ${recipientEmail}</span>
+                      </span>
+                    ` : ''}
+                  </div>
+                  
+                  <div class="text-xs text-slate-600 font-medium flex items-center gap-2 flex-wrap">
+                    <span>Contact: <strong class="text-slate-800">${d.contactPerson || '-'}</strong></span>
+                    ${d.ceo ? `<span class="text-slate-300">&bull;</span><span>CEO: <strong class="text-slate-700">${d.ceo}</strong></span>` : ''}
+                    <span class="text-slate-300">&bull;</span>
+                    <span class="text-teal-700 font-mono text-[11px] font-bold">${d.donorId || 'DNR-SL-001'}</span>
+                    ${d.country ? `<span class="text-slate-300">&bull;</span><span class="text-slate-500">${d.country}</span>` : ''}
+                  </div>
+                </div>
+              </div>
+
+              <!-- Financial Metric Box -->
+              <div class="text-left sm:text-right bg-teal-50/70 border border-teal-200 sm:border-0 sm:bg-transparent p-2.5 sm:p-0 rounded-xl shrink-0">
+                <div class="text-[10px] uppercase font-bold text-slate-500 tracking-wider">Donation Value</div>
+                <div class="text-lg font-black text-teal-900 font-mono tracking-tight">${amountDisplay}</div>
+                <div class="text-[11px] font-semibold text-teal-700 flex items-center sm:justify-end gap-1">
+                  <span class="material-symbols-outlined text-[13px]">${d.itemType === 'In-Kind' ? 'inventory_2' : 'payments'}</span>
+                  <span>${d.itemType || 'Money'} &bull; ${d.currency || 'SLE'}</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- KEY ATTRIBUTES 4-COLUMN GRID -->
+            <div class="grid grid-cols-2 sm:grid-cols-4 gap-2.5 text-xs bg-slate-50/80 p-3 rounded-xl border border-slate-100">
+              <div>
+                <span class="text-[10px] uppercase font-bold text-slate-400 block">Donation ID &amp; Date</span>
+                <span class="font-mono font-bold text-teal-800">${d.id || '-'}</span>
+                <div class="text-[11px] text-slate-500 font-medium">${d.dateReceived || d.dateRegistered || '-'}</div>
+              </div>
+
+              <div>
+                <span class="text-[10px] uppercase font-bold text-slate-400 block">Program &amp; Tracking ID</span>
+                <span class="font-bold text-slate-800">${d.programCategory || 'General'} (${d.programCode || 'BCF-H01'})</span>
+                <div class="text-[11px] font-mono text-teal-700 font-bold">${d.projectTrackingId || '-'}</div>
+              </div>
+
+              <div>
+                <span class="text-[10px] uppercase font-bold text-slate-400 block">Grant Structure</span>
+                <span class="font-semibold text-slate-800">${d.restriction || 'Restricted'}</span>
+                <div class="text-[11px] text-slate-500">${d.frequency || 'One-time'} Contribution</div>
+              </div>
+
+              <div>
+                <span class="text-[10px] uppercase font-bold text-slate-400 block">Payment Method</span>
+                <span class="font-semibold text-slate-800 flex items-center gap-1">
+                  <span class="material-symbols-outlined text-[13px] text-teal-700">account_balance</span>
+                  <span>${d.paymentMethod || 'Bank Transfer'}</span>
+                </span>
+                <div class="text-[11px] font-mono text-slate-500 truncate" title="${d.txRef || d.receiptNo || '-'}">Ref: ${d.txRef || d.receiptNo || '-'}</div>
+              </div>
+            </div>
+
+            <!-- CAMPAIGN & IN-KIND HIGHLIGHT (If applicable) -->
+            ${d.campaign || d.itemType === 'In-Kind' || d.docRef ? `
+              <div class="flex items-center gap-2 flex-wrap text-xs">
+                ${d.campaign ? `
+                  <span class="px-2.5 py-1 rounded-lg bg-teal-50 text-teal-900 border border-teal-200 font-semibold inline-flex items-center gap-1">
+                    <span class="material-symbols-outlined text-[14px] text-teal-700">flag</span>
+                    <span>Campaign: <strong>${d.campaign}</strong></span>
+                  </span>
+                ` : ''}
+                ${d.itemType === 'In-Kind' ? `
+                  <span class="px-2.5 py-1 rounded-lg bg-amber-50 text-amber-900 border border-amber-200 font-semibold inline-flex items-center gap-1">
+                    <span class="material-symbols-outlined text-[14px] text-amber-700">package_2</span>
+                    <span>Items: <strong>${d.inkindName || 'Goods'}</strong> (${d.inkindQty || '-'})</span>
+                  </span>
+                ` : ''}
+                ${d.docRef ? `
+                  <span class="px-2.5 py-1 rounded-lg bg-slate-100 text-slate-700 border border-slate-200 text-[11px] font-mono inline-flex items-center gap-1">
+                    <span class="material-symbols-outlined text-[13px]">attachment</span>
+                    <span>${d.docRef}</span>
+                  </span>
+                ` : ''}
+              </div>
+            ` : ''}
+
+            <!-- STEWARDSHIP NOTE & AUDIT SIGN-OFF EXCERPT -->
+            ${d.notes ? `
+              <div class="text-xs text-slate-600 bg-slate-50 p-2.5 rounded-lg border-l-3 border-teal-600 italic">
+                &ldquo;${d.notes}&rdquo;
+              </div>
+            ` : ''}
+
+            <!-- FOOTER TOOLBAR & ACTION BUTTONS -->
+            <div class="flex flex-col sm:flex-row items-center justify-between gap-3 pt-2 border-t border-slate-100 text-xs no-print">
+              
+              <!-- Contact Links -->
+              <div class="flex items-center gap-3 text-slate-500 font-medium">
+                ${d.phone ? `
+                  <a href="tel:${d.phone}" class="hover:text-teal-700 inline-flex items-center gap-1 transition" title="Call Donor">
+                    <span class="material-symbols-outlined text-[15px]">call</span>
+                    <span>${d.phone}</span>
+                  </a>
+                ` : ''}
+                ${d.email ? `
+                  <a href="mailto:${d.email}" class="hover:text-teal-700 inline-flex items-center gap-1 transition" title="Email Donor">
+                    <span class="material-symbols-outlined text-[15px]">mail</span>
+                    <span>${d.email}</span>
+                  </a>
+                ` : ''}
+              </div>
+
+              <!-- Action Buttons -->
+              <div class="flex items-center gap-2 w-full sm:w-auto justify-end flex-wrap">
+                <button type="button" onclick="openDossierModal('${d.id}')" 
+                        class="px-3.5 py-1.5 rounded-lg bg-teal-800 hover:bg-teal-900 text-white font-bold inline-flex items-center gap-1.5 transition shadow-2xs" title="Click to view full dossier">
+                  <span class="material-symbols-outlined text-[15px]">visibility</span>
+                  <span>View &amp; Save</span>
+                </button>
+
+                <button type="button" onclick="printSingleDossierFromCard('${d.id}')" 
+                        class="px-3 py-1.5 rounded-lg border border-slate-300 hover:bg-slate-50 text-slate-700 font-bold inline-flex items-center gap-1 transition" title="Print this donor dossier">
+                  <span class="material-symbols-outlined text-[15px] text-slate-600">print</span>
+                  <span>Print</span>
+                </button>
+
+                <button type="button" onclick="openDossierEmailPreview('${d.id}')" 
+                        class="px-3 py-1.5 rounded-lg border border-teal-200 bg-teal-50/70 hover:bg-teal-100 text-teal-800 font-bold inline-flex items-center gap-1 transition shadow-2xs" title="Official Email Confirmation">
+                  <span class="material-symbols-outlined text-[15px] text-teal-700">mark_email_read</span>
+                  <span>Email Letter</span>
+                </button>
+
+                <a href="../log_new_donation/code.html" 
+                   class="px-3 py-1.5 rounded-lg border border-slate-200 hover:bg-slate-50 text-slate-700 font-bold inline-flex items-center gap-1 transition" title="Open Intake Console">
+                  <span class="material-symbols-outlined text-[15px]">edit_note</span>
+                  <span>Edit in Form</span>
+                </a>
+              </div>
+            </div>
+
+          </article>
+        `;
+      }).join('');
+    }
+
+    // Helper: Initials
+    function getInitials(name) {
+      if (!name) return "BC";
+      const parts = name.trim().split(/\s+/);
+      if (parts.length === 1) return parts[0].substring(0, 2).toUpperCase();
+      return (parts[0][0] + parts[1][0]).toUpperCase();
+    }
+
+    // Helper: Status Badge
+    function getStatusBadge(status) {
+      if (status === 'Verified') {
+        return `<span class="px-2 py-0.5 rounded-full text-[10px] font-extrabold uppercase tracking-wider bg-emerald-100 text-emerald-800 border border-emerald-300 inline-flex items-center gap-0.5">&check; Verified</span>`;
+      } else if (status === 'Pending') {
+        return `<span class="px-2 py-0.5 rounded-full text-[10px] font-extrabold uppercase tracking-wider bg-amber-100 text-amber-800 border border-amber-300 inline-flex items-center gap-0.5">&bull; Pending</span>`;
+      } else {
+        return `<span class="px-2 py-0.5 rounded-full text-[10px] font-extrabold uppercase tracking-wider bg-slate-100 text-slate-800 border border-slate-300 inline-flex items-center gap-0.5">${status}</span>`;
+      }
+    }
+
+    // OPEN FULL DOSSIER RECORD MODAL (VIEW & SAVE & PRINT)
+    function openDossierModal(id) {
+      const d = currentDonations.find(item => item.id === id);
+      if (!d) return;
+
+      activeDossierId = id;
+      const modal = document.getElementById('dossier-full-modal');
+      const container = document.getElementById('dossier-modal-body');
+      if (!modal || !container) return;
+
+      const recipientEmail = d.emailSentTo || d.email || 'bandamacharityfoundationsl@gmail.com';
+      const amountStr = d.itemType === 'In-Kind' 
+        ? `${d.inkindName || 'Goods'} (${d.inkindQty || '-'}, Est. Value: NLe ${parseFloat(d.inkindCost || 0).toLocaleString('en-US', { minimumFractionDigits: 2 })})`
+        : `${d.currency || 'SLE'} ${parseFloat(d.moneyAmount || 0).toLocaleString('en-US', { minimumFractionDigits: 2 })}`;
+
+      container.innerHTML = `
+        <div class="space-y-5 text-xs">
+          
+          <!-- Dossier Header Banner -->
+          <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-2xs flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <div>
+              <div class="flex items-center gap-2 mb-1">
+                <span class="font-mono font-black text-sm text-teal-800">${d.id}</span>
+                <span class="px-2 py-0.5 rounded text-[10px] font-extrabold uppercase bg-slate-100 text-slate-700">${d.donorType || 'Donor'}</span>
+                ${getStatusBadge(d.status || 'Verified')}
+              </div>
+              <h2 class="text-base font-black text-slate-900">${d.orgName || 'Donor'}</h2>
+              <p class="text-slate-500 font-medium">Donor Account: <strong class="text-teal-700 font-mono">${d.donorId || 'N/A'}</strong> &bull; Date Received: <strong>${d.dateReceived || d.dateRegistered || '-'}</strong></p>
+            </div>
+            <div class="text-left sm:text-right bg-teal-50/80 p-2.5 rounded-xl border border-teal-200 shrink-0">
+              <span class="text-[10px] uppercase font-bold text-slate-500 block">Total Donation Value</span>
+              <span class="text-xl font-black text-teal-900 font-mono">NLe ${d.estimatedValue || '0.00'}</span>
+              <span class="text-[11px] font-semibold text-teal-700 block">${d.itemType || 'Money'} &bull; ${d.currency || 'SLE'}</span>
+            </div>
+          </div>
+
+          <!-- Section 1: Donor Identity & Profile -->
+          <div class="space-y-2">
+            <h4 class="font-black text-slate-900 uppercase text-xs tracking-wider border-b border-slate-200 pb-1 flex items-center gap-1.5">
+              <span class="material-symbols-outlined text-[16px] text-teal-700">corporate_fare</span>
+              <span>1. Donor Profile &amp; Governance Details</span>
+            </h4>
+            <div class="grid grid-cols-2 sm:grid-cols-3 gap-2.5 p-3.5 bg-white rounded-xl border border-slate-200">
+              <div><strong class="text-slate-400 uppercase text-[10px] block">Organization Name:</strong> <div class="text-slate-900 font-bold">${d.orgName || '-'}</div></div>
+              <div><strong class="text-slate-400 uppercase text-[10px] block">Donor Type:</strong> <div class="text-slate-900 font-semibold">${d.donorType || '-'}</div></div>
+              <div><strong class="text-slate-400 uppercase text-[10px] block">CEO / Executive Director:</strong> <div class="text-slate-900 font-semibold">${d.ceo || '-'}</div></div>
+              <div><strong class="text-slate-400 uppercase text-[10px] block">Contact Person:</strong> <div class="text-slate-900 font-semibold">${d.contactPerson || '-'}</div></div>
+              <div><strong class="text-slate-400 uppercase text-[10px] block">Organization Email:</strong> <div class="text-teal-700 font-mono font-bold">${d.email || '-'}</div></div>
+              <div><strong class="text-slate-400 uppercase text-[10px] block">Phone:</strong> <div class="text-slate-900 font-mono">${d.phone || '-'}</div></div>
+              <div><strong class="text-slate-400 uppercase text-[10px] block">Country of Operation:</strong> <div class="text-slate-900 font-semibold">${d.country || 'Sierra Leone'}</div></div>
+              <div><strong class="text-slate-400 uppercase text-[10px] block">Address:</strong> <div class="text-slate-900">${d.address || '-'}</div></div>
+              <div><strong class="text-slate-400 uppercase text-[10px] block">Website:</strong> <div class="text-teal-700">${d.website ? `<a href="${d.website}" target="_blank" class="underline">${d.website}</a>` : '-'}</div></div>
+            </div>
+          </div>
+
+          <!-- Section 2: Donation Breakdown & Contribution Valuation -->
+          <div class="space-y-2">
+            <h4 class="font-black text-slate-900 uppercase text-xs tracking-wider border-b border-slate-200 pb-1 flex items-center gap-1.5">
+              <span class="material-symbols-outlined text-[16px] text-teal-700">payments</span>
+              <span>2. Contribution Breakdown &amp; Valuation (What Was Given)</span>
+            </h4>
+            <div class="grid grid-cols-2 sm:grid-cols-4 gap-2.5 p-3.5 bg-white rounded-xl border border-slate-200">
+              <div><strong class="text-slate-400 uppercase text-[10px] block">Contribution Type:</strong> <div class="text-slate-900 font-bold">${d.itemType || 'Money'}</div></div>
+              <div><strong class="text-slate-400 uppercase text-[10px] block">What Was Given:</strong> <div class="text-teal-900 font-mono font-black">${amountStr}</div></div>
+              <div><strong class="text-slate-400 uppercase text-[10px] block">Valuation (NLe):</strong> <div class="text-slate-900 font-mono font-bold">NLe ${d.estimatedValue || '0.00'}</div></div>
+              <div><strong class="text-slate-400 uppercase text-[10px] block">Grant Restriction:</strong> <div class="text-slate-900 font-bold">${d.restriction || 'Restricted'}</div></div>
+              <div><strong class="text-slate-400 uppercase text-[10px] block">Giving Frequency:</strong> <div class="text-slate-900">${d.frequency || 'One-time'}</div></div>
+              <div><strong class="text-slate-400 uppercase text-[10px] block">Date Received:</strong> <div class="text-slate-900 font-semibold">${d.dateReceived || '-'}</div></div>
+              <div><strong class="text-slate-400 uppercase text-[10px] block">Campaign Drive:</strong> <div class="text-slate-900 font-semibold">${d.campaign || 'General Drive'}</div></div>
+              <div><strong class="text-slate-400 uppercase text-[10px] block">Supporting File Ref:</strong> <div class="text-slate-900 font-mono">${d.docRef || 'Attached'}</div></div>
+            </div>
+          </div>
+
+          <!-- Section 3: Program Allocation & Project Tracking -->
+          <div class="space-y-2">
+            <h4 class="font-black text-slate-900 uppercase text-xs tracking-wider border-b border-slate-200 pb-1 flex items-center gap-1.5">
+              <span class="material-symbols-outlined text-[16px] text-teal-700">hub</span>
+              <span>3. Program Allocation &amp; Tracking ID</span>
+            </h4>
+            <div class="grid grid-cols-2 sm:grid-cols-3 gap-2.5 p-3.5 bg-white rounded-xl border border-slate-200">
+              <div><strong class="text-slate-400 uppercase text-[10px] block">Program Code:</strong> <div class="text-teal-800 font-mono font-bold">${d.programCode || 'BCF-H01'}</div></div>
+              <div><strong class="text-slate-400 uppercase text-[10px] block">Category:</strong> <div class="text-slate-900 font-bold">${d.programCategory || 'Health'}</div></div>
+              <div><strong class="text-slate-400 uppercase text-[10px] block">Project Tracking ID:</strong> <div class="text-teal-700 font-mono font-bold">${d.projectTrackingId || '-'}</div></div>
+              <div class="col-span-2 sm:col-span-3"><strong class="text-slate-400 uppercase text-[10px] block">Program Title:</strong> <div class="text-slate-900 font-semibold">${d.programTitle || 'Rural Health Project'}</div></div>
+            </div>
+          </div>
+
+          <!-- Section 4: Proof of Payment & Compliance Verification -->
+          <div class="space-y-2">
+            <h4 class="font-black text-slate-900 uppercase text-xs tracking-wider border-b border-slate-200 pb-1 flex items-center gap-1.5">
+              <span class="material-symbols-outlined text-[16px] text-teal-700">verified_user</span>
+              <span>4. Proof of Payment &amp; Compliance Audit</span>
+            </h4>
+            <div class="grid grid-cols-2 sm:grid-cols-3 gap-2.5 p-3.5 bg-white rounded-xl border border-slate-200">
+              <div><strong class="text-slate-400 uppercase text-[10px] block">Payment Method:</strong> <div class="text-slate-900 font-bold">${d.paymentMethod || 'Bank Transfer'}</div></div>
+              <div><strong class="text-slate-400 uppercase text-[10px] block">Official Receipt No:</strong> <div class="text-teal-800 font-mono font-bold">${d.receiptNo || 'REC-' + d.id}</div></div>
+              <div><strong class="text-slate-400 uppercase text-[10px] block">Transaction Reference:</strong> <div class="text-slate-900 font-mono">${d.txRef || '-'}</div></div>
+              <div><strong class="text-slate-400 uppercase text-[10px] block">Payment Voucher No:</strong> <div class="text-slate-900 font-mono">${d.voucherNo || '-'}</div></div>
+              <div><strong class="text-slate-400 uppercase text-[10px] block">Beneficiary Ack:</strong> <div class="text-slate-900 font-semibold">${d.beneficiaryAck || 'Yes'}</div></div>
+              <div><strong class="text-slate-400 uppercase text-[10px] block">Tax Receipt Status:</strong> <div class="text-emerald-700 font-semibold">${d.taxReceiptIssued === 'Yes' ? 'Issued' : 'Pending'}</div></div>
+            </div>
+          </div>
+
+          <!-- Section 5: Official Email Notification Record -->
+          <div class="space-y-2">
+            <h4 class="font-black text-slate-900 uppercase text-xs tracking-wider border-b border-slate-200 pb-1 flex items-center justify-between">
+              <span class="flex items-center gap-1.5">
+                <span class="material-symbols-outlined text-[16px] text-teal-700">mark_email_read</span>
+                <span>5. Official Email Notification to Organization</span>
+              </span>
+              <span class="text-[10px] font-extrabold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">
+                &check; Transmitted &amp; Tracked
+              </span>
+            </h4>
+            <div class="p-3.5 bg-emerald-50/70 rounded-xl border border-emerald-200 space-y-2">
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                <div><strong class="text-slate-500 block text-[10px] uppercase">Recipient Organization Email:</strong> <div class="text-slate-900 font-mono font-bold">${recipientEmail}</div></div>
+                <div><strong class="text-slate-500 block text-[10px] uppercase">Sender:</strong> <div class="text-slate-800 font-semibold">BANDAMA CHARITY FOUNDATION &lt;bandamacharityfoundationsl@gmail.com&gt;</div></div>
+                <div class="col-span-2"><strong class="text-slate-500 block text-[10px] uppercase">Subject:</strong> <div class="text-slate-800 font-medium">${d.emailSubject || 'OFFICIAL CONFIRMATION: Donation ' + d.id + ' Registered in BCF-SL Database'}</div></div>
+              </div>
+              <div class="pt-2 border-t border-emerald-200 flex items-center justify-between">
+                <span class="text-[11px] text-emerald-800 font-medium">Automatic confirmation dispatched on registration</span>
+                <button type="button" onclick="openDossierEmailPreview('${d.id}')" class="px-3 py-1 rounded-lg bg-teal-700 hover:bg-teal-800 text-white font-bold text-[11px] inline-flex items-center gap-1 transition">
+                  <span class="material-symbols-outlined text-[14px]">visibility</span>
+                  <span>View Dispatched Email Letter</span>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Section 6: Editable Dossier Compliance Notes & Status -->
+          <div class="space-y-2 bg-white p-4 rounded-xl border border-slate-200 shadow-2xs">
+            <h4 class="font-black text-slate-900 uppercase text-xs tracking-wider border-b border-slate-200 pb-1 flex items-center gap-1.5">
+              <span class="material-symbols-outlined text-[16px] text-teal-700">edit_note</span>
+              <span>6. Stewardship Notes &amp; Status Sign-Off (Click and Save)</span>
+            </h4>
+            
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
+              <div>
+                <label class="block text-[10px] uppercase font-bold text-slate-500 mb-1">Audit Verification Status</label>
+                <select id="edit-dossier-status" class="w-full h-8 px-2.5 rounded border border-slate-300 text-xs font-bold bg-white focus:outline-none focus:border-teal-700">
+                  <option value="Verified" ${d.status === 'Verified' ? 'selected' : ''}>Verified</option>
+                  <option value="Pending" ${d.status === 'Pending' ? 'selected' : ''}>Pending</option>
+                  <option value="Under Review" ${d.status === 'Under Review' ? 'selected' : ''}>Under Review</option>
+                </select>
+              </div>
+
+              <div>
+                <label class="block text-[10px] uppercase font-bold text-slate-500 mb-1">Verifying Officer</label>
+                <input type="text" id="edit-dossier-verifiedby" value="${d.verifiedBy || 'Josephine Koroma (Finance Director)'}"
+                       class="w-full h-8 px-2.5 rounded border border-slate-300 text-xs font-semibold bg-white focus:outline-none focus:border-teal-700"/>
+              </div>
+
+              <div class="col-span-1 sm:col-span-2">
+                <label class="block text-[10px] uppercase font-bold text-slate-500 mb-1">Stewardship Notes &amp; Audit Covenants</label>
+                <textarea id="edit-dossier-notes" rows="3" class="w-full p-2.5 rounded border border-slate-300 text-xs font-medium bg-white focus:outline-none focus:border-teal-700">${d.notes || ''}</textarea>
+              </div>
+
+              <div>
+                <label class="block text-[10px] uppercase font-bold text-slate-500 mb-1">Prepared By</label>
+                <input type="text" id="edit-dossier-preparedby" value="${d.preparedBy || 'Amadu Kamara, Compliance Officer'}"
+                       class="w-full h-8 px-2.5 rounded border border-slate-300 text-xs font-semibold bg-white"/>
+              </div>
+
+              <div>
+                <label class="block text-[10px] uppercase font-bold text-slate-500 mb-1">Approved By</label>
+                <input type="text" id="edit-dossier-approvedby" value="${d.approvedBy || 'Josephine Koroma, Director of Finance'}"
+                       class="w-full h-8 px-2.5 rounded border border-slate-300 text-xs font-semibold bg-white"/>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      `;
+
+      modal.classList.remove('hidden');
+    }
+
+    // Save Active Dossier Changes to LocalStorage & BroadcastChannel
+    function saveActiveDossierChanges() {
+      if (!activeDossierId) return;
+      const idx = currentDonations.findIndex(d => d.id === activeDossierId);
+      if (idx < 0) return;
+
+      const saveBtn = document.getElementById('btn-save-dossier');
+      if (saveBtn) {
+        saveBtn.innerHTML = '<span class="material-symbols-outlined text-[16px] animate-spin">progress_activity</span><span>Saving...</span>';
+      }
+
+      currentDonations[idx].status = document.getElementById('edit-dossier-status').value;
+      currentDonations[idx].verifiedBy = document.getElementById('edit-dossier-verifiedby').value.trim();
+      currentDonations[idx].notes = document.getElementById('edit-dossier-notes').value.trim();
+      currentDonations[idx].preparedBy = document.getElementById('edit-dossier-preparedby').value.trim();
+      currentDonations[idx].approvedBy = document.getElementById('edit-dossier-approvedby').value.trim();
+      currentDonations[idx].timestamp = Date.now();
+
+      try {
+        localStorage.setItem('bcf_donorlog_donations', JSON.stringify(currentDonations));
+        const channel = new BroadcastChannel('bcf_programs_sync_channel');
+        channel.postMessage({ type: 'DONATION_RECORDED', donation: currentDonations[idx] });
+      } catch(e) {}
+
+      setTimeout(() => {
+        if (saveBtn) {
+          saveBtn.innerHTML = '<span class="material-symbols-outlined text-[16px]">done_all</span><span>Saved!</span>';
+          setTimeout(() => {
+            saveBtn.innerHTML = '<span class="material-symbols-outlined text-[16px]">save</span><span>Save Dossier Changes</span>';
+          }, 1500);
+        }
+        renderDossiersList();
+        updateKPISummary();
+        showToast(`Dossier ${activeDossierId} updated and synchronized across all CRM consoles!`, 'task_alt');
+      }, 300);
+    }
+
+    function closeDossierModal() {
+      const modal = document.getElementById('dossier-full-modal');
+      if (modal) modal.classList.add('hidden');
+      activeDossierId = null;
+    }
+
+    // Print Single Dossier
+    function printSingleDossier() {
+      window.print();
+    }
+
+    function printSingleDossierFromCard(id) {
+      openDossierModal(id);
+      setTimeout(() => {
+        window.print();
+      }, 250);
+    }
+
+    function printAllDonorsReport() {
+      window.print();
+    }
+
+    // EMAIL ACKNOWLEDGMENT MODAL LOGIC
+    function openDossierEmailPreview(id) {
+      const d = currentDonations.find(item => item.id === id);
+      if (!d) return;
+
+      const org = d.orgName || 'Esteemed Donor Organization';
+      const contact = d.contactPerson || 'Donor Representative';
+      const ceo = d.ceo ? `Attn: ${d.ceo} (CEO / Executive Director)` : '';
+      const amountStr = d.itemType === 'In-Kind' 
+        ? `${d.inkindName || 'In-Kind Goods'} (Qty: ${d.inkindQty || '-'}, Valuation: SLE ${parseFloat(d.inkindCost || 0).toLocaleString('en-US', { minimumFractionDigits: 2 })})`
+        : `${d.currency || 'SLE'} ${parseFloat(d.moneyAmount || 0).toLocaleString('en-US', { minimumFractionDigits: 2 })}`;
+      
+      const dateRec = d.dateReceived || d.dateRegistered || new Date().toISOString().split('T')[0];
+      const tracking = d.projectTrackingId || 'BCF-H01-01-2025';
+      const recipient = d.emailSentTo || d.email || 'bandamacharityfoundationsl@gmail.com';
+      const subject = `OFFICIAL CONFIRMATION: Donation ${d.id} Registered in BCF-SL Database - Bandama Charity Foundation SL`;
+
+      const plainText = 
+`OFFICIAL CONFIRMATION OF DONATION REGISTRATION
+BANDAMA CHARITY FOUNDATION – SIERRA LEONE (BCF-SL)
+Non-Governmental Organization • Sierra Leone • Reg. No: SL-NNGO-2023-084
+Headquarters: Freetown, Sierra Leone
+Southern Region Office: 2 Ernest Gborie Street Off Gerihun Road Bo, Sierra Leone
+Email: bandamacharityfoundationsl@gmail.com | Phone: +23278242826
+
+Date: ${dateRec}
+To: ${contact} (${org})
+${ceo ? ceo + '\n' : ''}Organization Email: ${recipient}
+Country of Operation: ${d.country || 'Sierra Leone'}
+
+Dear ${contact} and the leadership of ${org},
+
+We write on behalf of the Governing Board, Executive Leadership, and beneficiary communities of BANDAMA CHARITY FOUNDATION – SIERRA LEONE (BCF-SL) to formally acknowledge and confirm that your contribution has been received, verified, and officially recorded into the BCF-SL Central Donation Database.
+
+DONATION REGISTRATION DOSSIER:
+============================================================
+• Donation ID: ${d.id}
+• Donor Account ID: ${d.donorId || 'N/A'}
+• Date Received: ${dateRec}
+• Date Registered: ${d.dateRegistered || dateRec}
+• Registered By: ${d.registeredBy || 'BCF-SL Grants Management Office'}
+• Donor Type: ${d.donorType || 'Corporate / Institutional'}
+
+DETAILS OF CONTRIBUTION GIVEN:
+============================================================
+• Contribution Category: ${d.itemType || 'Money'}
+• Details of What Was Given: ${amountStr}
+• Recorded Valuation: NLe ${d.estimatedValue || '0.00'}
+• Allocated Program: ${d.programCode || 'BCF-H01'} - ${d.programCategory || 'Health'} (${d.programTitle || 'Rural Health Project'})
+• Project Tracking ID: ${tracking}
+• Grant Designation: ${d.restriction || 'Restricted'}
+• Giving Frequency: ${d.frequency || 'One-time'}
+${d.campaign ? `• Campaign: ${d.campaign}\n` : ''}
+FINANCIAL AUDIT & TRANSACTION TRACEABILITY:
+============================================================
+• Payment Method: ${d.paymentMethod || 'Bank Transfer'}
+• Official Receipt No: ${d.receiptNo || 'REC-' + d.id}
+• Transaction Reference: ${d.txRef || 'N/A'}
+• Payment Voucher No: ${d.voucherNo || 'N/A'}
+• Ledger Verification Status: ${d.status || 'Verified'}
+• BCF-SL Verifying Officer: ${d.verifiedBy || 'Josephine Koroma (Finance Director)'}
+• Official Tax Receipt Issued: ${d.taxReceiptIssued || 'Yes'}
+• Official Acknowledgment Letter: ${d.ackLetterSent || 'Yes'}
+
+${d.notes ? `STEWARDSHIP & AUDIT NOTES:\n${d.notes}\n\n` : ''}Your generous investment provides vital resources to advance sustainable community health, education, and livelihood resilience across Sierra Leone. Comprehensive project milestones and financial utilization reports will be routed directly to this email address.
+
+Thank you for your partnership and dedication to transforming lives.
+
+With sincere gratitude,
+
+DIRECTORATE OF DONOR RELATIONS & PARTNERSHIPS
+BANDAMA CHARITY FOUNDATION – SIERRA LEONE (BCF-SL)
+Headquarters: Freetown, Sierra Leone
+Southern Region Office: 2 Ernest Gborie Street Off Gerihun Road Bo, Sierra Leone
+Email: bandamacharityfoundationsl@gmail.com
+Phone: +23278242826`;
+
+      activeEmailText = plainText;
+
+      const html = `
+        <div class="space-y-4 font-sans">
+          <!-- BCF Letterhead -->
+          <div class="text-center pb-3 border-b-2 border-slate-200">
+            <div class="inline-block px-2.5 py-0.5 rounded-full bg-teal-50 border border-teal-200 text-[10px] font-extrabold uppercase tracking-widest text-teal-800 mb-1">
+              Official Donation Acknowledgment Letter
+            </div>
+            <h1 class="text-sm font-black text-slate-900 tracking-tight">BANDAMA CHARITY FOUNDATION &ndash; SIERRA LEONE</h1>
+            <div class="text-[10px] font-semibold text-slate-500">Non-Governmental Organization &bull; Sierra Leone &bull; REG. NO: SL-NNGO-2023-084</div>
+            <div class="text-[10px] text-slate-400 mt-0.5">
+              <span>Southern Region Office: 2 Ernest Gborie Street Off Gerihun Road Bo, Sierra Leone</span> &bull; 
+              <span>Headquarters: Freetown, Sierra Leone</span>
+            </div>
+            <div class="text-[10px] text-teal-700 font-semibold mt-0.5">
+              bandamacharityfoundationsl@gmail.com &bull; +23278242826
+            </div>
+          </div>
+
+          <!-- Salutation Block -->
+          <div class="bg-teal-50/70 p-3.5 rounded-xl border border-teal-200 text-xs">
+            <div class="flex justify-between items-start gap-2">
+              <div>
+                <span class="text-[10px] uppercase font-bold text-teal-800">Transmitted To:</span>
+                <div class="font-black text-slate-900 text-sm">${contact}</div>
+                <div class="text-slate-800 font-bold">${org}</div>
+                ${ceo ? `<div class="text-[11px] text-slate-600 font-medium">${ceo}</div>` : ''}
+                <div class="text-[11px] text-teal-800 font-mono mt-0.5">${recipient}</div>
+              </div>
+              <div class="text-right shrink-0">
+                <span class="text-[10px] uppercase font-bold text-slate-400">Date Logged:</span>
+                <div class="font-mono font-bold text-slate-800">${dateRec}</div>
+                <div class="text-[10px] text-teal-700 font-bold uppercase mt-1">Ref: ${d.id}</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Confirmation Statement -->
+          <p class="text-xs text-slate-700 leading-relaxed">
+            Dear <strong class="text-slate-900">${contact}</strong> and the leadership of <strong class="text-slate-900">${org}</strong>,
+          </p>
+          <p class="text-xs text-slate-700 leading-relaxed">
+            We write on behalf of the Governing Board, Executive Leadership, and beneficiary communities of <strong>BANDAMA CHARITY FOUNDATION &ndash; SIERRA LEONE (BCF-SL)</strong> to formally confirm that your generous contribution has been received, verified, and officially recorded into the <strong>BCF-SL Central Donation Database</strong>.
+          </p>
+
+          <!-- DETAILS OF WHAT WAS GIVEN TABLE -->
+          <div class="border border-slate-200 rounded-xl overflow-hidden shadow-2xs">
+            <div class="bg-teal-800 text-white px-3 py-1.5 text-[11px] font-black uppercase tracking-wider flex items-center justify-between">
+              <span>Contribution Details &bull; What Was Given</span>
+              <span class="font-mono text-teal-200">${d.itemType || 'Money'}</span>
+            </div>
+            <table class="w-full text-xs divide-y divide-slate-200">
+              <tbody class="divide-y divide-slate-100 bg-white">
+                <tr>
+                  <td class="px-3 py-2 font-semibold text-slate-500 w-1/3 bg-slate-50">Donation ID</td>
+                  <td class="px-3 py-2 font-mono font-bold text-teal-800">${d.id} <span class="text-slate-400 font-normal">(Donor ID: ${d.donorId || 'N/A'})</span></td>
+                </tr>
+                <tr>
+                  <td class="px-3 py-2 font-semibold text-slate-500 bg-slate-50">What Was Given</td>
+                  <td class="px-3 py-2 font-black text-slate-900 text-sm font-mono text-teal-900">${amountStr}</td>
+                </tr>
+                <tr>
+                  <td class="px-3 py-2 font-semibold text-slate-500 bg-slate-50">Recorded Valuation</td>
+                  <td class="px-3 py-2 font-mono font-black text-slate-900">NLe ${d.estimatedValue || '0.00'}</td>
+                </tr>
+                <tr>
+                  <td class="px-3 py-2 font-semibold text-slate-500 bg-slate-50">Allocated Program</td>
+                  <td class="px-3 py-2 font-semibold text-slate-800">${d.programCode || 'BCF-H01'} &bull; ${d.programCategory || 'Health'} &ndash; ${d.programTitle || 'Rural Health Project'}</td>
+                </tr>
+                <tr>
+                  <td class="px-3 py-2 font-semibold text-slate-500 bg-slate-50">Project Tracking ID</td>
+                  <td class="px-3 py-2 font-mono font-bold text-teal-700">${tracking}</td>
+                </tr>
+                <tr>
+                  <td class="px-3 py-2 font-semibold text-slate-500 bg-slate-50">Grant Restriction &amp; Frequency</td>
+                  <td class="px-3 py-2 font-medium text-slate-700">${d.restriction || 'Restricted'} &bull; ${d.frequency || 'One-time'} Contribution</td>
+                </tr>
+                ${d.campaign ? `
+                <tr>
+                  <td class="px-3 py-2 font-semibold text-slate-500 bg-slate-50">Campaign Drive</td>
+                  <td class="px-3 py-2 font-semibold text-slate-800">${d.campaign}</td>
+                </tr>
+                ` : ''}
+              </tbody>
+            </table>
+          </div>
+
+          <!-- AUDIT & VERIFICATION ROW -->
+          <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 bg-slate-50 p-2.5 rounded-lg border border-slate-200 text-[11px]">
+            <div>
+              <span class="text-[9px] uppercase font-bold text-slate-400 block">Payment Method</span>
+              <span class="font-bold text-slate-800">${d.paymentMethod || 'Bank Transfer'}</span>
+            </div>
+            <div>
+              <span class="text-[9px] uppercase font-bold text-slate-400 block">Receipt No.</span>
+              <span class="font-mono font-bold text-teal-800">${d.receiptNo || 'REC-' + d.id}</span>
+            </div>
+            <div>
+              <span class="text-[9px] uppercase font-bold text-slate-400 block">Tx / Voucher Ref</span>
+              <span class="font-mono text-slate-700 truncate block">${d.txRef || d.voucherNo || '-'}</span>
+            </div>
+            <div>
+              <span class="text-[9px] uppercase font-bold text-slate-400 block">Status in Database</span>
+              <span class="font-bold text-emerald-700">&check; ${d.status || 'Verified'}</span>
+            </div>
+          </div>
+
+          <!-- Closing Note -->
+          <p class="text-xs text-slate-600 leading-relaxed italic">
+            &ldquo;Thank you for partnering with BCF-SL. Your support directly advances our mission of uplifting vulnerable populations across Sierra Leone. An official tax receipt and milestone progress updates will be issued in accordance with your grant agreement.&rdquo;
+          </p>
+
+          <div class="pt-3 border-t border-slate-200 flex justify-between items-end text-[11px] text-slate-500">
+            <div>
+              <div class="font-bold text-slate-800">Directorate of Donor Relations &amp; Financial Compliance</div>
+              <div>Bandama Charity Foundation &ndash; Sierra Leone</div>
+            </div>
+            <div class="text-right font-mono text-[10px] text-teal-700 font-bold">
+              REG: SL-NNGO-2023-084
+            </div>
+          </div>
+        </div>
+      `;
+
+      const recipientEl = document.getElementById('dossier-modal-email-recipient');
+      const subjectEl = document.getElementById('dossier-modal-email-subject');
+      const bodyEl = document.getElementById('dossier-modal-email-body');
+      const mailtoBtn = document.getElementById('btn-dossier-mailto');
+      const gmailBtn = document.getElementById('btn-dossier-gmail');
+
+      if (recipientEl) recipientEl.textContent = recipient;
+      if (subjectEl) subjectEl.textContent = subject;
+      if (bodyEl) bodyEl.innerHTML = html;
+
+      if (mailtoBtn) {
+        mailtoBtn.onclick = () => {
+          const mailtoUrl = `mailto:${encodeURIComponent(recipient)}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(plainText)}`;
+          window.location.href = mailtoUrl;
+        };
+      }
+
+      if (gmailBtn) {
+        gmailBtn.onclick = () => {
+          const gmailUrl = `https://mail.google.com/mail/?view=cm&fs=1&to=${encodeURIComponent(recipient)}&su=${encodeURIComponent(subject)}&body=${encodeURIComponent(plainText)}`;
+          window.open(gmailUrl, '_blank');
+        };
+      }
+
+      document.getElementById('dossier-email-modal').classList.remove('hidden');
+    }
+
+    function closeEmailModal() {
+      const modal = document.getElementById('dossier-email-modal');
+      if (modal) modal.classList.add('hidden');
+    }
+
+    function copyDossierEmailText() {
+      if (!activeEmailText) return;
+      navigator.clipboard.writeText(activeEmailText).then(() => {
+        showToast("Official email acknowledgment copied to clipboard!", "content_copy");
+      }).catch(() => {
+        showToast("Copied to clipboard", "content_copy");
+      });
+    }
+
+    // EXPORT ALL DONORS TO CSV / SPREADSHEET
+    function exportDossiersCSV() {
+      let csv = "data:text/csv;charset=utf-8,";
+      csv += "Donation ID,Donor ID,Registration Date,Date Received,Organization Name,Contact Person,CEO,Donor Type,Country,Address,Email,Phone,Website,Item Type,Amount,Currency,Recorded Valuation (NLe),In-Kind Items,In-Kind Qty,In-Kind Cost,Grant Restriction,Frequency,Campaign,Program Code,Program Category,Program Title,Project Tracking ID,Payment Method,Receipt No,Tx Ref,Voucher No,Payment Date,Beneficiary Ack,Supporting Doc,Doc Ref,Status,Verified By,Verified Date,Ack Letter Sent,Tax Receipt Issued,Stewardship Notes,Prepared By,Approved By,Email Dispatched To\n";
+
+      currentDonations.forEach(d => {
+        const val = parseFloat(String(d.estimatedValue || d.moneyAmount || 0).replace(/[^0-9.-]/g, '')) || 0;
+        csv += `"${d.id || ''}","${d.donorId || ''}","${d.dateRegistered || ''}","${d.dateReceived || ''}","${(d.orgName || '').replace(/"/g, '""')}","${(d.contactPerson || '').replace(/"/g, '""')}","${(d.ceo || '').replace(/"/g, '""')}","${d.donorType || ''}","${d.country || ''}","${(d.address || '').replace(/"/g, '""')}","${d.email || ''}","${d.phone || ''}","${d.website || ''}","${d.itemType || ''}",${d.moneyAmount || 0},"${d.currency || ''}",${val},"${(d.inkindName || '').replace(/"/g, '""')}","${d.inkindQty || ''}",${d.inkindCost || 0},"${d.restriction || ''}","${d.frequency || ''}","${(d.campaign || '').replace(/"/g, '""')}","${d.programCode || ''}","${d.programCategory || ''}","${(d.programTitle || '').replace(/"/g, '""')}","${d.projectTrackingId || ''}","${d.paymentMethod || ''}","${d.receiptNo || ''}","${d.txRef || ''}","${d.voucherNo || ''}","${d.datePayment || ''}","${d.beneficiaryAck || ''}","${d.supportingDocAttached || ''}","${d.docRef || ''}","${d.status || ''}","${(d.verifiedBy || '').replace(/"/g, '""')}","${d.verifiedDate || ''}","${d.ackLetterSent || ''}","${d.taxReceiptIssued || ''}","${(d.notes || '').replace(/"/g, '""')}","${(d.preparedBy || '').replace(/"/g, '""')}","${(d.approvedBy || '').replace(/"/g, '""')}","${d.emailSentTo || d.email || ''}"\n`;
+      });
+
+      const encodedUri = encodeURI(csv);
+      const link = document.createElement("a");
+      link.setAttribute("href", encodedUri);
+      link.setAttribute("download", `BCF_SL_Donor_Dossiers_Master_${new Date().toISOString().split('T')[0]}.csv`);
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      showToast("Exported all Donor Dossiers to CSV spreadsheet", "download");
+    }
+
+    // Toast Utility
+    function showToast(msg, icon = 'info') {
+      const container = document.getElementById('toast-container');
+      if (!container) return;
+
+      const toast = document.createElement('div');
+      toast.className = "bg-slate-900 text-white text-xs px-3.5 py-2.5 rounded-xl shadow-xl flex items-center gap-2 border border-slate-700 pointer-events-auto transform translate-y-2 opacity-0 transition-all duration-200";
+      toast.innerHTML = `
+        <span class="material-symbols-outlined text-[17px] text-teal-400">${icon}</span>
+        <span class="font-medium">${msg}</span>
+      `;
+
+      container.appendChild(toast);
+      setTimeout(() => {
+        toast.classList.remove('translate-y-2', 'opacity-0');
+      }, 10);
+
+      setTimeout(() => {
+        toast.classList.add('opacity-0', 'translate-y-2');
+        setTimeout(() => toast.remove(), 250);
+      }, 3500);
+    }
+
+    // REAL-TIME AUTO-TRACKING LISTENERS
+    // 1. Cross-tab BroadcastChannel listener from Log New Donation
+    try {
+      const channel = new BroadcastChannel('bcf_programs_sync_channel');
+      channel.onmessage = (event) => {
+        if (event.data && event.data.type === 'DONATION_RECORDED') {
+          const newDoc = event.data.donation;
+          if (newDoc) {
+            newDoc._justAdded = true;
+            const existingIdx = currentDonations.findIndex(d => d.id === newDoc.id);
+            if (existingIdx >= 0) {
+              currentDonations[existingIdx] = newDoc;
+            } else {
+              currentDonations.unshift(newDoc);
+            }
+            // Auto-switch filter to 'all' so new donor is immediately visible
+            currentFilter = 'all';
+            const chips = document.querySelectorAll('#filter-chips-container .dossier-chip');
+            chips.forEach(chip => {
+              if (chip.getAttribute('data-filter') === 'all') {
+                chip.className = "dossier-chip active px-3 py-1 rounded-full text-xs font-bold transition bg-teal-700 text-white shadow-xs";
+              } else {
+                chip.className = "dossier-chip px-3 py-1 rounded-full text-xs font-bold transition bg-slate-100 hover:bg-slate-200 text-slate-700";
+              }
+            });
+            renderDossiersList();
+            updateKPISummary();
+            showToast(`New donor dossier ${newDoc.id} (${newDoc.orgName || 'Donor'}) automatically tracked in Dossier Master!`, 'auto_awesome');
+          }
+        }
+      };
+    } catch(e) {}
+
+    // 2. Storage event listener (fallback for other windows/tabs)
+    window.addEventListener('storage', (e) => {
+      if (e.key === 'bcf_donorlog_donations') {
+        loadDossiers();
+        showToast("Donor Dossier Ledger synced with latest intake records", "sync");
+      }
+    });
+
+    // Page ready
+    window.addEventListener('DOMContentLoaded', () => {
+      loadDossiers();
+
+      // Auto-open dossier if ID passed via query parameter (e.g. ?id=DON-2025-001)
+      try {
+        const urlParams = new URLSearchParams(window.location.search);
+        const targetId = urlParams.get('id');
+        if (targetId) {
+          setTimeout(() => {
+            openDossierModal(targetId);
+          }, 350);
+        }
+      } catch(e) {}
+    });
+  </script>
+
+  <!-- BOTTOM DONORLOG NAVIGATION BAR -->
+  <nav class="fixed bottom-0 w-full z-40 bg-white border-t border-slate-200 shadow-md no-print">
+    <div class="max-w-md mx-auto flex items-center justify-around h-14 px-4 text-xs font-semibold">
+      <a href="../donors_directory_log/code.html" class="flex flex-col items-center justify-center text-slate-500 hover:text-teal-700 transition">
+        <span class="material-symbols-outlined text-[20px]">group</span>
+        <span class="text-[10px]">Directory</span>
+      </a>
+      <a href="../log_new_donation/code.html" class="flex flex-col items-center justify-center text-slate-500 hover:text-teal-700 transition">
+        <span class="material-symbols-outlined text-[20px]">volunteer_activism</span>
+        <span class="text-[10px]">Log Gift</span>
+      </a>
+      <a href="code.html" class="flex flex-col items-center justify-center text-teal-700 font-bold">
+        <div class="w-6 h-6 rounded-full bg-teal-100 flex items-center justify-center">
+          <span class="material-symbols-outlined text-[16px]">folder_shared</span>
+        </div>
+        <span class="text-[10px]">Dossiers</span>
+      </a>
+      <a href="../giving_analytics_reports/code.html" class="flex flex-col items-center justify-center text-slate-500 hover:text-teal-700 transition">
+        <span class="material-symbols-outlined text-[20px]">insights</span>
+        <span class="text-[10px]">Reports</span>
+      </a>
+    </div>
+  </nav>
+
+</body>
+</html>

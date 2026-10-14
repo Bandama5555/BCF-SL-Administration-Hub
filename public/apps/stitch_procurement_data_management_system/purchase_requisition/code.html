@@ -1,0 +1,1242 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover"/>
+  <title>Purchase Requisitions — BCF-SL Integrated Procurement</title>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: {
+            primary: "#0037b0",
+            "primary-dark": "#00247d",
+            secondary: "#565e74",
+            tertiary: "#006948",
+            "tertiary-dark": "#004f35",
+            surface: "#f8f9ff",
+            "surface-container": "#eff4ff",
+            "surface-container-high": "#e5eeff",
+            "on-surface": "#0b1c30",
+            "on-surface-variant": "#434655",
+            outline: "#747686",
+            error: "#ba1a1a"
+          },
+          fontFamily: {
+            sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+            body: ['"Inter"', 'sans-serif'],
+            mono: ['"JetBrains Mono"', 'monospace']
+          }
+        }
+      }
+    };
+  </script>
+  <style>
+    body { font-family: 'Inter', sans-serif; background-color: #f8f9ff; }
+    h1, h2, h3, h4, .font-headline { font-family: 'Plus Jakarta Sans', sans-serif; }
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-thumb { background-color: #cbd5e1; border-radius: 4px; }
+  </style>
+</head>
+<body class="text-on-surface flex flex-col min-h-screen">
+
+  <!-- UNIFIED PROCUREMENT TOP NAVIGATION & WORKFLOW TABS -->
+  <div id="bcf-procurement-nav-header"></div>
+
+  <!-- MAIN VIEWPORT -->
+  <main class="flex-grow p-4 sm:p-6 max-w-7xl mx-auto w-full flex flex-col gap-6">
+
+    <!-- HERO & SUMMARY METRICS -->
+    <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+      <div>
+        <div class="flex items-center gap-2 mb-1">
+          <span class="inline-flex items-center justify-center w-2 h-2 rounded-full bg-primary animate-pulse"></span>
+          <span class="text-xs font-extrabold uppercase tracking-wider text-primary bg-blue-50 px-2 py-0.5 rounded-full border border-blue-200">
+            Central Transaction Initiator
+          </span>
+          <span class="text-xs text-slate-500">• BCF-TXN Engine</span>
+        </div>
+        <h1 class="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight font-headline">
+          Purchase Requisitions (PR)
+        </h1>
+        <p class="text-xs sm:text-sm text-slate-600 mt-1 max-w-2xl">
+          Initiate procurement with automated Donor, Programme, Grant, and Budget Line linking. Generates the master <code class="font-mono text-primary font-bold">BCF-TXN-YYYY-NNNNNN</code> transaction key.
+        </p>
+      </div>
+
+      <div class="flex items-center gap-2.5 flex-wrap shrink-0">
+        <button onclick="exportRequisitionsCsv()" class="px-3.5 py-2 rounded-xl border border-slate-300 bg-white hover:bg-slate-50 text-xs font-bold text-slate-700 flex items-center gap-1.5 transition shadow-2xs cursor-pointer active:scale-95">
+          <span class="material-symbols-outlined text-[18px]">download</span>
+          <span>Export PR Log</span>
+        </button>
+        <button onclick="openRequisitionModal()" class="px-4 py-2 rounded-xl bg-primary hover:bg-primary-dark text-white text-xs font-extrabold flex items-center gap-1.5 transition shadow-md cursor-pointer active:scale-95">
+          <span class="material-symbols-outlined text-[18px]">add_circle</span>
+          <span>Raise New Requisition</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- STATS CARDS -->
+    <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+      <div class="p-4 sm:p-5 rounded-2xl bg-white border border-slate-200 shadow-xs flex flex-col justify-between">
+        <div class="flex items-center justify-between text-slate-500 mb-2">
+          <span class="text-xs font-extrabold uppercase tracking-wider">Total Requisitions</span>
+          <div class="w-8 h-8 rounded-lg bg-blue-50 text-primary flex items-center justify-center">
+            <span class="material-symbols-outlined text-[20px]">assignment</span>
+          </div>
+        </div>
+        <div>
+          <span id="metric-total-prs" class="text-2xl sm:text-3xl font-black text-slate-900 font-mono">0</span>
+          <div class="flex items-center gap-1 mt-1 text-[11px] text-slate-500 font-semibold">
+            <span>Fiscal Year 2026 Pipeline</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="p-4 sm:p-5 rounded-2xl bg-white border border-slate-200 shadow-xs flex flex-col justify-between">
+        <div class="flex items-center justify-between text-slate-500 mb-2">
+          <span class="text-xs font-extrabold uppercase tracking-wider">Approved Requisitions</span>
+          <div class="w-8 h-8 rounded-lg bg-emerald-50 text-emerald-700 flex items-center justify-center">
+            <span class="material-symbols-outlined text-[20px]">check_circle</span>
+          </div>
+        </div>
+        <div>
+          <span id="metric-approved-prs" class="text-2xl sm:text-3xl font-black text-emerald-700 font-mono">0</span>
+          <div class="flex items-center gap-1 mt-1 text-[11px] text-emerald-700 font-bold">
+            <span class="material-symbols-outlined text-[14px]">arrow_forward</span>
+            <span>Ready for RFQ / PO</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="p-4 sm:p-5 rounded-2xl bg-white border border-slate-200 shadow-xs flex flex-col justify-between">
+        <div class="flex items-center justify-between text-slate-500 mb-2">
+          <span class="text-xs font-extrabold uppercase tracking-wider">Pending Action</span>
+          <div class="w-8 h-8 rounded-lg bg-amber-50 text-amber-700 flex items-center justify-center">
+            <span class="material-symbols-outlined text-[20px]">pending_actions</span>
+          </div>
+        </div>
+        <div>
+          <span id="metric-pending-prs" class="text-2xl sm:text-3xl font-black text-amber-700 font-mono">0</span>
+          <div class="flex items-center gap-1 mt-1 text-[11px] text-slate-500">
+            <span>Budget check &amp; review</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="p-4 sm:p-5 rounded-2xl bg-white border border-slate-200 shadow-xs flex flex-col justify-between">
+        <div class="flex items-center justify-between text-slate-500 mb-2">
+          <span class="text-xs font-extrabold uppercase tracking-wider">Committed Value</span>
+          <div class="w-8 h-8 rounded-lg bg-purple-50 text-purple-700 flex items-center justify-center">
+            <span class="material-symbols-outlined text-[20px]">payments</span>
+          </div>
+        </div>
+        <div>
+          <span id="metric-committed-val" class="text-xl sm:text-2xl font-black text-slate-900 font-mono">NLe 0.00</span>
+          <div class="flex items-center gap-1 mt-1 text-[11px] text-purple-700 font-bold">
+            <span>Grant-backed commitments</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- FILTER BAR & CONTROLS -->
+    <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-xs flex flex-col gap-3">
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+        <!-- Search -->
+        <div class="relative flex-1">
+          <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-[20px]">search</span>
+          <input
+            id="pr-search-input"
+            type="text"
+            placeholder="Search by title, PR Ref, BCF-TXN ID, programme, or requestor..."
+            class="w-full pl-9 pr-4 py-2.5 rounded-xl border border-slate-200 bg-slate-50 text-xs text-slate-900 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition"
+          />
+        </div>
+
+        <!-- Status Filter -->
+        <div class="flex items-center gap-2">
+          <select id="filter-status-select" class="px-3 py-2.5 rounded-xl border border-slate-200 bg-slate-50 text-xs font-semibold text-slate-700 focus:outline-none focus:ring-2 focus:ring-primary/20">
+            <option value="all">All Statuses</option>
+            <option value="Approved">Approved</option>
+            <option value="Pending Budget Check">Pending Budget Check</option>
+            <option value="Draft">Draft</option>
+            <option value="Under Review">Under Review</option>
+            <option value="Rejected">Rejected</option>
+          </select>
+
+          <!-- Programme Filter -->
+          <select id="filter-programme-select" class="px-3 py-2.5 rounded-xl border border-slate-200 bg-slate-50 text-xs font-semibold text-slate-700 focus:outline-none focus:ring-2 focus:ring-primary/20">
+            <option value="all">All Programmes</option>
+            <!-- Populated via script -->
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <!-- REQUISITIONS LIST CONTAINER -->
+    <div id="requisitions-container" class="space-y-3 sm:space-y-4">
+      <!-- Dynamic PR Cards -->
+    </div>
+
+    <!-- EMPTY STATE -->
+    <div id="prs-empty-state" class="hidden text-center py-16 bg-white rounded-2xl border border-slate-200">
+      <div class="w-16 h-16 rounded-full bg-slate-100 text-slate-400 mx-auto flex items-center justify-center mb-3">
+        <span class="material-symbols-outlined text-3xl">request_quote</span>
+      </div>
+      <h3 class="text-base font-bold text-slate-800">No purchase requisitions found</h3>
+      <p class="text-xs text-slate-500 mt-1 max-w-sm mx-auto">Click "Raise New Requisition" to create a new transaction with auto-linked Programme and Donor.</p>
+      <button onclick="openRequisitionModal()" class="mt-4 px-4 py-2 rounded-xl bg-primary hover:bg-primary-dark text-white text-xs font-bold">
+        Create Purchase Requisition
+      </button>
+    </div>
+
+  </main>
+
+  <!-- RAISE / EDIT REQUISITION MODAL -->
+  <div id="pr-modal" class="fixed inset-0 z-50 bg-black/50 backdrop-blur-xs hidden flex items-center justify-center p-3 sm:p-4 overflow-y-auto">
+    <div class="bg-white rounded-2xl max-w-4xl w-full p-5 sm:p-6 shadow-2xl border border-slate-200 flex flex-col my-auto max-h-[94vh]">
+      <div class="flex items-center justify-between border-b border-slate-100 pb-3 mb-4">
+        <div class="flex items-center gap-2.5">
+          <div class="w-9 h-9 rounded-xl bg-primary/10 text-primary flex items-center justify-center">
+            <span class="material-symbols-outlined text-[20px]">request_quote</span>
+          </div>
+          <div>
+            <h3 id="pr-modal-title" class="text-base font-extrabold text-slate-900 font-headline">Raise Purchase Requisition (PR)</h3>
+            <p class="text-xs text-slate-500">Auto-links Programme, Donor, Grant, &amp; generates Master BCF-TXN Transaction ID</p>
+          </div>
+        </div>
+        <button onclick="closeRequisitionModal()" class="w-8 h-8 rounded-lg text-slate-400 hover:text-slate-600 hover:bg-slate-100 flex items-center justify-center">
+          <span class="material-symbols-outlined text-[20px]">close</span>
+        </button>
+      </div>
+
+      <form id="pr-form" onsubmit="handlePrSubmit(event)" class="flex-1 overflow-y-auto pr-1 space-y-4 text-xs">
+        <input type="hidden" id="pr-id" value=""/>
+        <input type="hidden" id="pr-txnid" value=""/>
+
+        <!-- SECTION 1: MASTER DATA LINKAGES (Programme, Donor, Grant, Budget Line) -->
+        <div class="p-3.5 bg-blue-50/60 rounded-xl border border-blue-200/60 space-y-3">
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-extrabold text-blue-900 flex items-center gap-1.5 uppercase tracking-wider">
+              <span class="material-symbols-outlined text-[16px] text-primary">account_tree</span>
+              <span>1. Cross-Module Data Inheritance</span>
+            </span>
+            <div class="flex items-center gap-2">
+              <button type="button" onclick="fillSamplePrData()" class="px-2.5 py-1 rounded-lg bg-blue-600 hover:bg-blue-700 text-white font-bold text-[11px] flex items-center gap-1 shadow-xs transition-colors cursor-pointer" title="Auto-fill recommended values for testing">
+                <span class="material-symbols-outlined text-[14px]">bolt</span>
+                <span>Auto-Fill Sample PR</span>
+              </button>
+              <span class="text-[10px] font-bold text-blue-800 bg-blue-100 px-2 py-0.5 rounded hidden sm:inline">
+                Rule: Create Once → Inherit Everywhere
+              </span>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2.5">
+            <!-- Programme Input (Pure Text Input) -->
+            <div>
+              <label class="block font-bold text-slate-700 mb-1">Programme *</label>
+              <input type="text" id="pr-programme" required oninput="runLiveBudgetCheck()" placeholder="e.g. School Feeding Programme" class="w-full px-2.5 py-1.5 rounded-lg border border-slate-300 bg-white text-xs font-semibold focus:ring-1 focus:ring-primary focus:border-primary outline-none"/>
+            </div>
+
+            <!-- Donor Partner Input (Pure Text Input) -->
+            <div>
+              <label class="block font-bold text-slate-700 mb-1">Donor Partner *</label>
+              <input type="text" id="pr-donor" required oninput="runLiveBudgetCheck()" placeholder="e.g. World Food Programme" class="w-full px-2.5 py-1.5 rounded-lg border border-slate-300 bg-white text-xs font-semibold focus:ring-1 focus:ring-primary focus:border-primary outline-none"/>
+            </div>
+
+            <!-- Grant / Project Input (Pure Text Input) -->
+            <div>
+              <label class="block font-bold text-slate-700 mb-1">Grant / Project *</label>
+              <input type="text" id="pr-grant" required oninput="runLiveBudgetCheck()" placeholder="e.g. School Feeding Programme" class="w-full px-2.5 py-1.5 rounded-lg border border-slate-300 bg-white text-xs font-semibold focus:ring-1 focus:ring-primary focus:border-primary outline-none"/>
+            </div>
+
+            <!-- Budget Line Item Input (Pure Text Input) -->
+            <div>
+              <label class="block font-bold text-slate-700 mb-1">Budget Line Item *</label>
+              <input type="text" id="pr-budgetline" required oninput="runLiveBudgetCheck()" placeholder="e.g. Food Procurement" class="w-full px-2.5 py-1.5 rounded-lg border border-slate-300 bg-white text-xs font-semibold focus:ring-1 focus:ring-primary focus:border-primary outline-none"/>
+            </div>
+          </div>
+        </div>
+
+        <!-- SECTION 2: REQUISITION DETAILS & REQUESTOR -->
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+          <div class="sm:col-span-2">
+            <label class="block font-bold text-slate-700 mb-1">Requisition Title *</label>
+            <input id="pr-title" type="text" required placeholder="e.g. Procurement of Long Grain Rice for School Feeding – Bo District" class="w-full px-3 py-2 rounded-xl border border-slate-200 bg-slate-50 focus:bg-white text-xs"/>
+          </div>
+          <div>
+            <label class="block font-bold text-slate-700 mb-1">Procurement Category *</label>
+            <select id="pr-category" required class="w-full px-3 py-2 rounded-xl border border-slate-200 bg-slate-50 text-xs">
+              <!-- Populated via script -->
+            </select>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-4 gap-3">
+          <div>
+            <label class="block font-bold text-slate-700 mb-1">Requested By (Staff) *</label>
+            <select id="pr-requestor" required onchange="onRequestorChange()" class="w-full px-2.5 py-2 rounded-xl border border-slate-200 bg-slate-50 text-xs">
+              <!-- Populated via script -->
+            </select>
+          </div>
+          <div>
+            <label class="block font-bold text-slate-700 mb-1">Requesting Department</label>
+            <input id="pr-dept" type="text" readonly class="w-full px-2.5 py-2 rounded-xl border border-slate-200 bg-slate-100 text-slate-600 text-xs"/>
+          </div>
+          <div>
+            <label class="block font-bold text-slate-700 mb-1">Delivery Destination *</label>
+            <select id="pr-location" required class="w-full px-2.5 py-2 rounded-xl border border-slate-200 bg-slate-50 text-xs">
+              <!-- Populated via script -->
+            </select>
+          </div>
+          <div>
+            <label class="block font-bold text-slate-700 mb-1">Required Delivery Date *</label>
+            <input id="pr-req-date" type="date" required class="w-full px-2.5 py-2 rounded-xl border border-slate-200 bg-slate-50 text-xs font-mono"/>
+          </div>
+        </div>
+
+        <!-- SECTION 3: LINE ITEMS TABLE -->
+        <div class="p-3.5 bg-slate-50 rounded-xl border border-slate-200 space-y-2.5">
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-extrabold text-slate-800 uppercase tracking-wider flex items-center gap-1.5">
+              <span class="material-symbols-outlined text-[16px] text-slate-600">format_list_bulleted</span>
+              <span>2. Requested Goods / Services (Bill of Quantities)</span>
+            </span>
+            <button type="button" onclick="addLineItem()" class="px-2.5 py-1 rounded-lg bg-white border border-slate-300 hover:bg-slate-50 text-slate-700 text-xs font-bold flex items-center gap-1">
+              <span class="material-symbols-outlined text-[14px]">add</span>
+              <span>Add Item</span>
+            </button>
+          </div>
+
+          <div class="overflow-x-auto">
+            <table class="w-full text-left text-xs border-collapse">
+              <thead>
+                <tr class="border-b border-slate-200 text-slate-500 font-bold">
+                  <th class="py-1.5 px-2">Description *</th>
+                  <th class="py-1.5 px-2 w-28">Unit</th>
+                  <th class="py-1.5 px-2 w-24">Qty *</th>
+                  <th class="py-1.5 px-2 w-28">Est. Unit (NLe) *</th>
+                  <th class="py-1.5 px-2 w-32 text-right">Est. Total (NLe)</th>
+                  <th class="py-1.5 px-2 w-10 text-center"></th>
+                </tr>
+              </thead>
+              <tbody id="line-items-body" class="divide-y divide-slate-100">
+                <!-- Populated via script -->
+              </tbody>
+            </table>
+          </div>
+
+          <div class="flex items-center justify-between pt-2 border-t border-slate-200 font-bold">
+            <span class="text-slate-600">Total Estimated Procurement Value:</span>
+            <span id="pr-grand-total-display" class="font-mono text-base font-black text-primary">NLe 0.00</span>
+          </div>
+        </div>
+
+        <!-- SECTION 4: REAL-TIME BUDGET VERIFICATION ENGINE -->
+        <div id="live-budget-feedback" class="p-3.5 rounded-xl border transition-all text-xs">
+          <!-- Populated by runLiveBudgetCheck() -->
+        </div>
+
+        <!-- SECTION 5: PROCUREMENT METHOD & THRESHOLD CALCULATION -->
+        <div class="p-3.5 bg-slate-50 rounded-xl border border-slate-200 flex items-center justify-between">
+          <div class="flex items-center gap-2.5">
+            <div class="w-8 h-8 rounded-lg bg-blue-100 text-primary flex items-center justify-center">
+              <span class="material-symbols-outlined text-[18px]">gavel</span>
+            </div>
+            <div>
+              <span class="text-[10px] text-slate-400 font-bold uppercase block">Determined Procurement Method</span>
+              <span id="disp-calc-method" class="font-bold text-slate-900">Request for Quotation (RFQ)</span>
+            </div>
+          </div>
+          <div class="text-right">
+            <span class="text-[10px] text-slate-400 font-bold uppercase block">Required Approvals</span>
+            <span id="disp-calc-approvers" class="text-xs font-semibold text-slate-700">Programme Mgr &bull; Procurement &bull; Finance</span>
+          </div>
+        </div>
+
+        <!-- Notes -->
+        <div>
+          <label class="block font-bold text-slate-700 mb-1">Procurement Justification / Additional Notes</label>
+          <textarea id="pr-notes" rows="2" placeholder="Specify any delivery deadlines, urgent donor commitments, or specifications..." class="w-full px-3 py-2 rounded-xl border border-slate-200 bg-slate-50 text-xs"></textarea>
+        </div>
+
+        <!-- Submit buttons -->
+        <div class="flex items-center justify-end gap-2 pt-3 border-t border-slate-100">
+          <button type="button" onclick="closeRequisitionModal()" class="px-4 py-2 rounded-xl border border-slate-200 hover:bg-slate-100 text-xs font-bold text-slate-600 cursor-pointer">
+            Cancel
+          </button>
+          <button type="submit" class="px-5 py-2 rounded-xl bg-primary hover:bg-primary-dark text-white text-xs font-extrabold shadow-md cursor-pointer active:scale-95">
+            Save &amp; Generate Master BCF-TXN
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- REQUISITION FULL DOSSIER / VIEW MODAL -->
+  <div id="pr-view-modal" class="fixed inset-0 z-50 bg-black/50 backdrop-blur-xs hidden flex items-center justify-center p-3 sm:p-4 overflow-y-auto">
+    <div class="bg-white rounded-2xl max-w-3xl w-full p-5 sm:p-6 shadow-2xl border border-slate-200 flex flex-col my-auto max-h-[94vh]">
+      <div class="flex items-center justify-between border-b border-slate-100 pb-3 mb-4">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-xl bg-primary text-white flex items-center justify-center font-black text-sm">
+            PR
+          </div>
+          <div>
+            <div class="flex items-center gap-2">
+              <h3 id="view-pr-title" class="text-base font-extrabold text-slate-900 font-headline">Requisition Title</h3>
+              <span id="view-pr-badge" class="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold bg-blue-100 text-blue-800">
+                Approved
+              </span>
+            </div>
+            <p id="view-pr-sub" class="text-xs text-slate-500 font-mono">BCF-PR-2026-0001 • BCF-TXN-2026-000001</p>
+          </div>
+        </div>
+        <button onclick="closePrViewModal()" class="w-8 h-8 rounded-lg text-slate-400 hover:text-slate-600 hover:bg-slate-100 flex items-center justify-center">
+          <span class="material-symbols-outlined text-[20px]">close</span>
+        </button>
+      </div>
+
+      <div class="flex-1 overflow-y-auto pr-1 space-y-4 text-xs" id="view-pr-content">
+        <!-- Rendered dynamically -->
+      </div>
+
+      <div class="flex items-center justify-between pt-3 border-t border-slate-100 mt-4">
+        <div class="flex items-center gap-2">
+          <button id="view-approve-btn" onclick="approveRequisitionFromModal()" class="px-4 py-2 rounded-xl bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-extrabold flex items-center gap-1.5 shadow-sm cursor-pointer">
+            <span class="material-symbols-outlined text-[16px]">how_to_reg</span>
+            <span>Approve Requisition</span>
+          </button>
+          <button id="view-forward-rfq-btn" onclick="routeToRfqFromModal()" class="px-4 py-2 rounded-xl bg-primary hover:bg-primary-dark text-white text-xs font-extrabold flex items-center gap-1.5 shadow-sm cursor-pointer">
+            <span class="material-symbols-outlined text-[16px]">forward_to_inbox</span>
+            <span>Proceed to RFQ &amp; Bids</span>
+          </button>
+        </div>
+        <button onclick="window.print()" class="px-3.5 py-2 rounded-xl border border-slate-200 hover:bg-slate-100 text-xs font-bold text-slate-700 flex items-center gap-1">
+          <span class="material-symbols-outlined text-[16px]">print</span>
+          <span>Print Official PR</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Shared Library -->
+  <script src="../bcf_procurement_shared.js"></script>
+
+  <!-- Controller Logic -->
+  <script>
+    let activeStatus = 'all';
+    let activeProgramme = 'all';
+    let searchQuery = '';
+    let currentViewingPr = null;
+
+    let formLineItems = [
+      { description: '', unit: 'Units', quantity: 1, estimatedUnitPrice: '', estimatedTotal: 0 }
+    ];
+
+    document.addEventListener('DOMContentLoaded', () => {
+      // Shared top navigation
+      BCF_PROCUREMENT.renderHeaderAndTabs('purchase-requisition');
+
+      // Setup programmes dropdown
+      populateProgrammesDropdown();
+
+      // Setup modal dropdowns
+      populateModalDropdowns();
+
+      // Render requisitions
+      loadRequisitions();
+
+      // Listeners
+      document.getElementById('pr-search-input')?.addEventListener('input', (e) => {
+        searchQuery = e.target.value.toLowerCase();
+        renderRequisitions();
+      });
+
+      document.getElementById('filter-status-select')?.addEventListener('change', (e) => {
+        activeStatus = e.target.value;
+        renderRequisitions();
+      });
+
+      document.getElementById('filter-programme-select')?.addEventListener('change', (e) => {
+        activeProgramme = e.target.value;
+        renderRequisitions();
+      });
+
+      // Handle direct handoff from Partnership Management Hub
+      const passedPartner = localStorage.getItem('bcf_selected_donor_partner');
+      const passedRelKey = localStorage.getItem('bcf_selected_rel_key');
+      if (passedPartner) {
+        localStorage.removeItem('bcf_selected_donor_partner');
+        localStorage.removeItem('bcf_selected_rel_key');
+        openRequisitionModal();
+        const donorInput = document.getElementById('pr-donor');
+        if (donorInput) donorInput.value = passedPartner;
+        if (passedRelKey) {
+          const notesInput = document.getElementById('pr-notes');
+          if (notesInput) notesInput.value = `Funded under Master Relationship Key: ${passedRelKey}`;
+        }
+        BCF_PROCUREMENT.showToast(`Pre-linked Funding Partner: ${passedPartner}`, 'info');
+      }
+    });
+
+    function populateProgrammesDropdown() {
+      const select = document.getElementById('filter-programme-select');
+      if (!select) return;
+      const progs = BCF_PROCUREMENT.getProgrammes();
+      select.innerHTML = '<option value="all">All Programmes</option>' + progs.map(p => `
+        <option value="${p.id}">${p.name}</option>
+      `).join('');
+    }
+
+    function populateModalDropdowns() {
+      // Categories
+      const catSelect = document.getElementById('pr-category');
+      if (catSelect) {
+        catSelect.innerHTML = BCF_PROCUREMENT.POLICY.CATEGORIES.map(c => `
+          <option value="${c}">${c}</option>
+        `).join('');
+      }
+
+      // Locations
+      const locSelect = document.getElementById('pr-location');
+      if (locSelect) {
+        locSelect.innerHTML = BCF_PROCUREMENT.POLICY.LOCATIONS.map(l => `
+          <option value="${l}">${l}</option>
+        `).join('');
+      }
+
+      // Staff Requestor
+      const reqSelect = document.getElementById('pr-requestor');
+      if (reqSelect) {
+        const staffList = BCF_PROCUREMENT.getStaffRegistry();
+        reqSelect.innerHTML = '<option value="">Select Staff...</option>' + staffList.map(s => `
+          <option value="${s.employeeId}">${s.fullName} (${s.title || s.department})</option>
+        `).join('');
+      }
+    }
+
+    function onRequestorChange() {
+      const staffId = document.getElementById('pr-requestor').value;
+      const s = BCF_PROCUREMENT.getStaffMember(staffId);
+      if (s) {
+        document.getElementById('pr-dept').value = s.department || 'Programs Department';
+      }
+    }
+
+    function onProgrammeChange() {
+      const val = (document.getElementById('pr-programme')?.value || '').trim();
+      if (!val) {
+        runLiveBudgetCheck();
+        return;
+      }
+
+      const prog = BCF_PROCUREMENT.getProgramme(val);
+      if (prog) {
+        const grants = BCF_PROCUREMENT.getGrantsByProgramme(prog.id);
+        const donorIds = [...new Set(grants.map(g => g.donorId))];
+        const donors = BCF_PROCUREMENT.getDonors().filter(d => donorIds.includes(d.id));
+
+        const donorList = document.getElementById('pr-donor-list');
+        if (donorList) {
+          donorList.innerHTML = donors.map(d => `<option value="${d.name}">${d.name} (${d.id})</option>`).join('');
+        }
+
+        const donorInput = document.getElementById('pr-donor');
+        if (donorInput && !donorInput.value && donors.length > 0) {
+          donorInput.value = donors[0].name;
+          onDonorChange();
+        }
+      }
+      runLiveBudgetCheck();
+    }
+
+    function onDonorChange() {
+      const progVal = (document.getElementById('pr-programme')?.value || '').trim();
+      const donorVal = (document.getElementById('pr-donor')?.value || '').trim();
+      const prog = BCF_PROCUREMENT.getProgramme(progVal);
+      const donor = BCF_PROCUREMENT.getDonor(donorVal);
+
+      if (donor) {
+        const grants = BCF_PROCUREMENT.getGrants().filter(g => 
+          g.donorId === donor.id && (!prog || g.programmeId === prog.id)
+        );
+        const grantList = document.getElementById('pr-grant-list');
+        if (grantList) {
+          grantList.innerHTML = grants.map(g => `<option value="${g.projectName}">${g.projectName} (${g.id})</option>`).join('');
+        }
+
+        const grantInput = document.getElementById('pr-grant');
+        if (grantInput && !grantInput.value && grants.length > 0) {
+          grantInput.value = grants[0].projectName;
+          onGrantChange();
+        }
+      }
+      runLiveBudgetCheck();
+    }
+
+    function onGrantChange() {
+      const grantVal = (document.getElementById('pr-grant')?.value || '').trim();
+      const grant = BCF_PROCUREMENT.getGrant(grantVal);
+
+      if (grant && grant.budgetLines) {
+        const blList = document.getElementById('pr-budgetline-list');
+        if (blList) {
+          blList.innerHTML = grant.budgetLines.map(bl => `
+            <option value="${bl.name}">${bl.name} (Alloc: NLe ${BCF_PROCUREMENT.formatNumber(bl.allocated)})</option>
+          `).join('');
+        }
+
+        const blInput = document.getElementById('pr-budgetline');
+        if (blInput && !blInput.value && grant.budgetLines.length > 0) {
+          blInput.value = grant.budgetLines[0].name;
+        }
+      }
+      runLiveBudgetCheck();
+    }
+
+    function fillSamplePrData() {
+      // 1. Set Programme
+      const progInput = document.getElementById('pr-programme');
+      if (progInput) {
+        progInput.value = 'School Feeding Programme';
+        onProgrammeChange();
+      }
+
+      // 2. Set Donor & Grant
+      const donorInput = document.getElementById('pr-donor');
+      if (donorInput) {
+        donorInput.value = 'World Food Programme';
+        onDonorChange();
+      }
+
+      const grantInput = document.getElementById('pr-grant');
+      if (grantInput) {
+        grantInput.value = 'School Feeding Programme';
+        onGrantChange();
+      }
+
+      // 3. Set Budget Line
+      const blInput = document.getElementById('pr-budgetline');
+      if (blInput) {
+        blInput.value = 'Food Procurement';
+      }
+
+      // 4. Set Requestor & Department
+      const reqSelect = document.getElementById('pr-requestor');
+      if (reqSelect && reqSelect.options.length > 1) {
+        reqSelect.selectedIndex = 1;
+        onRequestorChange();
+      }
+
+      // 5. Set General Requisition Details
+      const titleInput = document.getElementById('pr-title');
+      if (titleInput) titleInput.value = 'Emergency Food Ration Procurement – Bo District Schools';
+      
+      const catSelect = document.getElementById('pr-category');
+      if (catSelect) catSelect.value = 'School Feeding Supplies';
+      
+      const locSelect = document.getElementById('pr-location');
+      if (locSelect) locSelect.value = 'Bo District Office';
+      
+      const dateInput = document.getElementById('pr-req-date');
+      if (dateInput) {
+        const futureDate = new Date();
+        futureDate.setDate(futureDate.getDate() + 14);
+        dateInput.value = futureDate.toISOString().split('T')[0];
+      }
+
+      // 6. Populate exact Bill of Quantities matching user screenshot
+      formLineItems = [
+        { description: 'Long Grain Rice', unit: 'Bag', quantity: 10, estimatedUnitPrice: 150, estimatedTotal: 1500 },
+        { description: 'Oil', unit: 'Gallon', quantity: 3, estimatedUnitPrice: 50, estimatedTotal: 150 },
+        { description: 'Onion', unit: 'Bag', quantity: 3, estimatedUnitPrice: 50, estimatedTotal: 150 },
+        { description: 'Mayonise', unit: 'Carton', quantity: 5, estimatedUnitPrice: 40, estimatedTotal: 200 }
+      ];
+
+      renderLineItemsTable();
+      runLiveBudgetCheck();
+      BCF_PROCUREMENT.showToast('Sample PR data auto-filled for School Feeding!', 'info');
+    }
+
+
+
+    function loadRequisitions() {
+      renderRequisitions();
+      updatePrMetrics();
+    }
+
+    function updatePrMetrics() {
+      const list = BCF_PROCUREMENT.getRequisitions();
+      const approved = list.filter(p => p.status === 'Approved').length;
+      const pending = list.filter(p => p.status.includes('Pending') || p.status.includes('Draft')).length;
+      const totalCommitted = list.filter(p => p.status === 'Approved').reduce((sum, p) => sum + (p.estimatedTotal || 0), 0);
+
+      document.getElementById('metric-total-prs').textContent = list.length;
+      document.getElementById('metric-approved-prs').textContent = approved;
+      document.getElementById('metric-pending-prs').textContent = pending;
+      document.getElementById('metric-committed-val').textContent = BCF_PROCUREMENT.formatCurrency(totalCommitted);
+    }
+
+    function renderRequisitions() {
+      const container = document.getElementById('requisitions-container');
+      const emptyState = document.getElementById('prs-empty-state');
+      if (!container) return;
+
+      let list = BCF_PROCUREMENT.getRequisitions();
+
+      // Filter
+      list = list.filter(pr => {
+        const matchesStatus = activeStatus === 'all' || pr.status === activeStatus;
+        const matchesProgramme = activeProgramme === 'all' || pr.programmeId === activeProgramme;
+        const matchesSearch = !searchQuery ||
+          (pr.title && pr.title.toLowerCase().includes(searchQuery)) ||
+          (pr.id && pr.id.toLowerCase().includes(searchQuery)) ||
+          (pr.txnId && pr.txnId.toLowerCase().includes(searchQuery)) ||
+          (pr.requestedBy && pr.requestedBy.toLowerCase().includes(searchQuery)) ||
+          (pr.programmeName && pr.programmeName.toLowerCase().includes(searchQuery));
+
+        return matchesStatus && matchesProgramme && matchesSearch;
+      });
+
+      if (list.length === 0) {
+        container.innerHTML = '';
+        emptyState?.classList.remove('hidden');
+        return;
+      }
+
+      emptyState?.classList.add('hidden');
+
+      container.innerHTML = list.map(pr => {
+        const colors = BCF_PROCUREMENT.getStatusColor(pr.status);
+        const isApproved = pr.status === 'Approved';
+
+        return `
+          <div class="bg-white rounded-2xl border border-slate-200 shadow-xs hover:shadow-md transition p-4 sm:p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <!-- Left Info -->
+            <div class="flex items-start gap-3.5 flex-1 min-w-0">
+              <div class="w-11 h-11 rounded-xl bg-primary/10 text-primary flex items-center justify-center shrink-0 mt-0.5">
+                <span class="material-symbols-outlined text-[22px]">receipt</span>
+              </div>
+              <div class="flex-1 min-w-0">
+                <div class="flex items-center gap-2 flex-wrap mb-1">
+                  <span class="font-mono text-xs font-black text-primary bg-blue-50 px-2 py-0.5 rounded border border-blue-200">
+                    ${pr.id}
+                  </span>
+                  <span class="font-mono text-xs font-bold text-slate-700 bg-slate-100 px-2 py-0.5 rounded border border-slate-200 flex items-center gap-1" title="Master Transaction ID">
+                    <span class="material-symbols-outlined text-[13px] text-slate-500">key</span>
+                    <span>${pr.txnId}</span>
+                  </span>
+                  <span class="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold border ${colors.bg} ${colors.text} ${colors.border}">
+                    ${pr.status}
+                  </span>
+                  <span class="text-[10px] font-bold text-slate-500 bg-slate-50 px-2 py-0.5 rounded">
+                    ${pr.procurementMethod || 'RFQ'}
+                  </span>
+                </div>
+
+                <h3 class="text-sm sm:text-base font-extrabold text-slate-900 leading-snug truncate font-headline">${pr.title}</h3>
+                
+                <div class="flex items-center gap-3 text-xs text-slate-500 mt-1 flex-wrap">
+                  <span class="flex items-center gap-1">
+                    <span class="material-symbols-outlined text-[14px] text-slate-400">folder</span>
+                    <span>${pr.programmeName || '—'}</span>
+                  </span>
+                  <span class="flex items-center gap-1">
+                    <span class="material-symbols-outlined text-[14px] text-slate-400">volunteer_activism</span>
+                    <span>${pr.donorName || '—'}</span>
+                  </span>
+                  <span class="flex items-center gap-1">
+                    <span class="material-symbols-outlined text-[14px] text-slate-400">person</span>
+                    <span>${pr.requestedBy}</span>
+                  </span>
+                  <span class="flex items-center gap-1 font-mono">
+                    <span class="material-symbols-outlined text-[14px] text-slate-400">event</span>
+                    <span>Req: ${BCF_PROCUREMENT.formatDate(pr.requiredDate)}</span>
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Right Amounts & Actions -->
+            <div class="flex sm:flex-col items-center sm:items-end justify-between sm:justify-center border-t sm:border-t-0 pt-3 sm:pt-0 border-slate-100 shrink-0 gap-2">
+              <div class="text-left sm:text-right">
+                <span class="text-[10px] font-bold uppercase text-slate-400 block">Estimated Amount</span>
+                <span class="font-mono text-base sm:text-lg font-black text-slate-900">${BCF_PROCUREMENT.formatCurrency(pr.estimatedTotal)}</span>
+              </div>
+
+              <div class="flex items-center gap-1.5">
+                <button onclick="viewRequisition('${pr.id}')" class="px-3 py-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-800 text-xs font-bold transition flex items-center gap-1 cursor-pointer">
+                  <span class="material-symbols-outlined text-[16px]">visibility</span>
+                  <span>View Form</span>
+                </button>
+
+                ${!isApproved ? `
+                  <button onclick="quickApprovePr('${pr.id}')" class="p-1.5 rounded-lg bg-emerald-50 hover:bg-emerald-100 text-emerald-800 transition cursor-pointer" title="Endorse / Approve PR">
+                    <span class="material-symbols-outlined text-[18px]">how_to_reg</span>
+                  </button>
+                ` : `
+                  <button onclick="routePrToRfq('${pr.id}')" class="p-1.5 rounded-lg bg-blue-50 hover:bg-blue-100 text-primary transition cursor-pointer" title="Issue RFQ / Solicit Bids">
+                    <span class="material-symbols-outlined text-[18px]">forward_to_inbox</span>
+                  </button>
+                `}
+              </div>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function renderLineItemsTable() {
+      const tbody = document.getElementById('line-items-body');
+      if (!tbody) return;
+
+      tbody.innerHTML = formLineItems.map((item, idx) => {
+        const desc = (item.description || '').replace(/"/g, '&quot;');
+        const unit = (item.unit || 'Units').replace(/"/g, '&quot;');
+        const qtyVal = (item.quantity !== undefined && item.quantity !== null && item.quantity !== '') ? item.quantity : 1;
+        const priceVal = (item.estimatedUnitPrice !== undefined && item.estimatedUnitPrice !== null && item.estimatedUnitPrice !== '') ? item.estimatedUnitPrice : '';
+        const rowTotal = (parseFloat(item.quantity) || 0) * (parseFloat(item.estimatedUnitPrice) || 0);
+
+        return `
+        <tr id="line-item-row-${idx}">
+          <td class="py-1.5 px-2">
+            <input type="text" value="${desc}" oninput="updateLineItem(${idx}, 'description', this.value)" placeholder="e.g. Long Grain Rice (50kg bags)" class="w-full px-2 py-1 rounded border border-slate-200 bg-white text-xs focus:ring-1 focus:ring-primary focus:border-primary outline-none" required/>
+          </td>
+          <td class="py-1.5 px-2">
+            <input type="text" value="${unit}" oninput="updateLineItem(${idx}, 'unit', this.value)" placeholder="Units" class="w-full px-2 py-1 rounded border border-slate-200 bg-white text-xs focus:ring-1 focus:ring-primary focus:border-primary outline-none"/>
+          </td>
+          <td class="py-1.5 px-2">
+            <input type="number" min="0" step="any" value="${qtyVal}" oninput="updateLineItem(${idx}, 'quantity', this.value)" placeholder="1" class="w-full px-2 py-1 rounded border border-slate-200 bg-white text-xs font-mono text-center focus:ring-1 focus:ring-primary focus:border-primary outline-none" required/>
+          </td>
+          <td class="py-1.5 px-2">
+            <input type="number" min="0" step="any" value="${priceVal}" oninput="updateLineItem(${idx}, 'estimatedUnitPrice', this.value)" placeholder="0.00" class="w-full px-2 py-1 rounded border border-slate-200 bg-white text-xs font-mono text-right focus:ring-1 focus:ring-primary focus:border-primary outline-none" required/>
+          </td>
+          <td id="line-item-total-${idx}" class="py-1.5 px-2 font-mono font-bold text-right text-slate-800">
+            ${BCF_PROCUREMENT.formatNumber(rowTotal)}
+          </td>
+          <td class="py-1.5 px-2 text-center">
+            ${formLineItems.length > 1 ? `
+              <button type="button" onclick="removeLineItem(${idx})" class="text-slate-400 hover:text-red-600 p-1 rounded hover:bg-red-50 transition-colors" title="Remove item">
+                <span class="material-symbols-outlined text-[16px]">delete</span>
+              </button>
+            ` : ''}
+          </td>
+        </tr>
+      `;
+      }).join('');
+
+      refreshRequisitionCalculations();
+    }
+
+    function addLineItem() {
+      formLineItems.push({ description: '', unit: 'Units', quantity: 1, estimatedUnitPrice: '', estimatedTotal: 0 });
+      renderLineItemsTable();
+    }
+
+    function removeLineItem(idx) {
+      if (formLineItems.length <= 1) return;
+      formLineItems.splice(idx, 1);
+      renderLineItemsTable();
+    }
+
+    function updateLineItem(idx, field, val) {
+      if (!formLineItems[idx]) return;
+
+      formLineItems[idx][field] = val;
+
+      const qty = parseFloat(formLineItems[idx].quantity) || 0;
+      const unitPrice = parseFloat(formLineItems[idx].estimatedUnitPrice) || 0;
+      formLineItems[idx].estimatedTotal = qty * unitPrice;
+
+      // Update the row total text in DOM directly so user input focus is preserved
+      const totalCell = document.getElementById(`line-item-total-${idx}`);
+      if (totalCell) {
+        totalCell.textContent = BCF_PROCUREMENT.formatNumber(formLineItems[idx].estimatedTotal);
+      }
+
+      refreshRequisitionCalculations();
+    }
+
+    function refreshRequisitionCalculations() {
+      // Grand total calculation
+      const grandTotal = formLineItems.reduce((sum, item) => {
+        const q = parseFloat(item.quantity) || 0;
+        const p = parseFloat(item.estimatedUnitPrice) || 0;
+        return sum + (q * p);
+      }, 0);
+
+      const totalDisplay = document.getElementById('pr-grand-total-display');
+      if (totalDisplay) {
+        totalDisplay.textContent = BCF_PROCUREMENT.formatCurrency(grandTotal);
+      }
+
+      // Update procurement method calculation
+      const methodInfo = BCF_PROCUREMENT.determineProcurementMethod(grandTotal);
+      const methodEl = document.getElementById('disp-calc-method');
+      if (methodEl) {
+        methodEl.textContent = `${methodInfo.method} (${methodInfo.description})`;
+      }
+
+      // Update approval chain
+      const chain = BCF_PROCUREMENT.getApprovalChain(grandTotal);
+      const approversEl = document.getElementById('disp-calc-approvers');
+      if (approversEl) {
+        approversEl.textContent = chain.map(c => c.approver).join(' → ');
+      }
+
+      // Run live budget check
+      runLiveBudgetCheck();
+    }
+
+    function runLiveBudgetCheck() {
+      const grantId = document.getElementById('pr-grant')?.value;
+      const budgetLineId = document.getElementById('pr-budgetline')?.value;
+      const feedback = document.getElementById('live-budget-feedback');
+      if (!feedback) return;
+
+      const grandTotal = formLineItems.reduce((sum, item) => {
+        const q = parseFloat(item.quantity) || 0;
+        const p = parseFloat(item.estimatedUnitPrice) || 0;
+        return sum + (q * p);
+      }, 0);
+
+      if (!grantId || !budgetLineId) {
+        feedback.className = 'p-3 rounded-xl border border-slate-200 bg-slate-50 text-slate-500 flex items-center gap-2';
+        feedback.innerHTML = `
+          <span class="material-symbols-outlined text-[18px]">info</span>
+          <span>Select a Grant and Budget Line above to verify financial allocation in real-time.</span>
+        `;
+        return;
+      }
+
+      const res = BCF_PROCUREMENT.checkBudget(grantId, budgetLineId, grandTotal);
+
+      if (res.status === 'Within Budget') {
+        feedback.className = 'p-3 rounded-xl border border-emerald-300 bg-emerald-50 text-emerald-900 flex items-start gap-2.5';
+        feedback.innerHTML = `
+          <span class="material-symbols-outlined text-[20px] text-emerald-700 shrink-0 mt-0.5">check_circle</span>
+          <div class="flex-1">
+            <span class="font-extrabold uppercase text-[10px] tracking-wider text-emerald-800 block">Budget Verification: PASSED</span>
+            <p class="mt-0.5">${res.message}</p>
+            <div class="grid grid-cols-3 gap-2 mt-2 pt-2 border-t border-emerald-200 text-[11px] font-mono">
+              <div><span class="text-emerald-700">Allocated:</span> ${BCF_PROCUREMENT.formatCurrency(res.allocated)}</div>
+              <div><span class="text-emerald-700">Committed:</span> ${BCF_PROCUREMENT.formatCurrency(res.committed)}</div>
+              <div><span class="text-emerald-700 font-bold">New Balance:</span> ${BCF_PROCUREMENT.formatCurrency(res.remaining)}</div>
+            </div>
+          </div>
+        `;
+      } else {
+        feedback.className = 'p-3 rounded-xl border border-red-300 bg-red-50 text-red-900 flex items-start gap-2.5';
+        feedback.innerHTML = `
+          <span class="material-symbols-outlined text-[20px] text-red-700 shrink-0 mt-0.5">error</span>
+          <div class="flex-1">
+            <span class="font-extrabold uppercase text-[10px] tracking-wider text-red-800 block">Budget Verification: DEFICIT WARNING</span>
+            <p class="mt-0.5">${res.message}</p>
+            <div class="grid grid-cols-2 gap-2 mt-2 pt-2 border-t border-red-200 text-[11px] font-mono">
+              <div><span class="text-red-700">Remaining Available:</span> ${BCF_PROCUREMENT.formatCurrency(res.remaining)}</div>
+              <div><span class="text-red-700 font-bold">Deficit Overage:</span> ${BCF_PROCUREMENT.formatCurrency(res.overage)}</div>
+            </div>
+          </div>
+        `;
+      }
+    }
+
+    function openRequisitionModal() {
+      const modal = document.getElementById('pr-modal');
+      const form = document.getElementById('pr-form');
+      form.reset();
+
+      // Pre-fill pure text defaults
+      const prgInput = document.getElementById('pr-programme');
+      if (prgInput) prgInput.value = 'School Feeding Programme';
+      const dnrInput = document.getElementById('pr-donor');
+      if (dnrInput) dnrInput.value = 'World Food Programme';
+      const grtInput = document.getElementById('pr-grant');
+      if (grtInput) grtInput.value = 'School Feeding Programme';
+      const blInput = document.getElementById('pr-budgetline');
+      if (blInput) blInput.value = 'Food Procurement';
+
+      const titleInput = document.getElementById('pr-title');
+      if (titleInput && !titleInput.value) titleInput.value = 'Procurement of Food Supplies – Bo District Schools';
+
+      const catSelect = document.getElementById('pr-category');
+      if (catSelect) catSelect.value = 'School Feeding Supplies';
+
+      const locSelect = document.getElementById('pr-location');
+      if (locSelect) locSelect.value = 'Bo District Office';
+
+      const reqSelect = document.getElementById('pr-requestor');
+      if (reqSelect && reqSelect.options.length > 1) {
+        reqSelect.selectedIndex = 1;
+        onRequestorChange();
+      }
+
+      const dateInput = document.getElementById('pr-req-date');
+      if (dateInput && !dateInput.value) {
+        const futureDate = new Date();
+        futureDate.setDate(futureDate.getDate() + 14);
+        dateInput.value = futureDate.toISOString().split('T')[0];
+      }
+
+      populateModalDropdowns();
+
+      formLineItems = [
+        { description: 'Long Grain Rice', unit: 'Bag', quantity: 10, estimatedUnitPrice: 150, estimatedTotal: 1500 },
+        { description: 'Oil', unit: 'Gallon', quantity: 3, estimatedUnitPrice: 50, estimatedTotal: 150 },
+        { description: 'Onion', unit: 'Bag', quantity: 3, estimatedUnitPrice: 50, estimatedTotal: 150 },
+        { description: 'Mayonise', unit: 'Carton', quantity: 5, estimatedUnitPrice: 40, estimatedTotal: 200 }
+      ];
+
+      // Check if a supplier target was set by supplier management
+      const targetSupId = localStorage.getItem('bcf_target_supplier_id');
+      if (targetSupId) {
+        localStorage.removeItem('bcf_target_supplier_id');
+        const s = BCF_PROCUREMENT.getSupplier(targetSupId);
+        if (s) {
+          document.getElementById('pr-notes').value = `Target Supplier: ${s.name} (${s.id}) - Category: ${(s.categories || []).join(', ')}`;
+        }
+      }
+
+      renderLineItemsTable();
+      modal.classList.remove('hidden');
+    }
+
+    function closeRequisitionModal() {
+      document.getElementById('pr-modal').classList.add('hidden');
+    }
+
+    function handlePrSubmit(e) {
+      e.preventDefault();
+
+      const cleanedItems = formLineItems.map(item => ({
+        description: (item.description || '').trim(),
+        unit: (item.unit || 'Units').trim(),
+        quantity: parseFloat(item.quantity) || 0,
+        estimatedUnitPrice: parseFloat(item.estimatedUnitPrice) || 0,
+        estimatedTotal: (parseFloat(item.quantity) || 0) * (parseFloat(item.estimatedUnitPrice) || 0)
+      }));
+
+      const grandTotal = cleanedItems.reduce((sum, item) => sum + item.estimatedTotal, 0);
+      if (grandTotal <= 0) {
+        alert('Please specify at least one item with a valid quantity and unit price.');
+        return;
+      }
+
+      const hasInvalidItem = cleanedItems.some(it => !it.description || it.quantity <= 0);
+      if (hasInvalidItem) {
+        alert('Please ensure every item has a description and quantity greater than zero.');
+        return;
+      }
+
+      const progVal = document.getElementById('pr-programme').value.trim();
+      const prog = BCF_PROCUREMENT.getProgramme(progVal);
+      const donorVal = document.getElementById('pr-donor').value.trim();
+      const donor = BCF_PROCUREMENT.getDonor(donorVal);
+      const grantVal = document.getElementById('pr-grant').value.trim();
+      const grant = BCF_PROCUREMENT.getGrant(grantVal);
+      const blVal = document.getElementById('pr-budgetline').value.trim();
+
+      const staffId = document.getElementById('pr-requestor').value;
+      const staff = BCF_PROCUREMENT.getStaffMember(staffId);
+
+      const pr = {
+        title: document.getElementById('pr-title').value.trim(),
+        programmeId: prog ? prog.id : (progVal || 'BCF-PRG-001'),
+        programmeName: prog ? prog.name : (progVal || 'School Feeding Programme'),
+        donorId: donor ? donor.id : (donorVal || 'BCF-DNR-003'),
+        donorName: donor ? donor.name : (donorVal || 'World Food Programme'),
+        grantId: grant ? grant.id : (grantVal || 'BCF-GRT-2024-002'),
+        budgetLineId: blVal || 'Food Procurement',
+        category: document.getElementById('pr-category').value,
+        department: document.getElementById('pr-dept').value,
+        requestedById: staffId,
+        requestedBy: staff ? staff.fullName : 'BCF-SL Officer',
+        deliveryLocation: document.getElementById('pr-location').value,
+        requiredDate: document.getElementById('pr-req-date').value,
+        items: cleanedItems,
+        estimatedTotal: grandTotal,
+        procurementMethod: BCF_PROCUREMENT.determineProcurementMethod(grandTotal).method,
+        status: 'Pending Budget Check',
+        notes: document.getElementById('pr-notes').value.trim()
+      };
+
+      const savedPr = BCF_PROCUREMENT.saveRequisition(pr);
+      closeRequisitionModal();
+      loadRequisitions();
+      BCF_PROCUREMENT.showToast(`Purchase Requisition ${savedPr.id} created under Master TXN ${savedPr.txnId}!`, 'success');
+    }
+
+    function viewRequisition(prId) {
+      const pr = BCF_PROCUREMENT.getRequisition(prId);
+      if (!pr) return;
+      currentViewingPr = pr;
+
+      document.getElementById('view-pr-title').textContent = pr.title;
+      document.getElementById('view-pr-sub').textContent = `${pr.id} • Master Key: ${pr.txnId}`;
+
+      const badge = document.getElementById('view-pr-badge');
+      const colors = BCF_PROCUREMENT.getStatusColor(pr.status);
+      badge.className = `px-2.5 py-0.5 rounded-full text-[10px] font-extrabold border ${colors.bg} ${colors.text} ${colors.border}`;
+      badge.textContent = pr.status;
+
+      const isApproved = pr.status === 'Approved';
+      document.getElementById('view-approve-btn').classList.toggle('hidden', isApproved);
+      document.getElementById('view-forward-rfq-btn').classList.toggle('hidden', !isApproved);
+
+      const content = document.getElementById('view-pr-content');
+      content.innerHTML = `
+        <!-- Institutional Meta -->
+        <div class="p-3.5 rounded-xl bg-slate-50 border border-slate-200">
+          <div class="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
+            <div>
+              <span class="text-[10px] text-slate-400 font-bold block">Programme</span>
+              <span class="font-bold text-slate-900">${pr.programmeName || '—'}</span>
+            </div>
+            <div>
+              <span class="text-[10px] text-slate-400 font-bold block">Donor Partner</span>
+              <span class="font-bold text-slate-900">${pr.donorName || '—'}</span>
+            </div>
+            <div>
+              <span class="text-[10px] text-slate-400 font-bold block">Requested By</span>
+              <span class="font-bold text-slate-900">${pr.requestedBy}</span>
+            </div>
+            <div>
+              <span class="text-[10px] text-slate-400 font-bold block">Required By</span>
+              <span class="font-mono text-slate-900 font-bold">${BCF_PROCUREMENT.formatDate(pr.requiredDate)}</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Items Table -->
+        <div>
+          <span class="text-xs font-extrabold text-slate-800 uppercase tracking-wider block mb-2">Itemised Breakdown</span>
+          <div class="overflow-x-auto rounded-xl border border-slate-200 bg-white">
+            <table class="w-full text-left text-xs border-collapse">
+              <thead class="bg-slate-50 border-b border-slate-200 text-slate-600 font-bold">
+                <tr>
+                  <th class="py-2 px-3">#</th>
+                  <th class="py-2 px-3">Description</th>
+                  <th class="py-2 px-3 text-center">Unit</th>
+                  <th class="py-2 px-3 text-center">Qty</th>
+                  <th class="py-2 px-3 text-right">Est. Unit Price</th>
+                  <th class="py-2 px-3 text-right">Est. Total</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-slate-100">
+                ${(pr.items || []).map((item, idx) => `
+                  <tr>
+                    <td class="py-2 px-3 text-slate-400 font-mono">${idx + 1}</td>
+                    <td class="py-2 px-3 font-semibold text-slate-900">${item.description}</td>
+                    <td class="py-2 px-3 text-center text-slate-600">${item.unit || 'Units'}</td>
+                    <td class="py-2 px-3 text-center font-mono font-bold">${item.quantity}</td>
+                    <td class="py-2 px-3 text-right font-mono">${BCF_PROCUREMENT.formatCurrency(item.estimatedUnitPrice)}</td>
+                    <td class="py-2 px-3 text-right font-mono font-black text-slate-900">${BCF_PROCUREMENT.formatCurrency((item.quantity || 0) * (item.estimatedUnitPrice || 0))}</td>
+                  </tr>
+                `).join('')}
+              </tbody>
+              <tfoot class="bg-slate-50/80 font-bold border-t border-slate-200">
+                <tr>
+                  <td colspan="5" class="py-2 px-3 text-right text-slate-700">Total Estimated Procurement:</td>
+                  <td class="py-2 px-3 text-right font-mono text-base font-black text-primary">${BCF_PROCUREMENT.formatCurrency(pr.estimatedTotal)}</td>
+                </tr>
+              </tfoot>
+            </table>
+          </div>
+        </div>
+
+        <!-- Approval & Verification Chain -->
+        <div class="p-3.5 rounded-xl bg-blue-50/60 border border-blue-200/60">
+          <span class="text-xs font-extrabold text-blue-900 uppercase tracking-wider block mb-2">Delegation of Authority &amp; Approval Status</span>
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-2">
+            <div class="p-2 rounded-lg bg-white border border-blue-200">
+              <span class="text-[10px] text-slate-400 font-bold block">1. Programme Manager</span>
+              <span class="font-bold ${isApproved ? 'text-emerald-700' : 'text-amber-700'}">${isApproved ? 'Approved ✓' : 'Awaiting Review'}</span>
+            </div>
+            <div class="p-2 rounded-lg bg-white border border-blue-200">
+              <span class="text-[10px] text-slate-400 font-bold block">2. Procurement Officer</span>
+              <span class="font-bold ${isApproved ? 'text-emerald-700' : 'text-slate-400'}">${isApproved ? 'Method Validated ✓' : 'Pending'}</span>
+            </div>
+            <div class="p-2 rounded-lg bg-white border border-blue-200">
+              <span class="text-[10px] text-slate-400 font-bold block">3. Finance Director</span>
+              <span class="font-bold ${isApproved ? 'text-emerald-700' : 'text-slate-400'}">${isApproved ? 'Budget Certified ✓' : 'Pending'}</span>
+            </div>
+          </div>
+        </div>
+      `;
+
+      document.getElementById('pr-view-modal').classList.remove('hidden');
+    }
+
+    function closePrViewModal() {
+      document.getElementById('pr-view-modal').classList.add('hidden');
+    }
+
+    function quickApprovePr(prId) {
+      const pr = BCF_PROCUREMENT.getRequisition(prId);
+      if (!pr) return;
+
+      pr.status = 'Approved';
+      pr.approvedDate = new Date().toISOString().split('T')[0];
+      pr.approvedBy = 'Aminata Turay (Finance Director)';
+      BCF_PROCUREMENT.saveRequisition(pr);
+
+      loadRequisitions();
+      BCF_PROCUREMENT.showToast(`Requisition ${pr.id} approved and certified for procurement!`, 'success');
+    }
+
+    function approveRequisitionFromModal() {
+      if (!currentViewingPr) return;
+      quickApprovePr(currentViewingPr.id);
+      viewRequisition(currentViewingPr.id);
+    }
+
+    function routePrToRfq(prId) {
+      const pr = BCF_PROCUREMENT.getRequisition(prId);
+      if (!pr) return;
+      localStorage.setItem('bcf_selected_pr_id', pr.id);
+      localStorage.setItem('bcf_selected_txn_id', pr.txnId);
+      BCF_PROCUREMENT.switchTab('rfq-management');
+    }
+
+    function routeToRfqFromModal() {
+      if (!currentViewingPr) return;
+      routePrToRfq(currentViewingPr.id);
+    }
+
+    function exportRequisitionsCsv() {
+      const list = BCF_PROCUREMENT.getRequisitions();
+      const headers = ['PR ID', 'TXN ID', 'Title', 'Programme', 'Donor', 'Category', 'Requested By', 'Department', 'Estimated Total NLe', 'Status', 'Method', 'Required Date'];
+      const rows = list.map(p => [
+        p.id,
+        p.txnId,
+        `"${p.title.replace(/"/g, '""')}"`,
+        `"${(p.programmeName || '').replace(/"/g, '""')}"`,
+        `"${(p.donorName || '').replace(/"/g, '""')}"`,
+        p.category || '',
+        `"${(p.requestedBy || '').replace(/"/g, '""')}"`,
+        `"${(p.department || '').replace(/"/g, '""')}"`,
+        p.estimatedTotal || 0,
+        p.status || '',
+        p.procurementMethod || '',
+        p.requiredDate || ''
+      ]);
+
+      const csvContent = 'data:text/csv;charset=utf-8,' + [headers.join(','), ...rows.map(e => e.join(','))].join('\n');
+      const encodedUri = encodeURI(csvContent);
+      const link = document.createElement('a');
+      link.setAttribute('href', encodedUri);
+      link.setAttribute('download', `BCF_SL_Requisitions_Master_${new Date().toISOString().split('T')[0]}.csv`);
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      BCF_PROCUREMENT.showToast('Purchase Requisitions register exported successfully.', 'success');
+    }
+  </script>
+</body>
+</html>

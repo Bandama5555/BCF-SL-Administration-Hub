@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover"/>
+    <title>Role & Access Matrix - BCF-SL Super Admin</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+
+    function navToApp(nextRoute, fallbackPath, e) {
+        if (e) e.preventDefault();
+        try {
+            if (window.top && window.top !== window && window.top.location) {
+                window.top.location.href = nextRoute;
+                return;
+            }
+        } catch(err) {}
+        window.location.href = fallbackPath;
+    }
+
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: "#15803d",
+                        "primary-dark": "#166534",
+                        secondary: "#2563eb",
+                        tertiary: "#9333ea",
+                        surface: "#ffffff",
+                        "surface-container": "#f8fafc",
+                        "on-surface": "#0f172a",
+                        "on-surface-variant": "#475569",
+                        outline: "#e2e8f0",
+                        error: "#dc2626"
+                    },
+                    fontFamily: { sans: ['Calibri', 'Inter', 'sans-serif'] }
+                }
+            }
+        }
+    </script>
+    <style>
+        body { font-size: 11pt; overscroll-behavior-y: none; }
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-thumb { background-color: #cbd5e1; border-radius: 3px; }
+        .perm-full { background: #dcfce7; color: #15803d; border: 1px solid #bbf7d0; font-weight: 700; }
+        .perm-dept { background: #dbeafe; color: #1d4ed8; border: 1px solid #bfdbfe; font-weight: 700; }
+        .perm-view { background: #fef3c7; color: #b45309; border: 1px solid #fde68a; font-weight: 600; }
+        .perm-none { background: #f1f5f9; color: #94a3b8; border: 1px solid #e2e8f0; font-weight: 500; }
+        .perm-cell { transition: all 0.15s ease; }
+        .perm-cell:hover { transform: scale(1.05); }
+    </style>
+</head>
+<body class="bg-[#f1f5f9] text-on-surface flex flex-col min-h-screen font-sans">
+
+<!-- HEADER -->
+<header class="bg-surface border-b border-outline shadow-sm z-30 sticky top-0">
+    <div class="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between gap-4">
+        <div class="flex items-center gap-4">
+            <img src="../../bcf-logo.png" onerror="this.src='/bcf-logo.jpg'" alt="BCF-SL Logo" class="h-10 w-auto object-contain"/>
+            <div class="hidden sm:block">
+                <div class="flex items-center gap-2">
+                    <h1 class="font-bold text-base sm:text-lg text-primary leading-tight">BANDAMA CHARITY FOUNDATION SIERRA LEONE</h1>
+                    <span class="px-2 py-0.5 rounded bg-amber-100 text-amber-900 font-extrabold text-[10px] tracking-wider uppercase">Super Admin</span>
+                </div>
+                <p class="text-[9pt] font-semibold text-secondary">Role-Based Access Control (RBAC) Architecture &amp; Matrix</p>
+            </div>
+        </div>
+
+        <div class="flex items-center gap-1.5 sm:gap-2">
+            <a href="../account_management/code.html" onclick="navToApp('/super-admin/account-management', '../account_management/code.html', event)" class="h-9 px-3 rounded-lg border border-outline bg-surface hover:bg-slate-100 text-xs font-semibold flex items-center gap-1.5 transition">
+                <span class="material-symbols-outlined text-[17px] text-primary">manage_accounts</span>
+                <span class="hidden md:inline">Account Management</span>
+            </a>
+            <a href="../executive_analytics/code.html" onclick="navToApp('/super-admin/executive-analytics', '../executive_analytics/code.html', event)" class="h-9 px-3 rounded-lg border border-outline bg-surface hover:bg-slate-100 text-xs font-semibold flex items-center gap-1.5 transition">
+                <span class="material-symbols-outlined text-[17px] text-secondary">insights</span>
+                <span class="hidden md:inline">Analytics</span>
+            </a>
+            <a href="../audit_logs/code.html" onclick="navToApp('/super-admin/audit-logs', '../audit_logs/code.html', event)" class="h-9 px-3 rounded-lg border border-outline bg-surface hover:bg-slate-100 text-xs font-semibold flex items-center gap-1.5 transition">
+                <span class="material-symbols-outlined text-[17px] text-tertiary">history_edu</span>
+                <span class="hidden md:inline">Audit Logs</span>
+            </a>
+        </div>
+    </div>
+</header>
+
+<div class="max-w-7xl mx-auto w-full px-4 py-6 flex flex-col gap-6">
+
+    <!-- TITLE & LEGEND -->
+    <div class="flex flex-col md:flex-row md:items-center justify-between gap-3">
+        <div>
+            <h2 class="text-2xl sm:text-3xl font-extrabold text-on-surface tracking-tight flex items-center gap-2.5">
+                <span class="material-symbols-outlined text-secondary text-3xl">security</span>
+                Role &amp; Access Permissions Matrix
+            </h2>
+            <p class="text-on-surface-variant text-sm mt-0.5">Formal RBAC matrix governing multi-tier authorization across all BCF-SL modules</p>
+        </div>
+
+        <!-- Legend Pills -->
+        <div class="flex flex-wrap items-center gap-2 text-xs self-start md:self-auto bg-surface p-2 rounded-xl border border-outline shadow-sm">
+            <span class="px-2.5 py-1 rounded-md perm-full text-[10px]">Full Access</span>
+            <span class="px-2.5 py-1 rounded-md perm-dept text-[10px]">Departmental</span>
+            <span class="px-2.5 py-1 rounded-md perm-view text-[10px]">View / Limited</span>
+            <span class="px-2.5 py-1 rounded-md perm-none text-[10px]">No Access</span>
+        </div>
+    </div>
+
+    <!-- SECURITY ISOLATION CARDS -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div class="bg-surface border border-outline rounded-xl p-4 shadow-sm flex flex-col gap-1.5">
+            <div class="flex items-center gap-2 text-primary font-bold text-xs">
+                <span class="material-symbols-outlined text-[18px]">verified_user</span>
+                <span>Level 1 — Super Admin Authority</span>
+            </div>
+            <p class="text-xs text-on-surface-variant leading-relaxed">
+                CEO / Authorized Super Admin has unrestricted access to all 10+ modules, account provisioning, role assignment, and system settings. All sensitive actions are logged immutably.
+            </p>
+        </div>
+
+        <div class="bg-surface border border-outline rounded-xl p-4 shadow-sm flex flex-col gap-1.5">
+            <div class="flex items-center gap-2 text-secondary font-bold text-xs">
+                <span class="material-symbols-outlined text-[18px]">lock</span>
+                <span>Departmental Data Isolation</span>
+            </div>
+            <p class="text-xs text-on-surface-variant leading-relaxed">
+                Directors &amp; Managers access their respective departmental operational data. IT manages technical infrastructure but cannot view confidential HR, beneficiary, or financial records.
+            </p>
+        </div>
+
+        <div class="bg-surface border border-outline rounded-xl p-4 shadow-sm flex flex-col gap-1.5">
+            <div class="flex items-center gap-2 text-rose-600 font-bold text-xs">
+                <span class="material-symbols-outlined text-[18px]">gavel</span>
+                <span>Volunteer &amp; Intern Safeguards</span>
+            </div>
+            <p class="text-xs text-on-surface-variant leading-relaxed">
+                Volunteers and interns strictly have restricted access to assigned project forms and training. Access to payroll, legal files, financial transactions, and confidential files is permanently blocked.
+            </p>
+        </div>
+    </div>
+
+    <!-- ACCESS MATRIX TABLE -->
+    <div class="bg-surface border border-outline rounded-2xl shadow-sm overflow-hidden flex flex-col">
+        <div class="p-4 border-b border-outline bg-slate-50 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <div class="flex items-center gap-2">
+                <span class="material-symbols-outlined text-secondary">table_chart</span>
+                <h3 class="font-bold text-base text-on-surface">Organizational Module Authorization Grid</h3>
+            </div>
+            <div class="flex items-center gap-2">
+                <input type="text" id="matrix-search" placeholder="Search module or role..." 
+                    class="h-9 px-3 rounded-lg border border-outline text-xs outline-none focus:border-primary font-medium bg-surface w-48 sm:w-64"
+                    oninput="filterMatrix()">
+            </div>
+        </div>
+
+        <div class="overflow-x-auto">
+            <table class="w-full text-left text-xs border-collapse">
+                <thead class="bg-slate-100 text-slate-700 uppercase tracking-wider text-[10px] font-bold border-b border-outline">
+                    <tr>
+                        <th class="px-4 py-3.5 whitespace-nowrap sticky left-0 bg-slate-100 z-10 border-r border-outline">Module / Function</th>
+                        <th class="px-4 py-3.5 text-center whitespace-nowrap">CEO / Super Admin</th>
+                        <th class="px-4 py-3.5 text-center whitespace-nowrap">Governing Board</th>
+                        <th class="px-4 py-3.5 text-center whitespace-nowrap">Directors</th>
+                        <th class="px-4 py-3.5 text-center whitespace-nowrap">Unit Managers</th>
+                        <th class="px-4 py-3.5 text-center whitespace-nowrap">Assistant Managers</th>
+                        <th class="px-4 py-3.5 text-center whitespace-nowrap">Officers</th>
+                        <th class="px-4 py-3.5 text-center whitespace-nowrap">Volunteers / Interns</th>
+                    </tr>
+                </thead>
+                <tbody id="matrix-tbody" class="divide-y divide-outline">
+                    <!-- Dynamic Matrix Rows -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- DIRECTOR SPECIFIC BREAKDOWN -->
+    <div class="bg-surface border border-outline rounded-2xl p-5 shadow-sm flex flex-col gap-4">
+        <h3 class="font-bold text-base text-on-surface flex items-center gap-2">
+            <span class="material-symbols-outlined text-primary">groups</span>
+            Director-Level Departmental Access Specifications
+        </h3>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3.5 text-xs">
+            <div class="p-3.5 rounded-xl border border-outline bg-slate-50 flex flex-col gap-1">
+                <span class="font-bold text-secondary text-sm">Finance Director</span>
+                <p class="text-slate-600 text-[11px] leading-relaxed">
+                    <strong>Access:</strong> Budgets, expenditure, donor funds, financial transactions, project financial reports, payroll information where authorized.<br/>
+                    <span class="text-rose-600 font-semibold">Restriction:</span> Cannot modify HR employee records.
+                </p>
+            </div>
+
+            <div class="p-3.5 rounded-xl border border-outline bg-slate-50 flex flex-col gap-1">
+                <span class="font-bold text-primary text-sm">HRM Director</span>
+                <p class="text-slate-600 text-[11px] leading-relaxed">
+                    <strong>Access:</strong> Employee records, recruitment, accounts provisioning, attendance, leave, contracts, payroll information, training, HR reports.<br/>
+                    <span class="text-primary font-semibold">Authority:</span> Full HR operational authority.
+                </p>
+            </div>
+
+            <div class="p-3.5 rounded-xl border border-outline bg-slate-50 flex flex-col gap-1">
+                <span class="font-bold text-purple-700 text-sm">Programs Director</span>
+                <p class="text-slate-600 text-[11px] leading-relaxed">
+                    <strong>Access:</strong> All project records, work plans, beneficiary registries, project indicators, field activities, project reports.<br/>
+                    <span class="text-amber-700 font-semibold">Restriction:</span> View-only financial data.
+                </p>
+            </div>
+
+            <div class="p-3.5 rounded-xl border border-outline bg-slate-50 flex flex-col gap-1">
+                <span class="font-bold text-amber-700 text-sm">Internal Risk &amp; Audits</span>
+                <p class="text-slate-600 text-[11px] leading-relaxed">
+                    <strong>Access:</strong> Audit dashboard, risk register, compliance records, audit trails, financial control reports, procurement controls.<br/>
+                    <span class="text-rose-600 font-semibold">Restriction:</span> Read/audit access; cannot alter records audited.
+                </p>
+            </div>
+
+            <div class="p-3.5 rounded-xl border border-outline bg-slate-50 flex flex-col gap-1">
+                <span class="font-bold text-cyan-700 text-sm">IT Director</span>
+                <p class="text-slate-600 text-[11px] leading-relaxed">
+                    <strong>Access:</strong> User accounts, technical system admin, configuration, technical logs, security monitoring, backup management.<br/>
+                    <span class="text-rose-600 font-semibold">Restriction:</span> No access to confidential HR/beneficiary data.
+                </p>
+            </div>
+
+            <div class="p-3.5 rounded-xl border border-outline bg-slate-50 flex flex-col gap-1">
+                <span class="font-bold text-emerald-700 text-sm">Health &amp; Safety Director</span>
+                <p class="text-slate-600 text-[11px] leading-relaxed">
+                    <strong>Access:</strong> Health &amp; safety records, incident reports, safety inspections, risk assessments, staff safety training records.
+                </p>
+            </div>
+
+            <div class="p-3.5 rounded-xl border border-outline bg-slate-50 flex flex-col gap-1">
+                <span class="font-bold text-indigo-700 text-sm">Legal &amp; Communication</span>
+                <p class="text-slate-600 text-[11px] leading-relaxed">
+                    <strong>Access:</strong> Legal records, contracts, agreements, compliance documentation, litigation records, organizational communications.
+                </p>
+            </div>
+
+            <div class="p-3.5 rounded-xl border border-outline bg-slate-50 flex flex-col gap-1">
+                <span class="font-bold text-orange-700 text-sm">Procurement Director</span>
+                <p class="text-slate-600 text-[11px] leading-relaxed">
+                    <strong>Access:</strong> Procurement plans, suppliers, purchase requests, quotations, evaluations, purchase orders, goods received notes.
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+
+    function navToApp(nextRoute, fallbackPath, e) {
+        if (e) e.preventDefault();
+        try {
+            if (window.top && window.top !== window && window.top.location) {
+                window.top.location.href = nextRoute;
+                return;
+            }
+        } catch(err) {}
+        window.location.href = fallbackPath;
+    }
+
+    const MATRIX_DATA = [
+        {
+            module: "Executive Dashboard",
+            ceo: { text: "Full Access", type: "full" },
+            board: { text: "View Only", type: "view" },
+            directors: { text: "Executive View", type: "view" },
+            managers: { text: "Unit View", type: "view" },
+            asstManagers: { text: "Limited View", type: "view" },
+            officers: { text: "Assigned Only", type: "view" },
+            volunteers: { text: "No Access", type: "none" }
+        },
+        {
+            module: "Employee Management",
+            ceo: { text: "Full Access", type: "full" },
+            board: { text: "Strategic View", type: "view" },
+            directors: { text: "HR / Dept Only", type: "dept" },
+            managers: { text: "Unit Staff", type: "dept" },
+            asstManagers: { text: "Supervised Staff", type: "dept" },
+            officers: { text: "No Access", type: "none" },
+            volunteers: { text: "No Access", type: "none" }
+        },
+        {
+            module: "User Accounts & RBAC",
+            ceo: { text: "Full Access", type: "full" },
+            board: { text: "Audit View", type: "view" },
+            directors: { text: "Request / View", type: "view" },
+            managers: { text: "No Access", type: "none" },
+            asstManagers: { text: "No Access", type: "none" },
+            officers: { text: "No Access", type: "none" },
+            volunteers: { text: "No Access", type: "none" }
+        },
+        {
+            module: "HR Records & Contracts",
+            ceo: { text: "Full Access", type: "full" },
+            board: { text: "Summary View", type: "view" },
+            directors: { text: "HR / Authorized", type: "dept" },
+            managers: { text: "Limited View", type: "view" },
+            asstManagers: { text: "Assigned Staff", type: "view" },
+            officers: { text: "No Access", type: "none" },
+            volunteers: { text: "No Access", type: "none" }
+        },
+        {
+            module: "Financial Management",
+            ceo: { text: "Full Access", type: "full" },
+            board: { text: "Summaries / Budget", type: "view" },
+            directors: { text: "Finance / Dept Budget", type: "dept" },
+            managers: { text: "Unit Budget View", type: "view" },
+            asstManagers: { text: "Activity Budget", type: "view" },
+            officers: { text: "Limited Entry", type: "view" },
+            volunteers: { text: "No Access", type: "none" }
+        },
+        {
+            module: "Project Portfolio",
+            ceo: { text: "Full Access", type: "full" },
+            board: { text: "Portfolio View", type: "view" },
+            directors: { text: "Full / Departmental", type: "dept" },
+            managers: { text: "Department Projects", type: "dept" },
+            asstManagers: { text: "Assigned Activities", type: "dept" },
+            officers: { text: "Assigned Fieldwork", type: "dept" },
+            volunteers: { text: "Assigned Tasks", type: "dept" }
+        },
+        {
+            module: "Beneficiaries Database",
+            ceo: { text: "Full Access", type: "full" },
+            board: { text: "Aggregated Stats", type: "view" },
+            directors: { text: "Relevant Scope", type: "dept" },
+            managers: { text: "Unit Beneficiaries", type: "dept" },
+            asstManagers: { text: "Project Area", type: "dept" },
+            officers: { text: "Register / Field", type: "dept" },
+            volunteers: { text: "Restricted Form", type: "view" }
+        },
+        {
+            module: "Monitoring & Evaluation (M&E)",
+            ceo: { text: "Full Access", type: "full" },
+            board: { text: "Performance Indicators", type: "view" },
+            directors: { text: "M&E / Indicator View", type: "dept" },
+            managers: { text: "Enter / Monitor", type: "dept" },
+            asstManagers: { text: "Activity Reporting", type: "dept" },
+            officers: { text: "Data Entry", type: "dept" },
+            volunteers: { text: "Assigned Monitoring", type: "view" }
+        },
+        {
+            module: "Procurement & Assets",
+            ceo: { text: "Full Access", type: "full" },
+            board: { text: "Major Approvals", type: "view" },
+            directors: { text: "Procure / Dept Scope", type: "dept" },
+            managers: { text: "Requisitions", type: "dept" },
+            asstManagers: { text: "Requests", type: "view" },
+            officers: { text: "Submit Requests", type: "view" },
+            volunteers: { text: "No Access", type: "none" }
+        },
+        {
+            module: "Risk & Compliance",
+            ceo: { text: "Full Access", type: "full" },
+            board: { text: "Risk Dashboard", type: "view" },
+            directors: { text: "Audit / Department", type: "dept" },
+            managers: { text: "Incident Reports", type: "view" },
+            asstManagers: { text: "Report Incidents", type: "view" },
+            officers: { text: "Report Incidents", type: "view" },
+            volunteers: { text: "Report Incidents", type: "view" }
+        },
+        {
+            module: "Audit Trail & Logs",
+            ceo: { text: "Full Access", type: "full" },
+            board: { text: "Audit Summaries", type: "view" },
+            directors: { text: "Internal Audit Only", type: "dept" },
+            managers: { text: "No Access", type: "none" },
+            asstManagers: { text: "No Access", type: "none" },
+            officers: { text: "No Access", type: "none" },
+            volunteers: { text: "No Access", type: "none" }
+        },
+        {
+            module: "Legal & Contracts",
+            ceo: { text: "Full Access", type: "full" },
+            board: { text: "Legal Reviews", type: "view" },
+            directors: { text: "Legal Director Only", type: "dept" },
+            managers: { text: "No Access", type: "none" },
+            asstManagers: { text: "No Access", type: "none" },
+            officers: { text: "No Access", type: "none" },
+            volunteers: { text: "No Access", type: "none" }
+        },
+        {
+            module: "System Settings",
+            ceo: { text: "Full Access", type: "full" },
+            board: { text: "No Access", type: "none" },
+            directors: { text: "IT Technical Only", type: "dept" },
+            managers: { text: "No Access", type: "none" },
+            asstManagers: { text: "No Access", type: "none" },
+            officers: { text: "No Access", type: "none" },
+            volunteers: { text: "No Access", type: "none" }
+        }
+    ];
+
+    function getPermBadge(item) {
+        const clsMap = {
+            'full': 'perm-full',
+            'dept': 'perm-dept',
+            'view': 'perm-view',
+            'none': 'perm-none'
+        };
+        return `<span class="perm-cell px-2 py-1 rounded-md text-[10px] inline-block ${clsMap[item.type]||'perm-none'}">${item.text}</span>`;
+    }
+
+    function renderMatrix(data) {
+        const tbody = document.getElementById('matrix-tbody');
+        tbody.innerHTML = data.map(row => `
+            <tr class="hover:bg-slate-50 transition-colors border-b border-outline">
+                <td class="px-4 py-3 font-bold text-on-surface whitespace-nowrap sticky left-0 bg-surface z-10 border-r border-outline">
+                    ${row.module}
+                </td>
+                <td class="px-4 py-3 text-center whitespace-nowrap">${getPermBadge(row.ceo)}</td>
+                <td class="px-4 py-3 text-center whitespace-nowrap">${getPermBadge(row.board)}</td>
+                <td class="px-4 py-3 text-center whitespace-nowrap">${getPermBadge(row.directors)}</td>
+                <td class="px-4 py-3 text-center whitespace-nowrap">${getPermBadge(row.managers)}</td>
+                <td class="px-4 py-3 text-center whitespace-nowrap">${getPermBadge(row.asstManagers)}</td>
+                <td class="px-4 py-3 text-center whitespace-nowrap">${getPermBadge(row.officers)}</td>
+                <td class="px-4 py-3 text-center whitespace-nowrap">${getPermBadge(row.volunteers)}</td>
+            </tr>
+        `).join('');
+    }
+
+    function filterMatrix() {
+        const q = (document.getElementById('matrix-search').value || '').toLowerCase();
+        const filtered = MATRIX_DATA.filter(r => r.module.toLowerCase().includes(q));
+        renderMatrix(filtered);
+    }
+
+    window.onload = function() {
+        renderMatrix(MATRIX_DATA);
+    };
+</script>
+</body>
+</html>

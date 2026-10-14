@@ -1,0 +1,1960 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" name="viewport"/>
+  <title>BCF-SL — Programs Database & Thematic Tracking System</title>
+  
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <script id="tailwind-config">
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            primary: '#003820',
+            'primary-dark': '#002515',
+            'primary-light': '#E8F5EE',
+            'primary-container': '#0D5C3A',
+            'bcf-gold': '#D97706',
+            'bcf-blue': '#1D4ED8',
+            'bcf-purple': '#7E22CE',
+            surface: '#F8FAFC',
+            outline: '#E2E8F0',
+            'on-surface': '#0F172A',
+            'on-surface-variant': '#475569'
+          },
+          fontFamily: {
+            sans: ['"Plus Jakarta Sans"', 'system-ui', 'sans-serif'],
+            mono: ['"JetBrains Mono"', 'monospace']
+          }
+        }
+      }
+    };
+  </script>
+
+  <style>
+    @layer base {
+      html, body {
+        width: 100%;
+        margin: 0;
+        padding: 0;
+        background-color: #F8FAFC;
+        color: #0F172A;
+        font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+      }
+    }
+    .custom-scrollbar::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-track {
+      background: #f1f5f9;
+    }
+    .custom-scrollbar::-webkit-scrollbar-thumb {
+      background: #cbd5e1;
+      border-radius: 4px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+      background: #94a3b8;
+    }
+    .no-scrollbar::-webkit-scrollbar {
+      display: none;
+    }
+    .no-scrollbar {
+      -ms-overflow-style: none;
+      scrollbar-width: none;
+    }
+  </style>
+</head>
+
+<body class="bg-surface text-on-surface flex flex-col min-h-screen antialiased">
+
+  <!-- TOP HEADER -->
+  <header class="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-outline px-4 sm:px-6 py-3 shadow-2xs">
+    <div class="max-w-7xl mx-auto flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+      
+      <!-- Brand & Title -->
+      <div class="flex items-center gap-3">
+        <img alt="Bandama Charity Foundation Logo" class="h-10 w-auto object-contain shrink-0 rounded-md" 
+             src="/bcf_official_logo.png" onerror="this.onerror=null; this.src='bcf_official_logo.png';"/>
+        <div>
+          <div class="flex items-center gap-2">
+            <h1 class="text-base sm:text-lg font-black text-slate-900 tracking-tight">Programs Database & Master Tracking</h1>
+            <span class="px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-900 text-[10px] font-bold border border-emerald-300">
+              FY 2025/2026
+            </span>
+          </div>
+          <p class="text-xs text-slate-500 font-medium">Bandama Charity Foundation Sierra Leone &bull; Programs &amp; M&amp;E Directorate</p>
+        </div>
+      </div>
+
+      <!-- Quick Actions -->
+      <div class="flex items-center gap-2 shrink-0">
+        <a href="/programs/financial-ledger" class="h-9 px-3 rounded-lg border border-emerald-300 bg-emerald-50 hover:bg-emerald-100 text-emerald-950 text-xs font-bold inline-flex items-center gap-1.5 transition shadow-2xs">
+          <span class="material-symbols-outlined text-[16px] text-emerald-800">account_balance_wallet</span>
+          <span>Financial Ledger</span>
+        </a>
+        <button type="button" onclick="exportActiveTabCSV()" class="h-9 px-3 rounded-lg border border-slate-300 bg-white hover:bg-slate-50 text-slate-700 text-xs font-bold inline-flex items-center gap-1.5 transition shadow-2xs">
+          <span class="material-symbols-outlined text-[16px] text-slate-600">file_download</span>
+          <span>Export CSV</span>
+        </button>
+        <button type="button" onclick="openNewProjectModal()" class="h-9 px-3.5 rounded-lg bg-primary hover:bg-primary-container text-white text-xs font-bold inline-flex items-center gap-1.5 transition shadow-sm active:scale-95">
+          <span class="material-symbols-outlined text-[16px]">add_circle</span>
+          <span>Add Project</span>
+        </button>
+      </div>
+
+    </div>
+  </header>
+
+  <!-- MAIN WRAPPER -->
+  <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 py-5 space-y-5">
+
+    <!-- EXECUTIVE IMPACT & SUMMARY KPIS -->
+    <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4">
+      
+      <div class="bg-white p-3.5 sm:p-4 rounded-xl border border-outline shadow-2xs flex flex-col justify-between">
+        <div class="flex items-center justify-between text-slate-500 mb-1">
+          <span class="text-[11px] font-bold uppercase tracking-wider text-slate-500">Total Funds Received</span>
+          <span class="material-symbols-outlined text-primary text-[19px]">payments</span>
+        </div>
+        <div>
+          <div class="text-lg sm:text-xl font-black text-slate-900 font-mono" id="kpi-total-funds">NLe 0.00</div>
+          <span class="text-[10px] text-slate-500 font-medium">Sum Across All Thematic Codes</span>
+        </div>
+      </div>
+
+      <div class="bg-white p-3.5 sm:p-4 rounded-xl border border-outline shadow-2xs flex flex-col justify-between">
+        <div class="flex items-center justify-between text-slate-500 mb-1">
+          <span class="text-[11px] font-bold uppercase tracking-wider text-slate-500">Budget Spent</span>
+          <span class="material-symbols-outlined text-amber-600 text-[19px]">trending_up</span>
+        </div>
+        <div>
+          <div class="text-lg sm:text-xl font-black text-amber-700 font-mono" id="kpi-total-spent">NLe 0.00</div>
+          <span class="text-[10px] text-slate-500 font-medium" id="kpi-spent-pct">0.0% Absorption Rate</span>
+        </div>
+      </div>
+
+      <div class="bg-white p-3.5 sm:p-4 rounded-xl border border-outline shadow-2xs flex flex-col justify-between">
+        <div class="flex items-center justify-between text-slate-500 mb-1">
+          <span class="text-[11px] font-bold uppercase tracking-wider text-slate-500">Net Unspent Balance</span>
+          <span class="material-symbols-outlined text-emerald-700 text-[19px]">account_balance</span>
+        </div>
+        <div>
+          <div class="text-lg sm:text-xl font-black text-emerald-800 font-mono" id="kpi-total-balance">NLe 0.00</div>
+          <span class="text-[10px] text-emerald-700 font-semibold" id="kpi-balance-pct">0.0% Available Reserve</span>
+        </div>
+      </div>
+
+      <div class="bg-white p-3.5 sm:p-4 rounded-xl border border-outline shadow-2xs flex flex-col justify-between">
+        <div class="flex items-center justify-between text-slate-500 mb-1">
+          <span class="text-[11px] font-bold uppercase tracking-wider text-slate-500">Number of Projects</span>
+          <span class="material-symbols-outlined text-purple-600 text-[19px]">assignment</span>
+        </div>
+        <div>
+          <div class="text-lg sm:text-xl font-black text-purple-800 font-mono" id="kpi-projects-stat">18 Projects</div>
+          <span class="text-[10px] text-purple-700 font-semibold" id="kpi-execution-rate">5 Done &bull; 13 Undone</span>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- 5 OFFICIAL TABS BAR -->
+    <div class="bg-white rounded-xl border border-outline shadow-2xs p-1.5 flex items-center gap-1 overflow-x-auto no-scrollbar" role="tablist">
+      
+      <button type="button" role="tab" id="tab-btn-tracker" onclick="switchTab('tracker')" 
+              class="tab-btn px-3.5 py-2 rounded-lg text-xs font-bold inline-flex items-center gap-2 transition whitespace-nowrap bg-primary text-white shadow-2xs">
+        <span class="material-symbols-outlined text-[17px]">inventory</span>
+        <span>1. Programs Tracker &amp; Codes</span>
+        <span class="px-1.5 py-0.2 rounded-full bg-white/20 text-white text-[10px] font-mono">8 Codes</span>
+      </button>
+
+      <button type="button" role="tab" id="tab-btn-funds" onclick="switchTab('funds')" 
+              class="tab-btn px-3.5 py-2 rounded-lg text-xs font-bold inline-flex items-center gap-2 transition whitespace-nowrap text-slate-600 hover:text-slate-900 hover:bg-slate-100">
+        <span class="material-symbols-outlined text-[17px]">payments</span>
+        <span>2. Amount of Funds Received</span>
+        <span class="px-1.5 py-0.2 rounded-full bg-emerald-100 text-emerald-900 text-[10px] font-mono font-bold" id="badge-funds-sum">Live</span>
+      </button>
+
+      <button type="button" role="tab" id="tab-btn-master" onclick="switchTab('master')" 
+              class="tab-btn px-3.5 py-2 rounded-lg text-xs font-bold inline-flex items-center gap-2 transition whitespace-nowrap text-slate-600 hover:text-slate-900 hover:bg-slate-100">
+        <span class="material-symbols-outlined text-[17px]">table_chart</span>
+        <span>3. Program Master Table</span>
+        <span class="px-1.5 py-0.2 rounded-full bg-slate-200 text-slate-800 text-[10px] font-mono" id="badge-master-count">18</span>
+      </button>
+
+      <button type="button" role="tab" id="tab-btn-summary" onclick="switchTab('summary')" 
+              class="tab-btn px-3.5 py-2 rounded-lg text-xs font-bold inline-flex items-center gap-2 transition whitespace-nowrap text-slate-600 hover:text-slate-900 hover:bg-slate-100">
+        <span class="material-symbols-outlined text-[17px]">pie_chart</span>
+        <span>4. Year Summary Budget</span>
+      </button>
+
+      <button type="button" role="tab" id="tab-btn-revenue" onclick="switchTab('revenue')" 
+              class="tab-btn px-3.5 py-2 rounded-lg text-xs font-bold inline-flex items-center gap-2 transition whitespace-nowrap text-slate-600 hover:text-slate-900 hover:bg-slate-100">
+        <span class="material-symbols-outlined text-[17px]">analytics</span>
+        <span>5. Revenue Check By Thematic Area</span>
+      </button>
+
+    </div>
+
+    <!-- TAB 1: PROGRAMS TRACKER AND THEIR CODES -->
+    <div id="tab-content-tracker" class="tab-pane space-y-4">
+      
+      <div class="bg-white rounded-xl border border-outline p-5 shadow-2xs space-y-4">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between pb-3 border-b border-slate-100 gap-2">
+          <div>
+            <h2 class="text-sm font-extrabold text-slate-900 uppercase tracking-wider flex items-center gap-2">
+              <span class="material-symbols-outlined text-primary text-[20px]">dataset</span>
+              <span>Programs Tracker &amp; Official Thematic Codes</span>
+            </h2>
+            <p class="text-xs text-slate-500">Official catalog of core intervention thematic sectors and standard project tracking IDs</p>
+          </div>
+          <div class="flex items-center gap-2 flex-wrap">
+            <div id="tracker-header-projects-pill" class="px-2.5 py-1.5 rounded-lg bg-slate-900 text-white text-[11px] font-mono font-bold flex items-center gap-1.5 shadow-2xs">
+              <span class="material-symbols-outlined text-[15px] text-emerald-400">table_rows</span>
+              <span id="tracker-total-projects-badge">18 Projects in Master Table</span>
+            </div>
+            <button type="button" onclick="addTrackerRow()" class="h-8 px-2.5 rounded-lg border border-primary/30 bg-primary/10 hover:bg-primary/20 text-primary text-xs font-bold inline-flex items-center gap-1 transition" title="Add a new program category row">
+              <span class="material-symbols-outlined text-[15px]">add</span>
+              <span>Add Code Row</span>
+            </button>
+            <div class="px-3 py-1.5 rounded-lg bg-emerald-50 border border-emerald-200 text-[11px] text-emerald-900 font-mono font-bold flex items-center gap-1.5">
+              <span class="material-symbols-outlined text-[16px] text-emerald-700">info</span>
+              <span>ID: BCF-[CODE]-[PROJECT#]-[YEAR]</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Codes Table -->
+        <div class="overflow-x-auto rounded-xl border border-slate-200">
+          <table class="w-full text-left text-xs">
+            <thead class="bg-slate-50 border-b border-slate-200 text-[10px] font-black uppercase text-slate-600 tracking-wider">
+              <tr>
+                <th class="py-2.5 px-3 w-12 text-center">No</th>
+                <th class="py-2.5 px-3">Program Category</th>
+                <th class="py-2.5 px-4">Program Description</th>
+                <th class="py-2.5 px-3">Program Code</th>
+                <th class="py-2.5 px-3">Project Tracking ID Sample</th>
+                <th class="py-2.5 px-3 text-right w-44">Delete / Action</th>
+              </tr>
+            </thead>
+            <tbody id="tracker-table-body" class="divide-y divide-slate-100 font-medium">
+              <!-- Populated dynamically via JS -->
+            </tbody>
+          </table>
+        </div>
+
+      </div>
+
+    </div>
+
+    <!-- TAB 2: AMOUNT OF FUNDS RECEIVED (MATRIX GRID) -->
+    <div id="tab-content-funds" class="tab-pane hidden space-y-4">
+      
+      <div class="bg-white rounded-xl border border-outline p-5 shadow-2xs space-y-4">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between pb-3 border-b border-slate-100 gap-2">
+          <div>
+            <h2 class="text-sm font-extrabold text-slate-900 uppercase tracking-wider flex items-center gap-2">
+              <span class="material-symbols-outlined text-emerald-700 text-[20px]">account_balance_wallet</span>
+              <span>Amount of Funds Received by Project for the Year</span>
+            </h2>
+            <p class="text-xs text-slate-500">Annual tranche inflows across all 8 thematic categories (Values in NLe / SLE). Auto-calculates row &amp; column totals.</p>
+          </div>
+          <div class="flex flex-wrap items-center gap-2">
+            <div class="px-2.5 py-1 rounded-lg bg-emerald-50 border border-emerald-200 text-[11px] font-bold text-emerald-900 flex items-center gap-1.5 shadow-2xs">
+              <span class="material-symbols-outlined text-[15px] text-emerald-700">sync</span>
+              <span>FCFS Auto-Synced from Master Table</span>
+            </div>
+            <button type="button" onclick="syncFundsMatrixFromMasterProjects(true)" class="h-8 px-2.5 rounded-lg border border-emerald-300 bg-emerald-50 hover:bg-emerald-100 text-emerald-900 text-xs font-bold inline-flex items-center gap-1 transition" title="Re-sync all Donors Received from Master Table (First-Come, First-Served by Code)">
+              <span class="material-symbols-outlined text-[15px]">autorenew</span>
+              <span>Sync from Master</span>
+            </button>
+            <button type="button" onclick="addFundsReceivedRow()" class="h-8 px-2.5 rounded-lg border border-slate-300 bg-white hover:bg-slate-50 text-slate-800 text-xs font-bold inline-flex items-center gap-1 transition">
+              <span class="material-symbols-outlined text-[15px]">add</span>
+              <span>Add Tranche Row</span>
+            </button>
+            <button type="button" onclick="deleteLastFundsReceivedRow()" class="h-8 px-2.5 rounded-lg border border-rose-200 bg-rose-50 hover:bg-rose-100 text-rose-800 text-xs font-semibold inline-flex items-center gap-1 transition" title="Delete the last tranche row">
+              <span class="material-symbols-outlined text-[15px]">delete_sweep</span>
+              <span>Delete Last Row</span>
+            </button>
+            <button type="button" onclick="resetFundsReceivedToDefaults()" class="h-8 px-2.5 rounded-lg border border-slate-200 hover:bg-slate-50 text-slate-600 text-xs font-medium transition" title="Restore official sample figures">
+              <span>Reset Values</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Matrix Table -->
+        <div class="overflow-x-auto rounded-xl border border-slate-200 custom-scrollbar">
+          <table class="w-full text-left text-xs whitespace-nowrap min-w-[1000px]">
+            <thead class="bg-slate-900 text-white text-[10px] font-black uppercase tracking-wider">
+              <tr>
+                <th class="py-2.5 px-3 w-12 text-center">Tranche #</th>
+                <th class="py-2.5 px-3 text-right">BCF-H01<br/><span class="text-[9px] font-normal text-emerald-400">Health</span></th>
+                <th class="py-2.5 px-3 text-right">BCF-E02<br/><span class="text-[9px] font-normal text-emerald-400">Education</span></th>
+                <th class="py-2.5 px-3 text-right">BCF-A03<br/><span class="text-[9px] font-normal text-emerald-400">Agriculture</span></th>
+                <th class="py-2.5 px-3 text-right">BCF-CC04<br/><span class="text-[9px] font-normal text-emerald-400">Climate</span></th>
+                <th class="py-2.5 px-3 text-right">BCF-SJ05<br/><span class="text-[9px] font-normal text-emerald-400">Social Just.</span></th>
+                <th class="py-2.5 px-3 text-right">BCF-I06<br/><span class="text-[9px] font-normal text-emerald-400">Innovation</span></th>
+                <th class="py-2.5 px-3 text-right">BCF-AR07<br/><span class="text-[9px] font-normal text-emerald-400">Rehab</span></th>
+                <th class="py-2.5 px-3 text-right">BCF-EP08<br/><span class="text-[9px] font-normal text-emerald-400">Empower</span></th>
+                <th class="py-2.5 px-4 text-right bg-emerald-950 text-emerald-300 font-bold">Row Total (NLe)</th>
+                <th class="py-2.5 px-3 text-center w-32 bg-slate-800 text-rose-300 font-bold sticky right-0 z-20 shadow-xs border-l border-slate-700">Delete Row</th>
+              </tr>
+            </thead>
+            <tbody id="funds-matrix-body" class="divide-y divide-slate-100 font-mono">
+              <!-- Rendered via JS -->
+            </tbody>
+            <tfoot class="bg-emerald-50/90 border-t-2 border-emerald-600 font-mono font-bold text-xs">
+              <tr id="funds-matrix-foot">
+                <td class="py-3 px-3 text-slate-800 font-sans font-black uppercase text-[10px]">TOTAL RECEIVED</td>
+                <!-- Total cells rendered via JS -->
+              </tr>
+            </tfoot>
+          </table>
+        </div>
+
+      </div>
+
+    </div>
+
+    <!-- TAB 3: PROGRAMS INPUT TRACKERS (PROGRAM MASTER TABLE) -->
+    <div id="tab-content-master" class="tab-pane hidden space-y-4">
+      
+      <div class="bg-white rounded-xl border border-outline p-5 shadow-2xs space-y-4">
+        
+        <!-- Controls Header -->
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between pb-3 border-b border-slate-100 gap-3">
+          <div>
+            <h2 class="text-sm font-extrabold text-slate-900 uppercase tracking-wider flex items-center gap-2">
+              <span class="material-symbols-outlined text-primary text-[20px]">table_rows</span>
+              <span>Programs Input Trackers (Program Master Table)</span>
+            </h2>
+            <p class="text-xs text-slate-500">Live operational ledger of 18+ projects with automated Net Balance (Donors Received &minus; Budget Spent)</p>
+          </div>
+
+          <!-- Search & Filter Controls -->
+          <div class="flex flex-wrap items-center gap-2">
+            <div class="relative">
+              <span class="material-symbols-outlined absolute left-2.5 top-2 text-slate-400 text-[16px]">search</span>
+              <input type="text" id="master-search-input" oninput="renderMasterTable()" placeholder="Search project, code, title..." 
+                     class="h-8 pl-8 pr-3 text-xs rounded-lg border border-slate-300 focus:outline-none focus:ring-1 focus:ring-primary w-48 sm:w-56"/>
+            </div>
+
+            <select id="master-filter-status" onchange="renderMasterTable()" class="h-8 px-2 rounded-lg border border-slate-300 text-xs font-semibold bg-white cursor-pointer">
+              <option value="all">All Remarks / Status</option>
+              <option value="Completed">Completed</option>
+              <option value="Ongoing">Ongoing</option>
+              <option value="Planned">Planned</option>
+            </select>
+
+            <button type="button" onclick="quickAddProjectRow()" class="h-8 px-2.5 rounded-lg border border-primary/30 bg-primary/10 hover:bg-primary/20 text-primary text-xs font-bold inline-flex items-center gap-1 transition" title="Quickly append a new project row">
+              <span class="material-symbols-outlined text-[15px]">add</span>
+              <span>Quick Add Row</span>
+            </button>
+            <button type="button" onclick="openNewProjectModal()" class="h-8 px-3 rounded-lg bg-primary hover:bg-primary-container text-white text-xs font-bold inline-flex items-center gap-1 transition">
+              <span class="material-symbols-outlined text-[15px]">post_add</span>
+              <span>New Entry Modal</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Live Category & Remarks Calculation Banner (Equation: Number of Projects = Projects Done + Projects Undone) -->
+        <div class="grid grid-cols-1 sm:grid-cols-4 gap-3 bg-gradient-to-r from-slate-50 via-emerald-50/40 to-amber-50/40 p-3.5 rounded-xl border border-slate-200">
+          <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-xl bg-slate-900 text-white flex items-center justify-center shadow-xs">
+              <span class="material-symbols-outlined text-[20px]">assignment</span>
+            </div>
+            <div>
+              <div class="text-[10px] uppercase font-bold text-slate-500 tracking-wider">Number of Projects</div>
+              <div class="text-base font-black text-slate-900 font-mono" id="master-kpi-total-projects">0 Projects</div>
+              <div class="text-[10px] text-slate-500">= Year Summary Projects</div>
+            </div>
+          </div>
+
+          <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-xl bg-emerald-600 text-white flex items-center justify-center shadow-xs">
+              <span class="material-symbols-outlined text-[20px]">task_alt</span>
+            </div>
+            <div>
+              <div class="text-[10px] uppercase font-bold text-emerald-800 tracking-wider">Projects Done</div>
+              <div class="text-base font-black text-emerald-700 font-mono" id="master-kpi-done-projects">0 Done</div>
+              <div class="text-[10px] text-emerald-700 font-semibold" id="master-kpi-done-pct">Remarks = Completed</div>
+            </div>
+          </div>
+
+          <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-xl bg-amber-500 text-white flex items-center justify-center shadow-xs">
+              <span class="material-symbols-outlined text-[20px]">pending_actions</span>
+            </div>
+            <div>
+              <div class="text-[10px] uppercase font-bold text-amber-800 tracking-wider">Projects Undone</div>
+              <div class="text-base font-black text-amber-700 font-mono" id="master-kpi-undone-projects">0 Undone</div>
+              <div class="text-[10px] text-amber-700 font-semibold" id="master-kpi-undone-pct">Remarks = Ongoing / Planned</div>
+            </div>
+          </div>
+
+          <div class="flex items-center gap-2.5 bg-white p-2.5 rounded-lg border border-slate-200 shadow-2xs">
+            <div class="w-9 h-9 rounded-lg bg-primary/10 text-primary flex items-center justify-center flex-shrink-0">
+              <span class="material-symbols-outlined text-[19px]">balance</span>
+            </div>
+            <div class="min-w-0 flex-1">
+              <div class="text-[10px] uppercase font-bold text-slate-500 tracking-wider">Category Equation</div>
+              <div class="text-xs font-mono font-black text-primary truncate" id="master-kpi-equation">
+                Projects = Done + Undone
+              </div>
+              <div class="text-[10px] text-emerald-700 font-bold flex items-center gap-1">
+                <span class="material-symbols-outlined text-[13px]">verified</span>
+                <span>100% Balanced</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Interactive Program Category Filter & Status Chips -->
+        <div class="flex items-center gap-1.5 overflow-x-auto pb-1 custom-scrollbar text-xs" id="master-category-chips">
+          <!-- Dynamically populated via JS -->
+        </div>
+
+        <!-- Master Table -->
+        <div class="overflow-x-auto rounded-xl border border-slate-200 custom-scrollbar max-h-[600px] overflow-y-auto">
+          <table class="w-full text-left text-xs whitespace-nowrap min-w-[1200px]">
+            <thead class="sticky top-0 z-20 bg-slate-100 text-slate-700 text-[10px] font-black uppercase tracking-wider border-b border-slate-300">
+              <tr>
+                <th class="py-2.5 px-3 w-10 text-center">NO</th>
+                <th class="py-2.5 px-3">Program Code</th>
+                <th class="py-2.5 px-3">Program Category</th>
+                <th class="py-2.5 px-4">Program Title</th>
+                <th class="py-2.5 px-3">Responsible Dept</th>
+                <th class="py-2.5 px-4 min-w-[180px]">Core Focus / Objectives</th>
+                <th class="py-2.5 px-3 min-w-[150px]">Key Donors</th>
+                <th class="py-2.5 px-3 text-right">Donors Received (NLe)</th>
+                <th class="py-2.5 px-3 text-right">Budget Spent (NLe)</th>
+                <th class="py-2.5 px-3 text-right bg-emerald-50/70 text-emerald-900 font-bold">Balance (NLe)</th>
+                <th class="py-2.5 px-3">Project Tracking ID</th>
+                <th class="py-2.5 px-3 text-center">
+                  <div>Remarks</div>
+                  <div class="text-[9px] text-slate-500 font-normal normal-case">Completed = Done</div>
+                </th>
+                <th class="py-2.5 px-3 text-right w-44 sticky right-0 bg-slate-100 z-20 border-l border-slate-300">Delete / Edit</th>
+              </tr>
+            </thead>
+            <tbody id="master-table-body" class="divide-y divide-slate-100 font-medium">
+              <!-- Rendered via JS -->
+            </tbody>
+            <tfoot class="sticky bottom-0 z-20 bg-slate-900 text-white font-mono font-bold text-xs">
+              <tr id="master-table-foot">
+                <td colspan="7" class="py-2.5 px-3 font-sans font-black uppercase text-[10px]">TOTALS (FILTERED SELECTION)</td>
+                <td class="py-2.5 px-3 text-right text-emerald-400 font-bold" id="master-foot-received">NLe 0.00</td>
+                <td class="py-2.5 px-3 text-right text-amber-400 font-bold" id="master-foot-spent">NLe 0.00</td>
+                <td class="py-2.5 px-3 text-right text-emerald-300 font-black bg-slate-800" id="master-foot-balance">NLe 0.00</td>
+                <td colspan="2" class="py-2.5 px-3 text-right font-mono text-[11px]" id="master-foot-count">18 Projects = 5 Done + 13 Undone</td>
+                <td class="py-2.5 px-3 text-center sticky right-0 bg-slate-900 border-l border-slate-800 z-20">
+                  <button type="button" onclick="quickAddProjectRow()" class="px-2.5 py-1 rounded bg-primary hover:bg-primary-container text-white text-[11px] font-bold inline-flex items-center gap-1 shadow-2xs transition">
+                    <span class="material-symbols-outlined text-[13px]">add</span>
+                    <span>Add Row</span>
+                  </button>
+                </td>
+              </tr>
+            </tfoot>
+          </table>
+        </div>
+
+      </div>
+
+    </div>
+
+    <!-- TAB 4: YEAR SUMMARY BUDGET -->
+    <div id="tab-content-summary" class="tab-pane hidden space-y-4">
+      
+      <div class="bg-white rounded-xl border border-outline p-5 shadow-2xs space-y-4">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between pb-3 border-b border-slate-100 gap-2">
+          <div>
+            <h2 class="text-sm font-extrabold text-slate-900 uppercase tracking-wider flex items-center gap-2">
+              <span class="material-symbols-outlined text-bcf-blue text-[20px]">pie_chart</span>
+              <span>Year Summary Budget</span>
+            </h2>
+            <p class="text-xs text-slate-500">Thematic portfolio health, project completion rates, key donors, and automated budget integration from Funds Received.</p>
+          </div>
+          <div class="flex flex-wrap items-center gap-2">
+            <div class="text-[11px] font-mono text-emerald-900 bg-emerald-50 px-3 py-1.5 rounded-lg border border-emerald-300 font-bold flex items-center gap-1.5 shadow-2xs">
+              <span class="material-symbols-outlined text-[16px] text-emerald-700">verified</span>
+              <span>Number of Projects = Projects Done + Projects Undone</span>
+            </div>
+            <div class="text-[11px] font-mono text-slate-600 bg-slate-100 px-3 py-1.5 rounded-lg border border-slate-200">
+              Total Budget SLE = <strong>Automated from Funds Received</strong>
+            </div>
+          </div>
+        </div>
+
+        <!-- Year Summary Table -->
+        <div class="overflow-x-auto rounded-xl border border-slate-200 custom-scrollbar">
+          <table class="w-full text-left text-xs whitespace-nowrap min-w-[1000px]">
+            <thead class="bg-slate-100 text-slate-700 text-[10px] font-black uppercase tracking-wider border-b border-slate-300">
+              <tr>
+                <th class="py-2.5 px-3">Program Code</th>
+                <th class="py-2.5 px-3">Program Category</th>
+                <th class="py-2.5 px-3 text-right">Total Budget (SLE)</th>
+                <th class="py-2.5 px-3 text-center bg-slate-50 border-x border-slate-200">
+                  <div>Number of Projects</div>
+                  <div class="text-[9px] text-slate-500 normal-case font-medium">Done + Undone</div>
+                </th>
+                <th class="py-2.5 px-3 text-center text-emerald-800 bg-emerald-50/50">
+                  <div>Projects Done</div>
+                  <div class="text-[9px] text-emerald-600 normal-case font-medium">Remarks = Completed</div>
+                </th>
+                <th class="py-2.5 px-3 text-center text-amber-800 bg-amber-50/50">
+                  <div>Projects Undone</div>
+                  <div class="text-[9px] text-amber-600 normal-case font-medium">Ongoing / Planned</div>
+                </th>
+                <th class="py-2.5 px-3 text-right text-emerald-700">% Done</th>
+                <th class="py-2.5 px-3 text-right text-amber-700">% Undone</th>
+                <th class="py-2.5 px-3">Key Donors</th>
+                <th class="py-2.5 px-3 text-center">Status</th>
+              </tr>
+            </thead>
+            <tbody id="year-summary-body" class="divide-y divide-slate-100 font-medium">
+              <!-- Rendered via JS -->
+            </tbody>
+            <tfoot class="bg-slate-900 text-white font-mono font-bold text-xs">
+              <tr id="year-summary-foot">
+                <td colspan="2" class="py-3 px-3 font-sans font-black uppercase text-[10px]">
+                  <div>GRAND TOTALS</div>
+                  <div class="text-[9px] text-emerald-400 font-mono normal-case">Projects = Done + Undone</div>
+                </td>
+                <td class="py-3 px-3 text-right text-emerald-400 font-bold" id="ys-foot-budget">NLe 0.00</td>
+                <td class="py-3 px-3 text-center font-black text-white bg-slate-800" id="ys-foot-total-projects">0</td>
+                <td class="py-3 px-3 text-center text-emerald-300 font-black bg-emerald-950/60" id="ys-foot-done">0</td>
+                <td class="py-3 px-3 text-center text-amber-300 font-black bg-amber-950/60" id="ys-foot-undone">0</td>
+                <td class="py-3 px-3 text-right text-emerald-400" id="ys-foot-pct-done">0.0%</td>
+                <td class="py-3 px-3 text-right text-amber-400" id="ys-foot-pct-undone">0.0%</td>
+                <td colspan="2" class="py-3 px-3 text-center text-[10px] text-slate-300 font-sans" id="ys-foot-verification">
+                  18 Projects = 5 Done + 13 Undone (100% Balanced)
+                </td>
+              </tr>
+            </tfoot>
+          </table>
+        </div>
+
+      </div>
+
+    </div>
+
+    <!-- TAB 5: REVENUE CHECK BY THEMATIC AREA -->
+    <div id="tab-content-revenue" class="tab-pane hidden space-y-4">
+      
+      <div class="bg-white rounded-xl border border-outline p-5 shadow-2xs space-y-4">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between pb-3 border-b border-slate-100 gap-2">
+          <div>
+            <h2 class="text-sm font-extrabold text-slate-900 uppercase tracking-wider flex items-center gap-2">
+              <span class="material-symbols-outlined text-purple-700 text-[20px]">price_check</span>
+              <span>Revenue Check By Thematic Area</span>
+            </h2>
+            <p class="text-xs text-slate-500">Thematic absorption audit: Funds Received vs Amount Spent, % Spent, Net Balance, and % Balance remaining</p>
+          </div>
+          <div class="px-2.5 py-1 rounded bg-purple-50 text-purple-900 border border-purple-200 text-xs font-mono font-bold">
+            Real-Time Thematic Financial Audit
+          </div>
+        </div>
+
+        <!-- Revenue Table -->
+        <div class="overflow-x-auto rounded-xl border border-slate-200 custom-scrollbar">
+          <table class="w-full text-left text-xs whitespace-nowrap min-w-[950px]">
+            <thead class="bg-slate-100 text-slate-700 text-[10px] font-black uppercase tracking-wider border-b border-slate-300">
+              <tr>
+                <th class="py-2.5 px-3">Program Code</th>
+                <th class="py-2.5 px-3">Thematic Area</th>
+                <th class="py-2.5 px-3">Project Start</th>
+                <th class="py-2.5 px-3 text-right text-emerald-800">Funds Received (NLe)</th>
+                <th class="py-2.5 px-3 text-right text-amber-800">Amount Spent (NLe)</th>
+                <th class="py-2.5 px-3 text-right text-amber-700">% Spent by Project</th>
+                <th class="py-2.5 px-3 text-right text-emerald-900 font-bold bg-emerald-50/60">Balance (NLe)</th>
+                <th class="py-2.5 px-3 text-right text-emerald-700">% Balance</th>
+              </tr>
+            </thead>
+            <tbody id="revenue-check-body" class="divide-y divide-slate-100 font-medium">
+              <!-- Rendered via JS -->
+            </tbody>
+            <tfoot class="bg-slate-900 text-white font-mono font-bold text-xs">
+              <tr id="revenue-check-foot">
+                <td colspan="3" class="py-3 px-3 font-sans font-black uppercase text-[10px]">TOTAL</td>
+                <td class="py-3 px-3 text-right text-emerald-400 font-bold" id="rc-foot-received">NLe 0.00</td>
+                <td class="py-3 px-3 text-right text-amber-400 font-bold" id="rc-foot-spent">NLe 0.00</td>
+                <td class="py-3 px-3 text-right text-amber-300" id="rc-foot-pct-spent">0.0%</td>
+                <td class="py-3 px-3 text-right text-emerald-300 font-black bg-slate-800" id="rc-foot-balance">NLe 0.00</td>
+                <td class="py-3 px-3 text-right text-emerald-400" id="rc-foot-pct-balance">0.0%</td>
+              </tr>
+            </tfoot>
+          </table>
+        </div>
+
+      </div>
+
+    </div>
+
+  </main>
+
+  <!-- MODAL: ADD / EDIT PROJECT ENTRY -->
+  <div id="project-modal" class="hidden fixed inset-0 z-50 bg-black/50 backdrop-blur-xs flex items-center justify-center p-3 sm:p-4 overflow-y-auto">
+    <div class="bg-white rounded-2xl max-w-xl w-full p-5 sm:p-6 shadow-2xl relative max-h-[90vh] overflow-y-auto custom-scrollbar border border-slate-200">
+      
+      <div class="flex items-center justify-between pb-3 mb-4 border-b border-slate-200">
+        <div class="flex items-center gap-2">
+          <span class="material-symbols-outlined text-primary text-[22px]" id="modal-icon">add_task</span>
+          <h3 class="text-base font-extrabold text-slate-900" id="modal-title">Add New Project Record</h3>
+        </div>
+        <button type="button" onclick="closeProjectModal()" class="w-8 h-8 rounded-full hover:bg-slate-100 flex items-center justify-center text-slate-500 hover:text-slate-800 transition">
+          <span class="material-symbols-outlined text-[20px]">close</span>
+        </button>
+      </div>
+
+      <form id="project-form" onsubmit="handleProjectFormSubmit(event)" class="space-y-3.5 text-xs">
+        <input type="hidden" id="form-edit-index" value="-1"/>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div>
+            <label class="block font-bold text-slate-700 mb-1">Program Code</label>
+            <select id="form-code" onchange="handleFormCodeChange(this.value)" class="w-full px-3 py-2 rounded-lg border border-slate-300 text-xs font-semibold focus:ring-1 focus:ring-primary focus:outline-none bg-white">
+              <option value="BCF-H01">BCF-H01 — Health</option>
+              <option value="BCF-E02">BCF-E02 — Education</option>
+              <option value="BCF-A03">BCF-A03 — Agriculture</option>
+              <option value="BCF-CC04">BCF-CC04 — Climate Change</option>
+              <option value="BCF-SJ05">BCF-SJ05 — Social Justice</option>
+              <option value="BCF-I06">BCF-I06 — Innovation</option>
+              <option value="BCF-AR07">BCF-AR07 — Addiction Rehabilitation</option>
+              <option value="BCF-EP08">BCF-EP08 — Empowerment</option>
+            </select>
+          </div>
+
+          <div>
+            <label class="block font-bold text-slate-700 mb-1">Program Category</label>
+            <input type="text" id="form-category" value="Health" class="w-full px-3 py-2 rounded-lg border border-slate-300 text-xs bg-slate-50 text-slate-800 font-semibold" readonly/>
+          </div>
+        </div>
+
+        <div>
+          <label class="block font-bold text-slate-700 mb-1">Program / Project Title</label>
+          <input type="text" id="form-title" required placeholder="e.g. Rural Maternal Healthcare Outreach Initiative" class="w-full px-3 py-2 rounded-lg border border-slate-300 text-xs focus:ring-1 focus:ring-primary focus:outline-none"/>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div>
+            <label class="block font-bold text-slate-700 mb-1">Responsible Department</label>
+            <select id="form-dept" class="w-full px-3 py-2 rounded-lg border border-slate-300 text-xs font-semibold focus:ring-1 focus:ring-primary focus:outline-none bg-white">
+              <option value="Programs Department">Programs Department</option>
+              <option value="Health & Safety Department">Health & Safety Department</option>
+              <option value="Agriculture & Livelihoods Dept">Agriculture & Livelihoods Dept</option>
+              <option value="Innovation & Tech Department">Innovation & Tech Department</option>
+              <option value="Legal & Advocacy Department">Legal & Advocacy Department</option>
+              <option value="Executive Secretariat">Executive Secretariat</option>
+            </select>
+          </div>
+
+          <div>
+            <label class="block font-bold text-slate-700 mb-1">Project Tracking ID</label>
+            <input type="text" id="form-tracking-id" placeholder="BCF-H01-01-2025" class="w-full px-3 py-2 rounded-lg border border-slate-300 text-xs font-mono font-bold focus:ring-1 focus:ring-primary focus:outline-none"/>
+          </div>
+        </div>
+
+        <div>
+          <label class="block font-bold text-slate-700 mb-1">Core Focus / Strategic Objectives</label>
+          <textarea id="form-focus" rows="2" placeholder="Primary programmatic goals, community beneficiaries, deliverables..." class="w-full px-3 py-2 rounded-lg border border-slate-300 text-xs focus:ring-1 focus:ring-primary focus:outline-none"></textarea>
+        </div>
+
+        <div>
+          <label class="block font-bold text-slate-700 mb-1 flex items-center justify-between">
+            <span class="flex items-center gap-1.5">
+              <span class="material-symbols-outlined text-[15px] text-emerald-600">volunteer_activism</span>
+              <span>Key Donors / Funding Partners</span>
+            </span>
+            <span class="text-[10px] text-slate-400 font-normal italic">Optional / Co-Financers</span>
+          </label>
+          <input type="text" id="form-donors" placeholder="e.g. USAID, Global Fund, UNICEF, EU, BCF Trust" class="w-full px-3 py-2 rounded-lg border border-slate-300 text-xs focus:ring-1 focus:ring-primary focus:outline-none"/>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div>
+            <label class="block font-bold text-slate-700 mb-1">Donors Received [USD / NLE]</label>
+            <input type="number" step="any" min="0" id="form-received" value="100000" oninput="updateFormBalancePreview()" class="w-full px-3 py-2 rounded-lg border border-slate-300 text-xs font-mono font-bold focus:ring-1 focus:ring-primary focus:outline-none"/>
+          </div>
+
+          <div>
+            <label class="block font-bold text-slate-700 mb-1">Budget Spent (NLE / USD)</label>
+            <input type="number" step="any" min="0" id="form-spent" value="75000" oninput="updateFormBalancePreview()" class="w-full px-3 py-2 rounded-lg border border-slate-300 text-xs font-mono font-bold focus:ring-1 focus:ring-primary focus:outline-none"/>
+          </div>
+        </div>
+
+        <!-- Live Balance Calculation Pill in Modal -->
+        <div class="p-2.5 rounded-lg bg-emerald-50 border border-emerald-200 flex items-center justify-between text-xs font-mono">
+          <span class="text-emerald-900 font-sans font-bold">Auto-Calculated Net Balance:</span>
+          <span class="font-bold text-primary text-sm" id="form-balance-preview">NLe 25,000.00</span>
+        </div>
+
+        <div>
+          <label class="block font-bold text-slate-700 mb-1">Remarks / Operational Status</label>
+          <select id="form-remarks" class="w-full px-3 py-2 rounded-lg border border-slate-300 text-xs font-semibold focus:ring-1 focus:ring-primary focus:outline-none bg-white">
+            <option value="Completed">Completed</option>
+            <option value="Ongoing" selected>Ongoing</option>
+            <option value="Planned">Planned</option>
+          </select>
+        </div>
+
+        <div class="pt-3 border-t border-slate-200 flex items-center justify-end gap-2">
+          <button type="button" onclick="closeProjectModal()" class="px-4 py-2 rounded-lg border border-slate-300 text-slate-700 hover:bg-slate-50 font-bold transition">
+            Cancel
+          </button>
+          <button type="submit" class="px-5 py-2 rounded-lg bg-primary hover:bg-primary-container text-white font-bold transition shadow-sm">
+            Save Record
+          </button>
+        </div>
+      </form>
+
+    </div>
+  </div>
+
+  <!-- TOAST NOTIFICATION -->
+  <div id="toast-container" class="fixed bottom-5 right-5 z-50 pointer-events-none space-y-2"></div>
+
+  <!-- APPLICATION JAVASCRIPT LOGIC -->
+  <script>
+    // 1. OFFICIAL THEMATIC DICTIONARY (Programs Tracker & their codes)
+    const DEFAULT_PROGRAM_CODES_MASTER = [
+      { no: 1, category: "Health", desc: "Maternal healthcare, mobile community clinics, disease prevention & hygiene promotion", code: "BCF-H01", sampleId: "BCF-H01-01-2025" },
+      { no: 2, category: "Education", desc: "School supplies, teacher training, literacy labs, tuition bursaries & girl-child education", code: "BCF-E02", sampleId: "BCF-E02-01-2025" },
+      { no: 3, category: "Agriculture", desc: "Smallholder farmer seed subsidies, tractor cooperatives, cassava & rice food security", code: "BCF-A03", sampleId: "BCF-A03-01-2025" },
+      { no: 4, category: "Climate Change", desc: "Mangrove reforestation, solar village hubs, eco-stoves & environmental disaster mitigation", code: "BCF-CC04", sampleId: "BCF-CC04-01-2025" },
+      { no: 5, category: "Social Justice", desc: "Legal aid representation, human rights advocacy, anti-GBV defense & civic engagement", code: "BCF-SJ05", sampleId: "BCF-SJ05-01-2025" },
+      { no: 6, category: "Innovation", desc: "Digital coding bootcamps, youth tech incubator, STEM labs & renewable energy prototyping", code: "BCF-I06", sampleId: "BCF-I06-01-2025" },
+      { no: 7, category: "Addiction Rehabilitation", desc: "Substance abuse detox clinics, psychosocial counseling, medical therapy & reintegration", code: "BCF-AR07", sampleId: "BCF-AR07-01-2025" },
+      { no: 8, category: "Empowerment", desc: "Vocational skills training, women entrepreneurship seed grants & micro-credit loan hubs", code: "BCF-EP08", sampleId: "BCF-EP08-01-2025" }
+    ];
+
+    let programCodesList = [];
+
+    // Helper map for quick code lookup
+    const CODE_MAP = {};
+    DEFAULT_PROGRAM_CODES_MASTER.forEach(p => { CODE_MAP[p.code] = p.category; });
+
+    // 2. DEFAULT FUNDS RECEIVED MATRIX (10 Tranche Rows across 8 Program Codes)
+    const DEFAULT_FUNDS_RECEIVED = [
+      { tranche: 1,  H01: 250000, E02: 180000, A03: 320000, CC04: 150000, SJ05: 120000, I06: 200000, AR07: 140000, EP08: 260000 },
+      { tranche: 2,  H01: 200000, E02: 150000, A03: 280000, CC04: 120000, SJ05: 100000, I06: 180000, AR07: 120000, EP08: 220000 },
+      { tranche: 3,  H01: 180000, E02: 140000, A03: 250000, CC04: 110000, SJ05: 90000,  I06: 160000, AR07: 110000, EP08: 200000 },
+      { tranche: 4,  H01: 150000, E02: 120000, A03: 200000, CC04: 95000,  SJ05: 80000,  I06: 140000, AR07: 90000,  EP08: 180000 },
+      { tranche: 5,  H01: 140000, E02: 110000, A03: 180000, CC04: 85000,  SJ05: 75000,  I06: 120000, AR07: 85000,  EP08: 160000 },
+      { tranche: 6,  H01: 120000, E02: 95000,  A03: 160000, CC04: 80000,  SJ05: 70000,  I06: 110000, AR07: 80000,  EP08: 150000 },
+      { tranche: 7,  H01: 110000, E02: 90000,  A03: 150000, CC04: 75000,  SJ05: 65000,  I06: 100000, AR07: 75000,  EP08: 140000 },
+      { tranche: 8,  H01: 100000, E02: 85000,  A03: 140000, CC04: 70000,  SJ05: 60000,  I06: 95000,  AR07: 70000,  EP08: 130000 },
+      { tranche: 9,  H01: 90000,  E02: 80000,  A03: 120000, CC04: 65000,  SJ05: 55000,  I06: 90000,  AR07: 65000,  EP08: 120000 },
+      { tranche: 10, H01: 80000,  E02: 70000,  A03: 100000, CC04: 60000,  SJ05: 50000,  I06: 80000,  AR07: 60000,  EP08: 110000 }
+    ];
+
+    // 3. DEFAULT MASTER PROGRAM RECORDS (18 Exact Rows matching User's Spec)
+    const DEFAULT_MASTER_PROJECTS = [
+      { no: 1,  code: "BCF-H01",  cat: "Health",                   title: "Rural Maternal Health Outreach Bo",        dept: "Health & Safety Department",   focus: "Maternal health clinics, prenatal screening and infant immunization", donors: "UNICEF & Global Fund", received: 350000, spent: 280000, trackingId: "BCF-H01-01-2025", remarks: "Ongoing" },
+      { no: 2,  code: "BCF-E02",  cat: "Education",                title: "Primary School Literacy & Tech Kits",       dept: "Programs Department",          focus: "Furnishing 24 community schools with modern literacy books & solar tablets", donors: "Global Partnership for Education (GPE)", received: 220000, spent: 220000, trackingId: "BCF-E02-02-2025", remarks: "Completed" },
+      { no: 3,  code: "BCF-A03",  cat: "Agriculture",              title: "Kono Smallholder Agro-Cooperative",         dept: "Agriculture & Livelihoods Dept", focus: "Mechanized cassava processing mills and seedling loans", donors: "World Bank & FAO", received: 450000, spent: 390000, trackingId: "BCF-A03-03-2025", remarks: "Ongoing" },
+      { no: 4,  code: "BCF-CC04", cat: "Climate Change",           title: "Coastal Mangrove Bio-Shield Project",       dept: "Programs Department",          focus: "Planting 120,000 mangrove saplings across Scarcies river delta", donors: "Green Climate Fund (GCF) & EU", received: 200000, spent: 200000, trackingId: "BCF-CC04-04-2025", remarks: "Completed" },
+      { no: 5,  code: "BCF-SJ05", cat: "Social Justice",           title: "Community Legal Defense & GBV Centre",      dept: "Legal & Advocacy Department",  focus: "Free legal representation and safe-house counseling for vulnerable women", donors: "Open Society & UNDP", received: 180000, spent: 155000, trackingId: "BCF-SJ05-05-2025", remarks: "Ongoing" },
+      { no: 6,  code: "BCF-I06",  cat: "Innovation",               title: "Youth Digital Coding Hub Freetown",         dept: "Innovation & Tech Department", focus: "Full-stack software engineering certification for 250 youth", donors: "USAID & Google.org", received: 280000, spent: 210000, trackingId: "BCF-I06-06-2025", remarks: "Ongoing" },
+      { no: 7,  code: "BCF-AR07", cat: "Addiction Rehabilitation", title: "Kush Substance Detox & Clinical Recovery",  dept: "Health & Safety Department",   focus: "Medical detox, inpatient psychiatric stabilization & skills re-training", donors: "WHO & African Development Bank", received: 230000, spent: 190000, trackingId: "BCF-AR07-07-2025", remarks: "Ongoing" },
+      { no: 8,  code: "BCF-EP08", cat: "Empowerment",              title: "Women Micro-Grant Enterprise Network",      dept: "Programs Department",          focus: "Seed finance grants and bookkeeping training for 500 women traders", donors: "UN Women & BCF Trust", received: 340000, spent: 340000, trackingId: "BCF-EP08-08-2025", remarks: "Completed" },
+      { no: 9,  code: "BCF-H01",  cat: "Health",                   title: "Mobile Dental & Eye Care Convoy",          dept: "Health & Safety Department",   focus: "Rural cataract operations and emergency pediatric dentistry", donors: "Smile Train & UK Aid", received: 260000, spent: 180000, trackingId: "BCF-H01-09-2025", remarks: "Ongoing" },
+      { no: 10, code: "BCF-I06",  cat: "Innovation",               title: "Clean Water IoT Remote Monitoring Hub",    dept: "Innovation & Tech Department", focus: "Solar IoT sensors monitoring boreholes and water tables across Port Loko", donors: "WaterAid & Irish Aid", received: 190000, spent: 95000, trackingId: "BCF-I06-10-2025", remarks: "Ongoing" },
+      { no: 11, code: "BCF-H01",  cat: "Health",                   title: "District Vaccine Cold-Chain Solar Facility",dept: "Health & Safety Department",   focus: "Solar vaccine refrigerators for 16 primary healthcare units", donors: "Gavi, The Vaccine Alliance", received: 310000, spent: 310000, trackingId: "BCF-H01-11-2025", remarks: "Completed" },
+      { no: 12, code: "BCF-EP08", cat: "Empowerment",              title: "Artisanal Fishery Refrigeration Grant",    dept: "Programs Department",          focus: "Solar freezer facilities for coastal women fish-mongers in Bonthe", donors: "Nordic Development Fund (NDF)", received: 270000, spent: 220000, trackingId: "BCF-EP08-12-2025", remarks: "Ongoing" },
+      { no: 13, code: "BCF-EP08", cat: "Empowerment",              title: "Vocational Craft & Tailoring Guild",        dept: "Programs Department",          focus: "Industrial sewing machines and apprentice certificates for 180 youth", donors: "ILO & Standard Chartered", received: 210000, spent: 210000, trackingId: "BCF-EP08-13-2025", remarks: "Completed" },
+      { no: 14, code: "BCF-E02",  cat: "Education",                title: "Girl-Child STEM Education Bursary",         dept: "Programs Department",          focus: "Secondary boarding school scholarships and laptop equipment", donors: "Malala Fund & GlobalGiving", received: 290000, spent: 185000, trackingId: "BCF-E02-14-2025", remarks: "Ongoing" },
+      { no: 15, code: "BCF-CC04", cat: "Climate Change",           title: "Solar Mini-Grid Rural Hospital Power",     dept: "Programs Department",          focus: "50kW hybrid solar storage for referral hospital surgical theater", donors: "USAID Power Africa & EU", received: 420000, spent: 310000, trackingId: "BCF-CC04-15-2025", remarks: "Ongoing" },
+      { no: 16, code: "BCF-CC04", cat: "Climate Change",           title: "Agroforestry & Wind-Break Buffer Belts",   dept: "Programs Department",          focus: "Planting cashew and acacia trees around rural farmlands to halt erosion", donors: "World Wildlife Fund (WWF)", received: 180000, spent: 60000, trackingId: "BCF-CC04-16-2025", remarks: "Ongoing" },
+      { no: 17, code: "BCF-CC04", cat: "Climate Change",           title: "Community Clean Cooking Stove Rollout",     dept: "Programs Department",          focus: "Distribution of 5,000 clean bio-stoves reducing charcoal consumption", donors: "Clean Cooking Alliance", received: 150000, spent: 0, trackingId: "BCF-CC04-17-2025", remarks: "Planned" },
+      { no: 18, code: "BCF-I06",  cat: "Innovation",               title: "FarmMarket Mobile USSD Commodity Trading", dept: "Innovation & Tech Department", focus: "SMS/USSD price transparency platform connecting rural farmers to urban buyers", donors: "Gates Foundation & AfDB", received: 170000, spent: 0, trackingId: "BCF-I06-18-2025", remarks: "Planned" }
+    ];
+
+    // 4. PERSISTENT STATE
+    let fundsReceivedMatrix = [];
+    let masterProjects = [];
+
+    function safeNum(val, fallback = 0) {
+      if (val === null || val === undefined) return fallback;
+      if (typeof val === 'number') return isNaN(val) ? fallback : val;
+      const str = String(val).trim().replace(/[^0-9.-]/g, '');
+      if (!str) return fallback;
+      const n = parseFloat(str);
+      return isNaN(n) ? fallback : n;
+    }
+
+    function formatNLe(num) {
+      return Number(safeNum(num)).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    }
+
+    // Determine if project Remarks classify as "Projects Done" (Remarks = Completed / Done)
+    function isProjectDone(remarks) {
+      if (!remarks) return false;
+      const r = String(remarks).trim().toLowerCase();
+      return r === 'completed' || r === 'done';
+    }
+
+    // Match projects for a specific Program Category / Code
+    function getProjectsForProgram(prog, projectList = masterProjects) {
+      if (!prog || !Array.isArray(projectList)) return [];
+      const cleanCode = (prog.code || '').replace('BCF-', '').trim().toUpperCase();
+      const cleanCat = (prog.category || '').trim().toLowerCase();
+
+      return projectList.filter(p => {
+        if (!p) return false;
+        const pCode = (p.code || '').replace('BCF-', '').trim().toUpperCase();
+        const pCat = (p.cat || '').trim().toLowerCase();
+        return (pCode && cleanCode && pCode === cleanCode) ||
+               (pCat && cleanCat && pCat === cleanCat) ||
+               (p.code && prog.code && p.code.trim().toUpperCase() === prog.code.trim().toUpperCase());
+      });
+    }
+
+    function getProgramKeys() {
+      if (Array.isArray(programCodesList) && programCodesList.length > 0) {
+        return programCodesList.map(p => {
+          const clean = (p.code || '').replace('BCF-', '');
+          return {
+            key: clean,
+            label: p.code,
+            code: p.code,
+            name: p.category || clean
+          };
+        });
+      }
+      return [
+        { key: 'H01',  label: 'BCF-H01', code: 'BCF-H01', name: 'Health' },
+        { key: 'E02',  label: 'BCF-E02', code: 'BCF-E02', name: 'Education' },
+        { key: 'A03',  label: 'BCF-A03', code: 'BCF-A03', name: 'Agriculture' },
+        { key: 'CC04', label: 'BCF-CC04', code: 'BCF-CC04', name: 'Climate' },
+        { key: 'SJ05', label: 'BCF-SJ05', code: 'BCF-SJ05', name: 'Social Just.' },
+        { key: 'I06',  label: 'BCF-I06', code: 'BCF-I06', name: 'Innovation' },
+        { key: 'AR07', label: 'BCF-AR07', code: 'BCF-AR07', name: 'Rehab' },
+        { key: 'EP08', label: 'BCF-EP08', code: 'BCF-EP08', name: 'Empower' }
+      ];
+    }
+
+    // AUTO-POPULATE: Donors Received appears automatically in Funds Received (First-Come, First-Served by Code)
+    function syncFundsMatrixFromMasterProjects(showNotification = false) {
+      if (!Array.isArray(masterProjects)) return;
+
+      const keys = getProgramKeys();
+
+      // 1. Group projects by code in chronological order of appearance in masterProjects (FCFS)
+      const projectsByCode = {};
+      keys.forEach(k => {
+        projectsByCode[k.key] = masterProjects.filter(p => {
+          if (!p.code) return false;
+          const clean = p.code.replace('BCF-', '');
+          return clean === k.key || p.code === k.code || p.code === k.label;
+        });
+      });
+
+      // 2. Determine number of tranche rows needed
+      let maxCount = 0;
+      keys.forEach(k => {
+        if (projectsByCode[k.key].length > maxCount) {
+          maxCount = projectsByCode[k.key].length;
+        }
+      });
+
+      const targetRows = Math.max(10, maxCount, fundsReceivedMatrix.length || 0);
+
+      // 3. Populate matrix row by row (Tranche 1, Tranche 2, ...)
+      const updatedMatrix = [];
+      for (let r = 0; r < targetRows; r++) {
+        const row = {
+          tranche: r + 1
+        };
+
+        keys.forEach(k => {
+          const projs = projectsByCode[k.key] || [];
+          if (r < projs.length) {
+            // First-come, first-served: r-th project of this code is Tranche r+1
+            const p = projs[r];
+            row[k.key] = safeNum(p.received, 0);
+            row[k.key + '_meta'] = {
+              no: p.no,
+              title: p.title,
+              trackingId: p.trackingId
+            };
+          } else {
+            // Keep existing value if manually entered, else 0
+            const existingVal = (fundsReceivedMatrix[r] && fundsReceivedMatrix[r][k.key] !== undefined)
+              ? fundsReceivedMatrix[r][k.key]
+              : 0;
+            row[k.key] = safeNum(existingVal, 0);
+          }
+        });
+
+        updatedMatrix.push(row);
+      }
+
+      fundsReceivedMatrix = updatedMatrix;
+      saveState();
+
+      if (showNotification) {
+        refreshAllViews();
+        showToast("Amount of Funds Received auto-populated from Master Table (FCFS by Code)!", "sync");
+      }
+    }
+
+    function loadState() {
+      try {
+        const savedCodes = localStorage.getItem('bcf_programs_codes_master');
+        programCodesList = savedCodes ? JSON.parse(savedCodes) : JSON.parse(JSON.stringify(DEFAULT_PROGRAM_CODES_MASTER));
+      } catch(e) {
+        programCodesList = JSON.parse(JSON.stringify(DEFAULT_PROGRAM_CODES_MASTER));
+      }
+
+      try {
+        const savedFunds = localStorage.getItem('bcf_programs_funds_matrix');
+        fundsReceivedMatrix = savedFunds ? JSON.parse(savedFunds) : JSON.parse(JSON.stringify(DEFAULT_FUNDS_RECEIVED));
+      } catch(e) {
+        fundsReceivedMatrix = JSON.parse(JSON.stringify(DEFAULT_FUNDS_RECEIVED));
+      }
+
+      try {
+        const savedMaster = localStorage.getItem('bcf_programs_master_table');
+        if (savedMaster) {
+          masterProjects = JSON.parse(savedMaster);
+          // Backfill donors for existing saved projects if missing
+          masterProjects.forEach(p => {
+            if (!p.donors) {
+              const match = DEFAULT_MASTER_PROJECTS.find(d => d.no === p.no || d.trackingId === p.trackingId);
+              p.donors = match ? match.donors : "Direct / BCF";
+            }
+          });
+        } else {
+          masterProjects = JSON.parse(JSON.stringify(DEFAULT_MASTER_PROJECTS));
+          saveState();
+        }
+      } catch(e) {
+        masterProjects = JSON.parse(JSON.stringify(DEFAULT_MASTER_PROJECTS));
+        saveState();
+      }
+
+      // Automatically sync funds matrix from master projects on FCFS basis!
+      syncFundsMatrixFromMasterProjects(false);
+      saveState();
+    }
+
+    // BROADCAST CHANNEL FOR REAL-TIME INTER-APP SYNC
+    let bcfSyncChannel = null;
+    try {
+      bcfSyncChannel = new BroadcastChannel('bcf_programs_sync_channel');
+      bcfSyncChannel.onmessage = (event) => {
+        if (event.data && (event.data.type === 'LEDGER_MODIFIED' || event.data.type === 'MASTER_UPDATE_REQUEST')) {
+          loadState();
+          refreshAllViews();
+        }
+      };
+    } catch(e) {}
+
+    function saveState() {
+      try {
+        localStorage.setItem('bcf_programs_codes_master', JSON.stringify(programCodesList));
+        localStorage.setItem('bcf_programs_funds_matrix', JSON.stringify(fundsReceivedMatrix));
+        localStorage.setItem('bcf_programs_master_table', JSON.stringify(masterProjects));
+        localStorage.setItem('bcf_programs_last_sync', Date.now().toString());
+        if (bcfSyncChannel) {
+          bcfSyncChannel.postMessage({ type: 'MASTER_TABLE_UPDATED', timestamp: Date.now() });
+        }
+      } catch(e) {}
+    }
+
+    // 5. TAB SWITCHING ENGINE
+    let currentTab = 'tracker';
+    function switchTab(tabId) {
+      currentTab = tabId;
+      
+      // Update Tab Buttons
+      const tabBtns = ['tracker', 'funds', 'master', 'summary', 'revenue'];
+      tabBtns.forEach(t => {
+        const btn = document.getElementById(`tab-btn-${t}`);
+        const content = document.getElementById(`tab-content-${t}`);
+        if (t === tabId) {
+          btn.className = "tab-btn px-3.5 py-2 rounded-lg text-xs font-bold inline-flex items-center gap-2 transition whitespace-nowrap bg-primary text-white shadow-2xs";
+          content.classList.remove('hidden');
+        } else {
+          btn.className = "tab-btn px-3.5 py-2 rounded-lg text-xs font-bold inline-flex items-center gap-2 transition whitespace-nowrap text-slate-600 hover:text-slate-900 hover:bg-slate-100";
+          content.classList.add('hidden');
+        }
+      });
+
+      // Recalculate views
+      refreshAllViews();
+    }
+
+    // 6. RENDER TAB 1: PROGRAMS TRACKER & CODES
+    function renderTrackerTable() {
+      const tbody = document.getElementById('tracker-table-body');
+      if (!tbody) return;
+
+      const totalProjects = masterProjects.length;
+      const totalDone = masterProjects.filter(p => isProjectDone(p.remarks)).length;
+      const totalUndone = Math.max(0, totalProjects - totalDone);
+
+      const headerBadge = document.getElementById('tracker-total-projects-badge');
+      if (headerBadge) {
+        headerBadge.textContent = `${totalProjects} Projects (${totalDone} Done • ${totalUndone} Undone)`;
+      }
+
+      tbody.innerHTML = programCodesList.map((p, idx) => {
+        const matchingProjects = getProjectsForProgram(p, masterProjects);
+        const countProjects = matchingProjects.length;
+        const countDone = matchingProjects.filter(item => isProjectDone(item.remarks)).length;
+        const countUndone = Math.max(0, countProjects - countDone);
+
+        return `
+        <tr class="hover:bg-slate-50/80 transition-colors group">
+          <td class="py-2.5 px-3 text-center font-mono font-bold text-slate-500">${p.no || idx + 1}</td>
+          <td class="py-2.5 px-3">
+            <div class="flex items-center gap-1.5 flex-wrap">
+              <span class="font-bold text-slate-900">${p.category}</span>
+              <span class="px-1.5 py-0.2 rounded-full text-[10px] font-mono font-bold bg-slate-100 text-slate-700 border border-slate-200" title="${countProjects} Projects = ${countDone} Done + ${countUndone} Undone">
+                ${countProjects} Proj (${countDone} Done &bull; ${countUndone} Active)
+              </span>
+            </div>
+          </td>
+          <td class="py-2.5 px-4 text-slate-600 max-w-md">${p.desc}</td>
+          <td class="py-2.5 px-3">
+            <span class="px-2 py-0.5 rounded bg-emerald-100 text-emerald-950 font-mono font-bold border border-emerald-300">
+              ${p.code}
+            </span>
+          </td>
+          <td class="py-2.5 px-3 font-mono font-semibold text-primary">
+            ${p.sampleId}
+          </td>
+          <td class="py-2.5 px-3 text-right">
+            <div class="flex items-center justify-end gap-1.5">
+              <button type="button" onclick="filterMasterByCode('${p.code}')" class="px-2 py-1 rounded bg-slate-100 hover:bg-primary hover:text-white text-slate-700 text-[11px] font-bold transition">
+                View (${countProjects})
+              </button>
+              <button type="button" onclick="deleteTrackerRow(${idx})" class="px-2.5 py-1 rounded-md bg-rose-50 hover:bg-rose-600 text-rose-700 hover:text-white border border-rose-200 text-xs font-bold inline-flex items-center gap-1 transition shadow-2xs" title="Delete Category Row">
+                <span class="material-symbols-outlined text-[14px]">delete</span>
+                <span>Delete</span>
+              </button>
+            </div>
+          </td>
+        </tr>
+      `;
+      }).join('');
+    }
+
+    function deleteTrackerRow(idx) {
+      if (programCodesList.length <= 1) {
+        showToast("At least one program category must remain in the tracker", "warning");
+        return;
+      }
+      const item = programCodesList[idx];
+      if (confirm(`Delete program category "${item.category} (${item.code})"?`)) {
+        programCodesList.splice(idx, 1);
+        programCodesList.forEach((p, i) => p.no = i + 1);
+        saveState();
+        refreshAllViews();
+        showToast(`Category ${item.code} deleted`, "delete");
+      }
+    }
+
+    function addTrackerRow() {
+      const nextNo = programCodesList.length + 1;
+      const nextCode = `BCF-C${nextNo < 10 ? '0' + nextNo : nextNo}`;
+      programCodesList.push({
+        no: nextNo,
+        category: `Program Category ${nextNo}`,
+        desc: "Intervention category manual description and programmatic deliverables",
+        code: nextCode,
+        sampleId: `${nextCode}-01-2025`
+      });
+      saveState();
+      refreshAllViews();
+      showToast(`Added Program Category #${nextNo}`, "add");
+    }
+
+    function filterMasterByCode(code) {
+      switchTab('master');
+      const search = document.getElementById('master-search-input');
+      if (search) search.value = code;
+      renderMasterTable();
+    }
+
+    // 7. RENDER TAB 2: AMOUNT OF FUNDS RECEIVED (MATRIX GRID)
+    const PROGRAM_KEYS = [
+      { key: 'H01',  label: 'BCF-H01' },
+      { key: 'E02',  label: 'BCF-E02' },
+      { key: 'A03',  label: 'BCF-A03' },
+      { key: 'CC04', label: 'BCF-CC04' },
+      { key: 'SJ05', label: 'BCF-SJ05' },
+      { key: 'I06',  label: 'BCF-I06' },
+      { key: 'AR07', label: 'BCF-AR07' },
+      { key: 'EP08', label: 'BCF-EP08' }
+    ];
+
+    function renderFundsMatrix() {
+      const tbody = document.getElementById('funds-matrix-body');
+      const tfoot = document.getElementById('funds-matrix-foot');
+      if (!tbody || !tfoot) return;
+
+      const keys = getProgramKeys();
+      const columnTotals = {};
+      keys.forEach(k => { columnTotals[k.key] = 0; });
+      let grandTotal = 0;
+
+      tbody.innerHTML = fundsReceivedMatrix.map((row, idx) => {
+        let rowSum = 0;
+        keys.forEach(p => {
+          const val = safeNum(row[p.key], 0);
+          rowSum += val;
+          columnTotals[p.key] += val;
+        });
+        grandTotal += rowSum;
+
+        return `
+          <tr class="hover:bg-slate-50/80 transition-colors group">
+            <td class="py-2 px-3 text-center font-bold text-slate-500 font-sans">
+              ${idx + 1}
+            </td>
+            ${keys.map(p => {
+              const meta = row[p.key + '_meta'];
+              const tooltip = meta
+                ? `Tranche #${idx + 1} (${p.label}): Project #${meta.no} - ${meta.title} [${meta.trackingId || p.label}]`
+                : `Tranche #${idx + 1} - ${p.label}`;
+              const isAuto = Boolean(meta);
+              return `
+                <td class="py-2 px-3 text-right">
+                  <div class="relative inline-block w-full">
+                    <input type="number" step="any" min="0" value="${safeNum(row[p.key], 0)}" 
+                           title="${tooltip}"
+                           onchange="updateFundsCell(${idx}, '${p.key}', this.value)"
+                           class="w-24 text-right px-2 py-1 rounded border ${isAuto ? 'border-emerald-200 bg-emerald-50/30' : 'border-transparent'} hover:border-slate-300 focus:border-primary focus:bg-white bg-transparent font-mono text-xs font-semibold focus:outline-none"/>
+                    ${isAuto ? '<span class="absolute top-1 left-1 w-1.5 h-1.5 rounded-full bg-emerald-500" title="Auto-synced from Master Table Project (FCFS)"></span>' : ''}
+                  </div>
+                </td>
+              `;
+            }).join('')}
+            <td class="py-2 px-4 text-right font-black text-emerald-900 bg-emerald-50/50">
+              ${formatNLe(rowSum)}
+            </td>
+            <td class="py-2 px-3 text-center sticky right-0 bg-white group-hover:bg-slate-50 border-l border-slate-200 shadow-xs z-10">
+              <div class="flex items-center justify-center gap-1.5">
+                <button type="button" onclick="deleteFundsReceivedRow(${idx})" class="px-2.5 py-1 rounded-md bg-rose-50 hover:bg-rose-600 text-rose-700 hover:text-white border border-rose-200 text-xs font-bold inline-flex items-center gap-1 transition shadow-2xs" title="Delete Tranche #${idx + 1}">
+                  <span class="material-symbols-outlined text-[15px]">delete</span>
+                  <span>Delete</span>
+                </button>
+                <button type="button" onclick="insertFundsReceivedRow(${idx})" class="p-1 rounded text-slate-400 hover:text-emerald-700 hover:bg-emerald-50 transition" title="Insert new tranche row below">
+                  <span class="material-symbols-outlined text-[16px]">add_circle</span>
+                </button>
+              </div>
+            </td>
+          </tr>
+        `;
+      }).join('');
+
+      // Foot Totals
+      tfoot.innerHTML = `
+        <td class="py-3 px-3 text-slate-800 font-sans font-black uppercase text-[10px]">TOTAL RECEIVED</td>
+        ${keys.map(p => `
+          <td class="py-3 px-3 text-right font-black text-emerald-900">
+            ${formatNLe(columnTotals[p.key])}
+          </td>
+        `).join('')}
+        <td class="py-3 px-4 text-right font-black text-emerald-950 bg-emerald-100 text-sm">
+          NLe ${formatNLe(grandTotal)}
+        </td>
+        <td class="py-3 px-2 text-center bg-emerald-50 sticky right-0 border-l border-emerald-200 z-10">
+          <button type="button" onclick="addFundsReceivedRow()" class="px-2.5 py-1 rounded-md bg-emerald-700 hover:bg-emerald-800 text-white font-bold text-xs inline-flex items-center gap-1 transition shadow-2xs" title="Add New Tranche Row at end">
+            <span class="material-symbols-outlined text-[14px]">add</span>
+            <span>Add Row</span>
+          </button>
+        </td>
+      `;
+
+      // Update badge
+      const badge = document.getElementById('badge-funds-sum');
+      if (badge) badge.textContent = `NLe ${Math.round(grandTotal).toLocaleString()}`;
+    }
+
+    function updateFundsCell(rowIdx, progKey, val) {
+      if (!fundsReceivedMatrix[rowIdx]) return;
+      const numVal = safeNum(val, 0);
+      fundsReceivedMatrix[rowIdx][progKey] = numVal;
+
+      // Two-way synchronization: update the corresponding project in masterProjects if it exists!
+      const keys = getProgramKeys();
+      const pKeyObj = keys.find(pk => pk.key === progKey);
+      if (pKeyObj) {
+        const projs = masterProjects.filter(p => {
+          const clean = (p.code || '').replace('BCF-', '');
+          return clean === progKey || p.code === pKeyObj.code;
+        });
+        if (rowIdx < projs.length) {
+          projs[rowIdx].received = numVal;
+        }
+      }
+
+      saveState();
+      refreshAllViews();
+      showToast("Funds Received updated & synchronized with Master Table", "sync");
+    }
+
+    function addFundsReceivedRow() {
+      const nextNum = fundsReceivedMatrix.length + 1;
+      fundsReceivedMatrix.push({
+        tranche: nextNum,
+        H01: 0, E02: 0, A03: 0, CC04: 0, SJ05: 0, I06: 0, AR07: 0, EP08: 0
+      });
+      saveState();
+      refreshAllViews();
+      showToast(`Added Tranche #${nextNum} row`, "add");
+    }
+
+    function insertFundsReceivedRow(idx) {
+      const newRow = {
+        tranche: idx + 2,
+        H01: 0, E02: 0, A03: 0, CC04: 0, SJ05: 0, I06: 0, AR07: 0, EP08: 0
+      };
+      fundsReceivedMatrix.splice(idx + 1, 0, newRow);
+      fundsReceivedMatrix.forEach((r, i) => {
+        r.tranche = i + 1;
+      });
+      saveState();
+      refreshAllViews();
+      showToast(`Inserted new Tranche row at position #${idx + 2}`, "add");
+    }
+
+    function deleteFundsReceivedRow(idx) {
+      if (fundsReceivedMatrix.length <= 1) {
+        showToast("At least one tranche row must remain in the schedule", "warning");
+        return;
+      }
+      const trancheNum = idx + 1;
+      fundsReceivedMatrix.splice(idx, 1);
+      fundsReceivedMatrix.forEach((r, i) => {
+        r.tranche = i + 1;
+      });
+      saveState();
+      refreshAllViews();
+      showToast(`Deleted Tranche #${trancheNum} row`, "delete");
+    }
+
+    function deleteLastFundsReceivedRow() {
+      if (fundsReceivedMatrix.length <= 1) {
+        showToast("At least one tranche row must remain in the schedule", "warning");
+        return;
+      }
+      const removedTranche = fundsReceivedMatrix.length;
+      fundsReceivedMatrix.pop();
+      saveState();
+      refreshAllViews();
+      showToast(`Removed last row (Tranche #${removedTranche})`, "delete");
+    }
+
+    function resetFundsReceivedToDefaults() {
+      if (confirm("Reset Funds Received matrix to official foundation benchmark figures?")) {
+        fundsReceivedMatrix = JSON.parse(JSON.stringify(DEFAULT_FUNDS_RECEIVED));
+        saveState();
+        refreshAllViews();
+        showToast("Restored benchmark funds figures", "refresh");
+      }
+    }
+
+    // Helper: calculate total received for a specific code from the matrix
+    function getTotalReceivedForCode(code) {
+      const clean = code.replace('BCF-', '');
+      let sum = 0;
+      fundsReceivedMatrix.forEach(r => {
+        sum += safeNum(r[clean], 0);
+      });
+      return sum;
+    }
+
+    let selectedCategoryFilter = 'all';
+
+    function setMasterCategoryFilter(cat) {
+      selectedCategoryFilter = cat;
+      const searchInput = document.getElementById('master-search-input');
+      if (cat === 'all') {
+        if (searchInput && searchInput.dataset.fromChip) {
+          searchInput.value = '';
+          delete searchInput.dataset.fromChip;
+        }
+      } else {
+        if (searchInput) {
+          searchInput.value = cat;
+          searchInput.dataset.fromChip = "true";
+        }
+      }
+      renderMasterTable();
+    }
+
+    function renderMasterCategoryChips() {
+      const container = document.getElementById('master-category-chips');
+      if (!container) return;
+
+      const totalProjects = masterProjects.length;
+      const currentSearch = (document.getElementById('master-search-input')?.value || '').trim().toLowerCase();
+
+      let html = `
+        <button type="button" onclick="setMasterCategoryFilter('all')" 
+                class="px-2.5 py-1 rounded-lg text-xs font-bold transition whitespace-nowrap inline-flex items-center gap-1.5 ${(!currentSearch || selectedCategoryFilter === 'all') ? 'bg-slate-900 text-white shadow-2xs' : 'bg-slate-100 hover:bg-slate-200 text-slate-700'}">
+          <span>All Categories</span>
+          <span class="px-1.5 py-0.2 rounded-full text-[10px] font-mono ${(!currentSearch || selectedCategoryFilter === 'all') ? 'bg-white/20 text-white' : 'bg-slate-300 text-slate-800'}">
+            ${totalProjects}
+          </span>
+        </button>
+      `;
+
+      programCodesList.forEach(prog => {
+        const matching = getProjectsForProgram(prog, masterProjects);
+        const count = matching.length;
+        const done = matching.filter(p => isProjectDone(p.remarks)).length;
+        const undone = Math.max(0, count - done);
+
+        const isSelected = currentSearch && (
+          currentSearch === prog.code.toLowerCase() || 
+          currentSearch === prog.category.toLowerCase()
+        );
+
+        html += `
+          <button type="button" onclick="setMasterCategoryFilter('${prog.code}')" 
+                  title="${prog.category} (${prog.code}): ${count} Projects = ${done} Done + ${undone} Undone"
+                  class="px-2.5 py-1 rounded-lg text-xs transition whitespace-nowrap inline-flex items-center gap-1.5 border ${isSelected ? 'bg-primary text-white border-primary shadow-2xs font-bold' : 'bg-white hover:bg-slate-100 text-slate-700 border-slate-200 font-semibold'}">
+            <span class="font-mono text-[11px] font-bold ${isSelected ? 'text-white' : 'text-primary'}">${prog.code}</span>
+            <span>${prog.category}</span>
+            <span class="px-1.5 py-0.2 rounded-full text-[10px] font-mono font-bold ${isSelected ? 'bg-white/20 text-white' : 'bg-slate-100 text-slate-800'}">
+              ${count}
+            </span>
+            <span class="text-[10px] font-mono ${isSelected ? 'text-emerald-200' : 'text-emerald-700'} font-bold">
+              (${done}D + ${undone}U)
+            </span>
+          </button>
+        `;
+      });
+
+      container.innerHTML = html;
+    }
+
+    // 8. RENDER TAB 3: PROGRAM MASTER TABLE (18+ ROWS)
+    function renderMasterTable() {
+      const tbody = document.getElementById('master-table-body');
+      if (!tbody) return;
+
+      const q = (document.getElementById('master-search-input')?.value || '').trim().toLowerCase();
+      const statusFilter = document.getElementById('master-filter-status')?.value || 'all';
+
+      let filtered = masterProjects.filter(p => {
+        if (statusFilter !== 'all' && p.remarks !== statusFilter) return false;
+        if (q) {
+          const matchCode = (p.code || '').toLowerCase().includes(q);
+          const matchCat = (p.cat || '').toLowerCase().includes(q);
+          const matchTitle = (p.title || '').toLowerCase().includes(q);
+          const matchDept = (p.dept || '').toLowerCase().includes(q);
+          const matchId = (p.trackingId || '').toLowerCase().includes(q);
+          const matchDonors = (p.donors || '').toLowerCase().includes(q);
+          if (!matchCode && !matchCat && !matchTitle && !matchDept && !matchId && !matchDonors) return false;
+        }
+        return true;
+      });
+
+      let sumReceived = 0;
+      let sumSpent = 0;
+      let sumBalance = 0;
+
+      tbody.innerHTML = filtered.map((p, idx) => {
+        const received = safeNum(p.received, 0);
+        const spent = safeNum(p.spent, 0);
+        // Balance = Donors Received minus Budget Spent
+        const balance = received - spent;
+
+        sumReceived += received;
+        sumSpent += spent;
+        sumBalance += balance;
+
+        const originalIndex = masterProjects.indexOf(p);
+
+        // Status Badge Style (Completed = Done)
+        let badgeClass = "bg-amber-100 text-amber-900 border-amber-300";
+        if (isProjectDone(p.remarks)) badgeClass = "bg-emerald-100 text-emerald-900 border-emerald-300";
+        else if (p.remarks === 'Planned') badgeClass = "bg-slate-100 text-slate-800 border-slate-300";
+
+        return `
+          <tr class="hover:bg-slate-50/80 transition-colors">
+            <td class="py-2.5 px-3 text-center font-mono font-bold text-slate-500">${p.no || idx + 1}</td>
+            <td class="py-2.5 px-3">
+              <span class="px-2 py-0.5 rounded bg-emerald-50 text-primary font-mono font-bold border border-emerald-200">
+                ${p.code}
+              </span>
+            </td>
+            <td class="py-2.5 px-3 font-semibold text-slate-800">${p.cat}</td>
+            <td class="py-2.5 px-4 font-bold text-slate-900 max-w-xs truncate" title="${p.title}">${p.title}</td>
+            <td class="py-2.5 px-3 text-slate-600 text-[11px] truncate max-w-[140px]" title="${p.dept}">${p.dept}</td>
+            <td class="py-2.5 px-4 text-slate-600 max-w-sm truncate" title="${p.focus}">${p.focus}</td>
+            <td class="py-2.5 px-3 font-semibold text-slate-800 max-w-[160px] truncate" title="${p.donors || 'Direct / BCF'}">
+              <span class="inline-flex items-center gap-1">
+                <span class="material-symbols-outlined text-[14px] text-emerald-600">volunteer_activism</span>
+                <span class="truncate">${p.donors || '<span class="text-slate-400 font-normal italic">Direct / BCF</span>'}</span>
+              </span>
+            </td>
+            <td class="py-2.5 px-3 text-right font-mono font-semibold text-slate-900">${formatNLe(received)}</td>
+            <td class="py-2.5 px-3 text-right font-mono font-semibold text-amber-700">${formatNLe(spent)}</td>
+            <td class="py-2.5 px-3 text-right font-mono font-bold bg-emerald-50/50 ${balance < 0 ? 'text-rose-700' : 'text-primary'}">
+              ${formatNLe(balance)}
+            </td>
+            <td class="py-2.5 px-3 font-mono text-[11px] text-primary font-semibold">${p.trackingId || '-'}</td>
+            <td class="py-2.5 px-3 text-center">
+              <select onchange="updateProjectRemarks(${originalIndex}, this.value)" class="text-[10px] font-bold px-2 py-1 rounded-full border cursor-pointer ${badgeClass}">
+                <option value="Completed" ${p.remarks === 'Completed' ? 'selected' : ''}>Completed (Done)</option>
+                <option value="Ongoing" ${p.remarks === 'Ongoing' ? 'selected' : ''}>Ongoing (Undone)</option>
+                <option value="Planned" ${p.remarks === 'Planned' ? 'selected' : ''}>Planned (Undone)</option>
+              </select>
+            </td>
+            <td class="py-2.5 px-3 text-right sticky right-0 bg-white group-hover:bg-slate-50 border-l border-slate-200 shadow-xs z-10">
+              <div class="flex items-center justify-end gap-1.5">
+                <button type="button" onclick="editProject(${originalIndex})" class="px-2 py-1 rounded text-slate-600 hover:text-primary hover:bg-slate-100 border border-slate-200 text-xs font-semibold inline-flex items-center gap-1 transition" title="Edit Project">
+                  <span class="material-symbols-outlined text-[14px]">edit</span>
+                  <span>Edit</span>
+                </button>
+                <button type="button" onclick="deleteProject(${originalIndex})" class="px-2.5 py-1 rounded-md bg-rose-50 hover:bg-rose-600 text-rose-700 hover:text-white border border-rose-200 text-xs font-bold inline-flex items-center gap-1 transition shadow-2xs" title="Delete Project">
+                  <span class="material-symbols-outlined text-[14px]">delete</span>
+                  <span>Delete</span>
+                </button>
+              </div>
+            </td>
+          </tr>
+        `;
+      }).join('');
+
+      // Master totals & Live Category Equation: Number of Projects = Projects Done + Projects Undone
+      const totalProjects = masterProjects.length;
+      const totalDone = masterProjects.filter(p => isProjectDone(p.remarks)).length;
+      const totalUndone = Math.max(0, totalProjects - totalDone);
+
+      const filteredDone = filtered.filter(p => isProjectDone(p.remarks)).length;
+      const filteredUndone = Math.max(0, filtered.length - filteredDone);
+
+      const pctDone = totalProjects > 0 ? ((totalDone / totalProjects) * 100).toFixed(1) : "0.0";
+      const pctUndone = totalProjects > 0 ? ((totalUndone / totalProjects) * 100).toFixed(1) : "0.0";
+
+      const kpiTotal = document.getElementById('master-kpi-total-projects');
+      const kpiDone = document.getElementById('master-kpi-done-projects');
+      const kpiUndone = document.getElementById('master-kpi-undone-projects');
+      const kpiDonePct = document.getElementById('master-kpi-done-pct');
+      const kpiUndonePct = document.getElementById('master-kpi-undone-pct');
+      const kpiEq = document.getElementById('master-kpi-equation');
+
+      if (kpiTotal) kpiTotal.textContent = `${totalProjects} Projects`;
+      if (kpiDone) kpiDone.textContent = `${totalDone} Done`;
+      if (kpiUndone) kpiUndone.textContent = `${totalUndone} Undone`;
+      if (kpiDonePct) kpiDonePct.textContent = `${pctDone}% (Remarks = Completed)`;
+      if (kpiUndonePct) kpiUndonePct.textContent = `${pctUndone}% (Ongoing / Planned)`;
+      if (kpiEq) kpiEq.textContent = `${totalProjects} = ${totalDone} Done + ${totalUndone} Undone`;
+
+      // Update Table Footer
+      const footRec = document.getElementById('master-foot-received');
+      const footSpent = document.getElementById('master-foot-spent');
+      const footBal = document.getElementById('master-foot-balance');
+      const footCount = document.getElementById('master-foot-count');
+      if (footRec) footRec.textContent = `NLe ${formatNLe(sumReceived)}`;
+      if (footSpent) footSpent.textContent = `NLe ${formatNLe(sumSpent)}`;
+      if (footBal) footBal.textContent = `NLe ${formatNLe(sumBalance)}`;
+      if (footCount) {
+        if (filtered.length === totalProjects) {
+          footCount.innerHTML = `<span class="text-white font-bold">${totalProjects} Projects</span> = <span class="text-emerald-400 font-bold">${totalDone} Done</span> + <span class="text-amber-400 font-bold">${totalUndone} Undone</span>`;
+        } else {
+          footCount.innerHTML = `<span class="text-white font-bold">${filtered.length} of ${totalProjects} Projects</span> (${filteredDone} Done + ${filteredUndone} Undone)`;
+        }
+      }
+
+      const badgeCount = document.getElementById('badge-master-count');
+      if (badgeCount) badgeCount.textContent = masterProjects.length;
+
+      // Render category filter chips
+      renderMasterCategoryChips();
+    }
+
+    function updateProjectRemarks(idx, newRemarks) {
+      if (masterProjects[idx]) {
+        masterProjects[idx].remarks = newRemarks;
+        saveState();
+        refreshAllViews();
+        showToast(`Updated status to '${newRemarks}'`, "check");
+      }
+    }
+
+    function deleteProject(idx) {
+      const p = masterProjects[idx];
+      const title = p?.title || "Selected Project";
+      if (confirm(`Delete project "${title}"?`)) {
+        masterProjects.splice(idx, 1);
+        masterProjects.forEach((proj, i) => {
+          proj.no = i + 1;
+        });
+        syncFundsMatrixFromMasterProjects(false);
+        saveState();
+        refreshAllViews();
+        showToast("Project deleted successfully", "delete");
+      }
+    }
+
+    function quickAddProjectRow() {
+      const nextNo = masterProjects.length + 1;
+      const defaultCode = "BCF-H01";
+      const newProj = {
+        no: nextNo,
+        code: defaultCode,
+        cat: "Health",
+        title: `Intervention Project Initiative #${nextNo}`,
+        dept: "Programs Department",
+        focus: "Community impact deliverable & beneficiary outreach",
+        donors: "USAID / BCF Donor Partner",
+        received: 0,
+        spent: 0,
+        trackingId: `BCF-H01-${String(nextNo).padStart(2, '0')}-2025`,
+        remarks: "Planned"
+      };
+      masterProjects.push(newProj);
+      syncFundsMatrixFromMasterProjects(false);
+      saveState();
+      refreshAllViews();
+      showToast(`Added Project #${nextNo} row`, "add");
+    }
+
+    // 9. RENDER TAB 4: YEAR SUMMARY BUDGET
+    function renderYearSummary() {
+      const tbody = document.getElementById('year-summary-body');
+      if (!tbody) return;
+
+      let totalBudgetSum = 0;
+      let totalProjectsSum = 0;
+      let totalDoneSum = 0;
+      let totalUndoneSum = 0;
+
+      const DONOR_MAP = {
+        'BCF-H01': 'WHO, Global Fund, MoHS SL, Irish Aid',
+        'BCF-E02': 'UNICEF, Global Partnership for Education, UK Aid',
+        'BCF-A03': 'FAO, IFAD, World Bank Agro-Corp, WFP',
+        'BCF-CC04': 'UNDP, Green Climate Fund, European Union',
+        'BCF-SJ05': 'Open Society (OSIWA), Amnesty SL, Legal Aid Board',
+        'BCF-I06': 'DSTI Sierra Leone, UNDP Accelerator, African Dev Bank',
+        'BCF-AR07': 'Ministry of Health & Sanitation, World Vision, CRS',
+        'BCF-EP08': 'CRS Sierra Leone, UK Aid, CARE International'
+      };
+
+      tbody.innerHTML = programCodesList.map(prog => {
+        // Total Budget SLE = Automatically calculated total received from Amount of Funds Received
+        const budgetFromMatrix = getTotalReceivedForCode(prog.code);
+
+        // Project counts from master table for this Program Category
+        const matchingProjects = getProjectsForProgram(prog, masterProjects);
+        const countProjects = matchingProjects.length;
+        // Remarks Completed = Projects Done
+        const countDone = matchingProjects.filter(p => isProjectDone(p.remarks)).length;
+        // Strictly: Number of Projects = Projects Done + Projects Undone
+        const countUndone = Math.max(0, countProjects - countDone);
+
+        // Percentages
+        const pctDone = countProjects > 0 ? (countDone / countProjects) * 100 : 0;
+        const pctUndone = countProjects > 0 ? (countUndone / countProjects) * 100 : 0;
+
+        totalBudgetSum += budgetFromMatrix;
+        totalProjectsSum += countProjects;
+        totalDoneSum += countDone;
+        totalUndoneSum += countUndone;
+
+        // Health Status badge
+        let statusBadge = `<span class="px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-900 font-bold text-[10px] inline-flex items-center gap-1"><span class="w-1.5 h-1.5 rounded-full bg-emerald-600"></span>On Track</span>`;
+        if (countProjects === 0) {
+          statusBadge = `<span class="px-2 py-0.5 rounded-full bg-slate-100 text-slate-600 font-medium text-[10px]">Queued (0 Projects)</span>`;
+        } else if (pctDone === 100) {
+          statusBadge = `<span class="px-2 py-0.5 rounded-full bg-emerald-200 text-emerald-950 font-bold text-[10px] inline-flex items-center gap-1"><span class="material-symbols-outlined text-[12px]">done_all</span>100% Done</span>`;
+        } else if (pctDone < 50 && countUndone >= 3) {
+          statusBadge = `<span class="px-2 py-0.5 rounded-full bg-amber-100 text-amber-900 font-bold text-[10px] inline-flex items-center gap-1"><span class="w-1.5 h-1.5 rounded-full bg-amber-600"></span>Active (${countUndone} Undone)</span>`;
+        }
+
+        return `
+          <tr class="hover:bg-slate-50/80 transition-colors">
+            <td class="py-2.5 px-3">
+              <span class="px-2 py-0.5 rounded bg-emerald-50 text-primary font-mono font-bold border border-emerald-200">
+                ${prog.code}
+              </span>
+            </td>
+            <td class="py-2.5 px-3 font-semibold text-slate-900">
+              <div class="flex items-center gap-1.5">
+                <span>${prog.category}</span>
+                <span class="text-[10px] font-mono text-slate-500 bg-slate-100 px-1.5 py-0.5 rounded">${countProjects} Proj</span>
+              </div>
+            </td>
+            <td class="py-2.5 px-3 text-right font-mono font-bold text-slate-900">
+              ${formatNLe(budgetFromMatrix)}
+            </td>
+            <td class="py-2.5 px-3 text-center font-mono font-bold bg-slate-50/80">
+              <span class="px-2.5 py-0.5 rounded-md bg-slate-200 text-slate-900 text-xs font-black shadow-2xs" title="${countProjects} Projects = ${countDone} Done + ${countUndone} Undone">
+                ${countProjects}
+              </span>
+            </td>
+            <td class="py-2.5 px-3 text-center font-mono font-bold text-emerald-800 bg-emerald-50/40">
+              <span class="px-2.5 py-0.5 rounded-md bg-emerald-100 text-emerald-900 text-xs font-black shadow-2xs" title="Remarks: Completed">
+                ${countDone}
+              </span>
+            </td>
+            <td class="py-2.5 px-3 text-center font-mono font-bold text-amber-800 bg-amber-50/40">
+              <span class="px-2.5 py-0.5 rounded-md bg-amber-100 text-amber-900 text-xs font-black shadow-2xs" title="Remarks: Ongoing / Planned">
+                ${countUndone}
+              </span>
+            </td>
+            <td class="py-2.5 px-3 text-right font-mono font-bold text-emerald-800">${pctDone.toFixed(1)}%</td>
+            <td class="py-2.5 px-3 text-right font-mono font-bold text-amber-800">${pctUndone.toFixed(1)}%</td>
+            <td class="py-2.5 px-3 text-slate-600 text-[11px] truncate max-w-[200px]" title="${DONOR_MAP[prog.code] || 'Donor Network'}">
+              ${DONOR_MAP[prog.code] || 'Core Donors'}
+            </td>
+            <td class="py-2.5 px-3 text-center">${statusBadge}</td>
+          </tr>
+        `;
+      }).join('');
+
+      // Foot totals
+      const overallPctDone = totalProjectsSum > 0 ? (totalDoneSum / totalProjectsSum) * 100 : 0;
+      const overallPctUndone = totalProjectsSum > 0 ? (totalUndoneSum / totalProjectsSum) * 100 : 0;
+
+      const footBudget = document.getElementById('ys-foot-budget');
+      const footTotalProjects = document.getElementById('ys-foot-total-projects');
+      const footDone = document.getElementById('ys-foot-done');
+      const footUndone = document.getElementById('ys-foot-undone');
+      const footPctDone = document.getElementById('ys-foot-pct-done');
+      const footPctUndone = document.getElementById('ys-foot-pct-undone');
+      const footVerification = document.getElementById('ys-foot-verification');
+
+      if (footBudget) footBudget.textContent = `NLe ${formatNLe(totalBudgetSum)}`;
+      if (footTotalProjects) footTotalProjects.textContent = totalProjectsSum;
+      if (footDone) footDone.textContent = totalDoneSum;
+      if (footUndone) footUndone.textContent = totalUndoneSum;
+      if (footPctDone) footPctDone.textContent = `${overallPctDone.toFixed(1)}%`;
+      if (footPctUndone) footPctUndone.textContent = `${overallPctUndone.toFixed(1)}%`;
+      if (footVerification) {
+        footVerification.textContent = `${totalProjectsSum} Projects = ${totalDoneSum} Done + ${totalUndoneSum} Undone (100% Balanced)`;
+      }
+    }
+
+    // 10. RENDER TAB 5: REVENUE CHECK BY THEMATIC AREA
+    function renderRevenueCheck() {
+      const tbody = document.getElementById('revenue-check-body');
+      if (!tbody) return;
+
+      const START_DATES = {
+        'BCF-H01': '15 Jan 2025',
+        'BCF-E02': '01 Feb 2025',
+        'BCF-A03': '10 Jan 2025',
+        'BCF-CC04': '01 Mar 2025',
+        'BCF-SJ05': '18 Jan 2025',
+        'BCF-I06': '12 Feb 2025',
+        'BCF-AR07': '05 Jan 2025',
+        'BCF-EP08': '20 Jan 2025'
+      };
+
+      let grandReceived = 0;
+      let grandSpent = 0;
+      let grandBalance = 0;
+
+      tbody.innerHTML = programCodesList.map(prog => {
+        // Funds received from master projects of this code, or matrix if projects don't cover
+        const matchingProjects = masterProjects.filter(p => p.code === prog.code);
+        let fundsReceived = 0;
+        let amountSpent = 0;
+
+        matchingProjects.forEach(p => {
+          fundsReceived += safeNum(p.received, 0);
+          amountSpent += safeNum(p.spent, 0);
+        });
+
+        // Fallback to matrix if no projects entered yet
+        if (fundsReceived === 0) {
+          fundsReceived = getTotalReceivedForCode(prog.code);
+        }
+
+        const pctSpent = fundsReceived > 0 ? (amountSpent / fundsReceived) * 100 : 0;
+        const balance = Math.max(0, fundsReceived - amountSpent);
+        const pctBalance = fundsReceived > 0 ? (balance / fundsReceived) * 100 : 0;
+
+        grandReceived += fundsReceived;
+        grandSpent += amountSpent;
+        grandBalance += balance;
+
+        return `
+          <tr class="hover:bg-slate-50/80 transition-colors">
+            <td class="py-2.5 px-3">
+              <span class="px-2 py-0.5 rounded bg-emerald-50 text-primary font-mono font-bold border border-emerald-200">
+                ${prog.code}
+              </span>
+            </td>
+            <td class="py-2.5 px-3 font-semibold text-slate-900">${prog.category}</td>
+            <td class="py-2.5 px-3 font-mono text-slate-500 text-[11px]">${START_DATES[prog.code] || 'Jan 2025'}</td>
+            <td class="py-2.5 px-3 text-right font-mono font-bold text-slate-900">${formatNLe(fundsReceived)}</td>
+            <td class="py-2.5 px-3 text-right font-mono font-bold text-amber-700">${formatNLe(amountSpent)}</td>
+            <td class="py-2.5 px-3 text-right font-mono font-bold ${pctSpent > 90 ? 'text-emerald-700' : 'text-slate-700'}">
+              ${pctSpent.toFixed(1)}%
+            </td>
+            <td class="py-2.5 px-3 text-right font-mono font-bold bg-emerald-50/50 text-primary">
+              ${formatNLe(balance)}
+            </td>
+            <td class="py-2.5 px-3 text-right font-mono font-bold text-emerald-700">
+              ${pctBalance.toFixed(1)}%
+            </td>
+          </tr>
+        `;
+      }).join('');
+
+      const overallPctSpent = grandReceived > 0 ? (grandSpent / grandReceived) * 100 : 0;
+      const overallPctBalance = grandReceived > 0 ? (grandBalance / grandReceived) * 100 : 0;
+
+      document.getElementById('rc-foot-received').textContent = `NLe ${formatNLe(grandReceived)}`;
+      document.getElementById('rc-foot-spent').textContent = `NLe ${formatNLe(grandSpent)}`;
+      document.getElementById('rc-foot-pct-spent').textContent = `${overallPctSpent.toFixed(1)}%`;
+      document.getElementById('rc-foot-balance').textContent = `NLe ${formatNLe(grandBalance)}`;
+      document.getElementById('rc-foot-pct-balance').textContent = `${overallPctBalance.toFixed(1)}%`;
+    }
+
+    // 11. REFRESH ALL TOP KPIS & VIEWS
+    function refreshAllViews() {
+      // Top Executive KPIs
+      let totalReceived = 0;
+      let totalSpent = 0;
+      masterProjects.forEach(p => {
+        totalReceived += safeNum(p.received, 0);
+        totalSpent += safeNum(p.spent, 0);
+      });
+
+      // If master received is smaller than matrix, matrix represents total foundation grant pool
+      let matrixGrandTotal = 0;
+      fundsReceivedMatrix.forEach(r => {
+        PROGRAM_KEYS.forEach(k => { matrixGrandTotal += safeNum(r[k.key], 0); });
+      });
+
+      const effectiveFunds = Math.max(totalReceived, matrixGrandTotal);
+      const effectiveBalance = Math.max(0, effectiveFunds - totalSpent);
+      const spentRate = effectiveFunds > 0 ? (totalSpent / effectiveFunds) * 100 : 0;
+      const balanceRate = effectiveFunds > 0 ? (effectiveBalance / effectiveFunds) * 100 : 0;
+
+      const doneCount = masterProjects.filter(p => isProjectDone(p.remarks)).length;
+      const totalCount = masterProjects.length;
+      const undoneCount = Math.max(0, totalCount - doneCount);
+      const execRate = totalCount > 0 ? (doneCount / totalCount) * 100 : 0;
+
+      document.getElementById('kpi-total-funds').textContent = `NLe ${formatNLe(effectiveFunds)}`;
+      document.getElementById('kpi-total-spent').textContent = `NLe ${formatNLe(totalSpent)}`;
+      document.getElementById('kpi-spent-pct').textContent = `${spentRate.toFixed(1)}% Absorption Rate`;
+
+      document.getElementById('kpi-total-balance').textContent = `NLe ${formatNLe(effectiveBalance)}`;
+      document.getElementById('kpi-balance-pct').textContent = `${balanceRate.toFixed(1)}% Available Reserve`;
+
+      document.getElementById('kpi-projects-stat').textContent = `${totalCount} Projects`;
+      document.getElementById('kpi-execution-rate').textContent = `${doneCount} Done • ${undoneCount} Undone (${execRate.toFixed(1)}% Completed)`;
+
+      try {
+        const bc = new BroadcastChannel("bcf_programs_sync_channel");
+        bc.postMessage({ type: "PROJECTS_UPDATED", count: totalCount, doneCount, undoneCount });
+        setTimeout(() => bc.close(), 200);
+      } catch (e) {}
+
+      // Render Active Tab Content
+      renderTrackerTable();
+      renderFundsMatrix();
+      renderMasterTable();
+      renderYearSummary();
+      renderRevenueCheck();
+    }
+
+    // 12. PROJECT MODAL & EDIT LOGIC
+    function openNewProjectModal() {
+      document.getElementById('project-form').reset();
+      document.getElementById('form-edit-index').value = "-1";
+      document.getElementById('modal-title').textContent = "Add New Program Project";
+      document.getElementById('modal-icon').textContent = "add_task";
+      if (document.getElementById('form-donors')) document.getElementById('form-donors').value = "";
+      handleFormCodeChange('BCF-H01');
+      updateFormBalancePreview();
+      document.getElementById('project-modal').classList.remove('hidden');
+    }
+
+    function closeProjectModal() {
+      document.getElementById('project-modal').classList.add('hidden');
+    }
+
+    function handleFormCodeChange(code) {
+      const catInput = document.getElementById('form-category');
+      const idInput = document.getElementById('form-tracking-id');
+      const cat = CODE_MAP[code] || "General Program";
+      if (catInput) catInput.value = cat;
+
+      // Auto generate sequential tracking ID
+      const existingCount = masterProjects.filter(p => p.code === code).length + 1;
+      if (idInput && (!idInput.value || idInput.value.startsWith('BCF-'))) {
+        idInput.value = `${code}-${String(existingCount).padStart(2, '0')}-2025`;
+      }
+    }
+
+    function updateFormBalancePreview() {
+      const rec = safeNum(document.getElementById('form-received')?.value, 0);
+      const spent = safeNum(document.getElementById('form-spent')?.value, 0);
+      const bal = rec - spent;
+      const preview = document.getElementById('form-balance-preview');
+      if (preview) {
+        preview.textContent = `NLe ${formatNLe(bal)}`;
+        preview.className = `font-bold text-sm ${bal < 0 ? 'text-rose-600' : 'text-primary'}`;
+      }
+    }
+
+    function editProject(idx) {
+      const p = masterProjects[idx];
+      if (!p) return;
+
+      document.getElementById('form-edit-index').value = idx;
+      document.getElementById('form-code').value = p.code || 'BCF-H01';
+      document.getElementById('form-category').value = p.cat || CODE_MAP[p.code] || 'General';
+      document.getElementById('form-title').value = p.title || '';
+      document.getElementById('form-dept').value = p.dept || 'Programs Department';
+      document.getElementById('form-tracking-id').value = p.trackingId || '';
+      document.getElementById('form-focus').value = p.focus || '';
+      if (document.getElementById('form-donors')) document.getElementById('form-donors').value = p.donors || '';
+      document.getElementById('form-received').value = p.received || 0;
+      document.getElementById('form-spent').value = p.spent || 0;
+      document.getElementById('form-remarks').value = p.remarks || 'Ongoing';
+
+      document.getElementById('modal-title').textContent = `Edit Project #${p.no || idx + 1}`;
+      document.getElementById('modal-icon').textContent = "edit_note";
+      updateFormBalancePreview();
+      document.getElementById('project-modal').classList.remove('hidden');
+    }
+
+    function handleProjectFormSubmit(e) {
+      e.preventDefault();
+      const editIdx = parseInt(document.getElementById('form-edit-index').value, 10);
+      const code = document.getElementById('form-code').value;
+      const cat = document.getElementById('form-category').value;
+      const title = document.getElementById('form-title').value.trim();
+      const dept = document.getElementById('form-dept').value;
+      const trackingId = document.getElementById('form-tracking-id').value.trim();
+      const focus = document.getElementById('form-focus').value.trim();
+      const donors = document.getElementById('form-donors')?.value.trim() || 'Direct / BCF';
+      const received = safeNum(document.getElementById('form-received').value, 0);
+      const spent = safeNum(document.getElementById('form-spent').value, 0);
+      const remarks = document.getElementById('form-remarks').value;
+
+      if (editIdx >= 0 && masterProjects[editIdx]) {
+        // Update
+        masterProjects[editIdx] = Object.assign({}, masterProjects[editIdx], {
+          code, cat, title, dept, trackingId, focus, donors, received, spent, remarks
+        });
+        showToast(`Updated project "${title}"`, "done_all");
+      } else {
+        // Add new
+        const newNo = masterProjects.length + 1;
+        masterProjects.push({
+          no: newNo,
+          code, cat, title, dept, trackingId, focus, donors, received, spent, remarks
+        });
+        showToast(`Added new project "${title}"`, "add_circle");
+      }
+
+      syncFundsMatrixFromMasterProjects(false);
+      saveState();
+      closeProjectModal();
+      refreshAllViews();
+    }
+
+    // 13. EXPORT TO CSV ENGINE
+    function exportActiveTabCSV() {
+      let csv = "data:text/csv;charset=utf-8,";
+      let filename = `BCF_SL_Programs_${currentTab}_${new Date().toISOString().split('T')[0]}.csv`;
+
+      if (currentTab === 'tracker') {
+        csv += "No,Program Category,Program Description,Program Code,Sample Project Tracking ID\n";
+        programCodesList.forEach(p => {
+          csv += `"${p.no}","${p.category}","${p.desc.replace(/"/g, '""')}","${p.code}","${p.sampleId}"\n`;
+        });
+      } else if (currentTab === 'funds') {
+        const keys = getProgramKeys();
+        csv += `Tranche,${keys.map(k => k.label).join(',')},Row Total\n`;
+        fundsReceivedMatrix.forEach((r, i) => {
+          let rowTot = 0;
+          keys.forEach(k => rowTot += safeNum(r[k.key], 0));
+          const vals = keys.map(k => safeNum(r[k.key], 0)).join(',');
+          csv += `"${i + 1}",${vals},${rowTot}\n`;
+        });
+      } else if (currentTab === 'master') {
+        csv += "NO,Program Code,Program Category,Program Title,Responsible Department,Core Focus,Key Donors,Donors Received (NLe),Budget Spent (NLe),Balance (NLe),Project Tracking ID,Remarks\n";
+        masterProjects.forEach(p => {
+          const bal = safeNum(p.received, 0) - safeNum(p.spent, 0);
+          csv += `"${p.no}","${p.code}","${p.cat}","${p.title.replace(/"/g, '""')}","${p.dept}","${p.focus.replace(/"/g, '""')}","${(p.donors || 'Direct / BCF').replace(/"/g, '""')}",${p.received},${p.spent},${bal},"${p.trackingId}","${p.remarks}"\n`;
+        });
+      } else if (currentTab === 'summary') {
+        csv += "Program Code,Category,Total Budget (SLE),Number of Projects,Projects Done,Projects Undone,% Done,% Undone\n";
+        programCodesList.forEach(prog => {
+          const b = getTotalReceivedForCode(prog.code);
+          const m = getProjectsForProgram(prog, masterProjects);
+          const done = m.filter(p => isProjectDone(p.remarks)).length;
+          const undone = Math.max(0, m.length - done);
+          const pDone = m.length > 0 ? (done / m.length) * 100 : 0;
+          const pUndone = m.length > 0 ? (undone / m.length) * 100 : 0;
+          csv += `"${prog.code}","${prog.category}",${b},${m.length},${done},${undone},${pDone.toFixed(1)}%,${pUndone.toFixed(1)}%\n`;
+        });
+      } else {
+        csv += "Program Code,Thematic Area,Funds Received (NLe),Amount Spent (NLe),% Spent,Balance (NLe),% Balance\n";
+        programCodesList.forEach(prog => {
+          const m = getProjectsForProgram(prog, masterProjects);
+          let rec = 0, spent = 0;
+          m.forEach(p => { rec += safeNum(p.received, 0); spent += safeNum(p.spent, 0); });
+          if (rec === 0) rec = getTotalReceivedForCode(prog.code);
+          const bal = Math.max(0, rec - spent);
+          const pS = rec > 0 ? (spent / rec) * 100 : 0;
+          const pB = rec > 0 ? (bal / rec) * 100 : 0;
+          csv += `"${prog.code}","${prog.category}",${rec},${spent},${pS.toFixed(1)}%,${bal},${pB.toFixed(1)}%\n`;
+        });
+      }
+
+      const encodedUri = encodeURI(csv);
+      const link = document.createElement("a");
+      link.setAttribute("href", encodedUri);
+      link.setAttribute("download", filename);
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      showToast(`Exported ${currentTab.toUpperCase()} to CSV`, "download");
+    }
+
+    // 14. TOAST NOTIFICATION UTILITY
+    function showToast(msg, icon = 'info') {
+      const container = document.getElementById('toast-container');
+      if (!container) return;
+
+      const toast = document.createElement('div');
+      toast.className = "bg-slate-900/95 text-white text-xs px-3.5 py-2.5 rounded-xl shadow-lg flex items-center gap-2 border border-slate-700 pointer-events-auto transform translate-y-2 opacity-0 transition-all duration-200";
+      toast.innerHTML = `
+        <span class="material-symbols-outlined text-[17px] text-emerald-400">${icon}</span>
+        <span>${msg}</span>
+      `;
+
+      container.appendChild(toast);
+      setTimeout(() => {
+        toast.classList.remove('translate-y-2', 'opacity-0');
+      }, 10);
+
+      setTimeout(() => {
+        toast.classList.add('opacity-0', 'translate-y-2');
+        setTimeout(() => toast.remove(), 250);
+      }, 3200);
+    }
+
+    // INITIALIZATION ON DOM READY
+    window.addEventListener('DOMContentLoaded', () => {
+      loadState();
+      refreshAllViews();
+    });
+  </script>
+
+</body>
+</html>

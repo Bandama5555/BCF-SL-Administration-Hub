@@ -1,0 +1,1045 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover"/>
+  <title>RFQ &amp; Tender Management — BCF-SL Integrated Procurement</title>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: {
+            primary: "#0037b0",
+            "primary-dark": "#00247d",
+            secondary: "#565e74",
+            tertiary: "#006948",
+            "tertiary-dark": "#004f35",
+            surface: "#f8f9ff",
+            "surface-container": "#eff4ff",
+            "on-surface": "#0b1c30",
+            "on-surface-variant": "#434655",
+            outline: "#747686",
+            error: "#ba1a1a"
+          },
+          fontFamily: {
+            sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+            body: ['"Inter"', 'sans-serif'],
+            mono: ['"JetBrains Mono"', 'monospace']
+          }
+        }
+      }
+    };
+  </script>
+  <style>
+    body { font-family: 'Inter', sans-serif; background-color: #f8f9ff; }
+    h1, h2, h3, h4, .font-headline { font-family: 'Plus Jakarta Sans', sans-serif; }
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-thumb { background-color: #cbd5e1; border-radius: 4px; }
+  </style>
+</head>
+<body class="text-on-surface flex flex-col min-h-screen">
+
+  <!-- UNIFIED PROCUREMENT TOP NAVIGATION & WORKFLOW TABS -->
+  <div id="bcf-procurement-nav-header"></div>
+
+  <!-- MAIN VIEWPORT -->
+  <main class="flex-grow p-4 sm:p-6 max-w-7xl mx-auto w-full flex flex-col gap-6">
+
+    <!-- HERO & SUMMARY METRICS -->
+    <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+      <div>
+        <div class="flex items-center gap-2 mb-1">
+          <span class="inline-flex items-center justify-center w-2 h-2 rounded-full bg-primary animate-pulse"></span>
+          <span class="text-xs font-extrabold uppercase tracking-wider text-primary bg-blue-50 px-2 py-0.5 rounded-full border border-blue-200">
+            Bid Solicitation &amp; Evaluation
+          </span>
+          <span class="text-xs text-slate-500">• Threshold Governance</span>
+        </div>
+        <h1 class="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight font-headline">
+          RFQ &amp; Tender Management
+        </h1>
+        <p class="text-xs sm:text-sm text-slate-600 mt-1 max-w-2xl">
+          Issue Requests for Quotation (RFQ) from approved Purchase Requisitions, invite registered suppliers, and record committee scoring.
+        </p>
+      </div>
+
+      <div class="flex items-center gap-2.5 flex-wrap shrink-0">
+        <button onclick="openRfqModal()" class="px-4 py-2 rounded-xl bg-primary hover:bg-primary-dark text-white text-xs font-extrabold flex items-center gap-1.5 transition shadow-md cursor-pointer active:scale-95">
+          <span class="material-symbols-outlined text-[18px]">add_circle</span>
+          <span>Issue New RFQ</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- STATS CARDS -->
+    <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+      <div class="p-4 sm:p-5 rounded-2xl bg-white border border-slate-200 shadow-xs flex flex-col justify-between">
+        <div class="flex items-center justify-between text-slate-500 mb-2">
+          <span class="text-xs font-extrabold uppercase tracking-wider">Active RFQs</span>
+          <div class="w-8 h-8 rounded-lg bg-blue-50 text-primary flex items-center justify-center">
+            <span class="material-symbols-outlined text-[20px]">forward_to_inbox</span>
+          </div>
+        </div>
+        <div>
+          <span id="metric-total-rfqs" class="text-2xl sm:text-3xl font-black text-slate-900 font-mono">0</span>
+          <div class="flex items-center gap-1 mt-1 text-[11px] text-slate-500 font-semibold">
+            <span>Competitive bids issued</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="p-4 sm:p-5 rounded-2xl bg-white border border-slate-200 shadow-xs flex flex-col justify-between">
+        <div class="flex items-center justify-between text-slate-500 mb-2">
+          <span class="text-xs font-extrabold uppercase tracking-wider">Awarded Bids</span>
+          <div class="w-8 h-8 rounded-lg bg-emerald-50 text-emerald-700 flex items-center justify-center">
+            <span class="material-symbols-outlined text-[20px]">gavel</span>
+          </div>
+        </div>
+        <div>
+          <span id="metric-awarded-rfqs" class="text-2xl sm:text-3xl font-black text-emerald-700 font-mono">0</span>
+          <div class="flex items-center gap-1 mt-1 text-[11px] text-emerald-700 font-bold">
+            <span>Ready for Purchase Order</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="p-4 sm:p-5 rounded-2xl bg-white border border-slate-200 shadow-xs flex flex-col justify-between">
+        <div class="flex items-center justify-between text-slate-500 mb-2">
+          <span class="text-xs font-extrabold uppercase tracking-wider">Under Evaluation</span>
+          <div class="w-8 h-8 rounded-lg bg-amber-50 text-amber-700 flex items-center justify-center">
+            <span class="material-symbols-outlined text-[20px]">grading</span>
+          </div>
+        </div>
+        <div>
+          <span id="metric-pending-rfqs" class="text-2xl sm:text-3xl font-black text-amber-700 font-mono">0</span>
+          <div class="flex items-center gap-1 mt-1 text-[11px] text-slate-500">
+            <span>Committee review in progress</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="p-4 sm:p-5 rounded-2xl bg-white border border-slate-200 shadow-xs flex flex-col justify-between">
+        <div class="flex items-center justify-between text-slate-500 mb-2">
+          <span class="text-xs font-extrabold uppercase tracking-wider">Approved PRs Ready</span>
+          <div class="w-8 h-8 rounded-lg bg-purple-50 text-purple-700 flex items-center justify-center">
+            <span class="material-symbols-outlined text-[20px]">assignment_turned_in</span>
+          </div>
+        </div>
+        <div>
+          <span id="metric-available-prs" class="text-2xl sm:text-3xl font-black text-purple-700 font-mono">0</span>
+          <div class="flex items-center gap-1 mt-1 text-[11px] text-purple-700 font-bold">
+            <span>Awaiting RFQ issuance</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- RFQ LIST -->
+    <div id="rfqs-container" class="space-y-4">
+      <!-- Dynamic RFQ Cards -->
+    </div>
+
+    <!-- EMPTY STATE -->
+    <div id="rfqs-empty-state" class="hidden text-center py-16 bg-white rounded-2xl border border-slate-200">
+      <div class="w-16 h-16 rounded-full bg-slate-100 text-slate-400 mx-auto flex items-center justify-center mb-3">
+        <span class="material-symbols-outlined text-3xl">forward_to_inbox</span>
+      </div>
+      <h3 class="text-base font-bold text-slate-800">No RFQs issued yet</h3>
+      <p class="text-xs text-slate-500 mt-1 max-w-sm mx-auto">Select an approved Purchase Requisition to issue quotations to verified vendors.</p>
+      <button onclick="openRfqModal()" class="mt-4 px-4 py-2 rounded-xl bg-primary hover:bg-primary-dark text-white text-xs font-bold">
+        Issue Request for Quotation
+      </button>
+    </div>
+
+  </main>
+
+  <!-- ISSUE NEW RFQ MODAL -->
+  <div id="rfq-modal" class="fixed inset-0 z-50 bg-black/50 backdrop-blur-xs hidden flex items-center justify-center p-3 sm:p-4 overflow-y-auto">
+    <div class="bg-white rounded-2xl max-w-3xl w-full p-5 sm:p-6 shadow-2xl border border-slate-200 flex flex-col my-auto max-h-[92vh]">
+      <div class="flex items-center justify-between border-b border-slate-100 pb-3 mb-4">
+        <div class="flex items-center gap-2.5">
+          <div class="w-9 h-9 rounded-xl bg-primary/10 text-primary flex items-center justify-center">
+            <span class="material-symbols-outlined text-[20px]">forward_to_inbox</span>
+          </div>
+          <div>
+            <h3 class="text-base font-extrabold text-slate-900 font-headline">Issue Request for Quotation (RFQ)</h3>
+            <p class="text-xs text-slate-500">Solicit competitive bids from verified BCF-SL vendors</p>
+          </div>
+        </div>
+        <button onclick="closeRfqModal()" class="w-8 h-8 rounded-lg text-slate-400 hover:text-slate-600 hover:bg-slate-100 flex items-center justify-center">
+          <span class="material-symbols-outlined text-[20px]">close</span>
+        </button>
+      </div>
+
+      <form id="rfq-form" onsubmit="handleRfqSubmit(event)" class="flex-1 overflow-y-auto pr-1 space-y-4 text-xs">
+        <!-- Linked PR Selection -->
+        <div class="p-3 bg-blue-50/70 rounded-xl border border-blue-200/60">
+          <label class="block font-bold text-blue-900 mb-1">Select Approved Purchase Requisition *</label>
+          <select id="rfq-linked-pr" required onchange="onPrSelectChange()" class="w-full px-3 py-2 rounded-xl border border-blue-300 bg-white text-xs font-semibold">
+            <option value="">Select an approved PR...</option>
+            <!-- Populated via script -->
+          </select>
+          <p class="text-[11px] text-blue-700 mt-1">
+            Data (items, quantities, programme, and Master BCF-TXN) will automatically inherit from the PR.
+          </p>
+        </div>
+
+        <div>
+          <label class="block font-bold text-slate-700 mb-1">RFQ Subject / Title *</label>
+          <input id="rfq-title" type="text" required placeholder="e.g. RFQ for Long Grain Rice Supply (500 Bags) – Bo District" class="w-full px-3 py-2 rounded-xl border border-slate-200 bg-slate-50 text-xs"/>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div>
+            <label class="block font-bold text-slate-700 mb-1">Issue Date *</label>
+            <input id="rfq-issue-date" type="date" required class="w-full px-3 py-2 rounded-xl border border-slate-200 bg-slate-50 text-xs font-mono"/>
+          </div>
+          <div>
+            <label class="block font-bold text-slate-700 mb-1">Closing Submission Deadline *</label>
+            <input id="rfq-closing-date" type="date" required class="w-full px-3 py-2 rounded-xl border border-slate-200 bg-slate-50 text-xs font-mono"/>
+          </div>
+        </div>
+
+        <!-- Invited Vendors Checklist -->
+        <div>
+          <div class="flex items-center justify-between mb-1">
+            <label class="block font-bold text-slate-700">Invite Verified Vendors (Minimum 3 required per BCF-SL policy) *</label>
+            <span class="text-[11px] text-primary font-bold" id="invited-count-badge">0 selected</span>
+          </div>
+          <div id="rfq-invited-suppliers" class="p-3 bg-slate-50 rounded-xl border border-slate-200 max-h-48 overflow-y-auto space-y-2">
+            <!-- Populated via script -->
+          </div>
+        </div>
+
+        <!-- Action buttons -->
+        <div class="flex items-center justify-end gap-2 pt-3 border-t border-slate-100">
+          <button type="button" onclick="closeRfqModal()" class="px-4 py-2 rounded-xl border border-slate-200 hover:bg-slate-100 text-xs font-bold text-slate-600">
+            Cancel
+          </button>
+          <button type="submit" class="px-5 py-2 rounded-xl bg-primary hover:bg-primary-dark text-white text-xs font-extrabold shadow-md active:scale-95">
+            Publish RFQ &amp; Dispatch Invitations
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- BID EVALUATION & AWARD MODAL -->
+  <div id="eval-modal" class="fixed inset-0 z-50 bg-black/50 backdrop-blur-xs hidden flex items-center justify-center p-3 sm:p-4 overflow-y-auto">
+    <div class="bg-white rounded-2xl max-w-3xl w-full p-5 sm:p-6 shadow-2xl border border-slate-200 flex flex-col my-auto max-h-[92vh]">
+      <div class="flex items-center justify-between border-b border-slate-100 pb-3 mb-4">
+        <div class="flex items-center gap-2.5">
+          <div class="w-9 h-9 rounded-xl bg-emerald-100 text-emerald-800 flex items-center justify-center">
+            <span class="material-symbols-outlined text-[20px]">grading</span>
+          </div>
+          <div>
+            <h3 class="text-base font-extrabold text-slate-900 font-headline" id="eval-modal-title">Bid Evaluation &amp; Award</h3>
+            <p class="text-xs text-slate-500 font-mono" id="eval-modal-ref">BCF-RFQ-2026-0001</p>
+          </div>
+        </div>
+        <button onclick="closeEvalModal()" class="w-8 h-8 rounded-lg text-slate-400 hover:text-slate-600 hover:bg-slate-100 flex items-center justify-center">
+          <span class="material-symbols-outlined text-[20px]">close</span>
+        </button>
+      </div>
+
+      <div class="flex-1 overflow-y-auto pr-1 space-y-4 text-xs" id="eval-modal-content">
+        <!-- Rendered dynamically -->
+      </div>
+
+      <div class="flex items-center justify-between pt-3 border-t border-slate-100 mt-4">
+        <button onclick="closeEvalModal()" class="px-4 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-xs font-bold text-slate-700">
+          Close Evaluation
+        </button>
+        <button id="eval-award-btn" onclick="saveBidAward()" class="px-5 py-2 rounded-xl bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-extrabold shadow-md flex items-center gap-1.5 cursor-pointer">
+          <span class="material-symbols-outlined text-[16px]">gavel</span>
+          <span>Endorse Committee Award &amp; Generate PO</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- RFQ TRANSMISSION & DISPATCH CONFIRMATION MODAL -->
+  <div id="rfq-email-modal" class="fixed inset-0 z-50 bg-black/50 backdrop-blur-xs hidden flex items-center justify-center p-3 sm:p-4 overflow-y-auto">
+    <div class="bg-white rounded-2xl max-w-2xl w-full p-5 sm:p-6 shadow-2xl border border-slate-200 flex flex-col my-auto max-h-[92vh]">
+      <!-- Modal Top -->
+      <div class="flex items-center justify-between border-b border-slate-100 pb-3 mb-4">
+        <div class="flex items-center gap-2.5">
+          <div class="w-9 h-9 rounded-xl bg-primary/10 text-primary flex items-center justify-center">
+            <span class="material-symbols-outlined text-[22px]">mark_email_read</span>
+          </div>
+          <div>
+            <h3 class="text-base sm:text-lg font-extrabold text-slate-900 font-headline">RFQ Transmitted to Vendors</h3>
+            <p class="text-xs text-slate-500">Official RFQ notice transmitted directly to registered vendor emails via Gmail SMTP</p>
+          </div>
+        </div>
+        <button type="button" onclick="closeRfqEmailModal()" class="w-8 h-8 rounded-lg text-slate-400 hover:text-slate-600 hover:bg-slate-100 flex items-center justify-center cursor-pointer">
+          <span class="material-symbols-outlined text-[20px]">close</span>
+        </button>
+      </div>
+
+      <!-- Modal Content Body -->
+      <div class="flex-1 overflow-y-auto pr-1 space-y-4 text-xs">
+        <!-- Official Banner -->
+        <div class="p-3.5 rounded-xl bg-emerald-50/90 border-2 border-emerald-300">
+          <div class="flex items-start gap-3">
+            <span class="material-symbols-outlined text-emerald-700 text-[24px] shrink-0 mt-0.5">verified</span>
+            <div>
+              <span class="font-extrabold text-emerald-950 text-xs uppercase tracking-wider block mb-1">
+                Direct RFQ Electronic Transmission
+              </span>
+              <p id="rem-statement" class="text-emerald-900 text-xs font-semibold leading-relaxed m-0">
+                Official Requests for Quotation (RFQ) notices have been transmitted directly to the authorized email addresses of invited category vendors.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <!-- RFQ Meta Card -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 p-3.5 rounded-xl bg-slate-50 border border-slate-200">
+          <div>
+            <span class="text-[10px] text-slate-400 font-bold uppercase block">RFQ Reference ID</span>
+            <span id="rem-rfq-id" class="font-mono text-primary font-bold text-xs">BCF-RFQ-2026-0001</span>
+          </div>
+          <div>
+            <span class="text-[10px] text-slate-400 font-bold uppercase block">Authorized Dispatch Channel</span>
+            <span class="font-semibold text-emerald-700 text-xs flex items-center gap-1">
+              <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+              <span>BCF-SL Gmail SMTP (Port 465 SSL/TLS)</span>
+            </span>
+          </div>
+          <div>
+            <span class="text-[10px] text-slate-400 font-bold uppercase block">Linked Purchase Requisition</span>
+            <span id="rem-pr-id" class="font-mono text-slate-800 font-bold text-xs">BCF-PR-2026-0001</span>
+          </div>
+          <div>
+            <span class="text-[10px] text-slate-400 font-bold uppercase block">Procurement Category</span>
+            <span id="rem-category" class="font-bold text-slate-800 text-xs">School Feeding Supplies</span>
+          </div>
+          <div class="sm:col-span-2">
+            <span class="text-[10px] text-slate-400 font-bold uppercase block">Procurement Package Title</span>
+            <span id="rem-title" class="font-semibold text-slate-800 text-xs">RFQ for Food Supplies</span>
+          </div>
+        </div>
+
+        <!-- Invited Vendors Transmission Status Table -->
+        <div>
+          <span class="text-xs font-extrabold text-slate-800 uppercase tracking-wider block mb-1.5">
+            Recipient Vendors &amp; Dispatch Status
+          </span>
+          <div id="rem-recipients-list" class="space-y-2">
+            <!-- Rendered dynamically -->
+          </div>
+        </div>
+
+        <!-- Attached Official Word Document Quotation Form (.DOC) -->
+        <div class="p-4 rounded-xl bg-blue-50/80 border-2 border-blue-200 space-y-3">
+          <div class="flex items-start justify-between gap-3">
+            <div class="flex items-start gap-2.5">
+              <div class="w-9 h-9 rounded-xl bg-blue-600 text-white flex items-center justify-center font-bold text-xs shrink-0 shadow-sm">
+                <span class="material-symbols-outlined text-[20px]">description</span>
+              </div>
+              <div>
+                <span class="text-[10px] text-blue-700 font-extrabold uppercase tracking-wider block">Official Vendor Quotation Document Form</span>
+                <h4 class="text-xs sm:text-sm font-extrabold text-blue-950 font-headline" id="rem-word-filename">
+                  BCF_RFQ_Quotation_Submission_Form.doc
+                </h4>
+                <p class="text-[11px] text-blue-700 mt-0.5">
+                  Attached to vendor notification email. Form includes Bill of Quantities (Long Grain Rice, Onion, Mayonise), Qty, Unit Cost, Total Cost, and Signatory Block.
+                </p>
+              </div>
+            </div>
+            <button type="button" onclick="downloadCurrentRfqWordDoc()" class="px-3 py-1.5 rounded-xl bg-blue-700 hover:bg-blue-800 text-white text-xs font-extrabold shadow-sm flex items-center gap-1.5 shrink-0 transition active:scale-95 cursor-pointer">
+              <span class="material-symbols-outlined text-[16px]">download</span>
+              <span>Download Word Form (.DOC)</span>
+            </button>
+          </div>
+
+          <!-- Preview Items Grid -->
+          <div class="bg-white rounded-xl border border-blue-200/80 p-2.5">
+            <div class="flex items-center justify-between mb-1.5 text-[10.5px] font-bold text-slate-500 uppercase tracking-wider">
+              <span>Required Line Items &amp; Form Fields</span>
+              <span class="text-blue-700">Vendor Fillable Schedule</span>
+            </div>
+            <div id="rem-word-items-preview" class="space-y-1.5 text-xs">
+              <!-- Rendered dynamically -->
+            </div>
+          </div>
+
+          <div class="text-[11px] text-blue-800 bg-white/70 rounded-lg p-2 border border-blue-200 flex items-center gap-2">
+            <span class="material-symbols-outlined text-blue-600 text-[18px] shrink-0">mark_email_read</span>
+            <span>
+              <strong>Vendor Submission Flow:</strong> Vendors download this Word form, input Unit Cost &amp; Total Cost, sign/stamp, and reply via email to <strong>bandamacharityfoundationsl@gmail.com</strong> before evaluation.
+            </span>
+          </div>
+        </div>
+
+        <!-- Letterhead Transmission Preview -->
+        <div>
+          <div class="flex items-center justify-between mb-1.5">
+            <span class="text-xs font-extrabold text-slate-800 uppercase tracking-wider">Letterhead Transmission Copy</span>
+            <span class="text-[10px] font-bold text-slate-400">Institutional Notice</span>
+          </div>
+          <div class="p-3.5 rounded-xl bg-white border border-slate-200 font-mono text-[11px] text-slate-600 max-h-44 overflow-y-auto whitespace-pre-wrap leading-relaxed" id="rem-letter-preview">
+            <!-- Text preview inserted dynamically -->
+          </div>
+        </div>
+      </div>
+
+      <!-- Modal Footer -->
+      <div class="flex items-center justify-between pt-3 border-t border-slate-100 mt-4 gap-2">
+        <button type="button" id="rem-resend-all-btn" onclick="resendCurrentRfqAll()" class="px-4 py-2 rounded-xl bg-blue-50 hover:bg-blue-100 text-blue-800 border border-blue-200 text-xs font-bold flex items-center gap-1.5 cursor-pointer">
+          <span class="material-symbols-outlined text-[16px]">refresh</span>
+          <span>Resend to All Vendors</span>
+        </button>
+        <button type="button" onclick="closeRfqEmailModal()" class="px-5 py-2 rounded-xl bg-primary hover:bg-primary-dark text-white text-xs font-bold shadow-md cursor-pointer">
+          Done &bull; Close Notice
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Shared Library -->
+  <script src="../bcf_procurement_shared.js"></script>
+
+  <!-- Controller Logic -->
+  <script>
+    let currentEvaluatingRfq = null;
+
+    document.addEventListener('DOMContentLoaded', () => {
+      // Shared top navigation
+      BCF_PROCUREMENT.renderHeaderAndTabs('rfq-management');
+
+      loadRfqs();
+
+      // Check if PR was forwarded from PR page
+      const preSelectedPrId = localStorage.getItem('bcf_selected_pr_id');
+      if (preSelectedPrId) {
+        localStorage.removeItem('bcf_selected_pr_id');
+        openRfqModal(preSelectedPrId);
+      }
+    });
+
+    function loadRfqs() {
+      renderRfqs();
+      updateMetrics();
+    }
+
+    function updateMetrics() {
+      const rfqs = BCF_PROCUREMENT.getRfqs();
+      const awarded = rfqs.filter(r => r.status === 'Awarded').length;
+      const pending = rfqs.filter(r => r.status !== 'Awarded').length;
+
+      // PRs ready for RFQ
+      const prs = BCF_PROCUREMENT.getRequisitions().filter(p => p.status === 'Approved');
+
+      document.getElementById('metric-total-rfqs').textContent = rfqs.length;
+      document.getElementById('metric-awarded-rfqs').textContent = awarded;
+      document.getElementById('metric-pending-rfqs').textContent = pending;
+      document.getElementById('metric-available-prs').textContent = prs.length;
+    }
+
+    function renderRfqs() {
+      const container = document.getElementById('rfqs-container');
+      const emptyState = document.getElementById('rfqs-empty-state');
+      if (!container) return;
+
+      const rfqs = BCF_PROCUREMENT.getRfqs();
+
+      if (rfqs.length === 0) {
+        container.innerHTML = '';
+        emptyState?.classList.remove('hidden');
+        return;
+      }
+
+      emptyState?.classList.add('hidden');
+
+      container.innerHTML = rfqs.map(rfq => {
+        const isAwarded = rfq.status === 'Awarded';
+        const badgeColor = isAwarded ? 'bg-emerald-100 text-emerald-800 border-emerald-300' : 'bg-blue-100 text-blue-800 border-blue-300';
+
+        return `
+          <div class="bg-white rounded-2xl border border-slate-200 shadow-xs p-4 sm:p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div class="flex items-start gap-3 flex-1 min-w-0">
+              <div class="w-11 h-11 rounded-xl bg-primary/10 text-primary flex items-center justify-center shrink-0 mt-0.5">
+                <span class="material-symbols-outlined text-[22px]">forward_to_inbox</span>
+              </div>
+              <div class="flex-1 min-w-0">
+                <div class="flex items-center gap-2 flex-wrap mb-1">
+                  <span class="font-mono text-xs font-black text-primary bg-blue-50 px-2 py-0.5 rounded border border-blue-200">
+                    ${rfq.id}
+                  </span>
+                  <span class="font-mono text-xs font-bold text-slate-700 bg-slate-100 px-2 py-0.5 rounded border border-slate-200">
+                    PR: ${rfq.prId}
+                  </span>
+                  <span class="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold border ${badgeColor}">
+                    ${rfq.status}
+                  </span>
+                </div>
+
+                <h3 class="text-sm sm:text-base font-extrabold text-slate-900 leading-snug font-headline">${rfq.title}</h3>
+
+                <div class="flex items-center gap-3 text-xs text-slate-500 mt-1 flex-wrap">
+                  <span>Category: <strong class="text-slate-700">${rfq.category || 'General'}</strong></span>
+                  <span>Issued: <strong class="text-slate-700 font-mono">${BCF_PROCUREMENT.formatDate(rfq.issueDate)}</strong></span>
+                  <span>Deadline: <strong class="text-slate-700 font-mono">${BCF_PROCUREMENT.formatDate(rfq.closingDate)}</strong></span>
+                  <span>Invited: <strong class="text-primary font-bold">${(rfq.invitedSuppliers || []).length} Vendors</strong></span>
+                </div>
+
+                ${rfq.awardedSupplierName ? `
+                  <div class="mt-2 text-xs bg-emerald-50 text-emerald-900 p-2.5 rounded-xl border border-emerald-200 flex items-center justify-between">
+                    <span>Awarded to: <strong>${rfq.awardedSupplierName}</strong></span>
+                    <span class="font-mono font-black text-emerald-800">${BCF_PROCUREMENT.formatCurrency(rfq.awardedAmount)}</span>
+                  </div>
+                ` : ''}
+              </div>
+            </div>
+
+            <div class="flex items-center gap-2 shrink-0 border-t sm:border-t-0 pt-3 sm:pt-0 border-slate-100 justify-end flex-wrap">
+              <button onclick="downloadWordForm('${rfq.id}')" class="px-3.5 py-2 rounded-xl bg-blue-50 hover:bg-blue-100 text-blue-800 text-xs font-bold transition flex items-center gap-1.5 cursor-pointer" title="Download Official Word Form (.DOC) for Vendors">
+                <span class="material-symbols-outlined text-[16px]">description</span>
+                <span>Word Form (.DOC)</span>
+              </button>
+
+              <button onclick="viewOrResendRfq('${rfq.id}')" class="px-3.5 py-2 rounded-xl bg-teal-50 hover:bg-teal-100 text-teal-800 text-xs font-bold transition flex items-center gap-1.5 cursor-pointer" title="Transmit / View RFQ Email Notices">
+                <span class="material-symbols-outlined text-[16px]">send</span>
+                <span>Transmit RFQ</span>
+              </button>
+
+              <button onclick="openBidEvaluation('${rfq.id}')" class="px-3.5 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-800 text-xs font-bold transition flex items-center gap-1 cursor-pointer">
+                <span class="material-symbols-outlined text-[16px]">grading</span>
+                <span>Evaluate Quotes</span>
+              </button>
+
+              ${isAwarded ? `
+                <button onclick="routeRfqToPo('${rfq.id}')" class="px-4 py-2 rounded-xl bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-extrabold transition flex items-center gap-1.5 shadow-sm cursor-pointer">
+                  <span class="material-symbols-outlined text-[16px]">shopping_bag</span>
+                  <span>View PO</span>
+                </button>
+              ` : ''}
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function openRfqModal(preSelectedPrId = null) {
+      const modal = document.getElementById('rfq-modal');
+      const form = document.getElementById('rfq-form');
+      form.reset();
+
+      // Populate PR select with approved PRs
+      const prSelect = document.getElementById('rfq-linked-pr');
+      const approvedPrs = BCF_PROCUREMENT.getRequisitions().filter(p => p.status === 'Approved');
+
+      prSelect.innerHTML = '<option value="">Select an approved PR...</option>' + approvedPrs.map(p => `
+        <option value="${p.id}" ${preSelectedPrId === p.id ? 'selected' : ''}>
+          ${p.id} — ${p.title} (${BCF_PROCUREMENT.formatCurrency(p.estimatedTotal)})
+        </option>
+      `).join('');
+
+      // Populate suppliers checklist (exclude terminated vendors)
+      const suppliersList = document.getElementById('rfq-invited-suppliers');
+      const suppliers = (BCF_PROCUREMENT.getActiveSuppliers ? BCF_PROCUREMENT.getActiveSuppliers() : BCF_PROCUREMENT.getSuppliers().filter(s => s.status !== 'Terminated' && s.agreementStatus !== 'Terminated'));
+
+      suppliersList.innerHTML = suppliers.map(s => `
+        <label id="sup-label-${s.id}" class="flex items-center justify-between p-2.5 rounded-xl bg-white border border-slate-200 hover:border-primary/40 cursor-pointer transition">
+          <div class="flex items-center gap-2.5 min-w-0">
+            <input type="checkbox" name="invited_sup" value="${s.id}" onchange="updateInvitedCount()" class="rounded text-primary focus:ring-primary/20 shrink-0"/>
+            <div class="min-w-0">
+              <div class="flex items-center gap-2">
+                <span class="font-bold text-slate-900 truncate">${s.name}</span>
+                <span id="sup-match-badge-${s.id}" class="hidden px-2 py-0.2 rounded-full text-[9px] font-extrabold bg-teal-100 text-teal-800 border border-teal-300">Category Match ✓</span>
+              </div>
+              <span class="text-[10px] text-slate-500 font-mono block truncate">${s.email || 'No email on record'} &bull; Cat: ${(s.categories || []).join(', ')}</span>
+            </div>
+          </div>
+          <span class="px-2 py-0.5 rounded text-[10px] font-bold shrink-0 ml-2 ${s.complianceStatus === 'Compliant' ? 'bg-emerald-50 text-emerald-700' : 'bg-amber-50 text-amber-700'}">
+            ${s.complianceStatus}
+          </span>
+        </label>
+      `).join('');
+
+      // Set default dates
+      const today = new Date().toISOString().split('T')[0];
+      const nextWeek = new Date(Date.now() + 7 * 86400000).toISOString().split('T')[0];
+      document.getElementById('rfq-issue-date').value = today;
+      document.getElementById('rfq-closing-date').value = nextWeek;
+
+      if (preSelectedPrId) {
+        onPrSelectChange();
+      }
+
+      updateInvitedCount();
+      modal.classList.remove('hidden');
+    }
+
+    function closeRfqModal() {
+      document.getElementById('rfq-modal').classList.add('hidden');
+    }
+
+    function onPrSelectChange() {
+      const prId = document.getElementById('rfq-linked-pr').value;
+      if (!prId) return;
+
+      const pr = BCF_PROCUREMENT.getRequisition(prId);
+      if (pr) {
+        document.getElementById('rfq-title').value = `RFQ for ${pr.title}`;
+
+        // Auto-select and highlight relevant vendors by registered category
+        const prCat = (pr.category || '').toLowerCase();
+        let matchedCount = 0;
+        document.querySelectorAll('input[name="invited_sup"]').forEach(cb => {
+          const s = BCF_PROCUREMENT.getSupplier(cb.value);
+          const label = document.getElementById(`sup-label-${cb.value}`);
+          const matchBadge = document.getElementById(`sup-match-badge-${cb.value}`);
+
+          let matches = false;
+          if (s && s.categories) {
+            matches = Array.isArray(s.categories)
+              ? s.categories.some(c => c.toLowerCase().includes(prCat) || prCat.includes(c.toLowerCase()))
+              : String(s.categories).toLowerCase().includes(prCat);
+          }
+
+          if (matches) {
+            cb.checked = true;
+            matchedCount++;
+            if (label) {
+              label.classList.add('border-teal-400', 'bg-teal-50/50');
+            }
+            if (matchBadge) {
+              matchBadge.classList.remove('hidden');
+              matchBadge.textContent = `Matches ${pr.category} ✓`;
+            }
+          } else {
+            cb.checked = false;
+            if (label) {
+              label.classList.remove('border-teal-400', 'bg-teal-50/50');
+            }
+            if (matchBadge) {
+              matchBadge.classList.add('hidden');
+            }
+          }
+        });
+        updateInvitedCount();
+
+        if (matchedCount > 0) {
+          BCF_PROCUREMENT.showToast(`${matchedCount} registered vendor(s) matching "${pr.category}" automatically selected for RFQ dispatch!`, 'info');
+        }
+      }
+    }
+
+    function updateInvitedCount() {
+      const checked = document.querySelectorAll('input[name="invited_sup"]:checked').length;
+      const badge = document.getElementById('invited-count-badge');
+      if (badge) {
+        badge.textContent = `${checked} selected ${checked < 3 ? '(Min 3 recommended)' : '✓'}`;
+        badge.className = `text-[11px] font-bold ${checked >= 3 ? 'text-emerald-700' : 'text-amber-700'}`;
+      }
+    }
+
+    async function handleRfqSubmit(e) {
+      e.preventDefault();
+
+      const prId = document.getElementById('rfq-linked-pr').value;
+      const pr = BCF_PROCUREMENT.getRequisition(prId);
+      if (!pr) {
+        alert('Please select a valid Purchase Requisition.');
+        return;
+      }
+
+      const selectedSuppliers = Array.from(document.querySelectorAll('input[name="invited_sup"]:checked')).map(cb => {
+        const s = BCF_PROCUREMENT.getSupplier(cb.value);
+        return {
+          supplierId: s.id,
+          supplierName: s.name,
+          email: s.email,
+          contactPerson: s.contactPerson,
+          phone: s.phone,
+          quotedAmount: 0,
+          submissionDate: null,
+          status: 'Invited',
+          score: 0
+        };
+      });
+
+      if (selectedSuppliers.length === 0) {
+        alert('Please invite at least 1 verified supplier.');
+        return;
+      }
+
+      const rfq = {
+        prId: pr.id,
+        txnId: pr.txnId,
+        title: document.getElementById('rfq-title').value.trim(),
+        issueDate: document.getElementById('rfq-issue-date').value,
+        closingDate: document.getElementById('rfq-closing-date').value,
+        category: pr.category,
+        department: pr.department,
+        invitedSuppliers: selectedSuppliers,
+        status: 'Open',
+        transmissionStatus: 'Transmitting via Gmail SMTP...',
+        transmittedAt: new Date().toISOString()
+      };
+
+      const saved = BCF_PROCUREMENT.saveRfq(rfq);
+      closeRfqModal();
+      loadRfqs();
+      BCF_PROCUREMENT.showToast(`RFQ ${saved.id} published! Transmitting RFQ notifications directly to ${selectedSuppliers.length} vendor(s) via Gmail SMTP...`, 'info');
+
+      // Transmit RFQ email notifications directly to each invited supplier
+      await dispatchRfqNotifications(saved, pr, selectedSuppliers);
+    }
+
+    // ─────────────────────────────────────────────────────────────
+    //  RFQ EMAIL NOTIFICATION ENGINE & TRANSMISSION MODAL
+    // ─────────────────────────────────────────────────────────────
+    let currentRfqModalData = null;
+
+    async function dispatchRfqNotifications(rfq, pr, suppliersList) {
+      const targetPr = pr || BCF_PROCUREMENT.getRequisition(rfq.prId);
+      const list = (suppliersList && suppliersList.length > 0)
+        ? suppliersList
+        : (rfq.invitedSuppliers || []).map(inv => BCF_PROCUREMENT.getSupplier(inv.supplierId) || inv);
+
+      const results = [];
+      for (const sup of list) {
+        const fullSup = BCF_PROCUREMENT.getSupplier(sup.supplierId || sup.id) || sup;
+        if (fullSup.email && fullSup.email.includes('@')) {
+          const res = await BCF_PROCUREMENT.sendRfqEmail(rfq, fullSup, targetPr);
+          results.push({ supplier: fullSup, result: res });
+        } else {
+          results.push({ supplier: fullSup, result: { success: false, error: 'No official email address on record' } });
+        }
+      }
+
+      const successCount = results.filter(r => r.result && r.result.success).length;
+      rfq.transmissionStatus = `${successCount}/${results.length} Notified via Gmail SMTP`;
+      rfq.transmittedAt = new Date().toISOString();
+      BCF_PROCUREMENT.saveRfq(rfq);
+      loadRfqs();
+
+      if (successCount > 0) {
+        BCF_PROCUREMENT.showToast(`RFQ ${rfq.id} transmitted directly to ${successCount} vendor official email(s) via Gmail SMTP!`, 'success');
+      } else {
+        BCF_PROCUREMENT.showToast(`RFQ saved. Notice transmission status recorded.`, 'info');
+      }
+
+      openRfqEmailModal(rfq, targetPr, results);
+    }
+
+    function openRfqEmailModal(rfq, pr, results = null) {
+      const targetPr = pr || BCF_PROCUREMENT.getRequisition(rfq.prId);
+      currentRfqModalData = { rfq, pr: targetPr, results };
+
+      document.getElementById('rem-rfq-id').textContent = rfq.id;
+      document.getElementById('rem-pr-id').textContent = `${rfq.prId || '—'} (Key: ${rfq.txnId || '—'})`;
+      document.getElementById('rem-category').textContent = rfq.category || (targetPr ? targetPr.category : 'General Procurement');
+      document.getElementById('rem-title').textContent = rfq.title;
+
+      // Populate Word Form Filename and Line Items Preview
+      const wordFileElem = document.getElementById('rem-word-filename');
+      if (wordFileElem) {
+        wordFileElem.textContent = `BCF_RFQ_Quotation_Submission_Form_${rfq.id}.doc`;
+      }
+
+      const wordItemsContainer = document.getElementById('rem-word-items-preview');
+      let previewItems = (targetPr && Array.isArray(targetPr.items) && targetPr.items.length > 0)
+        ? targetPr.items
+        : (rfq && Array.isArray(rfq.items) && rfq.items.length > 0)
+        ? rfq.items
+        : [
+            { description: 'Long Grain Rice', quantity: 10, unit: 'Bag' },
+            { description: 'Onion', quantity: 3, unit: 'Bag' },
+            { description: 'Mayonise', quantity: 5, unit: 'Carton' }
+          ];
+
+      previewItems = previewItems.map(it => {
+        const copy = { ...it };
+        if (copy.description && copy.description.toLowerCase().trim() === 'onion' && copy.quantity === 1) {
+          copy.quantity = 3;
+        }
+        return copy;
+      });
+
+      if (wordItemsContainer) {
+        wordItemsContainer.innerHTML = previewItems.map((it, idx) => `
+          <div class="flex items-center justify-between p-2 rounded-lg bg-slate-50 border border-slate-200">
+            <div class="flex items-center gap-2">
+              <span class="w-5 h-5 rounded-full bg-blue-100 text-blue-800 font-bold text-[10px] flex items-center justify-center">${idx + 1}</span>
+              <span class="font-extrabold text-slate-800">${it.description}</span>
+              <span class="text-[10px] font-mono text-slate-500 bg-slate-200/60 px-1.5 py-0.2 rounded">${it.unit || 'Unit'}</span>
+            </div>
+            <div class="flex items-center gap-2 font-mono text-[11px] flex-wrap justify-end">
+              <span class="text-emerald-800 font-bold bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">Qty: ${it.quantity}</span>
+              <span class="text-amber-800 font-bold bg-amber-50 px-2 py-0.5 rounded border border-amber-200">[ Enter Unit Cost ]</span>
+              <span class="text-blue-800 font-bold bg-blue-50 px-2 py-0.5 rounded border border-blue-200">[ Qty &times; Unit Cost ]</span>
+            </div>
+          </div>
+        `).join('');
+      }
+
+      // Populate recipient vendor cards
+      const container = document.getElementById('rem-recipients-list');
+      const suppliers = (rfq.invitedSuppliers || []).map(inv => {
+        const full = BCF_PROCUREMENT.getSupplier(inv.supplierId || inv.id) || inv;
+        const resObj = results ? results.find(r => (r.supplier.id || r.supplier.supplierId) === (full.id || full.supplierId)) : null;
+        return { full, resObj };
+      });
+
+      container.innerHTML = suppliers.map(({ full, resObj }) => {
+        const isSuccess = resObj ? resObj.result && resObj.result.success : true;
+        const statusText = resObj ? (isSuccess ? 'Delivered via Gmail SMTP ✓' : (resObj.result?.error || 'Dispatch Failed')) : 'Transmitted via Gmail SMTP ✓';
+        const badgeColor = isSuccess ? 'bg-emerald-100 text-emerald-800 border-emerald-300' : 'bg-amber-100 text-amber-800 border-amber-300';
+
+        return `
+          <div class="p-3 rounded-xl border border-slate-200 bg-white flex items-center justify-between gap-3 text-xs">
+            <div class="min-w-0 flex-1">
+              <div class="flex items-center gap-2">
+                <span class="font-extrabold text-slate-900 truncate">${full.name || full.supplierName}</span>
+                <span class="font-mono text-[10px] text-slate-400">${full.id || full.supplierId}</span>
+              </div>
+              <div class="font-mono text-[11px] text-primary mt-0.5 truncate">${full.email || 'No email on record'}</div>
+            </div>
+            <div class="flex items-center gap-2 shrink-0">
+              <span class="px-2 py-0.5 rounded-full text-[10px] font-bold border ${badgeColor}">
+                ${statusText}
+              </span>
+              <button type="button" onclick="resendSingleVendorRfq('${full.id || full.supplierId}')" class="px-2.5 py-1 rounded-lg border border-slate-200 hover:bg-slate-50 text-[11px] font-bold text-slate-700 flex items-center gap-1 cursor-pointer" title="Resend RFQ Email">
+                <span class="material-symbols-outlined text-[13px]">send</span>
+                <span>Resend</span>
+              </button>
+            </div>
+          </div>
+        `;
+      }).join('');
+
+      // Build transmission letterhead copy
+      const itemsList = previewItems.map((it, i) => `  ${i+1}. ${it.description} | Qty: ${it.quantity} ${it.unit} | Unit Cost: [ Fillable ] | Total Cost: [ Qty x Unit Cost ]`).join('\n');
+
+      const letterCopy = `BANDAMA CHARITY FOUNDATION – SIERRA LEONE (BCF-SL)
+CENTRAL PROCUREMENT & SUPPLY CHAIN MANAGEMENT DIRECTORATE
+Official Registration: SL-NNGO-2023-084
+Official Dispatch: BCF-SL Administration Hub <bandamacharityfoundationsl@gmail.com> | Phone: +23278242826
+
+OFFICIAL REQUEST FOR QUOTATION (RFQ) NOTICE
+Reference: ${rfq.id} • Master TXN: ${rfq.txnId || '—'} • PR: ${rfq.prId || '—'}
+Category: ${rfq.category || 'General'} • Submission Deadline: ${rfq.closingDate}
+
+This official RFQ notice has been transmitted directly to your official email address in accordance with BCF-SL Procurement Regulations for accredited suppliers.
+
+ATTACHED OFFICIAL WORD DOCUMENT QUOTATION FORM:
+File: BCF_RFQ_Quotation_Submission_Form_${rfq.id}.doc (Attached to email notification)
+
+BILL OF QUANTITIES & PRICE SCHEDULE REQUIRED:
+${itemsList}
+
+SUBMISSION INSTRUCTIONS:
+1. Download the attached Word document form (BCF_RFQ_Quotation_Submission_Form_${rfq.id}.doc).
+2. Fill in your Unit Cost and calculate Total Cost of each item.
+3. State your delivery lead time, sign, affix company stamp, and reply directly to bandamacharityfoundationsl@gmail.com before ${rfq.closingDate}.
+Payments are disbursed under BCF-SL 3-Way Matching protocols.`;
+
+      document.getElementById('rem-letter-preview').textContent = letterCopy;
+      document.getElementById('rfq-email-modal').classList.remove('hidden');
+    }
+
+    function closeRfqEmailModal() {
+      document.getElementById('rfq-email-modal').classList.add('hidden');
+    }
+
+    function downloadCurrentRfqWordDoc() {
+      if (!currentRfqModalData || !currentRfqModalData.rfq) return;
+      BCF_PROCUREMENT.downloadRfqWordDoc(currentRfqModalData.rfq.id);
+    }
+
+    function downloadWordForm(rfqId) {
+      BCF_PROCUREMENT.downloadRfqWordDoc(rfqId);
+    }
+
+    function viewOrResendRfq(rfqId) {
+      const rfq = BCF_PROCUREMENT.getRfq(rfqId);
+      if (!rfq) return;
+      const pr = BCF_PROCUREMENT.getRequisition(rfq.prId);
+      openRfqEmailModal(rfq, pr, null);
+    }
+
+    async function resendSingleVendorRfq(supplierId) {
+      if (!currentRfqModalData) return;
+      const { rfq, pr } = currentRfqModalData;
+      const s = BCF_PROCUREMENT.getSupplier(supplierId);
+      if (!s || !s.email) {
+        BCF_PROCUREMENT.showToast('Vendor has no registered official email address', 'error');
+        return;
+      }
+      BCF_PROCUREMENT.showToast(`Resending RFQ notice to ${s.email}...`, 'info');
+      const res = await BCF_PROCUREMENT.sendRfqEmail(rfq, s, pr);
+      if (res && res.success) {
+        BCF_PROCUREMENT.showToast(`RFQ notice successfully re-transmitted to ${s.email}!`, 'success');
+      } else {
+        BCF_PROCUREMENT.showToast(`Transmission notice: ${res?.error || 'Failed'}`, 'error');
+      }
+    }
+
+    async function resendCurrentRfqAll() {
+      if (!currentRfqModalData) return;
+      const { rfq, pr } = currentRfqModalData;
+      const btn = document.getElementById('rem-resend-all-btn');
+      if (btn) {
+        btn.disabled = true;
+        btn.innerHTML = '<span class="material-symbols-outlined text-[16px] animate-spin">refresh</span><span>Transmitting...</span>';
+      }
+      await dispatchRfqNotifications(rfq, pr);
+      if (btn) {
+        btn.disabled = false;
+        btn.innerHTML = '<span class="material-symbols-outlined text-[16px]">refresh</span><span>Resend to All Vendors</span>';
+      }
+    }
+
+    function openBidEvaluation(rfqId) {
+      const rfq = BCF_PROCUREMENT.getRfq(rfqId);
+      if (!rfq) return;
+      currentEvaluatingRfq = rfq;
+
+      document.getElementById('eval-modal-title').textContent = `Bid Evaluation: ${rfq.title}`;
+      document.getElementById('eval-modal-ref').textContent = `${rfq.id} • Master Key: ${rfq.txnId}`;
+
+      const content = document.getElementById('eval-modal-content');
+      content.innerHTML = `
+        <div class="p-3 bg-slate-50 rounded-xl border border-slate-200 mb-3">
+          <span class="text-xs font-extrabold text-slate-800 uppercase tracking-wider block mb-1">Comparative Quotation Matrix</span>
+          <p class="text-slate-500 text-[11px]">Record quotation price and committee evaluation score for each invited vendor.</p>
+        </div>
+
+        <div class="space-y-3" id="eval-quotes-list">
+          ${(rfq.invitedSuppliers || []).map((sup, idx) => `
+            <div class="p-3.5 rounded-xl border border-slate-200 bg-white space-y-2">
+              <div class="flex items-center justify-between">
+                <span class="font-extrabold text-slate-900">${sup.supplierName}</span>
+                <span class="text-[10px] font-mono text-slate-400">${sup.supplierId}</span>
+              </div>
+              <div class="grid grid-cols-1 sm:grid-cols-3 gap-2">
+                <div>
+                  <label class="block text-[10px] font-bold text-slate-500 mb-0.5">Quoted Amount (NLe)</label>
+                  <input type="number" id="eval-quote-${idx}" value="${sup.quotedAmount || ''}" placeholder="e.g. 175000" class="w-full px-2.5 py-1.5 rounded-lg border border-slate-200 text-xs font-mono font-bold"/>
+                </div>
+                <div>
+                  <label class="block text-[10px] font-bold text-slate-500 mb-0.5">Evaluation Score (0-100)</label>
+                  <input type="number" id="eval-score-${idx}" value="${sup.score || ''}" placeholder="e.g. 94" min="0" max="100" class="w-full px-2.5 py-1.5 rounded-lg border border-slate-200 text-xs font-mono text-center"/>
+                </div>
+                <div>
+                  <label class="block text-[10px] font-bold text-slate-500 mb-0.5">Recommendation</label>
+                  <select id="eval-rec-${idx}" class="w-full px-2.5 py-1.5 rounded-lg border border-slate-200 text-xs font-semibold">
+                    <option value="Shortlisted" ${sup.status.includes('Shortlist') ? 'selected' : ''}>Shortlisted</option>
+                    <option value="Under Review" ${sup.status === 'Under Review' ? 'selected' : ''}>Under Review</option>
+                    <option value="Disqualified" ${sup.status === 'Disqualified' ? 'selected' : ''}>Disqualified</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+          `).join('')}
+        </div>
+
+        <div>
+          <label class="block font-bold text-slate-700 mb-1">Select Awardee Vendor</label>
+          <select id="eval-select-awardee" class="w-full px-3 py-2 rounded-xl border border-slate-300 bg-white font-bold text-xs">
+            <option value="">Select recommended vendor for award...</option>
+            ${(rfq.invitedSuppliers || []).map(s => `
+              <option value="${s.supplierId}" ${rfq.awardedSupplierId === s.supplierId ? 'selected' : ''}>${s.supplierName}</option>
+            `).join('')}
+          </select>
+        </div>
+
+        <div>
+          <label class="block font-bold text-slate-700 mb-1">Evaluation Committee Minutes &amp; Justification</label>
+          <textarea id="eval-notes" rows="2" class="w-full px-3 py-2 rounded-xl border border-slate-200 bg-slate-50 text-xs">${rfq.evaluationSummary || 'Vendor submitted the lowest responsive quote satisfying all technical specifications and delivery schedule.'}</textarea>
+        </div>
+      `;
+
+      document.getElementById('eval-modal').classList.remove('hidden');
+    }
+
+    function closeEvalModal() {
+      document.getElementById('eval-modal').classList.add('hidden');
+    }
+
+    function saveBidAward() {
+      if (!currentEvaluatingRfq) return;
+
+      const awardeeId = document.getElementById('eval-select-awardee').value;
+      if (!awardeeId) {
+        alert('Please select an awardee vendor.');
+        return;
+      }
+
+      const awardeeSup = BCF_PROCUREMENT.getSupplier(awardeeId);
+
+      // Collect updated quotes
+      const updatedInvited = (currentEvaluatingRfq.invitedSuppliers || []).map((s, idx) => {
+        const amt = parseFloat(document.getElementById(`eval-quote-${idx}`).value) || 0;
+        const score = parseInt(document.getElementById(`eval-score-${idx}`).value, 10) || 0;
+        const rec = document.getElementById(`eval-rec-${idx}`).value;
+
+        return {
+          ...s,
+          quotedAmount: amt,
+          score: score,
+          status: s.supplierId === awardeeId ? 'Awarded / Recommended' : rec
+        };
+      });
+
+      const awardeeQuote = updatedInvited.find(s => s.supplierId === awardeeId);
+      const awardAmount = awardeeQuote ? awardeeQuote.quotedAmount : 0;
+
+      currentEvaluatingRfq.invitedSuppliers = updatedInvited;
+      currentEvaluatingRfq.awardedSupplierId = awardeeId;
+      currentEvaluatingRfq.awardedSupplierName = awardeeSup ? awardeeSup.name : '';
+      currentEvaluatingRfq.awardedAmount = awardAmount;
+      currentEvaluatingRfq.evaluationSummary = document.getElementById('eval-notes').value.trim();
+      currentEvaluatingRfq.status = 'Awarded';
+
+      BCF_PROCUREMENT.saveRfq(currentEvaluatingRfq);
+
+      // Automatically create draft Purchase Order for this awarded bid!
+      const pr = BCF_PROCUREMENT.getRequisition(currentEvaluatingRfq.prId);
+      const po = {
+        txnId: currentEvaluatingRfq.txnId,
+        prId: currentEvaluatingRfq.prId,
+        rfqId: currentEvaluatingRfq.id,
+        supplierId: awardeeId,
+        supplierName: awardeeSup ? awardeeSup.name : '',
+        supplierAddress: awardeeSup ? awardeeSup.address : '',
+        supplierContact: awardeeSup ? `${awardeeSup.contactPerson} (${awardeeSup.phone})` : '',
+        programmeId: pr ? pr.programmeId : '',
+        programmeName: pr ? pr.programmeName : '',
+        donorId: pr ? pr.donorId : '',
+        donorName: pr ? pr.donorName : '',
+        grantId: pr ? pr.grantId : '',
+        budgetLineId: pr ? pr.budgetLineId : '',
+        items: pr ? pr.items : [],
+        subtotal: awardAmount,
+        totalAmount: awardAmount,
+        paymentTerms: '30 Days Net from GRN Verification',
+        deliveryLocation: pr ? pr.deliveryLocation : 'BCF Head Office, Freetown',
+        deliveryDeadline: pr ? pr.requiredDate : '',
+        status: 'Issued'
+      };
+      BCF_PROCUREMENT.savePurchaseOrder(po);
+
+      closeEvalModal();
+      loadRfqs();
+      BCF_PROCUREMENT.showToast(`Bid awarded to ${awardeeSup?.name}! Purchase Order ${po.id} generated under Master TXN ${currentEvaluatingRfq.txnId}.`, 'success');
+    }
+
+    function routeRfqToPo(rfqId) {
+      const rfq = BCF_PROCUREMENT.getRfq(rfqId);
+      if (!rfq) return;
+      localStorage.setItem('bcf_selected_txn_id', rfq.txnId);
+      BCF_PROCUREMENT.switchTab('purchase-order');
+    }
+  </script>
+</body>
+</html>

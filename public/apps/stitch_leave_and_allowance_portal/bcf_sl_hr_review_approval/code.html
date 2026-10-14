@@ -1,0 +1,1184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover"/>
+  <title>BCF-SL Leave Management Module — HR &amp; Management Review Console</title>
+  
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
+  
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: {
+            primary: "#004328",
+            "primary-dark": "#002d1a",
+            secondary: "#465f88",
+            tertiary: "#ca8a04",
+            surface: "#f8fafd",
+            "surface-container": "#eff5f8",
+            "on-surface": "#0f191d"
+          },
+          fontFamily: {
+            sans: ['"Inter"', 'sans-serif'],
+            headline: ['"Plus Jakarta Sans"', 'sans-serif'],
+            mono: ['"JetBrains Mono"', 'monospace']
+          }
+        }
+      }
+    };
+  </script>
+
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"/>
+  <meta http-equiv="Pragma" content="no-cache"/>
+  <meta http-equiv="Expires" content="0"/>
+
+  <style>
+    body { font-family: 'Inter', sans-serif; background-color: #f8fafd; }
+    h1, h2, h3, h4, h5, .font-headline { font-family: 'Plus Jakarta Sans', sans-serif; }
+    .badge-soft { display: inline-flex; align-items: center; gap: 0.25rem; font-size: 0.72rem; font-weight: 700; padding: 0.25rem 0.6rem; border-radius: 9999px; }
+    .hidden { display: none !important; }
+  </style>
+
+  <script src="../bcf_leave_shared.js?v=20261006_FINAL_REV1"></script>
+</head>
+<body class="text-on-surface flex flex-col min-h-screen">
+
+  <!-- TOP HEADER -->
+  <header class="bg-white border-b border-slate-200 sticky top-0 z-40 shadow-xs">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between gap-4">
+      <div class="flex items-center gap-3 min-w-0">
+        <a href="../bcf_sl_leave_allowance_dashboard/code.html" class="p-1.5 rounded-lg border border-slate-200 hover:bg-slate-100 text-slate-600 transition" title="Back to Leave Dashboard">
+          <span class="material-symbols-outlined text-[20px]">arrow_back</span>
+        </a>
+        <img src="/bcf-logo.jpg" onerror="this.src='../bcf-logo.jpg'; this.onerror=function(){this.src='../../bcf-logo.jpg'}" alt="BCF-SL Logo" class="h-8 w-auto object-contain shrink-0 rounded"/>
+        <div class="flex flex-col min-w-0">
+          <span class="font-extrabold text-sm sm:text-base text-primary tracking-tight truncate uppercase leading-none">
+            Bandama Charity Foundation
+          </span>
+          <span class="text-[11px] font-semibold text-slate-500 truncate mt-0.5">
+            Leave &amp; Allowance Review Console • Multi-Tier Approval Authority
+          </span>
+        </div>
+      </div>
+
+      <div class="flex items-center gap-2">
+        <div class="flex items-center gap-1.5 bg-slate-100 border border-slate-300 rounded-xl px-2.5 py-1">
+          <span class="material-symbols-outlined text-[16px] text-primary">admin_panel_settings</span>
+          <select id="review-officer-select" class="bg-transparent text-xs font-bold text-slate-800 outline-none cursor-pointer">
+            <option value="Joe Ansumana Conteh (HR Director)">Joe A. Conteh (HR Director)</option>
+            <option value="Albert Joseph Bandama (CEO)">Albert J. Bandama (CEO)</option>
+            <option value="Dr. Sorie Sesay (CEO / Authority)">Dr. Sorie Sesay (Executive Authority)</option>
+            <option value="Supervisor / Line Manager">Line Manager / Supervisor</option>
+          </select>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- MAIN VIEWPORT -->
+  <main class="flex-grow p-4 sm:p-6 max-w-7xl mx-auto w-full flex flex-col gap-6">
+
+    <!-- HERO OVERVIEW BANNER -->
+    <div class="bg-white rounded-2xl border border-slate-200 p-5 shadow-xs flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+      <div>
+        <div class="flex items-center gap-2">
+          <span class="badge-soft bg-emerald-100 text-emerald-800">Section 17 &amp; 20 Compliance</span>
+          <span class="text-xs text-slate-400 font-mono">Workflow: Employee &rarr; Supervisor &rarr; HR &rarr; Executive &rarr; Approved</span>
+        </div>
+        <h2 class="text-xl font-extrabold text-slate-900 tracking-tight mt-1">Multi-Tier Leave &amp; Allowance Approval Hierarchy</h2>
+        <p class="text-xs text-slate-500 mt-0.5">Automated conflict checking, team staffing impact evaluation, recall protocols, and return-to-work clearance</p>
+      </div>
+
+      <div class="flex items-center gap-2">
+        <span class="text-xs font-bold text-slate-600 bg-slate-100 px-3 py-1.5 rounded-xl border border-slate-200" id="pending-counter-badge">
+          0 Requests Pending
+        </span>
+      </div>
+    </div>
+
+    <!-- TABS FILTER -->
+    <div class="flex items-center gap-2 overflow-x-auto border-b border-slate-200 pb-2">
+      <button onclick="setReviewTab('pending')" id="tab-pending" class="px-3.5 py-1.5 rounded-xl text-xs font-bold flex items-center gap-1.5 bg-primary text-white shadow-2xs">
+        <span class="material-symbols-outlined text-[16px]">pending_actions</span>
+        <span>Action Required</span>
+      </button>
+      <button onclick="setReviewTab('approved')" id="tab-approved" class="px-3.5 py-1.5 rounded-xl text-xs font-bold flex items-center gap-1.5 text-slate-600 hover:bg-slate-100">
+        <span class="material-symbols-outlined text-[16px]">verified</span>
+        <span>Approved &amp; Active Leaves</span>
+      </button>
+      <button onclick="setReviewTab('completed')" id="tab-completed" class="px-3.5 py-1.5 rounded-xl text-xs font-bold flex items-center gap-1.5 text-slate-600 hover:bg-slate-100">
+        <span class="material-symbols-outlined text-[16px]">assignment_turned_in</span>
+        <span>Completed &amp; Returned</span>
+      </button>
+      <button onclick="setReviewTab('rejected')" id="tab-rejected" class="px-3.5 py-1.5 rounded-xl text-xs font-bold flex items-center gap-1.5 text-slate-600 hover:bg-slate-100">
+        <span class="material-symbols-outlined text-[16px]">cancel</span>
+        <span>Rejected / Cancelled</span>
+      </button>
+    </div>
+
+    <!-- RESUMPTION DATE DETECTION & RETURN-TO-WORK AUTO ENGINE (Section 27 & 29) -->
+    <div id="resumption-detection-banner" class="p-4 rounded-2xl bg-gradient-to-r from-emerald-50 via-teal-50 to-blue-50 border border-emerald-200 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-4">
+      <div class="flex items-start gap-3">
+        <div class="w-10 h-10 rounded-xl bg-white border border-emerald-200 text-primary flex items-center justify-center shrink-0 shadow-2xs">
+          <span class="material-symbols-outlined text-2xl text-primary">auto_mode</span>
+        </div>
+        <div>
+          <div class="flex items-center gap-2 flex-wrap">
+            <h4 class="font-extrabold text-sm text-slate-900">Resumption Date Detection &amp; Return-to-Duty Engine</h4>
+            <span class="px-2 py-0.5 rounded-full text-[10px] font-black bg-emerald-100 text-emerald-800 border border-emerald-300 flex items-center gap-1">
+              <span class="w-1.5 h-1.5 rounded-full bg-emerald-600 animate-pulse"></span>
+              <span>Scanner Active</span>
+            </span>
+          </div>
+          <p class="text-xs text-slate-600 mt-0.5">
+            Monitors active leaves, automatically detects when Resumption Date is reached, executes Section 29 return confirmation, and dispatches return clearance emails to employees.
+          </p>
+          <div class="flex items-center gap-3 mt-1.5 text-[11px] text-slate-500 font-medium flex-wrap">
+            <span id="resumption-due-summary" class="font-bold text-slate-800">Checking active leaves...</span>
+            <span>•</span>
+            <span id="resumption-today-date" class="font-mono">Current System Date: 07 Oct 2026</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="flex items-center gap-2 shrink-0 flex-wrap">
+        <button type="button" onclick="triggerAutoResumptionScan()" id="btn-auto-detect-resumptions" class="px-4 py-2.5 rounded-xl bg-primary hover:bg-primary-dark text-white text-xs font-black flex items-center gap-1.5 shadow-sm active:scale-95 transition cursor-pointer">
+          <span class="material-symbols-outlined text-[17px]">sync</span>
+          <span id="btn-auto-detect-label">Detect &amp; Auto-Confirm Resumptions</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- APPLICATIONS LIST CONTAINER -->
+    <div id="applications-list" class="space-y-4">
+      <!-- Dynamically populated -->
+    </div>
+
+  </main>
+
+  <!-- MODAL: REJECT APPLICATION JUSTIFICATION -->
+  <div id="reject-modal" class="hidden fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl border border-slate-200 max-w-md w-full p-6 shadow-2xl">
+      <h3 class="font-extrabold text-base text-rose-950 mb-1">Reject Leave Application</h3>
+      <p class="text-xs text-slate-500 mb-4">Please provide an official justification for the applicant and audit record.</p>
+
+      <form onsubmit="submitReject(event)" class="space-y-4 text-xs">
+        <input type="hidden" id="reject-app-id"/>
+        <div>
+          <label class="font-bold text-slate-700 block mb-1">Rejection Reason</label>
+          <textarea id="reject-reason" required rows="3" placeholder="e.g. Critical donor reporting period; department staffing levels below emergency minimum threshold..." class="w-full px-3 py-2 rounded-xl border border-slate-300 outline-none focus:border-rose-600"></textarea>
+        </div>
+        <div class="flex items-center justify-end gap-2 pt-2 border-t border-slate-100">
+          <button type="button" onclick="closeRejectModal()" class="px-4 py-2 rounded-xl border border-slate-300 text-slate-700 font-bold">Cancel</button>
+          <button type="submit" class="px-5 py-2 rounded-xl bg-rose-600 hover:bg-rose-700 text-white font-extrabold">Confirm Rejection</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL: LEAVE RECALL PROTOCOL (Section 28) -->
+  <div id="recall-modal" class="hidden fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl border border-slate-200 max-w-md w-full p-6 shadow-2xl">
+      <div class="flex items-center gap-2 mb-1">
+        <span class="material-symbols-outlined text-amber-600 text-2xl">crisis_alert</span>
+        <h3 class="font-extrabold text-base text-slate-900">Issue Operational Leave Recall</h3>
+      </div>
+      <p class="text-xs text-slate-500 mb-4">Under Section 28, authorized management may recall an employee for unforeseen humanitarian or operational emergencies. Unspent days will be refunded to the ledger.</p>
+
+      <form onsubmit="submitRecall(event)" class="space-y-4 text-xs">
+        <input type="hidden" id="recall-app-id"/>
+        <div>
+          <label class="font-bold text-slate-700 block mb-1">Operational Justification</label>
+          <textarea id="recall-reason" required rows="2" placeholder="e.g. Critical cholera outbreak response deployment in Bo Field Office..." class="w-full px-3 py-2 rounded-xl border border-slate-300 outline-none focus:border-primary"></textarea>
+        </div>
+        <div>
+          <label class="font-bold text-slate-700 block mb-1">Unused Days to Refund to Balance</label>
+          <input type="number" id="recall-unspent-days" min="1" max="31" required class="w-full px-3 py-2 rounded-xl border border-slate-300 font-bold" value="5"/>
+        </div>
+        <div class="flex items-center justify-end gap-2 pt-2 border-t border-slate-100">
+          <button type="button" onclick="closeRecallModal()" class="px-4 py-2 rounded-xl border border-slate-300 text-slate-700 font-bold">Cancel</button>
+          <button type="submit" class="px-5 py-2 rounded-xl bg-amber-600 hover:bg-amber-700 text-white font-extrabold">Issue Recall Order</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL: RETURN TO WORK CONFIRMATION & RESUMPTION DISPATCH (Section 29) -->
+  <div id="return-modal" class="hidden fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl border border-slate-200 max-w-lg w-full p-6 shadow-2xl space-y-4">
+      <div class="flex items-start justify-between pb-3 border-b border-slate-100">
+        <div class="flex items-center gap-2.5">
+          <div class="w-10 h-10 rounded-xl bg-emerald-50 border border-emerald-200 text-primary flex items-center justify-center">
+            <span class="material-symbols-outlined text-2xl">how_to_reg</span>
+          </div>
+          <div>
+            <h3 class="font-extrabold text-base text-slate-900 leading-tight">Confirm Return to Duty &amp; Resumption</h3>
+            <p class="text-[11px] text-slate-500 font-medium">Verify employee physical resumption and dispatch official return notice</p>
+          </div>
+        </div>
+        <button type="button" onclick="closeReturnModal()" class="text-slate-400 hover:text-slate-600 p-1 rounded-lg">
+          <span class="material-symbols-outlined text-[20px]">close</span>
+        </button>
+      </div>
+
+      <!-- Dossier Summary Card -->
+      <div class="p-3.5 rounded-xl bg-slate-50 border border-slate-200 text-xs space-y-2">
+        <div class="flex items-center justify-between">
+          <span class="font-mono font-bold text-primary" id="m-return-app-id">BCF-LEV-2026-0002</span>
+          <span class="badge-soft bg-blue-100 text-blue-900 font-extrabold" id="m-return-status-badge">Active (On Leave)</span>
+        </div>
+        <div class="grid grid-cols-2 gap-2 pt-1 border-t border-slate-200/60">
+          <div>
+            <span class="text-[10px] text-slate-400 uppercase font-bold block">Employee</span>
+            <strong class="text-slate-900 block truncate" id="m-return-emp-name">Mohamed Bangura</strong>
+            <span class="text-[11px] text-slate-500 font-mono" id="m-return-emp-id">BCF-EMP-00042</span>
+          </div>
+          <div>
+            <span class="text-[10px] text-slate-400 uppercase font-bold block">Leave Type</span>
+            <span class="text-slate-800 font-bold block" id="m-return-leave-type">Annual Leave</span>
+            <span class="text-[11px] text-slate-500" id="m-return-days-count">10 Days</span>
+          </div>
+          <div>
+            <span class="text-[10px] text-slate-400 uppercase font-bold block">Leave Period</span>
+            <span class="font-mono text-slate-800 font-bold block" id="m-return-period">2026-10-01 to 2026-10-15</span>
+          </div>
+          <div>
+            <span class="text-[10px] text-slate-400 uppercase font-bold block">Handover Officer</span>
+            <span class="text-slate-800 font-semibold block truncate" id="m-return-handover">Joseph Conteh</span>
+          </div>
+        </div>
+        <div id="m-return-resumption-alert" class="p-2 rounded-lg bg-emerald-50 border border-emerald-200 text-[11px] font-bold text-emerald-950 flex items-center gap-1.5">
+          <span class="material-symbols-outlined text-emerald-600 text-[16px]">event_available</span>
+          <span id="m-return-resumption-text">Resumption Date reached. Eligible for clearance.</span>
+        </div>
+      </div>
+
+      <form id="return-work-form" onsubmit="submitReturn(event)" class="space-y-3.5 text-xs">
+        <input type="hidden" id="return-app-id"/>
+
+        <div>
+          <label class="font-bold text-slate-700 block mb-1">Employee Notification Email (Delivery Address)</label>
+          <input type="email" id="return-recipient-email" required placeholder="employee@domain.com" class="w-full px-3 py-2 rounded-xl border border-slate-300 font-mono text-xs font-bold text-slate-900 outline-none focus:border-primary shadow-2xs"/>
+          <p class="text-[10px] text-slate-400 mt-0.5">The official return confirmation email will be delivered to this address via Gmail SMTP.</p>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div>
+            <label class="font-bold text-slate-700 block mb-1">Effective Return Date</label>
+            <input type="date" id="return-effective-date" required class="w-full px-3 py-2 rounded-xl border border-slate-300 font-mono text-xs font-bold text-slate-900 outline-none focus:border-primary"/>
+          </div>
+          <div>
+            <label class="font-bold text-slate-700 block mb-1">Clearing Officer</label>
+            <input type="text" id="return-clearing-officer" required class="w-full px-3 py-2 rounded-xl border border-slate-300 text-xs font-bold text-slate-900 outline-none focus:border-primary"/>
+          </div>
+        </div>
+
+        <div>
+          <label class="font-bold text-slate-700 block mb-1">Resumption Notes &amp; Handover Status</label>
+          <textarea id="return-notes" rows="2" required class="w-full px-3 py-2 rounded-xl border border-slate-300 text-xs outline-none focus:border-primary">Employee resumed active duty in satisfactory condition; handover reversed.</textarea>
+        </div>
+
+        <label class="flex items-center gap-2 p-2.5 rounded-xl bg-emerald-50/70 border border-emerald-200 cursor-pointer">
+          <input type="checkbox" id="return-send-email-check" checked class="accent-primary w-4 h-4 rounded"/>
+          <span class="text-xs text-emerald-950 font-bold leading-tight flex items-center gap-1.5">
+            <span class="material-symbols-outlined text-primary text-[17px]">forward_to_inbox</span>
+            <span>Send Official Return-to-Duty Directive &amp; Resumption Notice to Staff via SMTP</span>
+          </span>
+        </label>
+
+        <div class="flex items-center justify-end gap-2 pt-2 border-t border-slate-100">
+          <button type="button" onclick="closeReturnModal()" class="px-4 py-2 rounded-xl border border-slate-300 text-slate-700 font-bold hover:bg-slate-50 transition cursor-pointer">
+            Cancel
+          </button>
+          <button type="submit" id="btn-submit-return" class="px-5 py-2.5 rounded-xl bg-primary hover:bg-primary-dark text-white font-extrabold flex items-center gap-1.5 shadow-md active:scale-95 transition cursor-pointer">
+            <span class="material-symbols-outlined text-[17px]">how_to_reg</span>
+            <span id="btn-submit-return-label">Confirm Return &amp; Send Resumption Email to Staff</span>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL: EXECUTIVE LEAVE AUTHORIZATION & OFFICIAL EMAIL DISPATCH -->
+  <div id="exec-approval-modal" class="hidden fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl border border-slate-200 max-w-lg w-full p-6 shadow-2xl space-y-4">
+      <div class="flex items-start justify-between pb-3 border-b border-slate-100">
+        <div class="flex items-center gap-2.5">
+          <div class="w-10 h-10 rounded-xl bg-emerald-50 border border-emerald-200 text-primary flex items-center justify-center">
+            <span class="material-symbols-outlined text-2xl">verified_user</span>
+          </div>
+          <div>
+            <h3 class="font-extrabold text-base text-slate-900 leading-tight">Executive Final Leave Authorization</h3>
+            <p class="text-[11px] text-slate-500 font-medium">Issue official sanction and dispatch notification email to employee</p>
+          </div>
+        </div>
+        <button type="button" onclick="closeExecutiveApprovalModal()" class="text-slate-400 hover:text-slate-600 p-1 rounded-lg">
+          <span class="material-symbols-outlined text-[20px]">close</span>
+        </button>
+      </div>
+
+      <!-- Dossier Summary Card -->
+      <div class="p-3.5 rounded-xl bg-slate-50 border border-slate-200 text-xs space-y-2">
+        <div class="flex items-center justify-between">
+          <span class="font-mono font-bold text-primary" id="m-exec-app-id">BCF-LEV-2026-0001</span>
+          <span class="badge-soft bg-emerald-100 text-emerald-800 font-extrabold" id="m-exec-leave-type">Annual Leave</span>
+        </div>
+        <div class="grid grid-cols-2 gap-2 pt-1 border-t border-slate-200/60">
+          <div>
+            <span class="text-[10px] text-slate-400 uppercase font-bold block">Employee</span>
+            <strong class="text-slate-900 block truncate" id="m-exec-emp-name">John Kamara</strong>
+            <span class="text-[11px] text-slate-500 font-mono" id="m-exec-emp-id">BCF-EMP-00025</span>
+          </div>
+          <div>
+            <span class="text-[10px] text-slate-400 uppercase font-bold block">Department / Role</span>
+            <span class="text-slate-800 block truncate" id="m-exec-dept-role">Programmes • Officer</span>
+          </div>
+          <div>
+            <span class="text-[10px] text-slate-400 uppercase font-bold block">Leave Period</span>
+            <span class="font-mono text-slate-800 font-bold block" id="m-exec-period">12 Oct – 12 Nov</span>
+            <span class="text-[11px] text-primary font-bold" id="m-exec-days">31 Working Days</span>
+          </div>
+          <div>
+            <span class="text-[10px] text-slate-400 uppercase font-bold block">Allowance &amp; Balance</span>
+            <span class="text-slate-800 block" id="m-exec-allowance">NLe 24,000.00</span>
+            <span class="text-[11px] text-slate-500 font-mono" id="m-exec-balance">Remaining: 0d</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Email Notification Parameters -->
+      <form id="exec-approval-form" onsubmit="submitExecutiveApproval(event)" class="space-y-3.5 text-xs">
+        <input type="hidden" id="exec-app-id" />
+
+        <div class="p-3.5 rounded-xl bg-emerald-50/70 border border-emerald-200 space-y-2.5">
+          <div class="flex items-center justify-between">
+            <span class="font-bold text-emerald-950 flex items-center gap-1.5 text-xs">
+              <span class="material-symbols-outlined text-primary text-[17px]">mail</span>
+              <span>Automated Notification Email to Employee</span>
+            </span>
+            <span class="badge-soft bg-emerald-200 text-emerald-900 text-[10px] font-mono">SMTP Delivery</span>
+          </div>
+
+          <div>
+            <label class="font-bold text-slate-700 block mb-1">
+              Recipient Employee Email <span class="text-rose-600">*</span>
+            </label>
+            <input type="email" id="exec-recipient-email" required placeholder="employee.email@domain.com" class="w-full px-3 py-2 rounded-xl border border-slate-300 bg-white text-xs font-bold text-slate-900 outline-none focus:border-primary font-mono shadow-2xs" />
+            <p class="text-[10px] text-slate-500 mt-1">Official Executive Authorization letter, approved dates, return guidelines &amp; token will be sent directly to this address.</p>
+          </div>
+
+          <div>
+            <label class="font-bold text-slate-700 block mb-1">Executive Signatory Authority</label>
+            <input type="text" id="exec-signatory-name" required value="Albert Joseph Bandama (CEO & Executive Director)" class="w-full px-3 py-2 rounded-xl border border-slate-300 bg-white text-xs font-bold text-slate-800 outline-none focus:border-primary" />
+          </div>
+
+          <div>
+            <label class="font-bold text-slate-700 block mb-1">Executive Remarks / Return Directives (Optional)</label>
+            <textarea id="exec-approval-notes" rows="2" placeholder="e.g. Leave authorization granted. Handover protocol acknowledged. Safe travels and restful recess." class="w-full px-3 py-2 rounded-xl border border-slate-300 bg-white text-xs outline-none focus:border-primary"></textarea>
+          </div>
+
+          <label class="flex items-center gap-2 cursor-pointer pt-1">
+            <input type="checkbox" id="exec-send-email-check" checked class="accent-primary w-4 h-4 rounded" />
+            <span class="font-bold text-emerald-950 text-xs">Dispatch official executive approval email notification immediately upon authorization</span>
+          </label>
+        </div>
+
+        <!-- Buttons -->
+        <div class="flex items-center justify-end gap-2 pt-2 border-t border-slate-100">
+          <button type="button" onclick="closeExecutiveApprovalModal()" class="px-4 py-2 rounded-xl border border-slate-300 text-slate-700 font-bold hover:bg-slate-50">Cancel</button>
+          <button type="submit" id="btn-confirm-exec-approval" class="px-5 py-2.5 rounded-xl bg-primary hover:bg-primary-dark text-white font-extrabold flex items-center gap-1.5 shadow-md active:scale-95 transition cursor-pointer">
+            <span class="material-symbols-outlined text-[17px]">verified</span>
+            <span id="btn-confirm-exec-label">Confirm Authorization &amp; Send Email</span>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL: RESEND EXECUTIVE APPROVAL EMAIL -->
+  <div id="resend-email-modal" class="hidden fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl border border-slate-200 max-w-md w-full p-6 shadow-2xl space-y-4">
+      <div class="flex items-start justify-between pb-3 border-b border-slate-100">
+        <div class="flex items-center gap-2.5">
+          <div class="w-10 h-10 rounded-xl bg-blue-50 border border-blue-200 text-blue-700 flex items-center justify-center">
+            <span class="material-symbols-outlined text-2xl">forward_to_inbox</span>
+          </div>
+          <div>
+            <h3 class="font-extrabold text-base text-slate-900 leading-tight">Resend Executive Approval Email</h3>
+            <p class="text-[11px] text-slate-500 font-medium">Re-dispatch official approval notice to employee</p>
+          </div>
+        </div>
+        <button type="button" onclick="closeResendEmailModal()" class="text-slate-400 hover:text-slate-600 p-1 rounded-lg">
+          <span class="material-symbols-outlined text-[20px]">close</span>
+        </button>
+      </div>
+
+      <form id="resend-email-form" onsubmit="submitResendEmail(event)" class="space-y-4 text-xs">
+        <input type="hidden" id="resend-app-id" />
+        
+        <div>
+          <label class="font-bold text-slate-700 block mb-1">Application Reference</label>
+          <input type="text" id="resend-ref-display" readonly class="w-full px-3 py-2 rounded-xl border border-slate-200 bg-slate-50 text-slate-600 font-mono font-bold" />
+        </div>
+
+        <div>
+          <label class="font-bold text-slate-700 block mb-1">Recipient Employee Email <span class="text-rose-600">*</span></label>
+          <input type="email" id="resend-recipient-email" required placeholder="employee.email@domain.com" class="w-full px-3 py-2 rounded-xl border border-slate-300 bg-white font-mono font-bold text-slate-900 outline-none focus:border-primary shadow-2xs" />
+        </div>
+
+        <div>
+          <label class="font-bold text-slate-700 block mb-1">Executive Signatory Authority</label>
+          <input type="text" id="resend-signatory-name" value="Albert Joseph Bandama (CEO & Executive Director)" class="w-full px-3 py-2 rounded-xl border border-slate-300 bg-white text-slate-800 font-bold outline-none focus:border-primary" />
+        </div>
+
+        <div class="flex items-center justify-end gap-2 pt-2 border-t border-slate-100">
+          <button type="button" onclick="closeResendEmailModal()" class="px-4 py-2 rounded-xl border border-slate-300 text-slate-700 font-bold hover:bg-slate-50">Cancel</button>
+          <button type="submit" id="btn-submit-resend" class="px-5 py-2.5 rounded-xl bg-blue-700 hover:bg-blue-800 text-white font-extrabold flex items-center gap-1.5 shadow-md active:scale-95 transition cursor-pointer">
+            <span class="material-symbols-outlined text-[17px]">send</span>
+            <span id="btn-submit-resend-label">Dispatch Email Now</span>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    let activeTab = 'pending';
+
+    document.addEventListener('DOMContentLoaded', () => {
+      initReviewConsole();
+    });
+
+    function initReviewConsole() {
+      if (typeof BCF_LEAVE === 'undefined') {
+        setTimeout(initReviewConsole, 40);
+        return;
+      }
+      renderApplications();
+      updateResumptionBanner();
+    }
+
+    function setReviewTab(tab) {
+      activeTab = tab;
+      ['pending', 'approved', 'completed', 'rejected'].forEach(t => {
+        const btn = document.getElementById(`tab-${t}`);
+        if (t === tab) {
+          btn.className = 'px-3.5 py-1.5 rounded-xl text-xs font-bold flex items-center gap-1.5 bg-primary text-white shadow-2xs';
+        } else {
+          btn.className = 'px-3.5 py-1.5 rounded-xl text-xs font-bold flex items-center gap-1.5 text-slate-600 hover:bg-slate-100';
+        }
+      });
+      renderApplications();
+      updateResumptionBanner();
+    }
+
+    function renderApplications() {
+      const container = document.getElementById('applications-list');
+      if (!container) return;
+
+      const allApps = BCF_LEAVE.getApplications();
+      const curOfficer = document.getElementById('review-officer-select')?.value || 'HR Director';
+
+      // Update badge
+      const pendingCount = allApps.filter(a => a.status.startsWith('Pending')).length;
+      document.getElementById('pending-counter-badge').textContent = `${pendingCount} Request(s) Pending`;
+
+      let filtered = [];
+      if (activeTab === 'pending') {
+        filtered = allApps.filter(a => a.status.startsWith('Pending'));
+      } else if (activeTab === 'approved') {
+        filtered = allApps.filter(a => ['Approved', 'Active (On Leave)'].includes(a.status));
+      } else if (activeTab === 'completed') {
+        filtered = allApps.filter(a => a.status === 'Completed (Returned)');
+      } else {
+        filtered = allApps.filter(a => ['Rejected', 'Cancelled', 'Recalled by Management'].includes(a.status));
+      }
+
+      if (filtered.length === 0) {
+        container.innerHTML = `
+          <div class="bg-white rounded-2xl border border-slate-200 p-12 text-center text-slate-400 text-xs">
+            <span class="material-symbols-outlined text-4xl block mb-2 opacity-50">task_alt</span>
+            <p class="font-bold text-slate-600">No applications in this category.</p>
+            <p class="text-[11px] mt-0.5">All dossiers in the current workflow view are clear and resolved.</p>
+          </div>
+        `;
+        return;
+      }
+
+      container.innerHTML = filtered.map(app => {
+        const emp = BCF_LEAVE.getEmployee(app.employeeId);
+        const elig = emp ? BCF_LEAVE.calculateEligibility(emp) : null;
+        const conflict = BCF_LEAVE.checkStaffingConflicts(app.department, app.startDate, app.endDate, app.id);
+        const alw = app.allowanceId ? BCF_LEAVE.getAllowance(app.allowanceId) : null;
+        const resStatus = BCF_LEAVE.getResumptionStatus ? BCF_LEAVE.getResumptionStatus(app) : { isDue: false, statusText: '' };
+
+        return `
+          <div class="bg-white rounded-2xl border border-slate-200 p-5 shadow-xs space-y-4 hover:border-slate-300 transition">
+            <!-- Header Row -->
+            <div class="flex items-start justify-between gap-3 flex-wrap">
+              <div class="flex items-center gap-3">
+                <div class="w-11 h-11 rounded-xl bg-slate-100 flex items-center justify-center font-bold text-primary text-sm font-headline">
+                  ${app.employeeName.split(' ').map(n=>n[0]).join('').slice(0,2)}
+                </div>
+                <div>
+                  <div class="flex items-center gap-2 flex-wrap">
+                    <h3 class="font-extrabold text-sm text-slate-900">${app.employeeName}</h3>
+                    <span class="font-mono text-[11px] font-bold text-primary">${app.id}</span>
+                    <span class="badge-soft ${getStatusBadgeClass(app.status)}">${app.status}</span>
+                    ${resStatus.isDue ? `
+                      <span class="px-2 py-0.5 rounded-full text-[10px] font-black bg-emerald-100 text-emerald-900 border border-emerald-400 flex items-center gap-1 animate-pulse">
+                        <span class="w-1.5 h-1.5 rounded-full bg-emerald-600"></span>
+                        <span>Resumption Date Reached</span>
+                      </span>
+                    ` : ''}
+                  </div>
+                  <p class="text-xs text-slate-500 mt-0.5">${app.position} • ${app.department}</p>
+                </div>
+              </div>
+
+              <!-- Ref, Dates & Email Badges -->
+              <div class="text-right">
+                <span class="font-bold text-xs text-slate-800 block">${app.leaveType}</span>
+                <span class="text-[11px] text-slate-500 font-mono">${app.startDate} to ${app.endDate} (${app.daysRequested} Days)</span>
+                <div class="flex items-center justify-end gap-1 mt-1 flex-wrap">
+                  ${app.returnEmailDispatched ? `
+                    <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-teal-100 text-teal-800 border border-teal-300" title="Return to work clearance delivered to ${app.returnEmailRecipient || app.employeeEmail}">
+                      <span class="material-symbols-outlined text-[13px]">how_to_reg</span>
+                      <span>Return Email Sent</span>
+                    </span>
+                  ` : ''}
+                  ${app.emailDispatched ? `
+                    <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-emerald-100 text-emerald-800 border border-emerald-300" title="Delivered to ${app.emailRecipient} at ${app.emailDispatchedAt}">
+                      <span class="material-symbols-outlined text-[13px]">mark_email_read</span>
+                      <span>Approval Email Sent</span>
+                    </span>
+                  ` : (app.status === 'Approved' ? `
+                    <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-100 text-amber-900 border border-amber-300" title="${app.emailError || 'Email queued'}">
+                      <span class="material-symbols-outlined text-[13px]">mail</span>
+                      <span>${app.emailError ? 'Email Error' : 'Email Pending'}</span>
+                    </span>
+                  ` : '')}
+                </div>
+              </div>
+            </div>
+
+            <!-- Detail Grid -->
+            <div class="grid grid-cols-2 sm:grid-cols-4 gap-2.5 p-3 rounded-xl bg-slate-50 border border-slate-100 text-xs">
+              <div>
+                <span class="text-[10px] uppercase font-bold text-slate-400 block">Employment Date</span>
+                <span class="font-mono text-slate-800 font-bold">${BCF_LEAVE.formatDate(app.employmentDate)}</span>
+              </div>
+              <div>
+                <span class="text-[10px] uppercase font-bold text-slate-400 block">Balance Impact</span>
+                <span class="font-mono font-bold text-slate-900">${app.balanceBefore}d &rarr; <strong class="text-primary">${app.balanceAfter}d</strong></span>
+              </div>
+              <div>
+                <span class="text-[10px] uppercase font-bold text-slate-400 block">Handover Officer</span>
+                <span class="font-bold text-slate-800 truncate block">${app.handoverOfficer || '—'}</span>
+              </div>
+              <div>
+                <span class="text-[10px] uppercase font-bold text-slate-400 block">5% Allowance Claim</span>
+                <span class="font-mono font-bold ${alw ? 'text-primary' : 'text-slate-400'}">
+                  ${alw ? BCF_LEAVE.formatCurrency(alw.allowanceAmount) : 'None Attached'}
+                </span>
+              </div>
+            </div>
+
+            <!-- Notification Recipient & Notes -->
+            <div class="text-xs text-slate-600 bg-white p-2.5 rounded-lg border border-slate-100 space-y-1">
+              <div class="flex items-center justify-between flex-wrap gap-1 text-[11px] pb-1 border-b border-slate-100">
+                <span class="text-slate-500 font-bold flex items-center gap-1">
+                  <span class="material-symbols-outlined text-slate-400 text-[14px]">alternate_email</span>
+                  <span>Employee Notification Email:</span>
+                </span>
+                <span class="font-mono font-bold text-slate-900">${app.employeeEmail || (emp && emp.email) || 'albertjosephhassanbandama@gmail.com'}</span>
+              </div>
+              <div>
+                <span class="font-bold text-slate-800">Reason:</span> ${app.reason}
+              </div>
+              ${app.handoverNotes ? `<div class="text-[11px] text-slate-500"><strong class="text-slate-700">Handover Coverage:</strong> ${app.handoverNotes}</div>` : ''}
+              ${app.rejectionReason ? `<div class="text-[11px] text-rose-700 font-bold">Rejection Note: ${app.rejectionReason}</div>` : ''}
+              ${app.finalApproval?.notes ? `<div class="text-[11px] text-emerald-800 font-medium italic"><strong class="not-italic text-emerald-950 font-bold">Executive Directive:</strong> "${app.finalApproval.notes}"</div>` : ''}
+            </div>
+
+            <!-- Resumption Date Detection & Return Alert Banner (Section 27 & 29) -->
+            ${(app.status === 'Active (On Leave)' || app.status === 'Approved') ? `
+              <div class="p-3 rounded-xl ${resStatus.isDue ? 'bg-gradient-to-r from-emerald-50 via-teal-50 to-emerald-100/60 border border-emerald-300 text-emerald-950' : 'bg-slate-50 border border-slate-200 text-slate-700'} text-xs flex items-center justify-between gap-3 shadow-2xs">
+                <div class="flex items-start gap-2.5">
+                  <span class="material-symbols-outlined ${resStatus.isDue ? 'text-emerald-700 text-[22px] animate-pulse' : 'text-primary text-[20px]'}">
+                    ${resStatus.isDue ? 'event_available' : 'calendar_clock'}
+                  </span>
+                  <div>
+                    <div class="flex items-center gap-2 flex-wrap">
+                      <strong class="font-extrabold ${resStatus.isDue ? 'text-emerald-950 text-xs' : 'text-slate-900'}">
+                        Resumption Date: ${app.endDate}
+                      </strong>
+                      <span class="px-2 py-0.2 rounded-full text-[10px] font-bold ${resStatus.isDue ? 'bg-emerald-200 text-emerald-900 border border-emerald-300' : 'bg-slate-200 text-slate-700'}">
+                        ${resStatus.statusText}
+                      </span>
+                    </div>
+                    <p class="text-[11px] ${resStatus.isDue ? 'text-emerald-800' : 'text-slate-500'} mt-0.5">
+                      ${resStatus.isDue 
+                        ? `Statutory leave period completed. The system is ready to auto-confirm return to work and dispatch clearance to <strong>${app.employeeEmail || (emp && emp.email) || 'albertjosephhassanbandama@gmail.com'}</strong>.` 
+                        : `Scheduled return date detected. You can auto-confirm now or wait for automated batch scanner.`}
+                    </p>
+                  </div>
+                </div>
+                <button onclick="autoConfirmSingleApp('${app.id}')" class="px-3 py-1.5 rounded-xl ${resStatus.isDue ? 'bg-emerald-800 hover:bg-emerald-900 text-white' : 'bg-slate-200 hover:bg-emerald-700 hover:text-white text-slate-800'} font-extrabold text-xs flex items-center gap-1.5 shadow-2xs active:scale-95 transition cursor-pointer shrink-0">
+                  <span class="material-symbols-outlined text-[15px]">bolt</span>
+                  <span>⚡ Auto-Confirm &amp; Notify</span>
+                </button>
+              </div>
+            ` : ''}
+
+            ${app.status === 'Completed (Returned)' ? `
+              <div class="p-2.5 rounded-xl bg-emerald-50/70 border border-emerald-200 text-emerald-950 text-xs flex items-center justify-between gap-2">
+                <div class="flex items-center gap-2">
+                  <span class="material-symbols-outlined text-emerald-700 text-[18px]">how_to_reg</span>
+                  <div>
+                    <strong class="font-bold text-emerald-900">Return to Duty Confirmed (Effective: ${app.returnDate || app.endDate})</strong>
+                    ${app.returnNotes ? `<p class="text-[11px] text-emerald-800 italic mt-0.5">"${app.returnNotes}"</p>` : ''}
+                  </div>
+                </div>
+                <span class="px-2 py-0.5 rounded-md bg-emerald-100 text-emerald-800 text-[10px] font-extrabold border border-emerald-300">
+                  ${app.returnAutoProcessed ? 'Automated Clearance' : 'Manual HR Sign-Off'}
+                </span>
+              </div>
+            ` : ''}
+
+            <!-- Conflict Checking Banner (Section 18) -->
+            ${conflict.conflictCount > 0 ? `
+              <div class="p-2.5 rounded-xl bg-amber-50 border border-amber-200 text-amber-950 text-xs flex items-center gap-2">
+                <span class="material-symbols-outlined text-amber-600 text-[18px]">warning</span>
+                <span>${conflict.alertMessage}</span>
+              </div>
+            ` : ''}
+
+            <!-- Multi-Tier Approval Pipeline Strip (Section 17) -->
+            <div class="pt-2 border-t border-slate-100 flex items-center justify-between flex-wrap gap-2 text-xs">
+              <div class="flex items-center gap-2">
+                <span class="px-2 py-0.5 rounded text-[10px] font-bold ${app.supervisorApproval?.approved ? 'bg-emerald-100 text-emerald-800' : 'bg-slate-100 text-slate-500'}">
+                  1. Supervisor: ${app.supervisorApproval?.approved ? '✓ Approved' : 'Pending'}
+                </span>
+                <span class="text-slate-300">&rarr;</span>
+                <span class="px-2 py-0.5 rounded text-[10px] font-bold ${app.hrVerification?.approved ? 'bg-emerald-100 text-emerald-800' : 'bg-slate-100 text-slate-500'}">
+                  2. HR: ${app.hrVerification?.approved ? '✓ Verified' : 'Pending'}
+                </span>
+                <span class="text-slate-300">&rarr;</span>
+                <span class="px-2 py-0.5 rounded text-[10px] font-bold ${app.finalApproval?.approved ? 'bg-emerald-100 text-emerald-800' : 'bg-slate-100 text-slate-500'}">
+                  3. Executive: ${app.finalApproval?.approved ? '✓ Authorized' : 'Pending'}
+                </span>
+              </div>
+
+              <!-- Action Buttons -->
+              <div class="flex items-center gap-1.5 flex-wrap">
+                ${getActionButtonsForApp(app, curOfficer)}
+              </div>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function getStatusBadgeClass(status) {
+      if (status === 'Approved' || status === 'Completed (Returned)') return 'bg-emerald-100 text-emerald-800';
+      if (status.startsWith('Pending')) return 'bg-amber-100 text-amber-900';
+      if (status === 'Active (On Leave)') return 'bg-blue-100 text-blue-900';
+      return 'bg-rose-100 text-rose-800';
+    }
+
+    function getActionButtonsForApp(app, curOfficer) {
+      if (app.status === 'Pending Supervisor Review') {
+        return `
+          <button onclick="rejectModal('${app.id}')" class="px-2.5 py-1 rounded-lg border border-rose-200 text-rose-700 hover:bg-rose-50 text-xs font-bold cursor-pointer">Reject</button>
+          <button onclick="approveSupervisor('${app.id}')" class="px-3 py-1 rounded-lg bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-extrabold cursor-pointer">Supervisor Sign-Off</button>
+        `;
+      }
+      if (app.status === 'Pending HR Verification') {
+        return `
+          <button onclick="rejectModal('${app.id}')" class="px-2.5 py-1 rounded-lg border border-rose-200 text-rose-700 hover:bg-rose-50 text-xs font-bold cursor-pointer">Reject</button>
+          <button onclick="verifyHr('${app.id}')" class="px-3 py-1 rounded-lg bg-primary hover:bg-primary-dark text-white text-xs font-extrabold cursor-pointer">Verify HR Compliance</button>
+        `;
+      }
+      if (app.status === 'Pending Final Approval') {
+        return `
+          <button onclick="rejectModal('${app.id}')" class="px-2.5 py-1 rounded-lg border border-rose-200 text-rose-700 hover:bg-rose-50 text-xs font-bold cursor-pointer">Reject</button>
+          <button onclick="openExecutiveApprovalModal('${app.id}')" class="px-3.5 py-1.5 rounded-lg bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-extrabold flex items-center gap-1.5 shadow-xs cursor-pointer">
+            <span class="material-symbols-outlined text-[15px]">verified</span>
+            <span>Executive Final Authorize</span>
+          </button>
+        `;
+      }
+      if (app.status === 'Approved' || app.status === 'Active (On Leave)') {
+        return `
+          <button onclick="openResendEmailModal('${app.id}')" class="px-2.5 py-1 rounded-lg border border-blue-200 bg-blue-50/70 hover:bg-blue-100 text-blue-700 text-xs font-bold flex items-center gap-1 cursor-pointer" title="Resend official executive approval email to employee">
+            <span class="material-symbols-outlined text-[14px]">send</span>
+            <span>Resend Email</span>
+          </button>
+          <button onclick="openRecallModal('${app.id}')" class="px-2.5 py-1 rounded-lg border border-amber-300 text-amber-800 hover:bg-amber-50 text-xs font-bold cursor-pointer" title="Emergency operational recall">Recall</button>
+          <button onclick="autoConfirmSingleApp('${app.id}')" class="px-3 py-1 rounded-lg bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-black flex items-center gap-1 cursor-pointer shadow-2xs active:scale-95 transition" title="Automatically detect Resumption Date, confirm return to work and dispatch confirmation email to employee">
+            <span class="material-symbols-outlined text-[15px]">bolt</span>
+            <span>Auto Confirm Return</span>
+          </button>
+          <button onclick="openReturnModal('${app.id}')" class="px-3 py-1 rounded-lg bg-primary hover:bg-primary-dark text-white text-xs font-extrabold cursor-pointer flex items-center gap-1" title="Manual Section 29 Return to Work confirmation modal">
+            <span class="material-symbols-outlined text-[15px]">how_to_reg</span>
+            <span>Confirm Return to Work</span>
+          </button>
+        `;
+      }
+      if (app.status === 'Completed (Returned)') {
+        return `
+          <button onclick="openReturnModal('${app.id}')" class="px-2.5 py-1 rounded-lg border border-slate-300 hover:bg-slate-50 text-slate-700 text-xs font-bold cursor-pointer flex items-center gap-1" title="Review return dossier and clearance record">
+            <span class="material-symbols-outlined text-[14px]">visibility</span>
+            <span>Return Dossier</span>
+          </button>
+        `;
+      }
+      return `<span class="text-slate-400 text-[11px] italic">Resolved</span>`;
+    }
+
+    // ─────────────────────────────────────────────────────────────
+    // APPROVAL HANDLERS
+    // ─────────────────────────────────────────────────────────────
+    function approveSupervisor(appId) {
+      const officer = document.getElementById('review-officer-select').value;
+      BCF_LEAVE.supervisorApprove(appId, officer);
+      BCF_LEAVE.showToast(`Supervisor sign-off recorded for ${appId}`, 'success');
+      renderApplications();
+    }
+
+    function verifyHr(appId) {
+      const officer = document.getElementById('review-officer-select').value;
+      BCF_LEAVE.hrVerify(appId, officer);
+      BCF_LEAVE.showToast(`HR verification completed for ${appId}`, 'success');
+      renderApplications();
+    }
+
+    function openExecutiveApprovalModal(appId) {
+      const app = BCF_LEAVE.getApplication(appId);
+      if (!app) return;
+      const emp = BCF_LEAVE.getEmployee(app.employeeId);
+      const alw = app.allowanceId ? BCF_LEAVE.getAllowance(app.allowanceId) : null;
+      const curOfficer = document.getElementById('review-officer-select').value;
+
+      document.getElementById('exec-app-id').value = appId;
+      document.getElementById('m-exec-app-id').textContent = app.id;
+      document.getElementById('m-exec-leave-type').textContent = app.leaveType;
+      document.getElementById('m-exec-emp-name').textContent = app.employeeName;
+      document.getElementById('m-exec-emp-id').textContent = app.employeeId;
+      document.getElementById('m-exec-dept-role').textContent = `${app.department} • ${app.position}`;
+      document.getElementById('m-exec-period').textContent = `${BCF_LEAVE.formatDate(app.startDate)} – ${BCF_LEAVE.formatDate(app.endDate)}`;
+      document.getElementById('m-exec-days').textContent = `${app.daysRequested} Working Days`;
+      document.getElementById('m-exec-allowance').textContent = alw ? BCF_LEAVE.formatCurrency(alw.allowanceAmount) : 'No allowance claim';
+      document.getElementById('m-exec-balance').textContent = `Balance after: ${app.balanceAfter} Days`;
+
+      // Prefill recipient email
+      const targetEmail = app.employeeEmail || (emp && emp.email) || '';
+      document.getElementById('exec-recipient-email').value = targetEmail;
+      document.getElementById('exec-signatory-name').value = curOfficer || 'Albert Joseph Bandama (CEO & Executive Director)';
+      document.getElementById('exec-approval-notes').value = '';
+      document.getElementById('exec-send-email-check').checked = true;
+
+      const m = document.getElementById('exec-approval-modal');
+      m.classList.remove('hidden');
+      m.style.display = 'flex';
+    }
+
+    function closeExecutiveApprovalModal() {
+      const m = document.getElementById('exec-approval-modal');
+      if (m) {
+        m.classList.add('hidden');
+        m.style.display = 'none';
+      }
+    }
+
+    async function submitExecutiveApproval(e) {
+      e.preventDefault();
+      const appId = document.getElementById('exec-app-id').value;
+      const recipientEmail = document.getElementById('exec-recipient-email').value.trim();
+      const signatory = document.getElementById('exec-signatory-name').value.trim();
+      const executiveNotes = document.getElementById('exec-approval-notes').value.trim();
+      const sendEmail = document.getElementById('exec-send-email-check').checked;
+
+      const btn = document.getElementById('btn-confirm-exec-approval');
+      const label = document.getElementById('btn-confirm-exec-label');
+      const prevText = label.textContent;
+
+      try {
+        btn.disabled = true;
+        label.textContent = sendEmail ? 'Authorizing & Dispatching Email...' : 'Authorizing...';
+
+        const result = await BCF_LEAVE.finalApprove(appId, signatory, {
+          recipientEmail,
+          executiveNotes,
+          skipEmail: !sendEmail
+        });
+
+        closeExecutiveApprovalModal();
+
+        if (sendEmail) {
+          if (result.emailResult && result.emailResult.success) {
+            BCF_LEAVE.showToast(`✅ Executive authorization granted! Official approval email sent to ${recipientEmail}.`, 'success');
+          } else {
+            const err = result.emailResult?.error || 'Email dispatch issue';
+            BCF_LEAVE.showToast(`Executive authorization issued! Notice: ${err}`, 'warning');
+          }
+        } else {
+          BCF_LEAVE.showToast(`Executive authorization issued for ${appId}.`, 'success');
+        }
+
+        renderApplications();
+      } catch (err) {
+        BCF_LEAVE.showToast(`Approval failed: ${err.message}`, 'error');
+      } finally {
+        btn.disabled = false;
+        label.textContent = prevText;
+      }
+    }
+
+    function openResendEmailModal(appId) {
+      const app = BCF_LEAVE.getApplication(appId);
+      if (!app) return;
+      const emp = BCF_LEAVE.getEmployee(app.employeeId);
+      const curOfficer = document.getElementById('review-officer-select').value;
+
+      document.getElementById('resend-app-id').value = appId;
+      document.getElementById('resend-ref-display').value = `${app.id} (${app.employeeName})`;
+      document.getElementById('resend-recipient-email').value = app.emailRecipient || app.employeeEmail || (emp && emp.email) || '';
+      document.getElementById('resend-signatory-name').value = app.finalApproval?.officer || curOfficer || 'Albert Joseph Bandama (CEO & Executive Director)';
+
+      const m = document.getElementById('resend-email-modal');
+      m.classList.remove('hidden');
+      m.style.display = 'flex';
+    }
+
+    function closeResendEmailModal() {
+      const m = document.getElementById('resend-email-modal');
+      if (m) {
+        m.classList.add('hidden');
+        m.style.display = 'none';
+      }
+    }
+
+    async function submitResendEmail(e) {
+      e.preventDefault();
+      const appId = document.getElementById('resend-app-id').value;
+      const recipientEmail = document.getElementById('resend-recipient-email').value.trim();
+      const signatory = document.getElementById('resend-signatory-name').value.trim();
+
+      const btn = document.getElementById('btn-submit-resend');
+      const label = document.getElementById('btn-submit-resend-label');
+      const prevText = label.textContent;
+
+      try {
+        btn.disabled = true;
+        label.textContent = 'Dispatching Email via SMTP...';
+
+        const result = await BCF_LEAVE.resendApprovalNotification(appId, signatory, recipientEmail);
+        closeResendEmailModal();
+
+        if (result && result.success) {
+          BCF_LEAVE.showToast(`✅ Executive approval email successfully resent to ${recipientEmail}!`, 'success');
+        } else {
+          BCF_LEAVE.showToast(`Dispatch error: ${result?.error || 'Could not send email'}`, 'error');
+        }
+
+        renderApplications();
+      } catch (err) {
+        BCF_LEAVE.showToast(`Resend failed: ${err.message}`, 'error');
+      } finally {
+        btn.disabled = false;
+        label.textContent = prevText;
+      }
+    }
+
+    // ─────────────────────────────────────────────────────────────
+    // REJECTION MODAL
+    // ─────────────────────────────────────────────────────────────
+    function rejectModal(appId) {
+      document.getElementById('reject-app-id').value = appId;
+      document.getElementById('reject-reason').value = '';
+      const m = document.getElementById('reject-modal');
+      m.classList.remove('hidden');
+      m.style.display = 'flex';
+    }
+    function closeRejectModal() {
+      const m = document.getElementById('reject-modal');
+      if (m) {
+        m.classList.add('hidden');
+        m.style.display = 'none';
+      }
+    }
+    function submitReject(e) {
+      e.preventDefault();
+      const id = document.getElementById('reject-app-id').value;
+      const reason = document.getElementById('reject-reason').value.trim();
+      const officer = document.getElementById('review-officer-select').value;
+      BCF_LEAVE.rejectApplication(id, officer, reason);
+      closeRejectModal();
+      BCF_LEAVE.showToast(`Application ${id} rejected.`, 'info');
+      renderApplications();
+    }
+
+    // ─────────────────────────────────────────────────────────────
+    // RECALL MODAL (Section 28)
+    // ─────────────────────────────────────────────────────────────
+    function openRecallModal(appId) {
+      document.getElementById('recall-app-id').value = appId;
+      document.getElementById('recall-reason').value = '';
+      const m = document.getElementById('recall-modal');
+      m.classList.remove('hidden');
+      m.style.display = 'flex';
+    }
+    function closeRecallModal() {
+      const m = document.getElementById('recall-modal');
+      if (m) {
+        m.classList.add('hidden');
+        m.style.display = 'none';
+      }
+    }
+    function submitRecall(e) {
+      e.preventDefault();
+      const id = document.getElementById('recall-app-id').value;
+      const reason = document.getElementById('recall-reason').value.trim();
+      const unspent = document.getElementById('recall-unspent-days').value;
+      const officer = document.getElementById('review-officer-select').value;
+      BCF_LEAVE.recallFromLeave(id, officer, reason, unspent);
+      closeRecallModal();
+      BCF_LEAVE.showToast(`Emergency recall issued for ${id}. Days refunded to ledger.`, 'warning');
+      renderApplications();
+    }
+
+    // ─────────────────────────────────────────────────────────────
+    // RETURN TO WORK MODAL & RESUMPTION AUTOMATION (Section 29)
+    // ─────────────────────────────────────────────────────────────
+    function openReturnModal(appId) {
+      const app = BCF_LEAVE.getApplication(appId);
+      if (!app) return;
+      const emp = BCF_LEAVE.getEmployee(app.employeeId);
+      const curOfficer = document.getElementById('review-officer-select')?.value || 'Albert Joseph Bandama (CEO & Executive Director)';
+
+      document.getElementById('return-app-id').value = appId;
+      document.getElementById('m-return-app-id').textContent = app.id;
+      document.getElementById('m-return-status-badge').textContent = app.status;
+      document.getElementById('m-return-emp-name').textContent = app.employeeName;
+      document.getElementById('m-return-emp-id').textContent = app.employeeId;
+      document.getElementById('m-return-leave-type').textContent = app.leaveType;
+      document.getElementById('m-return-days-count').textContent = `${app.daysRequested} Days`;
+      document.getElementById('m-return-period').textContent = `${app.startDate} to ${app.endDate}`;
+      document.getElementById('m-return-handover').textContent = app.handoverOfficer || 'Joseph Conteh';
+
+      const resStatus = BCF_LEAVE.getResumptionStatus ? BCF_LEAVE.getResumptionStatus(app) : { isDue: false, statusText: '' };
+      const alertEl = document.getElementById('m-return-resumption-alert');
+      const textEl = document.getElementById('m-return-resumption-text');
+      if (alertEl && textEl) {
+        if (resStatus.isDue) {
+          alertEl.className = 'p-2 rounded-lg bg-emerald-50 border border-emerald-300 text-[11px] font-bold text-emerald-950 flex items-center gap-1.5';
+          textEl.textContent = `Resumption Date (${app.endDate}) reached! Record is due for Section 29 return clearance.`;
+        } else {
+          alertEl.className = 'p-2 rounded-lg bg-blue-50 border border-blue-200 text-[11px] font-bold text-blue-950 flex items-center gap-1.5';
+          textEl.textContent = `Scheduled Resumption Date: ${app.endDate} (${resStatus.statusText}).`;
+        }
+      }
+
+      // Prefill recipient employee email (defaulting to Mohamed Bangura's target address)
+      const targetEmail = (app.employeeEmail || (emp && emp.email) || 'albertjosephhassanbandama@gmail.com').trim();
+      document.getElementById('return-recipient-email').value = targetEmail;
+      document.getElementById('return-effective-date').value = app.returnDate || app.endDate || (BCF_LEAVE.formatIsoDate ? BCF_LEAVE.formatIsoDate(new Date()) : '2026-10-15');
+      document.getElementById('return-clearing-officer').value = curOfficer;
+      document.getElementById('return-notes').value = app.returnNotes || `Employee resumed active duty in satisfactory condition; handover responsibilities reversed from ${app.handoverOfficer || 'handover officer'}.`;
+      document.getElementById('return-send-email-check').checked = true;
+
+      const m = document.getElementById('return-modal');
+      m.classList.remove('hidden');
+      m.style.display = 'flex';
+    }
+
+    function closeReturnModal() {
+      const m = document.getElementById('return-modal');
+      if (m) {
+        m.classList.add('hidden');
+        m.style.display = 'none';
+      }
+    }
+
+    async function submitReturn(e) {
+      e.preventDefault();
+      const id = document.getElementById('return-app-id').value;
+      const notes = document.getElementById('return-notes').value.trim();
+      const returnDate = document.getElementById('return-effective-date').value;
+      const officer = document.getElementById('return-clearing-officer').value.trim();
+      const recipientEmail = document.getElementById('return-recipient-email').value.trim();
+      const sendEmail = document.getElementById('return-send-email-check').checked;
+
+      const btn = document.getElementById('btn-submit-return');
+      const label = document.getElementById('btn-submit-return-label');
+      const prevText = label ? label.textContent : '';
+
+      try {
+        if (btn) btn.disabled = true;
+        if (label) label.textContent = sendEmail ? 'Signing Clearance & Dispatching Email...' : 'Signing Return Clearance...';
+
+        const result = await BCF_LEAVE.confirmReturnToWork(id, notes, {
+          sendEmail,
+          recipientEmail,
+          returnDate,
+          officer,
+          isAuto: false
+        });
+
+        closeReturnModal();
+
+        if (sendEmail) {
+          if (result.emailResult && result.emailResult.success) {
+            BCF_LEAVE.showToast(`✅ Return to duty confirmed for ${id}! Official resumption notice sent to staff at ${recipientEmail} to resume duty.`, 'success');
+          } else {
+            const err = result.emailResult?.error || 'Email queued';
+            BCF_LEAVE.showToast(`Return to duty recorded for ${id}. (Notice: ${err})`, 'warning');
+          }
+        } else {
+          BCF_LEAVE.showToast(`Return to work confirmed for ${id}. Leave record closed.`, 'success');
+        }
+
+        renderApplications();
+        updateResumptionBanner();
+      } catch (err) {
+        BCF_LEAVE.showToast(`Return confirmation failed: ${err.message}`, 'error');
+      } finally {
+        if (btn) btn.disabled = false;
+        if (label) label.textContent = prevText;
+      }
+    }
+
+    async function autoConfirmSingleApp(appId) {
+      const app = BCF_LEAVE.getApplication(appId);
+      if (!app) return;
+      const emp = BCF_LEAVE.getEmployee(app.employeeId);
+      const targetEmail = (app.employeeEmail || (emp && emp.email) || 'albertjosephhassanbandama@gmail.com').trim();
+      const curOfficer = document.getElementById('review-officer-select')?.value || 'Albert Joseph Bandama (CEO & Executive Director)';
+
+      const confirmMsg = `Auto-Confirm Return to Duty for ${app.employeeName} (${app.id})?\n\n` +
+        `• Resumption Date: ${app.endDate}\n` +
+        `• Notification Email: ${targetEmail}\n` +
+        `• Clearance Mode: Automated System Return (Section 29)\n\n` +
+        `The system will confirm return to work and dispatch the official return confirmation email. Proceed?`;
+
+      if (!confirm(confirmMsg)) return;
+
+      BCF_LEAVE.showToast(`Auto-detecting resumption and executing return clearance for ${app.id}...`, 'info');
+
+      try {
+        const result = await BCF_LEAVE.confirmReturnToWork(app.id, `System auto-cleared: Resumption date reached (${app.endDate}). Duty re-assumed; handover reversed.`, {
+          isAuto: true,
+          sendEmail: true,
+          recipientEmail: targetEmail,
+          returnDate: app.endDate,
+          officer: curOfficer
+        });
+
+        if (result.emailResult && result.emailResult.success) {
+          BCF_LEAVE.showToast(`✅ Auto-confirmed return for ${app.employeeName}! Official resumption notice sent to staff at ${targetEmail} to resume duty.`, 'success');
+        } else {
+          const err = result.emailResult?.error || 'Email queued';
+          BCF_LEAVE.showToast(`Auto-confirmed return for ${app.employeeName}! (Email notice: ${err})`, 'warning');
+        }
+
+        renderApplications();
+        updateResumptionBanner();
+      } catch (err) {
+        BCF_LEAVE.showToast(`Auto-confirmation failed: ${err.message}`, 'error');
+      }
+    }
+
+    async function triggerAutoResumptionScan(forceScheduled = false) {
+      const btn = document.getElementById('btn-auto-detect-resumptions');
+      const label = document.getElementById('btn-auto-detect-label');
+      const prevText = label ? label.textContent : '';
+
+      try {
+        if (btn) btn.disabled = true;
+        if (label) label.textContent = 'Scanning Active Leaves...';
+
+        let due = BCF_LEAVE.getDueResumptions ? BCF_LEAVE.getDueResumptions() : [];
+        let autoForce = forceScheduled;
+
+        if (due.length === 0 && !forceScheduled) {
+          const activeLeaves = BCF_LEAVE.getApplications().filter(a => 
+            (a.status === 'Active (On Leave)' || a.status === 'Approved') && !a.returnConfirmed && a.endDate
+          );
+
+          if (activeLeaves.length > 0) {
+            const leaveList = activeLeaves.map(a => `• ${a.employeeName} (${a.id}, Resumption Date: ${a.endDate})`).join('\n');
+            const proceed = confirm(
+              `Resumption Scanner Notification:\n\n` +
+              `Today is ${BCF_LEAVE.formatIsoDate ? BCF_LEAVE.formatIsoDate(new Date()) : '2026-10-07'}.\n` +
+              `Active leave(s) scheduled for resumption:\n${leaveList}\n\n` +
+              `Would you like the system to auto-confirm return to work against their scheduled Resumption Date and dispatch official Section 29 confirmation emails now?`
+            );
+            if (proceed) {
+              autoForce = true;
+            } else {
+              BCF_LEAVE.showToast('Resumption scan completed. No actions taken.', 'info');
+              if (btn) btn.disabled = false;
+              if (label) label.textContent = prevText;
+              return;
+            }
+          } else {
+            BCF_LEAVE.showToast('Resumption scan completed: No active leaves require return clearance.', 'info');
+            if (btn) btn.disabled = false;
+            if (label) label.textContent = prevText;
+            return;
+          }
+        }
+
+        if (label) label.textContent = 'Auto-Confirming & Dispatching Emails...';
+        const curOfficer = document.getElementById('review-officer-select')?.value || 'Automated HR Resumption Engine';
+
+        const res = await BCF_LEAVE.autoDetectAndProcessResumptions({
+          includeScheduledActive: autoForce,
+          sendEmail: true,
+          officer: curOfficer
+        });
+
+        const emailsSent = res.results.filter(r => r.emailResult && r.emailResult.success).length;
+        BCF_LEAVE.showToast(`✅ Auto-resumption complete! Cleared ${res.processedCount} leave(s) and dispatched ${emailsSent} confirmation email(s).`, 'success');
+
+        renderApplications();
+        updateResumptionBanner();
+      } catch (err) {
+        BCF_LEAVE.showToast(`Scan error: ${err.message}`, 'error');
+      } finally {
+        if (btn) btn.disabled = false;
+        if (label) label.textContent = prevText;
+      }
+    }
+
+    function updateResumptionBanner() {
+      const summaryEl = document.getElementById('resumption-due-summary');
+      const todayEl = document.getElementById('resumption-today-date');
+      if (!summaryEl) return;
+
+      const todayIso = BCF_LEAVE.formatIsoDate ? BCF_LEAVE.formatIsoDate(new Date()) : '2026-10-07';
+      if (todayEl) todayEl.textContent = `Current System Date: ${BCF_LEAVE.formatDate(todayIso)}`;
+
+      const allApps = BCF_LEAVE.getApplications();
+      const activeApps = allApps.filter(a => (a.status === 'Active (On Leave)' || a.status === 'Approved') && !a.returnConfirmed);
+      const dueApps = BCF_LEAVE.getDueResumptions ? BCF_LEAVE.getDueResumptions() : [];
+
+      if (dueApps.length > 0) {
+        summaryEl.innerHTML = `<span class="text-rose-700 font-extrabold flex items-center gap-1">⚠️ ${dueApps.length} leave record(s) reached Resumption Date — Ready for Section 29 clearance.</span>`;
+      } else if (activeApps.length > 0) {
+        const nextApp = activeApps[0];
+        summaryEl.innerHTML = `<span class="text-emerald-800 font-bold">Active leave monitored: ${nextApp.employeeName} (${nextApp.id}) • Resumption: ${nextApp.endDate}</span>`;
+      } else {
+        summaryEl.innerHTML = `<span class="text-slate-600 font-bold">All active leaves returned. No pending resumptions.</span>`;
+      }
+    }
+  </script>
+</body>
+</html>

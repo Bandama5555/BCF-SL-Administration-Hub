@@ -1,0 +1,3107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>HR Governance, Account Provisioning & Learning Administration — BCF-SL</title>
+<meta name="description" content="Manage staff account credentials, course request approvals, certificate verifications, semester quotas, and partner vendor licenses for Bandama Charity Foundation Sierra Leone."/>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin=""/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+  tailwind.config = {
+    theme: {
+      extend: {
+        fontFamily: {
+          sans: ['Inter', 'sans-serif'],
+          display: ['Plus Jakarta Sans', 'sans-serif']
+        },
+        colors: {
+          bcf: {
+            navy: '#00236f',
+            blue: '#0051d5',
+            cobalt: '#0b4fd6',
+            emerald: '#059669',
+            amber: '#d97706'
+          }
+        }
+      }
+    }
+  };
+</script>
+<script src="../learning_db.js?v=20261010_smtp_live_v3"></script>
+<script src="../bcf_mongo_bridge.js?v=20261010_v1"></script>
+<style>
+  body {
+    background: radial-gradient(1200px 500px at 10% -10%, #dbe7ff 0, transparent 60%),
+                radial-gradient(900px 400px at 110% 0, #e0f2fe 0, transparent 55%),
+                #f5f7fb;
+  }
+  .hero {
+    background: linear-gradient(135deg, #00164e 0%, #00236f 45%, #0051d5 90%, #1d4ed8 100%);
+  }
+  .chip {
+    font-size: 11px;
+    font-weight: 700;
+    padding: 3px 10px;
+    border-radius: 9999px;
+  }
+  .tab-btn {
+    padding: 9px 16px;
+    border-radius: 12px;
+    font-size: 12.5px;
+    font-weight: 700;
+    color: #475569;
+    transition: all .2s;
+  }
+  .tab-btn.active {
+    background: #ffffff;
+    color: #00236f;
+    box-shadow: 0 4px 14px -4px rgba(0, 35, 111, 0.25);
+  }
+  .fade-in { animation: f .3s ease both; }
+  @keyframes f { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+  /* Compact Size Mode for Admin Verification Receipt */
+  .receipt-compact-size #modal-email-html {
+    font-size: 11px !important;
+    line-height: 1.35 !important;
+    max-width: 580px !important;
+  }
+  .receipt-compact-size #modal-email-html div[style*="max-width: 600px"] {
+    max-width: 100% !important;
+    border-radius: 10px !important;
+  }
+  .receipt-compact-size #modal-email-html div[style*="padding: 24px"] {
+    padding: 10px 16px !important;
+    font-size: 11px !important;
+    line-height: 1.4 !important;
+  }
+  .receipt-compact-size #modal-email-html h2 {
+    font-size: 14px !important;
+    margin: 0 !important;
+  }
+  .receipt-compact-size #modal-email-html div[style*="padding: 18px"],
+  .receipt-compact-size #modal-email-html div[style*="background: #f8fafc"] {
+    padding: 8px 12px !important;
+    margin: 8px 0 !important;
+    border-radius: 8px !important;
+  }
+  .receipt-compact-size #modal-email-html table {
+    font-size: 11px !important;
+  }
+  .receipt-compact-size #modal-email-html table td {
+    padding: 2px 0 !important;
+  }
+  .receipt-compact-size #modal-email-html p {
+    margin: 4px 0 !important;
+  }
+  .receipt-compact-size #modal-email-html div[style*="margin: 24px 0"] {
+    margin: 8px 0 !important;
+  }
+  .receipt-compact-size #modal-email-html a[style*="padding: 12px 28px"] {
+    padding: 6px 18px !important;
+    font-size: 11px !important;
+    border-radius: 8px !important;
+  }
+  .receipt-compact-size #modal-email-html div[style*="background: #eff6ff"] {
+    padding: 6px 10px !important;
+    margin: 8px 0 !important;
+    font-size: 10.5px !important;
+  }
+  .receipt-compact-size #modal-email-html div[style*="background: #f1f5f9"] {
+    padding: 8px 14px !important;
+    font-size: 10px !important;
+  }
+</style>
+</head>
+<body class="font-sans text-slate-800 min-h-screen flex flex-col antialiased selection:bg-blue-600 selection:text-white">
+
+<!-- Top Navigation Bar -->
+<header class="sticky top-0 z-40 bg-white/90 backdrop-blur-xl border-b border-slate-200/80 shadow-xs">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between gap-3">
+    
+    <!-- Brand Info -->
+    <div class="flex items-center gap-3 min-w-0">
+      <div class="w-10 h-10 rounded-xl hero text-white flex items-center justify-center shadow-md shrink-0">
+        <span class="material-symbols-outlined text-[22px]">admin_panel_settings</span>
+      </div>
+      <div class="min-w-0">
+        <div class="flex items-center gap-2">
+          <h1 class="font-display font-extrabold text-[15px] text-slate-900 leading-none truncate">BCF-SL Learning Portal</h1>
+          <span class="hidden sm:inline-block px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-blue-100 text-blue-800">HR Governance & Administration</span>
+        </div>
+        <p class="text-[11px] text-slate-500 mt-1 truncate" id="hdr-sub">Staff Provisioning, Approvals & Partner Licenses</p>
+      </div>
+    </div>
+
+    <!-- Navigation Links -->
+    <nav class="hidden md:flex items-center gap-1 text-xs font-semibold">
+      <a target="_top" class="px-2.5 py-1.5 rounded-lg text-slate-600 hover:bg-slate-100 transition-colors" href="/learning/course-allocation" onclick="navTo('/learning/course-allocation'); return false;">Course Catalogue</a>
+      <a target="_top" class="px-2.5 py-1.5 rounded-lg text-slate-600 hover:bg-slate-100 transition-colors" href="/learning/learning-grades" onclick="navTo('/learning/learning-grades'); return false;">My Learning & Grades</a>
+      <a target="_top" class="px-2.5 py-1.5 rounded-lg text-slate-600 hover:bg-slate-100 transition-colors" href="/learning/certificates" onclick="navTo('/learning/certificates'); return false;">Certificates & Transcripts</a>
+      <a id="nav-acc-link" class="px-2.5 py-1.5 rounded-lg text-slate-600 hover:bg-slate-100 transition flex items-center gap-1 cursor-pointer" href="#accounts" onclick="switchTab('accounts'); return false;">
+        <span>Accounts</span> <span class="px-1.5 py-0.2 rounded text-[9px] bg-amber-100 text-amber-800 font-bold">Admin</span>
+      </a>
+      <a id="nav-dash-link" class="px-2.5 py-1.5 rounded-lg text-slate-600 hover:bg-slate-100 transition flex items-center gap-1 cursor-pointer" href="#analytics" onclick="switchTab('analytics'); return false;">
+        <span>Dashboard</span> <span class="px-1.5 py-0.2 rounded text-[9px] bg-indigo-100 text-indigo-800 font-bold">Admin</span>
+      </a>
+    </nav>
+
+    <!-- User / Profile Control -->
+    <div class="flex items-center gap-2">
+      
+      <!-- Notifications -->
+      <button id="btn-notif" class="relative w-10 h-10 rounded-xl hover:bg-slate-100 flex items-center justify-center text-slate-600 transition" onclick="toggleNotif()" aria-label="Notifications">
+        <span class="material-symbols-outlined text-xl">notifications</span>
+        <span id="notif-dot" class="hidden absolute top-1.5 right-1.5 min-w-[16px] h-4 px-1 rounded-full bg-rose-500 text-white text-[9px] font-bold flex items-center justify-center"></span>
+      </button>
+
+      <!-- Staff Switcher Dropdown Trigger -->
+      <div class="relative">
+        <button onclick="toggleUserDropdown()" class="flex items-center gap-2.5 p-1.5 pr-2.5 rounded-xl hover:bg-slate-100 border border-transparent hover:border-slate-200 transition">
+          <div id="avatar" class="w-8 h-8 rounded-full bg-gradient-to-br from-blue-700 to-indigo-800 text-white text-xs font-bold flex items-center justify-center shadow-xs">--</div>
+          <div class="hidden sm:block text-left leading-tight">
+            <div id="emp-name" class="text-xs font-bold text-slate-900 truncate max-w-[130px]">—</div>
+            <div id="emp-pos" class="text-[10px] text-slate-500 truncate max-w-[130px]">—</div>
+          </div>
+          <span class="material-symbols-outlined text-slate-400 text-sm">expand_more</span>
+        </button>
+
+        <!-- Dropdown Menu -->
+        <div id="user-dropdown" class="hidden absolute right-0 top-12 w-64 bg-white rounded-2xl shadow-xl border border-slate-200 p-2 z-50 fade-in">
+          <div class="px-3 py-2 border-b border-slate-100">
+            <div class="text-[10px] uppercase font-bold text-slate-400">Switch Active Staff Profile</div>
+            <div class="text-xs text-slate-600 mt-0.5">Quickly test learning state as another employee:</div>
+          </div>
+          <div class="py-1 flex flex-col gap-0.5" id="staff-switcher-items"></div>
+          <div class="pt-2 border-t border-slate-100 flex items-center justify-between px-2">
+            <a target="_top" href="/learning/login" onclick="navTo('/learning/login'); return false;" class="text-xs font-bold text-blue-700 hover:underline flex items-center gap-1">
+              <span class="material-symbols-outlined text-sm">login</span> Sign In Portal
+            </a>
+            <button onclick="logout()" class="text-xs font-bold text-rose-600 hover:underline flex items-center gap-1">
+              <span class="material-symbols-outlined text-sm">logout</span> Logout
+            </button>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Notification Drawer -->
+  <div id="notif-panel" class="hidden absolute right-4 top-16 w-80 max-h-96 overflow-auto bg-white rounded-2xl shadow-2xl border border-slate-200 p-3 z-50 fade-in"></div>
+</header>
+
+<main class="max-w-7xl mx-auto px-4 sm:px-6 py-6 flex flex-col gap-6 flex-1 w-full">
+
+  <!-- Hero Header Banner -->
+  <section class="hero rounded-3xl text-white p-6 sm:p-8 shadow-xl relative overflow-hidden">
+    <div class="absolute -right-16 -top-16 w-80 h-80 rounded-full bg-sky-400/20 blur-3xl pointer-events-none"></div>
+    <div class="absolute -left-12 -bottom-20 w-80 h-80 rounded-full bg-indigo-500/20 blur-3xl pointer-events-none"></div>
+
+    <div class="relative z-10 flex flex-col lg:flex-row lg:items-center justify-between gap-6">
+      <div>
+        <div class="flex flex-wrap items-center gap-2 mb-2">
+          <span class="chip bg-white/15 border border-white/20 text-white flex items-center gap-1">
+            <span class="material-symbols-outlined text-sm text-emerald-300">verified_user</span>
+            <span>BCF-SL HR Governance Console</span>
+          </span>
+          <span id="hero-sem-badge" class="chip bg-blue-400/20 text-blue-200 border border-blue-300/30">Active Semester</span>
+        </div>
+        <h2 class="font-display font-extrabold text-2xl sm:text-3xl tracking-tight text-white">
+          Staff Account Provisioning & Governance
+        </h2>
+        <p class="text-blue-100 text-xs sm:text-sm mt-1 max-w-2xl leading-relaxed">
+          Manage staff portal credentials, review course enrollment requests, verify submitted partner certificates, enforce the 2-course semester quota, and administer vendor subscriptions (Coursera, Udemy, Microsoft Learn).
+        </p>
+      </div>
+
+      <div class="flex flex-wrap items-center gap-3">
+        <a href="/learning/login" onclick="navTo('/learning/login'); return false;" class="h-10 px-4 rounded-xl bg-white hover:bg-blue-50 text-blue-900 font-bold text-xs flex items-center gap-1.5 shadow-md transition">
+          <span class="material-symbols-outlined text-base text-blue-700">login</span> Open Staff Login Portal
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- KPI Operational Metric Grid -->
+  <section class="grid grid-cols-2 md:grid-cols-4 gap-4" id="kpis-grid">
+    <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200 border-l-4 border-l-blue-600">
+      <div class="flex items-center justify-between text-slate-400 mb-1">
+        <span class="text-[10px] font-extrabold uppercase tracking-wider text-slate-500">Provisioned Accounts</span>
+        <span class="material-symbols-outlined text-blue-600 text-xl">group</span>
+      </div>
+      <div class="font-display font-extrabold text-2xl text-slate-900" id="stat-total-accounts">0</div>
+      <div class="text-[11px] font-semibold text-emerald-600 mt-1 flex items-center gap-1">
+        <span class="material-symbols-outlined text-sm">check_circle</span> Active Staff Credentials
+      </div>
+    </div>
+
+    <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200 border-l-4 border-l-amber-500">
+      <div class="flex items-center justify-between text-slate-400 mb-1">
+        <span class="text-[10px] font-extrabold uppercase tracking-wider text-slate-500">Pending Requests</span>
+        <span class="material-symbols-outlined text-amber-600 text-xl">pending_actions</span>
+      </div>
+      <div class="font-display font-extrabold text-2xl text-amber-700" id="stat-pending-requests">0</div>
+      <div class="text-[11px] font-medium text-slate-500 mt-1">Awaiting HR endorsement</div>
+    </div>
+
+    <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200 border-l-4 border-l-teal-500">
+      <div class="flex items-center justify-between text-slate-400 mb-1">
+        <span class="text-[10px] font-extrabold uppercase tracking-wider text-slate-500">Certs Awaiting Verification</span>
+        <span class="material-symbols-outlined text-teal-600 text-xl">upload_file</span>
+      </div>
+      <div class="font-display font-extrabold text-2xl text-teal-700" id="stat-pending-certs">0</div>
+      <div class="text-[11px] font-medium text-slate-500 mt-1">Staff submitted diplomas</div>
+    </div>
+
+    <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200 border-l-4 border-l-indigo-600">
+      <div class="flex items-center justify-between text-slate-400 mb-1">
+        <span class="text-[10px] font-extrabold uppercase tracking-wider text-slate-500">Semester Quota Policy</span>
+        <span class="material-symbols-outlined text-indigo-600 text-xl">inventory_2</span>
+      </div>
+      <div class="font-display font-extrabold text-2xl text-indigo-950" id="stat-quota-rule">2 Courses</div>
+      <div class="text-[11px] font-medium text-slate-500 mt-1">Cap per staff member per term</div>
+    </div>
+  </section>
+
+  <!-- Multi-Tab Navigation -->
+  <div class="flex flex-wrap items-center justify-between gap-4 border-b border-slate-200 pb-3">
+    <div class="bg-slate-200/70 p-1 rounded-2xl flex flex-wrap gap-1">
+      <button class="tab-btn active" data-tab="accounts" onclick="switchTab('accounts')">
+        <span class="material-symbols-outlined text-sm align-middle mr-1">person_add</span> Staff Account Creation (Admin Only)
+      </button>
+      <button class="tab-btn" data-tab="approvals" onclick="switchTab('approvals')">
+        Approvals &amp; Enrolment Queue <span id="queue-badge" class="ml-1.5 px-2 py-0.5 rounded-full text-[10px] bg-amber-500 text-white font-extrabold hidden">0</span>
+      </button>
+      <button class="tab-btn" data-tab="analytics" onclick="switchTab('analytics')">
+        <span class="material-symbols-outlined text-sm align-middle mr-1">insights</span> Learning Dashboard &amp; Analytics (Admin Only)
+      </button>
+      <button class="tab-btn" data-tab="quotas" onclick="switchTab('quotas')">
+        <span class="material-symbols-outlined text-sm align-middle mr-1">admin_panel_settings</span> Semester Governance &amp; Quotas (Admin Only)
+      </button>
+      <button class="tab-btn" data-tab="vendors" onclick="switchTab('vendors')">Vendor Licenses &amp; Seats</button>
+      <button class="tab-btn" data-tab="emails" onclick="switchTab('emails')">
+        Dispatched Emails Ledger <span id="emails-badge" class="ml-1.5 px-2 py-0.5 rounded-full text-[10px] bg-blue-600 text-white font-extrabold">0</span>
+      </button>
+    </div>
+
+    <div class="text-xs text-slate-500 font-medium hidden sm:flex items-center gap-1.5">
+      <span class="w-2 h-2 rounded-full bg-blue-600"></span> Policy Engine: 2-Course Meter Active
+    </div>
+  </div>
+
+  <!-- TAB 1: Staff Account Creation & Provisioning (Admin Only) -->
+  <section id="tab-accounts" class="flex flex-col gap-6 fade-in">
+
+    <!-- Admin Authorization Security Banner -->
+    <div class="bg-gradient-to-r from-amber-500/10 via-amber-50/60 to-blue-50/40 border border-amber-300/80 rounded-3xl p-5 flex flex-col md:flex-row md:items-center justify-between gap-4 shadow-xs">
+      <div class="flex items-start gap-3.5">
+        <div class="w-11 h-11 rounded-2xl bg-amber-500 text-white flex items-center justify-center shrink-0 shadow-xs">
+          <span class="material-symbols-outlined text-2xl">admin_panel_settings</span>
+        </div>
+        <div>
+          <div class="flex items-center gap-2 mb-0.5">
+            <span class="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold uppercase tracking-wider bg-amber-200 text-amber-900 border border-amber-300">
+              🔒 Administrator Restricted Tool
+            </span>
+            <span class="text-xs font-bold text-amber-900">BCF-SL HR Governance Console</span>
+          </div>
+          <h4 class="font-display font-extrabold text-base text-slate-900">Staff Account Creation &amp; Provisioning Console</h4>
+          <p class="text-xs text-slate-600 mt-0.5 max-w-2xl leading-relaxed">
+            This account creation portal is accessible exclusively by BCF-SL Administrators. Regular staff are restricted from creating or modifying accounts, viewing analytics, or resetting credentials.
+          </p>
+        </div>
+      </div>
+      <div class="flex items-center gap-2 text-xs font-bold text-emerald-800 bg-emerald-100/90 border border-emerald-300 px-3.5 py-2 rounded-2xl shrink-0 self-start md:self-auto">
+        <span class="w-2.5 h-2.5 rounded-full bg-emerald-600 animate-pulse"></span>
+        <span>Administrator Session Verified</span>
+      </div>
+    </div>
+
+    <!-- Batch Provision All Staff Banner (Executive Automation) -->
+    <div class="bg-gradient-to-r from-blue-950 via-slate-900 to-indigo-950 text-white rounded-3xl p-6 shadow-xl border border-blue-800/40 relative overflow-hidden flex flex-col md:flex-row md:items-center justify-between gap-6">
+      <div class="absolute -right-10 -bottom-10 w-48 h-48 bg-blue-500/10 rounded-full blur-2xl pointer-events-none"></div>
+      <div class="flex items-start gap-4 z-10">
+        <div class="w-12 h-12 rounded-2xl bg-amber-400/20 border border-amber-300/30 flex items-center justify-center shrink-0 text-amber-300">
+          <span class="material-symbols-outlined text-2xl">bolt</span>
+        </div>
+        <div>
+          <div class="flex items-center gap-2 mb-1">
+            <span class="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold uppercase tracking-wider bg-amber-400 text-slate-950 shadow-xs">1-Click Institutional Automation</span>
+            <span class="text-[11px] text-blue-200" id="batch-status-sub">All Departments Roster</span>
+          </div>
+          <h4 class="font-display font-extrabold text-lg text-white">Batch Create & Provision Accounts for All Staff</h4>
+          <p class="text-xs text-blue-200/90 mt-1 max-w-xl leading-relaxed">
+            Instantly create portal credentials for all registered personnel across Executive, HR, Finance, Programs, IT, Procurement, and Safety departments and automatically dispatch official login emails via SMTP.
+          </p>
+        </div>
+      </div>
+
+      <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 shrink-0 z-10">
+        <div class="bg-white/10 backdrop-blur-md px-4 py-2.5 rounded-2xl border border-white/15 text-center min-w-[130px]">
+          <div class="text-[10px] uppercase font-bold text-blue-200">Directory Status</div>
+          <div class="font-display font-extrabold text-sm text-white" id="batch-coverage-display">Loading...</div>
+        </div>
+        <button type="button" onclick="openBatchProvisionModal()" class="h-11 px-5 rounded-2xl bg-amber-400 hover:bg-amber-300 text-slate-950 font-extrabold text-xs flex items-center justify-center gap-2 shadow-lg transition transform active:scale-95">
+          <span class="material-symbols-outlined text-lg">group_add</span>
+          <span>⚡ Provision All Staff Accounts</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Primary Account Creation / Edit Form Card -->
+    <div class="bg-white rounded-3xl border border-slate-200 shadow-sm overflow-hidden">
+      
+      <div class="hero p-5 text-white flex items-center justify-between">
+        <div class="flex items-center gap-3">
+          <span class="w-10 h-10 rounded-xl bg-white/15 backdrop-blur-md text-blue-200 flex items-center justify-center ring-1 ring-white/20">
+            <span class="material-symbols-outlined text-xl">person_add</span>
+          </span>
+          <div>
+            <h3 class="font-display font-extrabold text-base text-white" id="form-card-title">Provision New Staff Account</h3>
+            <p class="text-xs text-blue-100/80 font-normal">Assign staff identity, email, username, and password credentials</p>
+          </div>
+        </div>
+        <button type="button" id="reset-form-btn" onclick="resetForm()" class="px-3 py-1.5 rounded-xl bg-white/15 hover:bg-white/25 text-white font-bold text-xs transition backdrop-blur-md hidden flex items-center gap-1">
+          <span class="material-symbols-outlined text-sm">add_circle</span>
+          <span>Create New</span>
+        </button>
+      </div>
+
+      <form id="account-form" onsubmit="handleAccountSubmit(event)" class="p-6 flex flex-col gap-5">
+
+        <!-- Quick Staff Directory Auto-Fill -->
+        <div class="bg-gradient-to-r from-blue-50 to-indigo-50/60 border border-blue-200/70 rounded-2xl p-4 flex flex-col gap-2 shadow-2xs">
+          <div class="flex items-center justify-between">
+            <label class="text-xs font-bold text-blue-950 flex items-center gap-2" for="staff-prefill-select">
+              <span class="material-symbols-outlined text-base text-blue-600">badge</span>
+              <span>Quick Pre-fill from BCF-SL Staff Directory</span>
+            </label>
+            <span class="text-[10px] font-bold text-blue-600 uppercase tracking-wider bg-blue-100 px-2 py-0.5 rounded-full" id="staff-directory-count-badge">Loading Directory...</span>
+          </div>
+          <select id="staff-prefill-select" onchange="prefillStaffDetails(this.value)" class="w-full h-11 px-3.5 rounded-xl border border-blue-200 bg-white text-xs font-semibold text-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-600 shadow-2xs">
+            <option value="">-- Choose an existing staff member to auto-populate credentials --</option>
+          </select>
+          <p class="text-[11px] text-slate-500 font-medium">Select any registered personnel from the master BCF-SL directory across all departments to auto-fill identity and generate credentials.</p>
+        </div>
+
+        <input type="hidden" id="edit-account-id" value=""/>
+
+        <!-- Form Grid Fields -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
+
+          <!-- Staff Name -->
+          <div class="flex flex-col gap-1.5">
+            <label class="text-xs font-bold text-slate-800" for="employeeName">Employee Full Name <span class="text-red-500">*</span></label>
+            <div class="relative rounded-xl border border-slate-300 bg-slate-50/50">
+              <span class="material-symbols-outlined absolute left-3.5 top-3 text-slate-400 text-lg">person</span>
+              <input type="text" id="employeeName" required placeholder="e.g. Sahr Emmanuel Bangura" class="w-full h-11 pl-10 pr-3.5 rounded-xl bg-transparent text-xs font-semibold text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-600"/>
+            </div>
+          </div>
+
+          <!-- Employee ID -->
+          <div class="flex flex-col gap-1.5">
+            <label class="text-xs font-bold text-slate-800" for="employeeId">Employee ID <span class="text-red-500">*</span></label>
+            <div class="relative rounded-xl border border-slate-300 bg-slate-50/50">
+              <span class="material-symbols-outlined absolute left-3.5 top-3 text-slate-400 text-lg">badge</span>
+              <input type="text" id="employeeId" required placeholder="e.g. BCF-EMP-2027-0001" class="w-full h-11 pl-10 pr-3.5 rounded-xl bg-transparent text-xs font-semibold text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-600"/>
+            </div>
+          </div>
+
+          <!-- Phone Number -->
+          <div class="flex flex-col gap-1.5">
+            <label class="text-xs font-bold text-slate-800" for="employeePhone">Phone Number <span class="text-red-500">*</span></label>
+            <div class="relative rounded-xl border border-slate-300 bg-slate-50/50">
+              <span class="material-symbols-outlined absolute left-3.5 top-3 text-slate-400 text-lg">call</span>
+              <input type="tel" id="employeePhone" required placeholder="e.g. +232 76 123456" class="w-full h-11 pl-10 pr-3.5 rounded-xl bg-transparent text-xs font-semibold text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-600"/>
+            </div>
+          </div>
+
+          <!-- Work Email -->
+          <div class="flex flex-col gap-1.5">
+            <div class="flex flex-wrap items-center justify-between gap-1.5">
+              <label class="text-xs font-bold text-slate-800" for="employeeEmail">Work Email Address <span class="text-red-500">*</span></label>
+              <div class="flex items-center gap-2">
+                <button type="button" onclick="fillTestGmail('albertjosephhassanbandama@gmail.com')" class="text-[11px] text-blue-700 font-bold hover:underline flex items-center gap-1 bg-blue-50 px-2 py-0.5 rounded border border-blue-200">
+                  <span class="material-symbols-outlined text-[13px]">person</span>
+                  <span>Use Albert's Gmail</span>
+                </button>
+                <button type="button" onclick="fillTestGmail('bandamacharityfoundationsl@gmail.com')" class="text-[11px] text-indigo-700 font-bold hover:underline flex items-center gap-1 bg-indigo-50 px-2 py-0.5 rounded border border-indigo-200">
+                  <span class="material-symbols-outlined text-[13px]">domain</span>
+                  <span>Use Foundation Gmail</span>
+                </button>
+              </div>
+            </div>
+            <div class="relative rounded-xl border border-slate-300 bg-slate-50/50">
+              <span class="material-symbols-outlined absolute left-3.5 top-3 text-slate-400 text-lg">mail</span>
+              <input type="email" id="employeeEmail" required placeholder="e.g. albertjosephhassanbandama@gmail.com" class="w-full h-11 pl-10 pr-3.5 rounded-xl bg-transparent text-xs font-semibold text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-600"/>
+            </div>
+            <div class="flex items-center justify-between gap-2 text-[11px] text-slate-500 font-medium">
+              <span>Enter an accessible mailbox. Live credentials &amp; archive copies are auto-sent via Gmail SMTP.</span>
+              <button type="button" onclick="triggerDirectLiveTestEmail()" class="text-emerald-700 font-bold hover:underline shrink-0 flex items-center gap-1">
+                <span class="material-symbols-outlined text-[13px]">send</span>
+                <span>Send Test Email Now</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Department -->
+          <div class="flex flex-col gap-1.5">
+            <label class="text-xs font-bold text-slate-800" for="department">Department &amp; Directorate</label>
+            <div class="relative rounded-xl border border-slate-300 bg-slate-50/50">
+              <select id="department" class="w-full h-11 px-3.5 rounded-xl bg-transparent text-xs font-semibold text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-600">
+                <option value="Executive Management">Executive Management</option>
+                <option value="Human Resources Management Department">Human Resources Management Department</option>
+                <option value="Finance Department">Finance Department</option>
+                <option value="Programs Department">Programs Department</option>
+                <option value="Information Technology (IT) Department">Information Technology (IT) Department</option>
+                <option value="Procurement Department">Procurement &amp; Supply Chain Department</option>
+                <option value="Internal Risk &amp; Audits Department">Internal Risk &amp; Audits Department</option>
+                <option value="Health &amp; Safety Department">Health &amp; Safety Department</option>
+                <option value="Legal &amp; Communication Department">Legal &amp; Communication Department</option>
+                <option value="IT Operations">IT Operations &amp; Systems</option>
+                <option value="Finance &amp; Auditing">Finance &amp; Auditing</option>
+                <option value="Logistics &amp; Field Operations">Logistics &amp; Field Operations</option>
+                <option value="Community Programs &amp; Outreach">Community Programs &amp; Outreach</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Position / Designation -->
+          <div class="flex flex-col gap-1.5">
+            <label class="text-xs font-bold text-slate-800" for="employeePosition">Job Title &amp; Designation <span class="text-red-500">*</span></label>
+            <div class="relative rounded-xl border border-slate-300 bg-slate-50/50">
+              <span class="material-symbols-outlined absolute left-3.5 top-3 text-slate-400 text-lg">work</span>
+              <input type="text" id="employeePosition" required placeholder="e.g. Senior Logistics Officer" class="w-full h-11 pl-10 pr-3.5 rounded-xl bg-transparent text-xs font-semibold text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-600"/>
+            </div>
+          </div>
+
+          <!-- Supervisor / Line Manager -->
+          <div class="flex flex-col gap-1.5">
+            <label class="text-xs font-bold text-slate-800" for="employeeSupervisor">Line Manager / Supervisor</label>
+            <div class="relative rounded-xl border border-slate-300 bg-slate-50/50">
+              <span class="material-symbols-outlined absolute left-3.5 top-3 text-slate-400 text-lg">supervisor_account</span>
+              <select id="employeeSupervisor" class="w-full h-11 pl-10 pr-3.5 rounded-xl bg-transparent text-xs font-semibold text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-600">
+                <option value="Albert Joseph Bandama (CEO)">Albert Joseph Bandama — Chief Executive Officer (CEO)</option>
+                <option value="Joe Ansumana Conteh (HR Director)">Joe Ansumana Conteh — Human Resources Director</option>
+                <option value="Mariama Bangura (Finance Director)">Mariama Bangura — Finance Director</option>
+                <option value="Aminata Kamara (Programs Director)">Aminata Kamara — Programs Director</option>
+                <option value="Hassan Mohamed Mansaray (IT Administrator)">Hassan Mohamed Mansaray — IT Systems Administrator</option>
+                <option value="Sahr David Williams (Risk & Audits Director)">Sahr David Williams — Internal Risk &amp; Audits Director</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Semester Quota Level -->
+          <div class="flex flex-col gap-1.5">
+            <label class="text-xs font-bold text-slate-800" for="quotaTier">Semester Quota Allocation</label>
+            <div class="relative rounded-xl border border-slate-300 bg-slate-50/50">
+              <span class="material-symbols-outlined absolute left-3.5 top-3 text-slate-400 text-lg">inventory_2</span>
+              <select id="quotaTier" class="w-full h-11 pl-10 pr-3.5 rounded-xl bg-transparent text-xs font-semibold text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-600">
+                <option value="2">Standard Policy (2 Course Slots / Semester)</option>
+                <option value="3">Executive &amp; Technical Track (3 Course Slots / Semester)</option>
+                <option value="1">Introductory / Probation (1 Course Slot / Semester)</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Access Status -->
+          <div class="flex flex-col gap-1.5">
+            <label class="text-xs font-bold text-slate-800" for="isActive">Account Login Privilege</label>
+            <div class="relative rounded-xl border border-slate-300 bg-slate-50/50">
+              <span class="material-symbols-outlined absolute left-3.5 top-3 text-slate-400 text-lg">security</span>
+              <select id="isActive" class="w-full h-11 pl-10 pr-3.5 rounded-xl bg-transparent text-xs font-bold text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-600">
+                <option value="true">Active (Granted Access to Select Online Courses)</option>
+                <option value="false">Suspended (Access Temporarily Locked)</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Username -->
+          <div class="flex flex-col gap-1.5">
+            <div class="flex items-center justify-between">
+              <label class="text-xs font-bold text-slate-800" for="username">Staff Login Username <span class="text-red-500">*</span></label>
+              <button type="button" onclick="generateUsernameFromName()" class="text-[11px] text-blue-700 font-bold hover:underline flex items-center gap-0.5">
+                <span class="material-symbols-outlined text-[13px]">bolt</span>
+                <span>Auto-Generate</span>
+              </button>
+            </div>
+            <div class="relative rounded-xl border border-slate-300 bg-slate-50/50">
+              <span class="material-symbols-outlined absolute left-3.5 top-3 text-slate-400 text-lg">account_circle</span>
+              <input type="text" id="username" required placeholder="e.g. sbangura" class="w-full h-11 pl-10 pr-3.5 rounded-xl bg-transparent text-xs font-mono font-bold text-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-600"/>
+            </div>
+          </div>
+
+          <!-- Password -->
+          <div class="flex flex-col gap-1.5">
+            <div class="flex items-center justify-between">
+              <label class="text-xs font-bold text-slate-800" for="password">Staff Login Password <span class="text-red-500">*</span></label>
+              <button type="button" onclick="generateRandomStrongPassword()" class="text-[11px] text-indigo-700 font-bold hover:underline flex items-center gap-0.5">
+                <span class="material-symbols-outlined text-[13px]">casino</span>
+                <span>🎲 Generate Strong</span>
+              </button>
+            </div>
+            <div class="relative rounded-xl border border-slate-300 bg-slate-50/50">
+              <span class="material-symbols-outlined absolute left-3.5 top-3 text-slate-400 text-lg">lock</span>
+              <input type="password" id="password" required placeholder="Enter login password" class="w-full h-11 pl-10 pr-10 rounded-xl bg-transparent text-xs font-mono font-bold text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-600"/>
+              <button type="button" onclick="togglePassVisibility()" class="absolute right-3 top-3 text-slate-400 hover:text-slate-700" title="Show/Hide Password">
+                <span class="material-symbols-outlined text-lg" id="pass-eye-icon">visibility</span>
+              </button>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Automated Email Credentials Dispatch Option -->
+        <div class="bg-gradient-to-r from-blue-50/90 to-indigo-50/80 border border-blue-200/90 rounded-2xl p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-2xs">
+          <label class="flex items-start sm:items-center gap-3 cursor-pointer text-xs font-bold text-slate-800">
+            <input type="checkbox" id="send-creds-email" checked class="mt-0.5 sm:mt-0 w-4 h-4 text-blue-600 rounded border-slate-300 focus:ring-blue-500 cursor-pointer" />
+            <span class="flex flex-col">
+              <span class="flex items-center gap-1.5 text-blue-950 font-extrabold">
+                <span class="material-symbols-outlined text-blue-600 text-base">forward_to_inbox</span>
+                Dispatch credentials notification email to Staff Work Email Address
+              </span>
+              <span class="text-[11px] font-medium text-slate-500 mt-0.5">
+                Automatically delivers official BCF-SL welcome letter with Login Username, Password, and Portal URL.
+              </span>
+            </span>
+          </label>
+          <span class="inline-flex items-center gap-1 text-[10px] uppercase tracking-wider font-extrabold text-blue-700 bg-blue-100/80 px-2.5 py-1 rounded-full border border-blue-200 shrink-0 self-start sm:self-auto">
+            <span class="material-symbols-outlined text-[13px]">mail</span> Auto-Email On Save
+          </span>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="flex items-center gap-3 pt-3 border-t border-slate-100">
+          <button type="submit" id="submit-account-btn" class="flex-1 h-12 rounded-2xl bg-blue-700 hover:bg-blue-800 text-white font-bold text-xs flex items-center justify-center gap-2 transition-all shadow-md">
+            <span class="material-symbols-outlined text-lg">save</span>
+            <span id="btn-text">Save &amp; Provision Staff Learning Account</span>
+          </button>
+          <button type="button" onclick="resetForm()" class="h-12 px-5 rounded-2xl border border-slate-300 bg-white text-slate-700 font-bold text-xs hover:bg-slate-100 transition shadow-2xs">
+            Clear Form
+          </button>
+        </div>
+
+      </form>
+    </div>
+
+    <!-- Provisioned Account Registry List -->
+    <div class="flex flex-col gap-4">
+      <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-3">
+        <div>
+          <div class="flex items-center gap-2">
+            <h3 class="font-display font-extrabold text-lg text-slate-900">Provisioned Staff Account Registry</h3>
+            <span class="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold bg-blue-100 text-blue-800" id="accounts-filtered-count">0 Accounts</span>
+          </div>
+          <p class="text-xs text-slate-500">View active credentials, access rights, line management, and quota allocations</p>
+        </div>
+
+        <!-- Filter & Search Controls -->
+        <div class="flex flex-wrap items-center gap-2.5">
+          <!-- Department Filter -->
+          <div class="relative">
+            <select id="filter-account-dept" onchange="renderAccountsList()" class="h-10 px-3 pr-8 rounded-xl border border-slate-300 bg-white text-xs font-semibold text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-600 shadow-2xs">
+              <option value="All">All Departments</option>
+              <option value="Executive Management">Executive Management</option>
+              <option value="Human Resources">Human Resources</option>
+              <option value="Finance">Finance</option>
+              <option value="Programs">Programs</option>
+              <option value="Information Technology">Information Technology</option>
+              <option value="Procurement">Procurement &amp; Logistics</option>
+              <option value="Health & Safety">Health &amp; Safety</option>
+              <option value="Internal Risk & Audits">Risk &amp; Audits</option>
+            </select>
+          </div>
+
+          <!-- Status Filter -->
+          <div class="relative">
+            <select id="filter-account-status" onchange="renderAccountsList()" class="h-10 px-3 pr-8 rounded-xl border border-slate-300 bg-white text-xs font-semibold text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-600 shadow-2xs">
+              <option value="All">All Statuses</option>
+              <option value="active">Active Only</option>
+              <option value="suspended">Suspended Only</option>
+            </select>
+          </div>
+
+          <!-- Search Bar -->
+          <div class="relative w-full sm:w-64">
+            <span class="material-symbols-outlined absolute left-3.5 top-2.5 text-slate-400 text-base">search</span>
+            <input type="text" id="search-accounts" oninput="renderAccountsList()" placeholder="Search name, ID, username..." class="w-full h-10 pl-10 pr-3.5 rounded-xl border border-slate-300 bg-white text-xs font-semibold text-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-600 shadow-2xs"/>
+          </div>
+        </div>
+      </div>
+
+      <!-- Accounts Cards Container -->
+      <div id="accounts-container" class="flex flex-col gap-3.5"></div>
+    </div>
+  </section>
+
+  <!-- TAB 2: Approvals & Enrolment Queue -->
+  <section id="tab-approvals" class="hidden flex flex-col gap-6 fade-in">
+    <!-- Course Requests Queue Card -->
+    <div class="bg-white rounded-3xl border border-slate-200 shadow-sm overflow-hidden p-6">
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4 border-b border-slate-100 pb-4">
+        <div>
+          <div class="flex items-center gap-2">
+            <h3 class="font-display font-extrabold text-lg text-slate-900">Staff Course Enrolment Requests</h3>
+            <span class="chip bg-amber-100 text-amber-800">Pending Review</span>
+          </div>
+          <p class="text-xs text-slate-500 mt-0.5">Approve courses to allocate partner seat licenses or decline with notes</p>
+        </div>
+      </div>
+
+      <div id="requests-queue-container" class="flex flex-col gap-3"></div>
+    </div>
+
+    <!-- Certificate Verification Queue Card -->
+    <div class="bg-white rounded-3xl border border-slate-200 shadow-sm overflow-hidden p-6">
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4 border-b border-slate-100 pb-4">
+        <div>
+          <div class="flex items-center gap-2">
+            <h3 class="font-display font-extrabold text-lg text-slate-900">Submitted Course Completion Certificates</h3>
+            <span class="chip bg-teal-100 text-teal-800">Verification Required</span>
+          </div>
+          <p class="text-xs text-slate-500 mt-0.5">Validate external completion credentials against partner records</p>
+        </div>
+      </div>
+
+      <div id="certificates-queue-container" class="flex flex-col gap-3"></div>
+    </div>
+  </section>
+
+  <!-- TAB 3: Semester Governance & Quotas -->
+  <section id="tab-quotas" class="hidden flex flex-col gap-6 fade-in">
+    <div class="grid md:grid-cols-2 gap-6">
+      
+      <!-- Current Active Semester -->
+      <div class="bg-white rounded-3xl border border-slate-200 shadow-sm p-6 flex flex-col justify-between">
+        <div>
+          <div class="flex items-center justify-between mb-4">
+            <h3 class="font-display font-extrabold text-base text-slate-900">Active Learning Term</h3>
+            <span class="chip bg-emerald-100 text-emerald-800 font-bold" id="gov-sem-status">Open for Selection</span>
+          </div>
+
+          <div class="space-y-3 text-xs">
+            <div class="p-4 rounded-2xl bg-blue-50/70 border border-blue-100">
+              <div class="text-[10px] uppercase font-bold text-blue-700">Semester Term Name</div>
+              <div class="text-base font-extrabold text-blue-950 mt-0.5" id="gov-sem-name">—</div>
+              <div class="text-slate-600 mt-1" id="gov-sem-dates">—</div>
+            </div>
+
+            <div class="p-3.5 rounded-2xl bg-slate-50 border border-slate-200/80">
+              <div class="font-bold text-slate-800">Staff Quota Rule Enforcement</div>
+              <p class="text-slate-500 mt-0.5">Maximum of <b>2 professional courses</b> per staff member per semester. Mandatory compliance courses do not consume quota slots.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="pt-5 border-t border-slate-100 mt-5 flex flex-col gap-2.5">
+          <button onclick="handleCloseSemester()" class="w-full h-11 rounded-xl bg-slate-900 hover:bg-black text-white font-bold text-xs flex items-center justify-center gap-2 transition">
+            <span class="material-symbols-outlined text-base">archive</span> Close Current Semester & Open Next Term
+          </button>
+          <button onclick="handleBroadcastReminder()" class="w-full h-11 rounded-xl border border-slate-300 hover:bg-slate-50 text-slate-700 font-bold text-xs flex items-center justify-center gap-2 transition">
+            <span class="material-symbols-outlined text-base text-amber-600">notifications_active</span> Broadcast Closing Notice to Staff
+          </button>
+        </div>
+      </div>
+
+      <!-- Governance Policy Controls -->
+      <div class="bg-white rounded-3xl border border-slate-200 shadow-sm p-6 flex flex-col justify-between">
+        <div>
+          <h3 class="font-display font-extrabold text-base text-slate-900 mb-4">Institutional Quota & Reminder Settings</h3>
+
+          <form id="settings-form" onsubmit="handleSettingsSave(event)" class="space-y-4 text-xs font-bold text-slate-700">
+            <div>
+              <label>Maximum Course Slots Per Semester (Quota Cap)</label>
+              <input type="number" id="set-slots" min="1" max="5" value="2" class="mt-1.5 w-full h-10 px-3.5 rounded-xl border border-slate-300 bg-slate-50 text-xs font-semibold focus:outline-none focus:ring-2 focus:ring-blue-600"/>
+              <p class="text-[10.5px] font-normal text-slate-400 mt-1">Default policy is 2 elective courses per term.</p>
+            </div>
+
+            <div>
+              <label>Inactivity Reminder Threshold (Days)</label>
+              <input type="number" id="set-reminders" min="3" max="60" value="14" class="mt-1.5 w-full h-10 px-3.5 rounded-xl border border-slate-300 bg-slate-50 text-xs font-semibold focus:outline-none focus:ring-2 focus:ring-blue-600"/>
+              <p class="text-[10.5px] font-normal text-slate-400 mt-1">Sends alert to staff if no activity is recorded for X days.</p>
+            </div>
+
+            <div>
+              <label>Passing Score Benchmark (%)</label>
+              <input type="number" id="set-passmark" min="50" max="100" value="80" class="mt-1.5 w-full h-10 px-3.5 rounded-xl border border-slate-300 bg-slate-50 text-xs font-semibold focus:outline-none focus:ring-2 focus:ring-blue-600"/>
+              <p class="text-[10.5px] font-normal text-slate-400 mt-1">Academic benchmark required for BCF-SL accredited certification.</p>
+            </div>
+
+            <button type="submit" class="w-full h-11 rounded-xl bg-blue-700 hover:bg-blue-800 text-white font-bold text-xs flex items-center justify-center gap-2 transition shadow-md mt-3">
+              <span class="material-symbols-outlined text-base">save</span> Save Policy Settings
+            </button>
+          </form>
+        </div>
+
+        <div class="mt-4 p-3 rounded-xl bg-amber-50 text-amber-900 text-[11px] border border-amber-200">
+          <b>Audit Trail:</b> All parameter modifications are permanently logged to the BCF-SL institutional governance ledger.
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- TAB 4: Vendor Subscriptions & Licenses -->
+  <section id="tab-vendors" class="hidden flex flex-col gap-6 fade-in">
+    <div class="bg-white rounded-3xl border border-slate-200 shadow-sm p-6">
+      <div class="flex items-center justify-between mb-4 border-b border-slate-100 pb-3">
+        <div>
+          <h3 class="font-display font-extrabold text-base text-slate-900">Partner Vendor Agreements & Enterprise Seats</h3>
+          <p class="text-xs text-slate-500">Corporate institutional subscriptions with international e-learning partners</p>
+        </div>
+        <span class="chip bg-blue-50 text-blue-700">Linked to Partnership Module</span>
+      </div>
+
+      <div class="grid md:grid-cols-2 gap-4" id="vendors-cards-container"></div>
+    </div>
+  </section>
+
+  <!-- TAB 5: Dispatched Credential Emails Ledger -->
+  <section id="tab-emails" class="hidden flex flex-col gap-6 fade-in">
+    <div class="bg-white rounded-3xl border border-slate-200 shadow-sm overflow-hidden p-6">
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4 border-b border-slate-100 pb-4">
+        <div>
+          <div class="flex items-center gap-2">
+            <h3 class="font-display font-extrabold text-lg text-slate-900">Dispatched Credential Emails Ledger</h3>
+            <span class="chip bg-blue-100 text-blue-800" id="ledger-total-count">0 Dispatched Emails</span>
+          </div>
+          <p class="text-xs text-slate-500 mt-0.5">Official audit log of credentials sent to staff work email addresses (Username, Password, and Portal Login URL)</p>
+        </div>
+
+        <!-- Search Bar -->
+        <div class="relative w-full sm:w-72">
+          <span class="material-symbols-outlined absolute left-3.5 top-2.5 text-slate-400 text-base">search</span>
+          <input type="text" id="search-emails" oninput="renderEmailsLedger()" placeholder="Search recipient, email, username..." class="w-full h-10 pl-10 pr-3.5 rounded-xl border border-slate-300 bg-white text-xs font-semibold text-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-600 shadow-2xs"/>
+        </div>
+      </div>
+
+      <div id="emails-container" class="flex flex-col gap-3.5"></div>
+    </div>
+  </section>
+
+  <!-- TAB 6: Learning Analytics (Admin Only Executive Dashboard) -->
+  <section id="tab-analytics" class="hidden flex flex-col gap-6 fade-in">
+    <!-- Executive Controls Banner -->
+    <div class="bg-white rounded-3xl border border-slate-200 shadow-sm p-6 flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+      <div>
+        <div class="flex items-center gap-2 mb-1">
+          <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-extrabold uppercase tracking-wider bg-blue-100 text-blue-800">
+            <span class="material-symbols-outlined text-[13px]">insights</span> Executive Intelligence
+          </span>
+          <span class="text-xs text-slate-400 font-medium">· Real-time capability telemetry</span>
+        </div>
+        <h3 class="font-display font-extrabold text-xl text-slate-900">BCF-SL Institutional Learning Analytics</h3>
+        <p class="text-xs text-slate-500 mt-1 max-w-2xl leading-relaxed">
+          Comprehensive workforce capability analytics, semester enrollment velocity, departmental participation rates, and accredited partner academy performance benchmarks.
+        </p>
+      </div>
+
+      <div class="flex flex-wrap items-center gap-3">
+        <!-- Semester Filter -->
+        <div class="flex items-center gap-1.5 bg-slate-50 border border-slate-200 rounded-xl px-3 py-1.5">
+          <span class="material-symbols-outlined text-slate-400 text-sm">calendar_month</span>
+          <select id="analytics-sem-select" onchange="renderLearningAnalytics()" class="bg-transparent text-xs font-bold text-slate-700 focus:outline-none cursor-pointer">
+          </select>
+        </div>
+
+        <!-- Department Filter -->
+        <div class="flex items-center gap-1.5 bg-slate-50 border border-slate-200 rounded-xl px-3 py-1.5">
+          <span class="material-symbols-outlined text-slate-400 text-sm">filter_alt</span>
+          <select id="analytics-dept-select" onchange="renderLearningAnalytics()" class="bg-transparent text-xs font-bold text-slate-700 focus:outline-none cursor-pointer">
+            <option value="All">All Departments</option>
+            <option value="Executive Management">Executive Management</option>
+            <option value="Human Resources">Human Resources Management</option>
+            <option value="Finance">Finance Department</option>
+            <option value="Programs">Programs Department</option>
+            <option value="Information Technology">Information Technology (IT)</option>
+            <option value="Procurement">Procurement & Logistics</option>
+            <option value="Health & Safety">Health & Safety</option>
+            <option value="Internal Risk & Audits">Internal Risk & Audits</option>
+          </select>
+        </div>
+
+        <!-- Print / Export Button -->
+        <button type="button" onclick="window.print()" class="h-10 px-4 rounded-xl border border-slate-300 bg-white hover:bg-slate-50 text-slate-700 font-bold text-xs flex items-center gap-1.5 transition shadow-2xs">
+          <span class="material-symbols-outlined text-base">print</span>
+          <span>Print Summary</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Executive KPI Grid (5 Cards) -->
+    <div class="grid grid-cols-2 md:grid-cols-5 gap-3.5" id="analytics-kpi-grid">
+      <!-- Coverage -->
+      <div class="bg-white p-4 sm:p-5 rounded-2xl shadow-sm border border-slate-200 border-l-4 border-l-blue-600">
+        <div class="text-[10px] font-extrabold uppercase tracking-wider text-slate-400 mb-1 flex items-center justify-between">
+          <span>Workforce Coverage</span>
+          <span class="material-symbols-outlined text-blue-600 text-base">groups</span>
+        </div>
+        <div class="font-display font-extrabold text-2xl text-slate-900" id="an-kpi-coverage">0%</div>
+        <div class="text-[11px] text-slate-500 font-medium mt-1 truncate" id="an-kpi-coverage-sub">0 of 0 Staff Provisioned</div>
+      </div>
+
+      <!-- Completion -->
+      <div class="bg-white p-4 sm:p-5 rounded-2xl shadow-sm border border-slate-200 border-l-4 border-l-emerald-600">
+        <div class="text-[10px] font-extrabold uppercase tracking-wider text-slate-400 mb-1 flex items-center justify-between">
+          <span>Completion Rate</span>
+          <span class="material-symbols-outlined text-emerald-600 text-base">task_alt</span>
+        </div>
+        <div class="font-display font-extrabold text-2xl text-emerald-700" id="an-kpi-completion">0%</div>
+        <div class="text-[11px] text-slate-500 font-medium mt-1 truncate" id="an-kpi-completion-sub">0 Courses Completed</div>
+      </div>
+
+      <!-- Hours -->
+      <div class="bg-white p-4 sm:p-5 rounded-2xl shadow-sm border border-slate-200 border-l-4 border-l-indigo-600">
+        <div class="text-[10px] font-extrabold uppercase tracking-wider text-slate-400 mb-1 flex items-center justify-between">
+          <span>Hours Invested</span>
+          <span class="material-symbols-outlined text-indigo-600 text-base">timer</span>
+        </div>
+        <div class="font-display font-extrabold text-2xl text-indigo-950" id="an-kpi-hours">0h</div>
+        <div class="text-[11px] text-slate-500 font-medium mt-1 truncate" id="an-kpi-hours-sub">Total Staff Study Time</div>
+      </div>
+
+      <!-- Average Score -->
+      <div class="bg-white p-4 sm:p-5 rounded-2xl shadow-sm border border-slate-200 border-l-4 border-l-amber-500">
+        <div class="text-[10px] font-extrabold uppercase tracking-wider text-slate-400 mb-1 flex items-center justify-between">
+          <span>Average Grade</span>
+          <span class="material-symbols-outlined text-amber-600 text-base">grade</span>
+        </div>
+        <div class="font-display font-extrabold text-2xl text-amber-700" id="an-kpi-score">0%</div>
+        <div class="text-[11px] text-slate-500 font-medium mt-1 truncate" id="an-kpi-score-sub">Org Assessment Score</div>
+      </div>
+
+      <!-- Budget Committed -->
+      <div class="bg-white p-4 sm:p-5 rounded-2xl shadow-sm border border-slate-200 border-l-4 border-l-teal-600 col-span-2 md:col-span-1">
+        <div class="text-[10px] font-extrabold uppercase tracking-wider text-slate-400 mb-1 flex items-center justify-between">
+          <span>Training Value</span>
+          <span class="material-symbols-outlined text-teal-600 text-base">payments</span>
+        </div>
+        <div class="font-display font-extrabold text-xl text-teal-900 truncate" id="an-kpi-budget">NLe 0</div>
+        <div class="text-[11px] text-slate-500 font-medium mt-1 truncate" id="an-kpi-budget-sub">Committed Licenses &amp; Fees</div>
+      </div>
+    </div>
+
+    <!-- Main Analytics Two-Column Layout -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+
+      <!-- Column 1 & 2: Departmental Matrix & Popular Courses (2/3 width) -->
+      <div class="lg:col-span-2 flex flex-col gap-6">
+
+        <!-- Departmental Capability & Participation Matrix -->
+        <div class="bg-white rounded-3xl border border-slate-200 shadow-sm p-6 overflow-hidden">
+          <div class="flex items-center justify-between mb-4 border-b border-slate-100 pb-3">
+            <div>
+              <h4 class="font-display font-extrabold text-base text-slate-900">Departmental Participation &amp; Completion</h4>
+              <p class="text-xs text-slate-500">Workforce enrollment, study hours, and completion rates by directorate</p>
+            </div>
+            <span class="text-[11px] font-bold text-blue-700 bg-blue-50 px-2.5 py-1 rounded-full border border-blue-200">
+              Department Benchmarks
+            </span>
+          </div>
+
+          <div class="overflow-x-auto">
+            <table class="w-full text-left text-xs">
+              <thead>
+                <tr class="text-slate-400 font-bold uppercase text-[10px] border-b border-slate-200 pb-2">
+                  <th class="py-2.5 font-bold">Department</th>
+                  <th class="py-2.5 font-bold text-center">Staff Roster</th>
+                  <th class="py-2.5 font-bold text-center">Provisioned</th>
+                  <th class="py-2.5 font-bold text-center">Enrolled</th>
+                  <th class="py-2.5 font-bold text-center">Hours</th>
+                  <th class="py-2.5 font-bold text-center">Avg Grade</th>
+                  <th class="py-2.5 font-bold text-right">Completion Rate</th>
+                </tr>
+              </thead>
+              <tbody id="an-dept-tbody" class="divide-y divide-slate-100">
+                <!-- Injected via JavaScript -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Top Courses in Demand -->
+        <div class="bg-white rounded-3xl border border-slate-200 shadow-sm p-6 overflow-hidden">
+          <div class="flex items-center justify-between mb-4 border-b border-slate-100 pb-3">
+            <div>
+              <h4 class="font-display font-extrabold text-base text-slate-900">Top Enrolled Courses &amp; Skill Development</h4>
+              <p class="text-xs text-slate-500">Most requested professional development curricula across partner academies</p>
+            </div>
+            <span class="text-[11px] font-bold text-indigo-700 bg-indigo-50 px-2.5 py-1 rounded-full border border-indigo-200">
+              Course Demand
+            </span>
+          </div>
+
+          <div class="overflow-x-auto">
+            <table class="w-full text-left text-xs">
+              <thead>
+                <tr class="text-slate-400 font-bold uppercase text-[10px] border-b border-slate-200 pb-2">
+                  <th class="py-2.5 font-bold">Course Title &amp; Category</th>
+                  <th class="py-2.5 font-bold">Partner Vendor</th>
+                  <th class="py-2.5 font-bold text-center">Enrolled Staff</th>
+                  <th class="py-2.5 font-bold text-center">Avg Score</th>
+                  <th class="py-2.5 font-bold text-right">Completion</th>
+                </tr>
+              </thead>
+              <tbody id="an-courses-tbody" class="divide-y divide-slate-100">
+                <!-- Injected via JavaScript -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Column 3: Partner Share & Grade Tier Distribution (1/3 width) -->
+      <div class="flex flex-col gap-6">
+
+        <!-- Partner Academy Share & Seat Allocation -->
+        <div class="bg-white rounded-3xl border border-slate-200 shadow-sm p-6 flex flex-col gap-4">
+          <div class="border-b border-slate-100 pb-3">
+            <h4 class="font-display font-extrabold text-base text-slate-900">Partner Academy Utilization</h4>
+            <p class="text-xs text-slate-500">Contracted learning vendor enrollment shares</p>
+          </div>
+
+          <div id="an-vendors-container" class="flex flex-col gap-3.5">
+            <!-- Injected via JavaScript -->
+          </div>
+        </div>
+
+        <!-- Grade Distribution & Mastery Tiers -->
+        <div class="bg-white rounded-3xl border border-slate-200 shadow-sm p-6 flex flex-col gap-4">
+          <div class="border-b border-slate-100 pb-3">
+            <h4 class="font-display font-extrabold text-base text-slate-900">Assessment Grade Distribution</h4>
+            <p class="text-xs text-slate-500">Staff competency scores across modules</p>
+          </div>
+
+          <div id="an-grades-container" class="flex flex-col gap-3">
+            <!-- Injected via JavaScript -->
+          </div>
+        </div>
+
+        <!-- Quick Governance Actions -->
+        <div class="bg-gradient-to-br from-slate-900 to-blue-950 text-white rounded-3xl p-5 shadow-md flex flex-col gap-3">
+          <div class="flex items-center gap-2">
+            <span class="material-symbols-outlined text-amber-300 text-xl">admin_panel_settings</span>
+            <div class="text-xs font-bold uppercase tracking-wider text-blue-200">Governance Controls</div>
+          </div>
+          <p class="text-xs text-blue-100/90 leading-relaxed">
+            Need to synchronize all personnel or enforce semester closing protocols? Use the one-click administrative utilities below.
+          </p>
+          <div class="flex flex-col gap-2 pt-2">
+            <button type="button" onclick="openBatchProvisionModal()" class="w-full py-2.5 px-3 rounded-xl bg-amber-400 hover:bg-amber-300 text-slate-950 font-bold text-xs flex items-center justify-center gap-1.5 transition">
+              <span class="material-symbols-outlined text-base">bolt</span>
+              <span>Batch Provision All Staff</span>
+            </button>
+            <button type="button" onclick="switchTab('quotas')" class="w-full py-2.5 px-3 rounded-xl bg-white/10 hover:bg-white/20 text-white font-bold text-xs flex items-center justify-center gap-1.5 transition">
+              <span class="material-symbols-outlined text-base">rule</span>
+              <span>Semester Window Governance</span>
+            </button>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+  </section>
+
+</main>
+
+<!-- Floating Toast -->
+<div id="toast" class="fixed bottom-6 left-1/2 -translate-x-1/2 z-[60] hidden bg-slate-900 text-white text-sm font-semibold px-5 py-3 rounded-2xl shadow-2xl items-center gap-2"></div>
+
+<!-- Email Preview & Dispatched Receipt Modal -->
+<div id="email-receipt-modal" class="hidden fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-3 sm:p-4">
+  <div class="bg-white rounded-3xl max-w-2xl w-full max-h-[94vh] shadow-2xl border border-slate-200 overflow-hidden flex flex-col fade-in">
+    <!-- Modal Header -->
+    <div class="hero p-4 sm:p-5 text-white flex items-center justify-between shrink-0">
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-xl bg-white/15 flex items-center justify-center text-white ring-1 ring-white/20 shrink-0">
+          <span class="material-symbols-outlined text-xl">mark_email_read</span>
+        </div>
+        <div>
+          <div class="flex items-center gap-2">
+            <h3 class="font-display font-extrabold text-base">Dispatched Credentials Email Receipt</h3>
+            <span class="hidden sm:inline-flex px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-emerald-400 text-slate-950 uppercase tracking-wider">Verified</span>
+          </div>
+          <p class="text-xs text-blue-100">Official notification delivered to staff work email address</p>
+        </div>
+      </div>
+      <div class="flex items-center gap-2">
+        <!-- Show All Toggle Button on it -->
+        <button type="button" id="toggle-receipt-size-btn-header" onclick="toggleReceiptSize()" class="h-8 px-3 rounded-xl bg-white/20 hover:bg-white/30 text-white font-extrabold text-xs flex items-center gap-1.5 transition shadow-xs cursor-pointer" title="Toggle Compact / Full Size">
+          <span class="material-symbols-outlined text-sm" id="toggle-size-icon-header">fullscreen</span>
+          <span id="toggle-size-text-header">Standard Size</span>
+        </button>
+        <button onclick="closeEmailReceiptModal()" class="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 text-white flex items-center justify-center transition cursor-pointer">
+          <span class="material-symbols-outlined text-base">close</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Email Metadata Bar -->
+    <div class="bg-slate-50 border-b border-slate-200 p-3 sm:p-4 text-xs flex flex-col gap-1.5 shrink-0">
+      <div class="flex items-center justify-between">
+        <span class="text-slate-500 font-bold uppercase text-[10px]">Recipient Work Email:</span>
+        <span id="modal-email-recipient" class="font-bold text-blue-700 font-mono text-xs">staff@bcf-sl.org</span>
+      </div>
+      <div class="flex items-center justify-between">
+        <span class="text-slate-500 font-bold uppercase text-[10px]">Subject:</span>
+        <span id="modal-email-subject" class="font-bold text-slate-800">Official Staff Learning Credentials</span>
+      </div>
+      <div class="flex items-center justify-between">
+        <span class="text-slate-500 font-bold uppercase text-[10px]">Delivery Timestamp:</span>
+        <span id="modal-email-date" class="text-slate-600 font-semibold">—</span>
+      </div>
+      <div class="flex items-center justify-between">
+        <span class="text-slate-500 font-bold uppercase text-[10px]">SMTP Delivery Status:</span>
+        <span id="modal-email-status" class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-bold font-mono bg-blue-50 text-blue-700 border border-blue-200">
+          <span class="w-1.5 h-1.5 rounded-full bg-blue-500 animate-pulse"></span> Dispatching via SMTP...
+        </span>
+      </div>
+    </div>
+
+    <!-- Admin Verification & Quick Credentials Bar -->
+    <div class="bg-gradient-to-r from-blue-950 via-slate-900 to-indigo-950 text-white px-4 py-2 flex flex-wrap items-center justify-between gap-2 text-xs border-b border-blue-800/60 shrink-0">
+      <div class="flex items-center gap-2 flex-wrap">
+        <span class="flex items-center gap-1 text-amber-300 font-bold text-[11px] uppercase tracking-wider">
+          <span class="material-symbols-outlined text-sm">verified_user</span> Admin Verification:
+        </span>
+        <span id="modal-admin-verify-strip" class="text-[11px] font-mono text-blue-200 font-semibold flex items-center gap-1.5 flex-wrap">
+          <!-- Injected dynamically -->
+        </span>
+      </div>
+      <div class="flex items-center gap-1.5">
+        <span class="text-[10px] uppercase font-bold text-slate-400 mr-1">Preview Size:</span>
+        <button type="button" id="btn-size-compact" onclick="setReceiptSize('compact')" class="px-2.5 py-1 rounded-lg text-[11px] font-bold bg-amber-400 text-slate-950 flex items-center gap-1 shadow-xs transition cursor-pointer">
+          <span class="material-symbols-outlined text-[13px]">fit_screen</span> Show All (Smaller)
+        </button>
+        <button type="button" id="btn-size-standard" onclick="setReceiptSize('standard')" class="px-2.5 py-1 rounded-lg text-[11px] font-bold bg-white/10 hover:bg-white/20 text-blue-100 flex items-center gap-1 transition cursor-pointer">
+          <span class="material-symbols-outlined text-[13px]">fullscreen</span> Standard
+        </button>
+      </div>
+    </div>
+
+    <!-- Email HTML Body Scrollable Area (Default: receipt-compact-size) -->
+    <div id="modal-email-viewport" class="receipt-compact-size p-3 sm:p-5 overflow-y-auto flex-1 bg-slate-100/60 transition-all flex flex-col items-center">
+      <div id="modal-email-html" class="w-full shadow-sm rounded-xl overflow-hidden transition-all duration-200"></div>
+    </div>
+
+    <!-- Modal Footer Actions -->
+    <div class="p-3.5 sm:p-4 bg-white border-t border-slate-200 flex items-center justify-between gap-3 shrink-0">
+      <button type="button" id="modal-copy-creds-btn" class="h-10 px-4 rounded-xl bg-blue-50 hover:bg-blue-100 text-blue-700 font-bold text-xs flex items-center gap-1.5 transition cursor-pointer">
+        <span class="material-symbols-outlined text-base">content_copy</span>
+        <span>Copy Credentials</span>
+      </button>
+      <div class="flex items-center gap-2">
+        <button type="button" onclick="window.print()" class="h-10 px-4 rounded-xl border border-slate-300 bg-white hover:bg-slate-100 text-slate-700 font-bold text-xs flex items-center gap-1.5 transition cursor-pointer">
+          <span class="material-symbols-outlined text-base">print</span>
+          <span>Print Receipt</span>
+        </button>
+        <button type="button" onclick="closeEmailReceiptModal()" class="h-10 px-5 rounded-xl bg-blue-700 hover:bg-blue-800 text-white font-bold text-xs transition shadow-xs cursor-pointer">
+          Done
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- One-Click Batch Provisioning Modal -->
+<div id="batch-provision-modal" class="hidden fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4">
+  <div class="bg-white rounded-3xl max-w-2xl w-full max-h-[90vh] shadow-2xl border border-slate-200 overflow-hidden flex flex-col fade-in">
+    <!-- Header -->
+    <div class="hero p-5 text-white flex items-center justify-between shrink-0">
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-xl bg-amber-400 text-slate-950 flex items-center justify-center font-bold">
+          <span class="material-symbols-outlined text-xl">bolt</span>
+        </div>
+        <div>
+          <h3 class="font-display font-extrabold text-base">Batch Provision Accounts for All Staff</h3>
+          <p class="text-xs text-blue-100">Automated institutional credential setup across all departments</p>
+        </div>
+      </div>
+      <button onclick="closeBatchProvisionModal()" class="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 text-white flex items-center justify-center transition">
+        <span class="material-symbols-outlined text-base">close</span>
+      </button>
+    </div>
+
+    <!-- Summary Stats Strip -->
+    <div class="bg-slate-50 border-b border-slate-200 p-4 grid grid-cols-3 gap-2 text-center text-xs shrink-0">
+      <div class="p-2 rounded-xl bg-white border border-slate-200">
+        <div class="text-[10px] font-bold text-slate-400 uppercase">Master Directory</div>
+        <div class="font-display font-extrabold text-base text-slate-900" id="batch-modal-total">0 Staff</div>
+      </div>
+      <div class="p-2 rounded-xl bg-white border border-slate-200">
+        <div class="text-[10px] font-bold text-slate-400 uppercase">Already Active</div>
+        <div class="font-display font-extrabold text-base text-emerald-600" id="batch-modal-active">0 Active</div>
+      </div>
+      <div class="p-2 rounded-xl bg-white border border-slate-200">
+        <div class="text-[10px] font-bold text-slate-400 uppercase">To Provision</div>
+        <div class="font-display font-extrabold text-base text-amber-600" id="batch-modal-pending">0 Pending</div>
+      </div>
+    </div>
+
+    <!-- Scrollable Staff Directory Preview -->
+    <div class="p-5 overflow-y-auto flex-1 flex flex-col gap-2.5 bg-slate-100/50">
+      <div class="text-xs font-bold text-slate-700 flex items-center justify-between">
+        <span>Personnel Roster Review</span>
+        <span class="text-[11px] text-slate-400">All departments</span>
+      </div>
+      <div id="batch-modal-staff-list" class="flex flex-col gap-2">
+        <!-- Injected via JavaScript -->
+      </div>
+    </div>
+
+    <!-- Email Dispatch & Options -->
+    <div class="p-4 bg-slate-50 border-t border-slate-200 flex flex-col gap-2 shrink-0">
+      <label class="flex items-center gap-2.5 text-xs font-bold text-slate-800 cursor-pointer">
+        <input type="checkbox" id="batch-send-email" checked class="w-4 h-4 text-blue-600 rounded border-slate-300 focus:ring-blue-500 cursor-pointer"/>
+        <span>Automatically dispatch credentials notification emails to work mailboxes via Gmail SMTP</span>
+      </label>
+      <label class="flex items-center gap-2.5 text-xs font-semibold text-slate-600 cursor-pointer">
+        <input type="checkbox" id="batch-resend-email" class="w-4 h-4 text-blue-600 rounded border-slate-300 focus:ring-blue-500 cursor-pointer"/>
+        <span>Also re-dispatch credentials email to staff who already have active accounts</span>
+      </label>
+    </div>
+
+    <!-- Actions -->
+    <div class="p-4 bg-white border-t border-slate-200 flex items-center justify-between gap-3 shrink-0">
+      <button type="button" onclick="closeBatchProvisionModal()" class="h-10 px-4 rounded-xl border border-slate-300 bg-white hover:bg-slate-100 text-slate-700 font-bold text-xs transition">
+        Cancel
+      </button>
+      <button type="button" id="batch-confirm-btn" onclick="executeBatchProvision()" class="h-11 px-6 rounded-2xl bg-amber-400 hover:bg-amber-300 text-slate-950 font-extrabold text-xs flex items-center gap-2 transition shadow-md">
+        <span class="material-symbols-outlined text-lg">bolt</span>
+        <span id="batch-confirm-btn-text">⚡ Confirm &amp; Provision All Staff</span>
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Reset Staff Password Modal (Admin Only) -->
+<div id="reset-password-modal" class="hidden fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4">
+  <div class="bg-white rounded-3xl max-w-md w-full shadow-2xl border border-slate-200 overflow-hidden flex flex-col fade-in">
+    <div class="hero p-5 text-white flex items-center justify-between">
+      <div class="flex items-center gap-3">
+        <span class="w-10 h-10 rounded-xl bg-white/15 flex items-center justify-center text-amber-300">
+          <span class="material-symbols-outlined text-xl">lock_reset</span>
+        </span>
+        <div>
+          <h3 class="font-display font-extrabold text-base">Reset Staff Account Password</h3>
+          <p class="text-xs text-blue-100/80">Issue updated credentials and optionally notify staff</p>
+        </div>
+      </div>
+      <button type="button" onclick="closeResetPasswordModal()" class="w-8 h-8 rounded-lg bg-white/10 hover:bg-white/20 text-white flex items-center justify-center">
+        <span class="material-symbols-outlined text-lg">close</span>
+      </button>
+    </div>
+
+    <div class="p-6 flex flex-col gap-4">
+      <div class="p-3.5 rounded-2xl bg-blue-50/80 border border-blue-200 text-xs">
+        <div class="font-bold text-slate-900" id="reset-modal-staff-name">—</div>
+        <div class="text-slate-600 mt-0.5">Staff ID: <span class="font-mono text-blue-700 font-bold" id="reset-modal-staff-id">—</span> · Username: <span class="font-mono text-blue-700 font-bold" id="reset-modal-username">—</span></div>
+        <div class="text-slate-500 text-[11px] mt-0.5">Work Email: <span id="reset-modal-email" class="font-semibold text-slate-800">—</span></div>
+      </div>
+
+      <input type="hidden" id="reset-modal-account-id" value="" />
+
+      <div class="flex flex-col gap-1.5">
+        <div class="flex items-center justify-between">
+          <label class="text-xs font-bold text-slate-800" for="reset-modal-password">New Secure Password</label>
+          <button type="button" onclick="generateResetModalPassword()" class="text-[11px] text-indigo-700 font-bold hover:underline flex items-center gap-1">
+            <span class="material-symbols-outlined text-[13px]">casino</span>
+            <span>🎲 Generate Strong</span>
+          </button>
+        </div>
+        <div class="relative rounded-xl border border-slate-300 bg-slate-50">
+          <input type="text" id="reset-modal-password" required class="w-full h-11 px-3.5 rounded-xl bg-transparent font-mono text-xs font-bold text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-600" />
+        </div>
+      </div>
+
+      <label class="flex items-start gap-2.5 cursor-pointer text-xs font-semibold text-slate-800 p-3 rounded-xl bg-slate-50 border border-slate-200">
+        <input type="checkbox" id="reset-modal-send-email" checked class="mt-0.5 w-4 h-4 text-blue-600 rounded border-slate-300 focus:ring-blue-500 cursor-pointer" />
+        <span>Automatically dispatch new credentials letter to staff work mailbox via Gmail SMTP</span>
+      </label>
+
+      <div class="flex items-center gap-3 pt-2">
+        <button type="button" id="reset-modal-confirm-btn" onclick="confirmResetPassword()" class="flex-1 h-11 rounded-xl bg-blue-700 hover:bg-blue-800 text-white font-bold text-xs flex items-center justify-center gap-1.5 shadow-md transition">
+          <span class="material-symbols-outlined text-base">check_circle</span>
+          <span id="reset-modal-confirm-text">Save New Password &amp; Notify</span>
+        </button>
+        <button type="button" onclick="closeResetPasswordModal()" class="h-11 px-4 rounded-xl border border-slate-300 bg-white text-slate-700 font-bold text-xs hover:bg-slate-100 transition">
+          Cancel
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  // Navigation helper for iframe parent routing
+  function navTo(url) {
+    try {
+      if (window.top && window.top !== window && window.top.location) {
+        window.top.location.href = url;
+        return;
+      }
+    } catch (e) {}
+    if (url.includes('course-allocation')) window.location.href = '../catalog_course_allocation/code.html';
+    else if (url.includes('learning-grades')) window.location.href = '../my_learning_grades/code.html';
+    else if (url.includes('certificates')) window.location.href = '../assessment_certificate/code.html';
+    else if (url.includes('account-creation')) { switchTab('accounts'); }
+    else if (url.includes('learning-dashboard')) { switchTab('analytics'); }
+    else if (url.includes('admin-provisioning')) { switchTab('quotas'); }
+    else if (url.includes('login')) window.location.href = '../login/code.html';
+  }
+
+  const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  const fmtDate = d => d ? new Date(d).toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'}) : '—';
+  const initials = n => (n||'?').split(' ').map(x=>x[0]).join('').slice(0,2).toUpperCase();
+
+  function toast(msg, ok=true){
+    const t = document.getElementById('toast');
+    t.innerHTML = `<span class="material-symbols-outlined text-[18px] ${ok?'text-emerald-400':'text-rose-400'}">${ok?'check_circle':'error'}</span>${esc(msg)}`;
+    t.classList.remove('hidden');
+    t.classList.add('flex');
+    clearTimeout(t._h);
+    t._h = setTimeout(() => { t.classList.add('hidden'); t.classList.remove('flex'); }, 4000);
+  }
+
+  function toggleUserDropdown() {
+    const el = document.getElementById('user-dropdown');
+    el.classList.toggle('hidden');
+  }
+
+  function toggleNotif() {
+    const p = document.getElementById('notif-panel');
+    const open = p.classList.toggle('hidden') === false;
+    if (!open) return;
+    const emp = getCurrentEmployee();
+    const notes = getNotifications(emp.employeeId).slice(0, 20);
+    p.innerHTML = `<div class="flex items-center justify-between pb-2 border-b border-slate-100">
+      <b class="text-xs font-bold text-slate-800">HR Governance Notifications</b>
+      <span class="text-[10px] text-slate-400">${notes.length} total</span>
+    </div>` +
+    (notes.length ? notes.map(n => `
+      <div class="p-2 border-b border-slate-50 text-xs">
+        <div class="text-slate-800 leading-snug">${esc(n.message)}</div>
+        <div class="text-[10px] text-slate-400 mt-1">${fmtDate(n.at)}</div>
+      </div>`).join('') : '<div class="text-xs text-slate-400 py-3 text-center">No new notifications.</div>');
+    markNotificationsRead(emp.employeeId);
+    document.getElementById('notif-dot').classList.add('hidden');
+  }
+
+  function checkStaffAccess() {
+    const emp = getCurrentEmployee();
+    const isStaff = !isHRAdmin(emp);
+
+    let hasVerifiedAdmin = false;
+    try {
+      const isStaffOnly = sessionStorage.getItem('bcf_staff_only_session') === 'true' ||
+                          (typeof window !== 'undefined' && window.parent && window.parent !== window && window.parent.sessionStorage.getItem('bcf_staff_only_session') === 'true');
+      
+      const adminAuth = sessionStorage.getItem('bcf_admin_authenticated') === 'true' ||
+                        (typeof window !== 'undefined' && window.parent && window.parent !== window && window.parent.sessionStorage.getItem('bcf_admin_authenticated') === 'true');
+      
+      const adminUser = sessionStorage.getItem('bcf_admin_verified_user') ||
+                        (typeof window !== 'undefined' && window.parent && window.parent !== window && window.parent.sessionStorage.getItem('bcf_admin_verified_user'));
+
+      if (adminAuth && adminUser && !isStaffOnly) {
+        hasVerifiedAdmin = true;
+      }
+    } catch (_) {}
+
+    if (!isStaff || hasVerifiedAdmin) {
+      return true;
+    }
+
+    document.body.innerHTML = `
+      <div class="min-h-screen bg-slate-50 flex items-center justify-center p-4 sm:p-6 font-sans">
+        <div class="max-w-md w-full bg-white rounded-3xl shadow-xl border border-slate-200 p-6 sm:p-8 flex flex-col gap-4">
+          <div class="flex items-center gap-3">
+            <div class="w-12 h-12 rounded-2xl bg-amber-500 text-white flex items-center justify-center shadow-xs shrink-0">
+              <span class="material-symbols-outlined text-2xl">admin_panel_settings</span>
+            </div>
+            <div>
+              <div class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-extrabold uppercase bg-amber-100 text-amber-900 border border-amber-300">
+                <span class="material-symbols-outlined text-xs">lock</span> Administrator Authorization Required
+              </div>
+              <h2 class="text-base font-extrabold text-slate-900 mt-0.5">Administrator Verification</h2>
+            </div>
+          </div>
+
+          <p class="text-xs text-slate-600 leading-relaxed">
+            Staff account creation, organizational learning analytics, and governance quotas are restricted strictly to authorized BCF-SL Administrators. Regular staff must provide Administrator credentials to proceed.
+          </p>
+
+          <div class="p-3 rounded-xl bg-slate-50 border border-slate-200 text-xs text-slate-600">
+            <div class="text-[10px] uppercase font-bold text-slate-400">Current Staff Profile</div>
+            <div class="font-bold text-slate-900">${esc(emp.fullName || 'Staff Member')}</div>
+            <div class="text-[11px] text-slate-500">${esc(emp.position || 'Staff')} · ${esc(emp.department)}</div>
+          </div>
+
+          <div id="inframe-admin-error" class="hidden p-3 rounded-xl bg-rose-50 border border-rose-300 text-xs text-rose-700 flex items-start gap-2">
+            <span class="material-symbols-outlined text-sm shrink-0 mt-0.5">error</span>
+            <span id="inframe-admin-error-text"></span>
+          </div>
+
+          <form onsubmit="handleInFrameAdminVerify(event)" class="flex flex-col gap-3">
+            <div>
+              <label class="text-xs font-bold text-slate-700 block mb-1">Administrator Username or Email <span class="text-rose-500">*</span></label>
+              <input id="inframe-admin-user" type="text" required placeholder="e.g. abandama" class="w-full h-10 px-3 rounded-xl border border-slate-300 text-xs font-semibold text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-600" autocomplete="username">
+            </div>
+            <div>
+              <label class="text-xs font-bold text-slate-700 block mb-1">Administrator Password <span class="text-rose-500">*</span></label>
+              <input id="inframe-admin-pass" type="password" required placeholder="Enter administrator password" class="w-full h-10 px-3 rounded-xl border border-slate-300 text-xs font-semibold text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-600" autocomplete="current-password">
+            </div>
+
+            <button type="button" onclick="prefillInFrameAdmin()" class="text-left text-[11px] text-blue-600 hover:text-blue-800 font-semibold flex items-center gap-1 cursor-pointer">
+              <span class="material-symbols-outlined text-xs">vpn_key</span>
+              <span>Quick fill: Albert Joseph Bandama (Admin)</span>
+            </button>
+
+            <button type="submit" id="inframe-admin-btn" class="w-full h-11 rounded-xl bg-blue-700 hover:bg-blue-800 text-white font-bold text-xs flex items-center justify-center gap-2 shadow-sm transition mt-1 cursor-pointer">
+              <span class="material-symbols-outlined text-base">verified_user</span>
+              <span id="inframe-admin-btn-text">Verify &amp; Unlock Administrator Console</span>
+            </button>
+          </form>
+
+          <button onclick="navTo('/learning/course-allocation'); if(window.top) window.top.location.href='/learning/course-allocation';" class="w-full py-2.5 px-4 rounded-xl border border-slate-300 bg-white hover:bg-slate-50 text-slate-700 font-bold text-xs flex items-center justify-center gap-2 transition cursor-pointer">
+            <span class="material-symbols-outlined text-base">school</span>
+            <span>Return to Course Catalogue</span>
+          </button>
+        </div>
+      </div>
+    `;
+    return false;
+  }
+
+  function prefillInFrameAdmin() {
+    const u = document.getElementById('inframe-admin-user');
+    const p = document.getElementById('inframe-admin-pass');
+    if (u) u.value = 'abandama';
+    if (p) p.value = 'Password123!';
+    const err = document.getElementById('inframe-admin-error');
+    if (err) err.classList.add('hidden');
+  }
+
+  async function handleInFrameAdminVerify(event) {
+    if (event) event.preventDefault();
+    const u = (document.getElementById('inframe-admin-user')?.value || '').trim();
+    const p = (document.getElementById('inframe-admin-pass')?.value || '').trim();
+    const err = document.getElementById('inframe-admin-error');
+    const errText = document.getElementById('inframe-admin-error-text');
+    const btnText = document.getElementById('inframe-admin-btn-text');
+    if (err) err.classList.add('hidden');
+    if (btnText) btnText.textContent = 'Verifying Credentials...';
+
+    let verified = false;
+    let adminEmpId = 'BCF-PTE-2026-0001';
+
+    try {
+      const res = await fetch('/api/learning/admin-verify', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username: u, password: p })
+      });
+      const data = await res.json();
+      if (data && data.success && data.user) {
+        verified = true;
+        adminEmpId = data.user.employeeId || 'BCF-PTE-2026-0001';
+      }
+    } catch (_) {}
+
+    // Offline / fallback verification
+    if (!verified) {
+      const uLower = u.toLowerCase();
+      if ((uLower === 'abandama' || uLower === 'albertjosephhassanbandama@gmail.com' || uLower === 'bcf-pte-2026-0001') && p === 'Password123!') {
+        verified = true;
+        adminEmpId = 'BCF-PTE-2026-0001';
+      } else {
+        const staff = (typeof MASTER_BCF_STAFF !== 'undefined' ? MASTER_BCF_STAFF : []).find(s => 
+          (s.username?.toLowerCase() === uLower || s.email?.toLowerCase() === uLower || s.id?.toLowerCase() === uLower) && s.password === p
+        );
+        if (staff && (staff.dept?.toLowerCase().includes('executive') || staff.dept?.toLowerCase().includes('human resource') || staff.title?.toLowerCase().includes('director') || staff.title?.toLowerCase().includes('ceo'))) {
+          verified = true;
+          adminEmpId = staff.id;
+        }
+      }
+    }
+
+    if (verified) {
+      try {
+        sessionStorage.setItem('bcf_admin_authenticated', 'true');
+        sessionStorage.setItem('bcf_admin_verified_user', 'abandama');
+        sessionStorage.removeItem('bcf_staff_only_session');
+        if (typeof window !== 'undefined' && window.parent && window.parent !== window) {
+          window.parent.sessionStorage.setItem('bcf_admin_authenticated', 'true');
+          window.parent.sessionStorage.setItem('bcf_admin_verified_user', 'abandama');
+          window.parent.sessionStorage.removeItem('bcf_staff_only_session');
+        }
+      } catch (_) {}
+      setCurrentEmployee(adminEmpId);
+      window.location.reload();
+      return;
+    }
+
+    if (btnText) btnText.textContent = 'Verify & Unlock Administrator Console';
+    if (err && errText) {
+      errText.textContent = 'Access Denied: Invalid administrator credentials. Please check your username and password.';
+      err.classList.remove('hidden');
+    }
+  }
+
+  function logout() {
+    sessionStorage.removeItem('bcf_learning_session');
+    localStorage.removeItem('bcf_selected_profile');
+    sessionStorage.removeItem('bcf_staff_only_session');
+    sessionStorage.removeItem('bcf_admin_authenticated');
+    sessionStorage.removeItem('bcf_admin_verified_user');
+    navTo('/learning/login');
+  }
+
+  function selectStaff(empId) {
+    if (!isHRAdmin()) {
+      toast('Profile switching is restricted to HR Administrators.');
+      return;
+    }
+    setCurrentEmployee(empId);
+    document.getElementById('user-dropdown').classList.add('hidden');
+    renderHeader();
+  }
+
+  function renderStaffSwitcher() {
+    const accounts = getLearningAccounts();
+    const current = getCurrentEmployee();
+    const list = document.getElementById('staff-switcher-items');
+    if (!list) return;
+    list.innerHTML = accounts.map(a => `
+      <button onclick="selectStaff('${a.employeeId}')" class="w-full px-3 py-2 text-left rounded-xl hover:bg-blue-50 transition flex items-center justify-between ${a.employeeId === current.employeeId ? 'bg-blue-50/80 font-bold text-blue-900' : 'text-slate-700'}">
+        <div class="min-w-0 pr-2">
+          <div class="text-xs truncate">${esc(a.employeeName)}</div>
+          <div class="text-[10px] text-slate-400 truncate">${esc(a.position || 'Staff')} · ${esc(a.department)}</div>
+        </div>
+        ${a.employeeId === current.employeeId ? '<span class="material-symbols-outlined text-sm text-blue-700">check</span>' : ''}
+      </button>
+    `).join('');
+  }
+
+  function renderHeader() {
+    const emp = getCurrentEmployee();
+    const sem = getActiveSemester();
+    document.getElementById('emp-name').textContent = emp.fullName;
+    document.getElementById('emp-pos').textContent = `${emp.position} · HR Admin`;
+    document.getElementById('avatar').textContent = initials(emp.fullName);
+    document.getElementById('hdr-sub').textContent = `${sem.name} · Staff Account Governance & Licensing`;
+    document.getElementById('hero-sem-badge').textContent = `${sem.name} Active`;
+
+    renderStaffSwitcher();
+  }
+
+  function switchTab(tabId) {
+    if (tabId === 'dashboard' || tabId === 'learning-dashboard') tabId = 'analytics';
+    if (tabId === 'account-creation') tabId = 'accounts';
+    if (tabId === 'governance') tabId = 'quotas';
+
+    // Gate admin tabs (Staff Account Creation, Learning Dashboard Analytics, Semester Quotas)
+    if (['accounts', 'analytics', 'quotas'].includes(tabId)) {
+      const emp = getCurrentEmployee();
+      if (!isHRAdmin(emp)) {
+        const isVerified = (sessionStorage.getItem('bcf_admin_authenticated') === 'true' &&
+                            Boolean(sessionStorage.getItem('bcf_admin_verified_user')) &&
+                            sessionStorage.getItem('bcf_staff_only_session') !== 'true');
+        if (!isVerified) {
+          checkStaffAccess();
+          return;
+        }
+      }
+    }
+
+    document.querySelectorAll('.tab-btn').forEach(btn => {
+      btn.classList.toggle('active', btn.dataset.tab === tabId);
+    });
+    ['accounts', 'approvals', 'analytics', 'quotas', 'vendors', 'emails'].forEach(t => {
+      const el = document.getElementById('tab-' + t);
+      if (el) el.classList.toggle('hidden', t !== tabId);
+    });
+    if (tabId === 'emails') renderEmailsLedger();
+    if (tabId === 'analytics') renderLearningAnalytics();
+  }
+
+  // ── Master BCF-SL Staff Directory & Dynamic Pre-fill Engine ──
+  const MASTER_BCF_STAFF = [
+    // Executive Management
+    { id: 'BCF-PTE-2026-0001', name: 'Albert Joseph Bandama', phone: '+232 76 123456', email: 'albertjosephhassanbandama@gmail.com', dept: 'Executive Management', title: 'Chief Executive Officer (CEO)', username: 'abandama', password: 'Password123!' },
+    
+    // Human Resources Management Department
+    { id: 'BCF-PTE-2026-0002', name: 'Joe Ansumana Conteh', phone: '+232 78 234567', email: 'joe.conteh@bcf-sl.org', dept: 'Human Resources Management Department', title: 'Human Resources Director', username: 'jconteh', password: 'Password123!' },
+    { id: 'BCF-SL-1002', name: 'Dr. Sorie Sesay', phone: '+232 78 441 200', email: 's.sesay@bcf-sl.org', dept: 'Human Resources Management Department', title: 'Director of Human Resources', username: 'ssesay', password: 'Password123!' },
+    
+    // Finance Department
+    { id: 'BCF-EMP-2026-0003', name: 'Mariama Bangura', phone: '+232 77 345678', email: 'mariama.bangura@bcf-sl.org', dept: 'Finance Department', title: 'Finance Director', username: 'mbangura', password: 'Password123!' },
+    { id: 'BCF-SL-1005', name: 'Aminata Turay', phone: '+232 79 552 119', email: 'a.turay@bcf-sl.org', dept: 'Finance Department', title: 'Director of Financial Operations', username: 'aturay', password: 'Password123!' },
+    { id: 'BCF-SL-1007', name: 'Sahr Bangura', phone: '+232 77 445 566', email: 's.bangura@bcf-sl.org', dept: 'Finance Department', title: 'Senior Finance Manager', username: 'sbangura.fin', password: 'Password123!' },
+    { id: 'BCF-EMP-2027-0003', name: 'Mohamed Kamara', phone: '+232 77 987654', email: 'm.kamara@bcf.sl', dept: 'Finance Department', title: 'Finance & Auditing Specialist', username: 'mkamara', password: 'Password123!' },
+
+    // Internal Risk & Audits Department
+    { id: 'BCF-EMP-2026-0004', name: 'Sahr David Williams', phone: '+232 76 456789', email: 'sahr.williams@bcf-sl.org', dept: 'Internal Risk & Audits Department', title: 'Internal Risk & Audits Director', username: 'swilliams', password: 'Password123!' },
+
+    // Programs Department
+    { id: 'BCF-FTC-2026-0005', name: 'Aminata Kamara', phone: '+232 79 567890', email: 'aminata.kamara@bcf-sl.org', dept: 'Programs Department', title: 'Programs Director', username: 'akamara', password: 'Password123!' },
+    { id: 'BCF-SL-1048', name: 'Mariama Kamara', phone: '+232 76 892 104', email: 'm.kamara@bcf-sl.org', dept: 'Programs Department', title: 'Senior Field Coordinator', username: 'mariama.kamara', password: 'Password123!' },
+    { id: 'BCF-SL-1012', name: 'Mohamed Bangura', phone: '+232 77 334 891', email: 'm.bangura@bcf-sl.org', dept: 'Programs Department', title: 'Program Monitoring Manager', username: 'mbangura.prog', password: 'Password123!' },
+    { id: 'BCF-EMP-2027-0004', name: 'Fatima Turay', phone: '+232 88 112233', email: 'f.turay@bcf.sl', dept: 'Programs Department', title: 'Community Programs & Outreach Officer', username: 'fturay', password: 'Password123!' },
+    { id: 'BCF-SL-1025', name: 'Fatmata Mansaray', phone: '+232 76 654 321', email: 'f.mansaray@bcf-sl.org', dept: 'Programs Department', title: 'Junior Community Facilitator', username: 'fmansaray', password: 'Password123!' },
+    { id: 'BCF-EMP-2026-0007', name: 'Mariama J. Bundu', phone: '+232 78 778 899', email: 'm.bundu@bcf-sl.org', dept: 'Programs Department', title: 'Field Operations Officer', username: 'mbundu', password: 'Password123!' },
+
+    // Information Technology (IT) Department
+    { id: 'BCF-FTC-2026-0006', name: 'Hassan Mohamed Mansaray', phone: '+232 30 678901', email: 'hassan.mansaray@bcf-sl.org', dept: 'Information Technology (IT) Department', title: 'IT Systems Administrator', username: 'hmansaray', password: 'Password123!' },
+    { id: 'BCF-EMP-2027-0002', name: 'Aminata Sesay', phone: '+232 78 654321', email: 'aminata.sesay@bcf.sl', dept: 'Information Technology (IT) Department', title: 'IT Operations & Systems Officer', username: 'asesay', password: 'Password123!' },
+    { id: 'BCF-EMP-2027-0005', name: 'Ibrahim Koroma', phone: '+232 79 445566', email: 'i.koroma@bcf.sl', dept: 'Information Technology (IT) Department', title: 'M&E Specialist & ICT Officer', username: 'ikoroma', password: 'Password123!' },
+
+    // Procurement & Logistics Department
+    { id: 'BCF-SL-1019', name: 'Joseph Conteh', phone: '+232 88 123 456', email: 'j.conteh@bcf-sl.org', dept: 'Procurement Department', title: 'Assistant Logistics Manager', username: 'jconteh.log', password: 'Password123!' },
+    { id: 'BCF-EMP-2027-0001', name: 'Sahr Emmanuel Bangura', phone: '+232 76 123456', email: 'sahr.bangura@bcf.sl', dept: 'Procurement Department', title: 'Logistics & Field Operations Specialist', username: 'sbangura', password: 'Password123!' },
+
+    // Health & Safety Department
+    { id: 'BCF-SL-1003', name: 'Ibrahim Kargbo', phone: '+232 76 223 344', email: 'i.kargbo@bcf-sl.org', dept: 'Health & Safety Department', title: 'Senior Program Coordinator', username: 'ikargbo', password: 'Password123!' }
+  ];
+
+  window._STAFF_DIRECTORY_CACHE = {};
+
+  function normalizeDepartment(dept) {
+    if (!dept) return 'Programs Department';
+    const d = String(dept).toLowerCase().trim();
+    if (d.includes('exec') || d.includes('board') || d.includes('ceo')) return 'Executive Management';
+    if (d.includes('human resource') || d.includes('hr')) return 'Human Resources Management Department';
+    if (d.includes('finan') || d.includes('account') || d.includes('treasur')) return 'Finance Department';
+    if (d.includes('program') || d.includes('field') || d.includes('community')) return 'Programs Department';
+    if (d.includes('tech') || d.includes('it ') || d.includes('(it)') || d.includes('information') || d.includes('m&e') || d.includes('system') || d.includes('ict')) return 'Information Technology (IT) Department';
+    if (d.includes('procur') || d.includes('supply') || d.includes('logist')) return 'Procurement Department';
+    if (d.includes('audit') || d.includes('risk') || d.includes('internal')) return 'Internal Risk & Audits Department';
+    if (d.includes('health') || d.includes('safety') || d.includes('h&s')) return 'Health & Safety Department';
+    if (d.includes('legal') || d.includes('commun')) return 'Legal & Communication Department';
+    return 'Programs Department';
+  }
+
+  function getAllStaffDirectory() {
+    const staffMap = new Map();
+
+    const masterList = (typeof MASTER_BCF_STAFF !== 'undefined' && Array.isArray(MASTER_BCF_STAFF))
+      ? MASTER_BCF_STAFF
+      : (window.MASTER_BCF_STAFF || (window.BCF_LEARNING && window.BCF_LEARNING.MASTER_BCF_STAFF) || []);
+
+    masterList.forEach(s => {
+      const idKey = (s.id || '').toUpperCase();
+      if (idKey) staffMap.set(idKey, { ...s });
+    });
+
+    try {
+      const liveReg = JSON.parse(localStorage.getItem('bcf_staff_registry') || '[]');
+      if (Array.isArray(liveReg)) {
+        liveReg.forEach(r => {
+          if (!r.employeeId && !r.fullName && !r.id && !r.name) return;
+          const id = r.employeeId || r.id || ('BCF-' + (r.fullName || r.name || '').replace(/\s+/g, '-').toUpperCase());
+          const idKey = id.toUpperCase();
+          const existing = staffMap.get(idKey);
+          const uName = r.username || (existing ? existing.username : ((r.fullName || r.name || '').toLowerCase().replace(/[^a-z]/g, '').slice(0, 10))) || 'staff';
+          const normDept = normalizeDepartment(r.department || r.dept || (existing ? existing.dept : 'Programs Department'));
+          const entry = {
+            id: id,
+            name: r.fullName || r.name || (existing ? existing.name : 'Staff Member'),
+            phone: r.phone || r.workPhone || (existing ? existing.phone : '+232 76 000000'),
+            email: r.email || r.workEmail || (existing ? existing.email : `${uName}@bcf-sl.org`),
+            dept: normDept,
+            title: r.title || r.position || r.jobLevel || (existing ? existing.title : 'Staff Member'),
+            username: uName,
+            password: r.password || (existing ? existing.password : 'Password123!')
+          };
+          staffMap.set(idKey, entry);
+        });
+      }
+    } catch (err) {
+      console.warn('Error reading live bcf_staff_registry:', err);
+    }
+
+    const list = Array.from(staffMap.values());
+    window._STAFF_DIRECTORY_CACHE = {};
+    list.forEach(s => {
+      window._STAFF_DIRECTORY_CACHE[s.id] = s;
+      window._STAFF_DIRECTORY_CACHE[(s.id || '').toUpperCase()] = s;
+    });
+    return list;
+  }
+
+  function populateStaffDirectoryDropdown() {
+    const select = document.getElementById('staff-prefill-select');
+    if (!select) return;
+
+    const staffList = getAllStaffDirectory();
+    const accounts = getLearningAccounts();
+    const provisionedIds = new Set(accounts.map(a => (a.employeeId || '').toUpperCase()));
+
+    const badge = document.getElementById('staff-directory-count-badge');
+    if (badge) {
+      badge.textContent = `${staffList.length} Registered Staff`;
+    }
+
+    // Group by department
+    const groups = {};
+    staffList.forEach(s => {
+      const d = s.dept || 'General Staff';
+      if (!groups[d]) groups[d] = [];
+      groups[d].push(s);
+    });
+
+    const departmentOrder = [
+      'Executive Management',
+      'Human Resources Management Department',
+      'Finance Department',
+      'Programs Department',
+      'Information Technology (IT) Department',
+      'Procurement Department',
+      'Internal Risk & Audits Department',
+      'Health & Safety Department',
+      'Legal & Communication Department'
+    ];
+
+    const sortedDepts = Object.keys(groups).sort((a, b) => {
+      const ia = departmentOrder.indexOf(a);
+      const ib = departmentOrder.indexOf(b);
+      if (ia !== -1 && ib !== -1) return ia - ib;
+      if (ia !== -1) return -1;
+      if (ib !== -1) return 1;
+      return a.localeCompare(b);
+    });
+
+    const curVal = select.value;
+    let html = '<option value="">-- Choose an existing staff member to auto-populate credentials --</option>';
+
+    sortedDepts.forEach(dept => {
+      html += `<optgroup label="📁 ${esc(dept)}">`;
+      groups[dept].forEach(s => {
+        const isProv = provisionedIds.has((s.id || '').toUpperCase());
+        html += `<option value="${esc(s.id)}">${esc(s.id)} — ${esc(s.name)} (${esc(s.title || s.dept)})${isProv ? ' ● [Already Provisioned]' : ''}</option>`;
+      });
+      html += `</optgroup>`;
+    });
+
+    select.innerHTML = html;
+    if (curVal) select.value = curVal;
+  }
+
+  async function syncStaffDirectoryFromBackend() {
+    try {
+      const res = await fetch('/api/employees');
+      if (res.ok) {
+        const json = await res.json();
+        const emps = Array.isArray(json) ? json : (json.data || json.employees || []);
+        if (Array.isArray(emps) && emps.length > 0) {
+          let currentReg = [];
+          try {
+            currentReg = JSON.parse(localStorage.getItem('bcf_staff_registry') || '[]');
+          } catch (_) {}
+          const regMap = new Map();
+          if (Array.isArray(currentReg)) {
+            currentReg.forEach(r => {
+              const id = r.employeeId || r.id;
+              if (id) regMap.set(id.toUpperCase(), r);
+            });
+          }
+          emps.forEach(r => {
+            const id = r.employeeId || r.id;
+            if (id) regMap.set(id.toUpperCase(), r);
+          });
+          localStorage.setItem('bcf_staff_registry', JSON.stringify(Array.from(regMap.values())));
+          populateStaffDirectoryDropdown();
+          updateBatchProvisionCard();
+        }
+      }
+    } catch (_) {}
+  }
+
+  function deduceSupervisor(dept) {
+    const d = (dept || '').toLowerCase();
+    if (d.includes('exec') || d.includes('board') || d.includes('ceo')) return 'Albert Joseph Bandama (CEO)';
+    if (d.includes('hr') || d.includes('human')) return 'Joe Ansumana Conteh (HR Director)';
+    if (d.includes('finan') || d.includes('account')) return 'Mariama Bangura (Finance Director)';
+    if (d.includes('program') || d.includes('field') || d.includes('community')) return 'Aminata Kamara (Programs Director)';
+    if (d.includes('it') || d.includes('tech') || d.includes('ict')) return 'Hassan Mohamed Mansaray (IT Administrator)';
+    if (d.includes('audit') || d.includes('risk')) return 'Sahr David Williams (Risk & Audits Director)';
+    return 'Albert Joseph Bandama (CEO)';
+  }
+
+  function prefillStaffDetails(empId) {
+    if (!empId) return;
+    const staff = (window._STAFF_DIRECTORY_CACHE && (window._STAFF_DIRECTORY_CACHE[empId] || window._STAFF_DIRECTORY_CACHE[empId.toUpperCase()])) ||
+                  getAllStaffDirectory().find(s => s.id === empId || (s.id || '').toUpperCase() === (empId || '').toUpperCase());
+    if (!staff) return;
+
+    const accounts = getLearningAccounts();
+    const existingAcc = accounts.find(a => (a.employeeId || '').toUpperCase() === (staff.id || '').toUpperCase());
+
+    const nameInput = document.getElementById('employeeName');
+    if (nameInput) nameInput.value = staff.name;
+
+    const idInput = document.getElementById('employeeId');
+    if (idInput) idInput.value = staff.id;
+
+    const phoneInput = document.getElementById('employeePhone');
+    if (phoneInput) phoneInput.value = staff.phone || '';
+
+    const emailInput = document.getElementById('employeeEmail');
+    if (emailInput) emailInput.value = staff.email || '';
+    
+    // Set position / designation
+    const posInput = document.getElementById('employeePosition');
+    if (posInput) posInput.value = staff.title || (existingAcc ? (existingAcc.position || '') : 'Staff Officer');
+
+    // Set supervisor
+    const supSelect = document.getElementById('employeeSupervisor');
+    if (supSelect) supSelect.value = (existingAcc && existingAcc.supervisor) ? existingAcc.supervisor : deduceSupervisor(staff.dept);
+
+    // Set quota allocation
+    const quotaSelect = document.getElementById('quotaTier');
+    if (quotaSelect) quotaSelect.value = (existingAcc && existingAcc.quotaTier) ? String(existingAcc.quotaTier) : '2';
+
+    // Set department
+    const deptSelect = document.getElementById('department');
+    if (deptSelect) {
+      const targetDept = normalizeDepartment(staff.dept);
+      let matched = false;
+      for (let i = 0; i < deptSelect.options.length; i++) {
+        if (deptSelect.options[i].value === targetDept || deptSelect.options[i].value === staff.dept) {
+          deptSelect.selectedIndex = i;
+          matched = true;
+          break;
+        }
+      }
+      if (!matched) deptSelect.value = targetDept;
+    }
+
+    const activeSelect = document.getElementById('isActive');
+    if (activeSelect) activeSelect.value = 'true';
+
+    if (existingAcc) {
+      document.getElementById('edit-account-id').value = existingAcc.accountId;
+      document.getElementById('username').value = existingAcc.username || staff.username;
+      document.getElementById('password').value = existingAcc.password || staff.password;
+      document.getElementById('form-card-title').textContent = `Edit Account Credentials — ${staff.name}`;
+      document.getElementById('btn-text').textContent = 'Update Staff Account Credentials';
+      document.getElementById('reset-form-btn').classList.remove('hidden');
+      toast(`Loaded existing provisioned account for ${staff.name} (${staff.title || staff.dept}).`);
+    } else {
+      document.getElementById('edit-account-id').value = '';
+      document.getElementById('username').value = staff.username || (staff.name.toLowerCase().replace(/[^a-z]/g, '').slice(0, 10));
+      document.getElementById('password').value = staff.password || 'Password123!';
+      document.getElementById('form-card-title').textContent = `Provision New Staff Account — ${staff.name}`;
+      document.getElementById('btn-text').textContent = 'Save & Provision Staff Learning Account';
+      document.getElementById('reset-form-btn').classList.remove('hidden');
+      toast(`Auto-populated credentials for ${staff.name} (${staff.title || staff.dept}). Ready to provision!`);
+    }
+  }
+
+  function generateUsernameFromName() {
+    const name = (document.getElementById('employeeName').value || '').trim();
+    if (!name) {
+      toast('Please enter the employee full name first.', false);
+      return;
+    }
+    const parts = name.toLowerCase().replace(/[^a-z\s]/g, '').split(/\s+/).filter(Boolean);
+    let u = '';
+    if (parts.length === 1) u = parts[0].slice(0, 8);
+    else if (parts.length >= 2) u = parts[0][0] + parts[parts.length - 1].slice(0, 9);
+    else u = 'staff' + Math.floor(100 + Math.random() * 900);
+    document.getElementById('username').value = u;
+    toast(`Generated login username: ${u}`);
+  }
+
+  function generateRandomStrongPassword() {
+    const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnpqrstuvwxyz23456789!@#$%&*';
+    let pwd = '';
+    pwd += 'ABCDEFGHJKLMNPQRSTUVWXYZ'[Math.floor(Math.random() * 24)];
+    pwd += 'abcdefghijkmnpqrstuvwxyz'[Math.floor(Math.random() * 24)];
+    pwd += '23456789'[Math.floor(Math.random() * 8)];
+    pwd += '!@#$%&*'[Math.floor(Math.random() * 7)];
+    for (let i = 0; i < 6; i++) pwd += chars[Math.floor(Math.random() * chars.length)];
+    pwd = pwd.split('').sort(() => 0.5 - Math.random()).join('');
+    const input = document.getElementById('password');
+    input.value = pwd;
+    if (input.type === 'password') input.type = 'text';
+    const ico = document.getElementById('pass-eye-icon');
+    if (ico) ico.textContent = 'visibility_off';
+    toast(`Generated strong password: ${pwd}`);
+  }
+
+  function fillTestGmail(targetEmail = 'albertjosephhassanbandama@gmail.com') {
+    const input = document.getElementById('employeeEmail');
+    if (input) {
+      input.value = targetEmail;
+      input.focus();
+      toast(`Populated ${targetEmail} as recipient address.`);
+    }
+  }
+
+  async function triggerDirectLiveTestEmail() {
+    let target = (document.getElementById('employeeEmail').value || 'albertjosephhassanbandama@gmail.com').trim();
+    if (typeof normalizeEmail === 'function') target = normalizeEmail(target);
+    document.getElementById('employeeEmail').value = target;
+    toast(`Dispatching live test email to ${target} via Gmail SMTP...`);
+    try {
+      const resp = await fetch(`http://localhost:3001/api/send-email?to=${encodeURIComponent(target)}&subject=${encodeURIComponent('[BCF-SL] Live SMTP Delivery Verification')}&text=${encodeURIComponent('Official BCF-SL Learning Portal test delivery. If you see this email in your inbox, live SMTP delivery is working perfectly!')}`);
+      const data = await resp.json().catch(() => ({}));
+      if (resp.ok && data.success) {
+        toast(`Live email successfully delivered to ${target}! Message ID: ${data.messageId}`);
+      } else {
+        toast(`SMTP Notice: ${data.error || 'Check server status'}`, false);
+      }
+    } catch(err) {
+      toast(`Connection notice: ${err.message}`, false);
+    }
+  }
+
+  function togglePassVisibility() {
+    const inp = document.getElementById('password');
+    const ico = document.getElementById('pass-eye-icon');
+    if (inp.type === 'password') { inp.type = 'text'; ico.textContent = 'visibility_off'; }
+    else { inp.type = 'password'; ico.textContent = 'visibility'; }
+  }
+
+  function resetForm() {
+    document.getElementById('account-form').reset();
+    document.getElementById('edit-account-id').value = '';
+    document.getElementById('staff-prefill-select').value = '';
+    const pos = document.getElementById('employeePosition');
+    if (pos) pos.value = '';
+    const quota = document.getElementById('quotaTier');
+    if (quota) quota.value = '2';
+    document.getElementById('form-card-title').textContent = 'Provision New Staff Account';
+    document.getElementById('btn-text').textContent = 'Save & Provision Staff Learning Account';
+    document.getElementById('reset-form-btn').classList.add('hidden');
+  }
+
+  async function handleAccountSubmit(e) {
+    e.preventDefault();
+
+    const editId = document.getElementById('edit-account-id').value;
+    const shouldSendEmail = document.getElementById('send-creds-email') ? document.getElementById('send-creds-email').checked : true;
+    
+    const emailInput = document.getElementById('employeeEmail');
+    let emailVal = (emailInput ? emailInput.value : '').trim();
+    if (typeof normalizeEmail === 'function') {
+      emailVal = normalizeEmail(emailVal);
+      if (emailInput) emailInput.value = emailVal;
+    }
+
+    const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
+    if (emailVal && !emailPattern.test(emailVal)) {
+      toast("Please enter a valid work email address (e.g. user@gmail.com or user@bcf-sl.org).", false);
+      if (emailInput) emailInput.focus();
+      return;
+    }
+
+    const accountData = {
+      accountId: editId || undefined,
+      employeeName: document.getElementById('employeeName').value.trim(),
+      employeeId: document.getElementById('employeeId').value.trim(),
+      employeePhone: document.getElementById('employeePhone').value.trim(),
+      employeeEmail: emailVal,
+      department: document.getElementById('department').value,
+      position: document.getElementById('employeePosition') ? document.getElementById('employeePosition').value.trim() : 'Staff Member',
+      supervisor: document.getElementById('employeeSupervisor') ? document.getElementById('employeeSupervisor').value : 'Executive Management',
+      quotaTier: document.getElementById('quotaTier') ? parseInt(document.getElementById('quotaTier').value, 10) || 2 : 2,
+      isActive: document.getElementById('isActive').value === 'true',
+      username: document.getElementById('username').value.trim().toLowerCase(),
+      password: document.getElementById('password').value
+    };
+
+    if (!accountData.employeeName || !accountData.employeeId || !accountData.username || !accountData.password) {
+      toast("Please fill in all required fields.", false);
+      return;
+    }
+
+    const isUpdate = !!editId;
+    const btnSubmit = document.getElementById('submit-account-btn');
+    const btnText = document.getElementById('btn-text');
+    const prevBtnText = btnText ? btnText.textContent : '';
+
+    if (btnSubmit) {
+      btnSubmit.disabled = true;
+      btnSubmit.classList.add('opacity-75');
+      if (btnText) btnText.textContent = shouldSendEmail ? 'Dispatching via Gmail SMTP...' : 'Saving Account...';
+    }
+
+    const saved = saveLearningAccount(accountData, {
+      sendEmail: shouldSendEmail,
+      actor: 'HR Learning Administrator'
+    });
+
+    if (saved && saved.success === false) {
+      toast(saved.error || 'Access Denied: Only BCF-SL Administrators can create or modify accounts.', false);
+      if (btnSubmit) {
+        btnSubmit.disabled = false;
+        btnSubmit.classList.remove('opacity-75');
+        if (btnText) btnText.textContent = prevBtnText || 'Save & Provision Staff Learning Account';
+      }
+      return;
+    }
+
+    if (shouldSendEmail && saved.employeeEmail) {
+      toast(`Sending official credentials email to ${saved.employeeEmail} via Gmail SMTP...`);
+      const sentEmails = getSentEmails();
+      if (sentEmails.length > 0) {
+        showEmailReceiptModal(sentEmails[0]);
+      }
+
+      if (saved._emailDispatch && saved._emailDispatch.promise) {
+        try {
+          const liveRes = await saved._emailDispatch.promise;
+          if (liveRes.success) {
+            toast(`Official credentials successfully delivered to ${saved.employeeEmail} via Gmail SMTP!`);
+          } else {
+            toast(`Account saved. SMTP notice: ${liveRes.email?.error || liveRes.email?.status || 'Sent'}`, false);
+          }
+          renderEmailsLedger();
+        } catch(err) {
+          toast(`Account saved. Network error: ${err.message}`, false);
+        }
+      }
+    } else {
+      toast(`Staff details & credentials for ${saved.employeeName} saved successfully.`);
+    }
+
+    if (btnSubmit) {
+      btnSubmit.disabled = false;
+      btnSubmit.classList.remove('opacity-75');
+      if (btnText) btnText.textContent = prevBtnText || 'Save & Provision Staff Learning Account';
+    }
+
+    resetForm();
+    renderAll();
+  }
+
+  function editAccount(accId) {
+    const accounts = getLearningAccounts();
+    const acc = accounts.find(a => a.accountId === accId || a.employeeId === accId);
+    if (!acc) return;
+
+    document.getElementById('edit-account-id').value = acc.accountId;
+    document.getElementById('employeeName').value = acc.employeeName || '';
+    document.getElementById('employeeId').value = acc.employeeId || '';
+    document.getElementById('employeePhone').value = acc.employeePhone || '';
+    document.getElementById('employeeEmail').value = acc.employeeEmail || '';
+    document.getElementById('department').value = acc.department || 'IT Operations';
+
+    const posInput = document.getElementById('employeePosition');
+    if (posInput) posInput.value = acc.position || '';
+
+    const supSelect = document.getElementById('employeeSupervisor');
+    if (supSelect) supSelect.value = acc.supervisor || 'Albert Joseph Bandama (CEO)';
+
+    const quotaSelect = document.getElementById('quotaTier');
+    if (quotaSelect) quotaSelect.value = String(acc.quotaTier || 2);
+
+    document.getElementById('isActive').value = acc.isActive !== false ? 'true' : 'false';
+    document.getElementById('username').value = acc.username || '';
+    document.getElementById('password').value = acc.password || '';
+
+    document.getElementById('form-card-title').textContent = `Edit Staff Details & Credentials — ${acc.employeeName}`;
+    document.getElementById('reset-form-btn').classList.remove('hidden');
+    const sel = document.getElementById('staff-prefill-select');
+    if (sel && acc.employeeId) sel.value = acc.employeeId;
+
+    switchTab('accounts');
+    window.scrollTo({ top: 320, behavior: 'smooth' });
+    toast(`Loaded details for ${acc.employeeName}. Update any details or credentials below.`);
+  }
+
+  function toggleStatus(accId) {
+    const accounts = getLearningAccounts();
+    const acc = accounts.find(a => a.accountId === accId);
+    if (acc) {
+      acc.isActive = !acc.isActive;
+      saveLearningAccount(acc, { sendEmail: false });
+      toast(`Account access status updated for ${acc.employeeName}.`);
+      renderAll();
+    }
+  }
+
+  function removeAccount(accId, name) {
+    if (confirm(`Are you sure you want to delete the learning account for ${name}?`)) {
+      deleteLearningAccount(accId);
+      toast(`Account for ${name} removed.`);
+      renderAll();
+    }
+  }
+
+  function copyText(text, label = 'Text') {
+    if (!text) return;
+    navigator.clipboard.writeText(text).then(() => {
+      toast(`${label} copied to clipboard!`);
+    }).catch(() => {
+      toast(`Could not copy ${label}.`, false);
+    });
+  }
+
+  function toggleCardPassword(accId, actualPassword) {
+    const el = document.getElementById('card-pass-' + accId);
+    const ico = document.getElementById('card-pass-ico-' + accId);
+    if (!el || !ico) return;
+    if (el.textContent === '••••••••') {
+      el.textContent = actualPassword || '••••••••';
+      ico.textContent = 'visibility_off';
+    } else {
+      el.textContent = '••••••••';
+      ico.textContent = 'visibility';
+    }
+  }
+
+  function openResetPasswordModal(accId) {
+    if (!isHRAdmin()) {
+      toast('Access Denied: Only BCF-SL Administrators can reset staff passwords.', false);
+      return;
+    }
+    const accounts = getLearningAccounts();
+    const acc = accounts.find(a => a.accountId === accId || a.employeeId === accId);
+    if (!acc) {
+      toast('Staff account not found.', false);
+      return;
+    }
+    document.getElementById('reset-modal-account-id').value = acc.accountId;
+    document.getElementById('reset-modal-staff-name').textContent = `${acc.employeeName} (${acc.position || acc.department})`;
+    document.getElementById('reset-modal-staff-id').textContent = acc.employeeId;
+    document.getElementById('reset-modal-username').textContent = acc.username;
+    document.getElementById('reset-modal-email').textContent = acc.employeeEmail || 'No work email on record';
+
+    generateResetModalPassword();
+
+    const modal = document.getElementById('reset-password-modal');
+    if (modal) modal.classList.remove('hidden');
+  }
+
+  function closeResetPasswordModal() {
+    const modal = document.getElementById('reset-password-modal');
+    if (modal) modal.classList.add('hidden');
+  }
+
+  function generateResetModalPassword() {
+    const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnpqrstuvwxyz23456789!@#$%&*';
+    let pwd = '';
+    pwd += 'ABCDEFGHJKLMNPQRSTUVWXYZ'[Math.floor(Math.random() * 24)];
+    pwd += 'abcdefghijkmnpqrstuvwxyz'[Math.floor(Math.random() * 24)];
+    pwd += '23456789'[Math.floor(Math.random() * 8)];
+    pwd += '!@#$%&*'[Math.floor(Math.random() * 7)];
+    for (let i = 0; i < 6; i++) pwd += chars[Math.floor(Math.random() * chars.length)];
+    pwd = pwd.split('').sort(() => 0.5 - Math.random()).join('');
+    document.getElementById('reset-modal-password').value = pwd;
+  }
+
+  async function confirmResetPassword() {
+    if (!isHRAdmin()) {
+      toast('Access Denied.', false);
+      return;
+    }
+    const accId = document.getElementById('reset-modal-account-id').value;
+    const newPass = (document.getElementById('reset-modal-password').value || '').trim();
+    const sendEmail = document.getElementById('reset-modal-send-email').checked;
+    if (!newPass || newPass.length < 6) {
+      toast('Please enter a password of at least 6 characters.', false);
+      return;
+    }
+
+    const accounts = getLearningAccounts();
+    const acc = accounts.find(a => a.accountId === accId);
+    if (!acc) {
+      toast('Account not found.', false);
+      return;
+    }
+
+    const btn = document.getElementById('reset-modal-confirm-btn');
+    const btnText = document.getElementById('reset-modal-confirm-text');
+    btn.disabled = true;
+    btnText.textContent = 'Updating Password...';
+
+    // Update password
+    acc.password = newPass;
+    acc.updatedAt = new Date().toISOString();
+    saveLearningAccount(acc, { sendEmail: false, skipAdminCheck: true });
+
+    toast(`Password updated successfully for ${acc.employeeName}!`);
+
+    if (sendEmail && acc.employeeEmail) {
+      toast(`Dispatching updated credentials email to ${acc.employeeEmail} via Gmail SMTP...`);
+      const emailRes = dispatchStaffCredentialEmail(acc, true, 'HR Learning Administrator');
+      if (emailRes && emailRes.promise) {
+        try {
+          const live = await emailRes.promise;
+          if (live.success) toast(`Credentials email successfully delivered to ${acc.employeeEmail}!`);
+          else toast(`SMTP note: ${live.email?.status || 'Dispatched'}`, false);
+        } catch(e) {
+          toast('Network note: ' + e.message, false);
+        }
+      }
+    }
+
+    renderAll();
+    closeResetPasswordModal();
+    btn.disabled = false;
+    btnText.textContent = 'Save New Password & Notify';
+  }
+
+  async function resendStaffCredentials(accId) {
+    const accounts = getLearningAccounts();
+    const acc = accounts.find(a => a.accountId === accId || a.employeeId === accId);
+    if (!acc) {
+      toast('Staff account not found.', false);
+      return;
+    }
+    if (!acc.employeeEmail) {
+      toast('Cannot dispatch email: No work email address recorded for this staff member.', false);
+      return;
+    }
+
+    toast(`Dispatching credentials email to ${acc.employeeEmail} via Gmail SMTP...`);
+    const res = dispatchStaffCredentialEmail(acc, true, 'HR Learning Administrator');
+    if (res.success) {
+      showEmailReceiptModal(res.email);
+      renderAll();
+      if (res.promise) {
+        try {
+          const live = await res.promise;
+          if (live.success) {
+            toast(`Official credentials email successfully delivered to ${acc.employeeEmail} via Gmail SMTP!`);
+          } else {
+            toast(`SMTP notice: ${live.email?.status || 'Dispatched'}`, false);
+          }
+          renderEmailsLedger();
+        } catch(e) {
+          toast(`SMTP dispatch notice: ${e.message}`, false);
+        }
+      }
+    } else {
+      toast(res.message || 'Failed to dispatch credentials email.', false);
+    }
+  }
+
+  let currentReceiptSizeMode = 'compact';
+
+  function setReceiptSize(mode) {
+    currentReceiptSizeMode = mode;
+    const viewport = document.getElementById('modal-email-viewport');
+    const btnCompact = document.getElementById('btn-size-compact');
+    const btnStandard = document.getElementById('btn-size-standard');
+    const btnHeader = document.getElementById('toggle-receipt-size-btn-header');
+    const iconHeader = document.getElementById('toggle-size-icon-header');
+    const textHeader = document.getElementById('toggle-size-text-header');
+
+    if (mode === 'compact') {
+      if (viewport) viewport.classList.add('receipt-compact-size');
+      if (btnCompact) {
+        btnCompact.className = 'px-2.5 py-1 rounded-lg text-[11px] font-bold bg-amber-400 text-slate-950 flex items-center gap-1 shadow-xs transition cursor-pointer';
+      }
+      if (btnStandard) {
+        btnStandard.className = 'px-2.5 py-1 rounded-lg text-[11px] font-bold bg-white/10 hover:bg-white/20 text-blue-100 flex items-center gap-1 transition cursor-pointer';
+      }
+      if (textHeader) textHeader.textContent = 'Standard Size';
+      if (iconHeader) iconHeader.textContent = 'fullscreen';
+      if (btnHeader) btnHeader.title = 'Switch to Standard Size';
+    } else {
+      if (viewport) viewport.classList.remove('receipt-compact-size');
+      if (btnCompact) {
+        btnCompact.className = 'px-2.5 py-1 rounded-lg text-[11px] font-bold bg-white/10 hover:bg-white/20 text-blue-100 flex items-center gap-1 transition cursor-pointer';
+      }
+      if (btnStandard) {
+        btnStandard.className = 'px-2.5 py-1 rounded-lg text-[11px] font-bold bg-amber-400 text-slate-950 flex items-center gap-1 shadow-xs transition cursor-pointer';
+      }
+      if (textHeader) textHeader.textContent = 'Show All (Smaller Size)';
+      if (iconHeader) iconHeader.textContent = 'fit_screen';
+      if (btnHeader) btnHeader.title = 'Switch to Show All (Smaller Size)';
+    }
+    try {
+      localStorage.setItem('bcf_receipt_view_mode', mode);
+    } catch (_) {}
+  }
+
+  function toggleReceiptSize() {
+    setReceiptSize(currentReceiptSizeMode === 'compact' ? 'standard' : 'compact');
+  }
+
+  function showEmailReceiptModal(emailRecord) {
+    if (!emailRecord) return;
+    const modal = document.getElementById('email-receipt-modal');
+    if (!modal) return;
+    document.getElementById('modal-email-recipient').textContent = `${emailRecord.recipientName} <${emailRecord.recipientEmail}>`;
+    document.getElementById('modal-email-subject').textContent = emailRecord.subject;
+    document.getElementById('modal-email-date').textContent = new Date(emailRecord.sentAt).toLocaleString('en-GB');
+    document.getElementById('modal-email-html').innerHTML = emailRecord.htmlBody;
+
+    // Admin Verification Quick Strip
+    const verifyStrip = document.getElementById('modal-admin-verify-strip');
+    if (verifyStrip) {
+      const u = emailRecord.credentials?.username || '—';
+      const p = emailRecord.credentials?.password || '—';
+      const id = emailRecord.recipientId || emailRecord.credentials?.employeeId || '—';
+      verifyStrip.innerHTML = `
+        <span class="bg-blue-900/80 px-2 py-0.5 rounded border border-blue-700/60">ID: <b class="text-white">${esc(id)}</b></span>
+        <span class="bg-blue-900/80 px-2 py-0.5 rounded border border-blue-700/60">User: <b class="text-amber-300 font-mono">${esc(u)}</b></span>
+        <span class="bg-blue-900/80 px-2 py-0.5 rounded border border-blue-700/60">Pass: <b class="text-white font-mono">${esc(p)}</b></span>
+      `;
+    }
+
+    const savedMode = localStorage.getItem('bcf_receipt_view_mode') || 'compact';
+    setReceiptSize(savedMode);
+
+    const statusEl = document.getElementById('modal-email-status');
+    if (statusEl) {
+      const isDelivered = emailRecord.status && emailRecord.status.startsWith('Delivered');
+      const isSending = emailRecord.status && emailRecord.status.includes('Sending');
+      if (isDelivered) {
+        statusEl.className = 'inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-bold font-mono bg-emerald-50 text-emerald-700 border border-emerald-200';
+        statusEl.innerHTML = '<span class="material-symbols-outlined text-[14px]">check_circle</span> Delivered (Gmail SMTP Live)';
+      } else if (isSending) {
+        statusEl.className = 'inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-bold font-mono bg-blue-50 text-blue-700 border border-blue-200';
+        statusEl.innerHTML = '<span class="w-1.5 h-1.5 rounded-full bg-blue-500 animate-pulse"></span> Dispatching via SMTP...';
+      } else {
+        statusEl.className = 'inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-bold font-mono bg-amber-50 text-amber-700 border border-amber-200';
+        statusEl.innerHTML = `<span class="material-symbols-outlined text-[14px]">warning</span> ${emailRecord.status || 'Sent'}`;
+      }
+    }
+
+    const btnCopy = document.getElementById('modal-copy-creds-btn');
+    if (btnCopy) {
+      btnCopy.onclick = () => {
+        const text = `BCF-SL Staff Learning Portal Credentials:\nUsername: ${emailRecord.credentials?.username}\nPassword: ${emailRecord.credentials?.password}\nPortal URL: ${emailRecord.loginUrl}`;
+        copyText(text, 'Login credentials');
+      };
+    }
+
+    modal.classList.remove('hidden');
+    modal.classList.add('flex');
+  }
+
+  function closeEmailReceiptModal() {
+    const modal = document.getElementById('email-receipt-modal');
+    if (modal) {
+      modal.classList.add('hidden');
+      modal.classList.remove('flex');
+    }
+  }
+
+  function renderAccountsList() {
+    const accounts = getLearningAccounts();
+    const filter = (document.getElementById('search-accounts')?.value || '').toLowerCase();
+    const deptFilter = document.getElementById('filter-account-dept')?.value || 'All';
+    const statusFilter = document.getElementById('filter-account-status')?.value || 'All';
+    const container = document.getElementById('accounts-container');
+    if (!container) return;
+
+    const filtered = accounts.filter(a => {
+      const matchSearch =
+        (a.employeeName || '').toLowerCase().includes(filter) ||
+        (a.employeeId || '').toLowerCase().includes(filter) ||
+        (a.username || '').toLowerCase().includes(filter) ||
+        (a.employeeEmail || '').toLowerCase().includes(filter) ||
+        (a.department || '').toLowerCase().includes(filter) ||
+        (a.position || '').toLowerCase().includes(filter);
+
+      const matchDept = deptFilter === 'All' || (a.department || '').toLowerCase().includes(deptFilter.toLowerCase());
+      const matchStatus = statusFilter === 'All' ||
+        (statusFilter === 'active' && a.isActive !== false) ||
+        (statusFilter === 'suspended' && a.isActive === false);
+
+      return matchSearch && matchDept && matchStatus;
+    });
+
+    // Update stats
+    document.getElementById('stat-total-accounts').textContent = accounts.length;
+    const countBadge = document.getElementById('accounts-filtered-count');
+    if (countBadge) countBadge.textContent = `${filtered.length} of ${accounts.length} Accounts`;
+
+    if (filtered.length === 0) {
+      container.innerHTML = `
+        <div class="bg-white rounded-3xl border border-dashed border-slate-300 p-10 text-center flex flex-col items-center gap-2">
+          <span class="material-symbols-outlined text-3xl text-slate-300">person_off</span>
+          <h4 class="font-display font-extrabold text-sm text-slate-800">No Staff Accounts Match Filters</h4>
+          <p class="text-xs text-slate-500">Adjust your search or filter criteria or create a new staff account above.</p>
+        </div>`;
+      return;
+    }
+
+    container.innerHTML = filtered.map(acc => `
+      <div class="bg-white rounded-2xl border border-slate-200/90 p-5 shadow-xs flex flex-col gap-4 hover:border-blue-300 transition-all">
+        <div class="flex flex-wrap items-center justify-between gap-3">
+          <div class="flex items-center gap-3.5">
+            <div class="w-12 h-12 rounded-2xl ${acc.isActive !== false ? 'hero text-white shadow-xs' : 'bg-slate-200 text-slate-600'} flex items-center justify-center font-display font-black text-base shrink-0">
+              ${(acc.employeeName || 'Staff').split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase()}
+            </div>
+            <div>
+              <div class="flex items-center gap-2 flex-wrap">
+                <h4 class="font-display font-extrabold text-base text-slate-900">${esc(acc.employeeName)}</h4>
+                <span class="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold flex items-center gap-1 ${acc.isActive !== false ? 'bg-emerald-100 text-emerald-800 border border-emerald-200' : 'bg-slate-100 text-slate-600 border border-slate-200'}">
+                  <span class="w-1.5 h-1.5 rounded-full ${acc.isActive !== false ? 'bg-emerald-500' : 'bg-slate-400'}"></span>
+                  ${acc.isActive !== false ? 'Active Access' : 'Suspended'}
+                </span>
+                <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-blue-50 text-blue-700 border border-blue-200">
+                  ${acc.quotaTier || 2} Slots / Term
+                </span>
+              </div>
+              <p class="text-xs font-semibold text-slate-600 mt-0.5">
+                <span class="font-bold text-slate-900">${esc(acc.position || 'Staff Member')}</span> · ${esc(acc.department || 'General')} · ID: <strong class="text-blue-700 font-mono">${esc(acc.employeeId)}</strong>
+              </p>
+            </div>
+          </div>
+
+          <!-- Actions -->
+          <div class="flex items-center gap-2 flex-wrap">
+            <button onclick="resendStaffCredentials('${acc.accountId}')" class="px-3 py-1.5 rounded-xl bg-blue-50 hover:bg-blue-100 text-blue-700 font-bold text-xs flex items-center gap-1 transition shadow-2xs" title="Send credentials to Work Email Address via Gmail SMTP">
+              <span class="material-symbols-outlined text-base">forward_to_inbox</span>
+              <span>Send Email</span>
+            </button>
+            <button onclick="openResetPasswordModal('${acc.accountId}')" class="px-3 py-1.5 rounded-xl bg-indigo-50 hover:bg-indigo-100 text-indigo-700 font-bold text-xs flex items-center gap-1 transition shadow-2xs" title="Reset password and issue updated credentials">
+              <span class="material-symbols-outlined text-base">lock_reset</span>
+              <span>Reset Password</span>
+            </button>
+            <button onclick="editAccount('${acc.accountId}')" class="px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-blue-50 text-slate-700 hover:text-blue-700 font-bold text-xs flex items-center gap-1 transition shadow-2xs" title="Edit details, username & password">
+              <span class="material-symbols-outlined text-base">edit</span>
+              <span>Edit Details</span>
+            </button>
+            <button onclick="toggleStatus('${acc.accountId}')" class="px-3 py-1.5 rounded-xl ${acc.isActive !== false ? 'bg-amber-50 text-amber-700 hover:bg-amber-100' : 'bg-emerald-50 text-emerald-700 hover:bg-emerald-100'} font-bold text-xs flex items-center gap-1 transition shadow-2xs">
+              <span class="material-symbols-outlined text-base">${acc.isActive !== false ? 'block' : 'check_circle'}</span>
+              <span>${acc.isActive !== false ? 'Suspend' : 'Activate'}</span>
+            </button>
+            <button onclick="removeAccount('${acc.accountId}', '${esc(acc.employeeName)}')" class="w-9 h-9 rounded-xl bg-slate-100 hover:bg-red-50 text-slate-500 hover:text-red-700 flex items-center justify-center transition shadow-2xs" title="Delete account">
+              <span class="material-symbols-outlined text-base">delete</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Credential Info Box -->
+        <div class="bg-slate-50/80 rounded-xl p-3.5 grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs border border-slate-100">
+          <div>
+            <div class="text-[10px] uppercase font-extrabold text-slate-400">Work Email Address</div>
+            <div class="font-bold text-blue-700 truncate mt-0.5" title="${esc(acc.employeeEmail || '')}">${esc(acc.employeeEmail || 'N/A')}</div>
+          </div>
+          <div>
+            <div class="text-[10px] uppercase font-extrabold text-slate-400">Supervisor / Line Manager</div>
+            <div class="font-semibold text-slate-700 truncate mt-0.5" title="${esc(acc.supervisor || '')}">${esc(acc.supervisor || 'Executive')}</div>
+          </div>
+          <div>
+            <div class="text-[10px] uppercase font-extrabold text-slate-400">Staff Login Username</div>
+            <div class="flex items-center gap-1.5 mt-0.5">
+              <span class="font-mono font-bold text-blue-700 bg-blue-50 px-2 py-0.5 rounded border border-blue-100 inline-block">${esc(acc.username)}</span>
+              <button type="button" onclick="copyText('${esc(acc.username)}', 'Username')" class="text-slate-400 hover:text-blue-700 transition" title="Copy Username">
+                <span class="material-symbols-outlined text-[15px]">content_copy</span>
+              </button>
+            </div>
+          </div>
+          <div>
+            <div class="text-[10px] uppercase font-extrabold text-slate-400">Staff Login Password</div>
+            <div class="flex items-center gap-1.5 mt-0.5">
+              <span id="card-pass-${acc.accountId}" class="font-mono font-bold text-slate-800 text-xs">••••••••</span>
+              <button type="button" onclick="toggleCardPassword('${acc.accountId}', '${esc(acc.password || '')}')" class="text-slate-400 hover:text-blue-700 transition" title="Show/Hide Password">
+                <span class="material-symbols-outlined text-[15px]" id="card-pass-ico-${acc.accountId}">visibility</span>
+              </button>
+              <button type="button" onclick="copyText('${esc(acc.password || '')}', 'Password')" class="text-slate-400 hover:text-blue-700 transition" title="Copy Password">
+                <span class="material-symbols-outlined text-[15px]">content_copy</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    `).join('');
+  }
+
+  function renderEmailsLedger() {
+    const emails = getSentEmails();
+    const badge = document.getElementById('emails-badge');
+    if (badge) badge.textContent = emails.length;
+
+    const countEl = document.getElementById('ledger-total-count');
+    if (countEl) countEl.textContent = `${emails.length} Dispatched Emails`;
+
+    const container = document.getElementById('emails-container');
+    if (!container) return;
+
+    const filter = (document.getElementById('search-emails')?.value || '').toLowerCase();
+    const filtered = emails.filter(e =>
+      (e.recipientName || '').toLowerCase().includes(filter) ||
+      (e.recipientEmail || '').toLowerCase().includes(filter) ||
+      (e.subject || '').toLowerCase().includes(filter) ||
+      (e.recipientId || '').toLowerCase().includes(filter) ||
+      (e.credentials?.username || '').toLowerCase().includes(filter)
+    );
+
+    if (filtered.length === 0) {
+      container.innerHTML = `
+        <div class="bg-white rounded-3xl border border-dashed border-slate-300 p-12 text-center flex flex-col items-center justify-center gap-2">
+          <div class="w-14 h-14 rounded-full bg-blue-50 text-blue-600 flex items-center justify-center mb-1">
+            <span class="material-symbols-outlined text-3xl">mark_email_unread</span>
+          </div>
+          <h4 class="font-display font-extrabold text-base text-slate-800">No Dispatched Credential Emails</h4>
+          <p class="text-xs text-slate-500 max-w-sm">When you provision a new staff account or update credentials, dispatched emails to staff work addresses will be tracked here in the institutional ledger.</p>
+        </div>`;
+      return;
+    }
+
+    container.innerHTML = filtered.map(em => {
+      const isDelivered = em.status && em.status.startsWith('Delivered');
+      const isSending = em.status && em.status.includes('Sending');
+      const statusBadge = isDelivered
+        ? `<span class="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold bg-emerald-100 text-emerald-800 border border-emerald-200 flex items-center gap-1"><span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> Delivered (SMTP Live)</span>`
+        : (isSending 
+            ? `<span class="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold bg-blue-100 text-blue-800 border border-blue-200 flex items-center gap-1"><span class="w-1.5 h-1.5 rounded-full bg-blue-500 animate-pulse"></span> Dispatching SMTP...</span>`
+            : `<span class="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold bg-amber-100 text-amber-800 border border-amber-200 flex items-center gap-1"><span class="material-symbols-outlined text-[12px]">warning</span> ${esc(em.status || 'Sent')}</span>`
+          );
+
+      return `
+      <div class="bg-white rounded-2xl border border-slate-200/90 p-5 shadow-xs flex flex-col gap-4 hover:border-blue-300 transition-all">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <div class="flex items-center gap-3.5">
+            <div class="w-11 h-11 rounded-2xl bg-blue-50 text-blue-700 border border-blue-200 flex items-center justify-center shrink-0">
+              <span class="material-symbols-outlined text-2xl">mail</span>
+            </div>
+            <div>
+              <div class="flex items-center gap-2">
+                <h4 class="font-display font-extrabold text-sm sm:text-base text-slate-900">${esc(em.recipientName)}</h4>
+                ${statusBadge}
+                ${em.isUpdate ? '<span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-100 text-amber-800">Updated</span>' : '<span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-blue-100 text-blue-800">New Provisioning</span>'}
+              </div>
+              <p class="text-xs text-slate-500 mt-0.5">
+                Work Email: <strong class="text-blue-700 font-semibold">${esc(em.recipientEmail)}</strong> · Staff ID: <span class="font-mono text-slate-700 font-bold">${esc(em.recipientId || 'N/A')}</span>
+              </p>
+            </div>
+          </div>
+
+          <div class="flex items-center gap-2">
+            <button onclick="viewSentEmail('${em.id}')" class="px-3.5 py-1.5 rounded-xl bg-blue-50 hover:bg-blue-100 text-blue-800 font-bold text-xs flex items-center gap-1.5 transition">
+              <span class="material-symbols-outlined text-base">visibility</span>
+              <span>View Full Email</span>
+            </button>
+            <button onclick="resendSentEmail('${em.id}')" class="px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs flex items-center gap-1 transition">
+              <span class="material-symbols-outlined text-base">forward_to_inbox</span>
+              <span>Resend</span>
+            </button>
+          </div>
+        </div>
+
+        <div class="bg-slate-50/80 rounded-xl p-3.5 grid grid-cols-1 sm:grid-cols-4 gap-3 text-xs border border-slate-100">
+          <div>
+            <div class="text-[10px] uppercase font-extrabold text-slate-400">Subject</div>
+            <div class="font-semibold text-slate-800 truncate mt-0.5" title="${esc(em.subject)}">${esc(em.subject)}</div>
+          </div>
+          <div>
+            <div class="text-[10px] uppercase font-extrabold text-slate-400">Dispatch Timestamp</div>
+            <div class="font-bold text-slate-700 mt-0.5">${new Date(em.sentAt).toLocaleString('en-GB')}</div>
+          </div>
+          <div>
+            <div class="text-[10px] uppercase font-extrabold text-slate-400">Dispatched Username</div>
+            <div class="font-mono font-bold text-blue-700 bg-blue-50 px-2 py-0.5 rounded border border-blue-100 inline-block mt-0.5">${esc(em.credentials?.username || '—')}</div>
+          </div>
+          <div>
+            <div class="text-[10px] uppercase font-extrabold text-slate-400">Dispatched Password</div>
+            <div class="font-mono font-bold text-slate-800 mt-0.5">${esc(em.credentials?.password || '••••••••')}</div>
+          </div>
+        </div>
+      </div>
+    `}).join('');
+  }
+
+  function viewSentEmail(emailId) {
+    const email = getSentEmails().find(e => e.id === emailId);
+    if (email) showEmailReceiptModal(email);
+  }
+
+  async function resendSentEmail(emailId) {
+    const email = getSentEmails().find(e => e.id === emailId);
+    if (!email) return;
+    const accounts = getLearningAccounts();
+    const acc = accounts.find(a => a.employeeId === email.recipientId || a.employeeEmail === email.recipientEmail);
+    if (acc) {
+      await resendStaffCredentials(acc.accountId);
+    } else {
+      toast(`Dispatching credentials email to ${email.recipientEmail} via Gmail SMTP...`);
+      const res = dispatchStaffCredentialEmail({
+        employeeName: email.recipientName,
+        employeeEmail: email.recipientEmail,
+        employeeId: email.recipientId,
+        username: email.credentials?.username,
+        password: email.credentials?.password,
+        department: email.department
+      }, true, 'HR Learning Administrator');
+      if (res.success) {
+        showEmailReceiptModal(res.email);
+        renderEmailsLedger();
+        if (res.promise) {
+          try {
+            const live = await res.promise;
+            if (live.success) {
+              toast(`Official credentials delivered to ${email.recipientEmail} via Gmail SMTP!`);
+            } else {
+              toast(`SMTP notice: ${live.email?.status || 'Dispatched'}`, false);
+            }
+            renderEmailsLedger();
+          } catch(e) {}
+        }
+      }
+    }
+  }
+
+  // ── Tab 2: Approvals Queue ──
+  function renderApprovalsQueue() {
+    const all = getAllEnrollments();
+    const accounts = getLearningAccounts();
+
+    // Requests requiring approval
+    const pendingRequests = all.filter(e => ['Requested', 'Under Review'].includes(e.status));
+    const reqContainer = document.getElementById('requests-queue-container');
+
+    document.getElementById('stat-pending-requests').textContent = pendingRequests.length;
+
+    if (pendingRequests.length === 0) {
+      reqContainer.innerHTML = `<div class="bg-slate-50 rounded-2xl p-6 text-center text-xs text-slate-500">No pending staff course requests at this time. All requests processed.</div>`;
+    } else {
+      reqContainer.innerHTML = pendingRequests.map(r => {
+        const emp = accounts.find(a => a.employeeId === r.employeeId) || { employeeName: 'Staff Member', department: 'Operations' };
+        return `
+          <div class="border border-slate-200 rounded-2xl p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white hover:border-blue-300 transition">
+            <div class="min-w-0">
+              <div class="flex items-center gap-2">
+                <span class="chip ${r.status === 'Under Review' ? 'bg-orange-100 text-orange-800' : 'bg-amber-100 text-amber-800'}">${esc(r.status)}</span>
+                <span class="text-xs font-bold text-slate-900">${esc(emp.employeeName)} (${esc(emp.department)})</span>
+                <span class="text-[11px] text-slate-400">Requested ${fmtDate(r.requestedAt)}</span>
+              </div>
+              <h4 class="font-display font-bold text-sm text-slate-900 mt-1">${esc(r.courseTitle)}</h4>
+              <p class="text-xs text-slate-600 mt-0.5"><b>Provider:</b> ${esc(r.vendor)} · <b>Staff Rationale:</b> ${esc(r.reason || 'Professional skill enhancement')}</p>
+            </div>
+            <div class="flex items-center gap-2 shrink-0">
+              <button onclick="approveCourse('${r.id}')" class="h-9 px-4 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs flex items-center gap-1 transition">
+                <span class="material-symbols-outlined text-base">check</span> Approve & Enrol
+              </button>
+              <button onclick="declineCourse('${r.id}')" class="h-9 px-4 rounded-xl bg-rose-50 hover:bg-rose-100 text-rose-700 font-bold text-xs flex items-center gap-1 transition">
+                <span class="material-symbols-outlined text-base">close</span> Decline
+              </button>
+            </div>
+          </div>`;
+      }).join('');
+    }
+
+    // Submitted Certificates requiring verification
+    const pendingCerts = all.filter(e => e.status === 'Certificate Submitted' || (e.certificate && e.certificate.status === 'Pending Verification'));
+    const certContainer = document.getElementById('certificates-queue-container');
+
+    document.getElementById('stat-pending-certs').textContent = pendingCerts.length;
+
+    // Queue badge on tab
+    const totalQueue = pendingRequests.length + pendingCerts.length;
+    const badge = document.getElementById('queue-badge');
+    badge.textContent = totalQueue;
+    badge.classList.toggle('hidden', totalQueue === 0);
+
+    if (pendingCerts.length === 0) {
+      certContainer.innerHTML = `<div class="bg-slate-50 rounded-2xl p-6 text-center text-xs text-slate-500">No submitted certificates awaiting verification.</div>`;
+    } else {
+      certContainer.innerHTML = pendingCerts.map(c => {
+        const emp = accounts.find(a => a.employeeId === c.employeeId) || { employeeName: 'Staff Member', department: 'Operations' };
+        const cert = c.certificate || {};
+        return `
+          <div class="border border-slate-200 rounded-2xl p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white hover:border-teal-300 transition">
+            <div class="min-w-0">
+              <div class="flex items-center gap-2">
+                <span class="chip bg-teal-100 text-teal-800">Certificate Submitted</span>
+                <span class="text-xs font-bold text-slate-900">${esc(emp.employeeName)} (${esc(emp.department)})</span>
+                <span class="text-[11px] text-slate-400">Submitted ${fmtDate(cert.submittedAt)}</span>
+              </div>
+              <h4 class="font-display font-bold text-sm text-slate-900 mt-1">${esc(c.courseTitle)}</h4>
+              <p class="text-xs text-slate-600 mt-0.5">
+                <b>Credential ID:</b> <span class="font-mono font-bold text-blue-700">${esc(cert.number || 'Provided in File')}</span>
+                ${cert.link ? `· <a href="${esc(cert.link)}" target="_blank" class="text-blue-600 underline">Verification Link</a>` : ''}
+              </p>
+            </div>
+            <div class="flex items-center gap-2 shrink-0">
+              <button onclick="approveCert('${c.id}')" class="h-9 px-4 rounded-xl bg-teal-600 hover:bg-teal-700 text-white font-bold text-xs flex items-center gap-1 transition">
+                <span class="material-symbols-outlined text-base">verified</span> Verify Credential
+              </button>
+              <button onclick="rejectCert('${c.id}')" class="h-9 px-4 rounded-xl bg-rose-50 hover:bg-rose-100 text-rose-700 font-bold text-xs flex items-center gap-1 transition">
+                <span class="material-symbols-outlined text-base">close</span> Reject
+              </button>
+            </div>
+          </div>`;
+      }).join('');
+    }
+  }
+
+  function approveCourse(id) {
+    hrDecision(id, true, 'Approved by HR Director for active semester allocation.');
+    toast('Course enrollment request approved. License provisioned.');
+    renderAll();
+  }
+
+  function declineCourse(id) {
+    const reason = prompt('Please enter decline reason for staff notification:', 'Course quota reached or alternate course recommended.');
+    if (reason) {
+      hrDecision(id, false, reason);
+      toast('Course request declined and slot released.');
+      renderAll();
+    }
+  }
+
+  function approveCert(id) {
+    verifyCertificate(id, true, 'HR Learning Director', 'Verified against official vendor completion register.');
+    toast('Certificate verified! Permanent BCF-SL transcript updated.');
+    renderAll();
+  }
+
+  function rejectCert(id) {
+    const reason = prompt('Enter rejection reason for certificate:', 'Credential number could not be validated.');
+    if (reason) {
+      verifyCertificate(id, false, 'HR Learning Director', reason);
+      toast('Certificate marked as rejected.');
+      renderAll();
+    }
+  }
+
+  // ── Tab 3: Governance & Quota Settings ──
+  function renderGovernanceSettings() {
+    const sem = getActiveSemester();
+    const settings = getSettings();
+
+    document.getElementById('gov-sem-name').textContent = sem.name;
+    document.getElementById('gov-sem-dates').textContent = `${fmtDate(sem.startDate)} – ${fmtDate(sem.endDate)}`;
+    document.getElementById('gov-sem-status').textContent = sem.status === 'Open' ? 'Selection Open' : 'Closed';
+
+    document.getElementById('set-slots').value = settings.maxSlotsPerSemester || 2;
+    document.getElementById('set-reminders').value = settings.reminderDays || 14;
+
+    document.getElementById('stat-quota-rule').textContent = `${settings.maxSlotsPerSemester || 2} Courses`;
+  }
+
+  function handleSettingsSave(e) {
+    e.preventDefault();
+    const slots = Number(document.getElementById('set-slots').value);
+    const reminders = Number(document.getElementById('set-reminders').value);
+
+    saveSettings({
+      maxSlotsPerSemester: slots,
+      reminderDays: reminders
+    });
+
+    toast('Institutional learning policy settings saved.');
+    renderAll();
+  }
+
+  function handleCloseSemester() {
+    if (confirm('Are you sure you want to CLOSE the current semester and OPEN the next semester term? This will archive existing enrollment slots and enable staff to pick new courses for the new semester.')) {
+      const res = closeSemesterAndOpenNext();
+      if (res) {
+        toast(`Semester closed. Opened ${res.opened.name}! Staff notified.`);
+        renderAll();
+      }
+    }
+  }
+
+  function handleBroadcastReminder() {
+    broadcastSemesterClosingNotice();
+    toast('Closing notice broadcasted to all provisioned staff members.');
+  }
+
+  // ── Tab 4: Vendors & Licenses ──
+  function renderVendors() {
+    const vendors = getVendors();
+    const stats = getVendorStats(getActiveSemester().id);
+    const container = document.getElementById('vendors-cards-container');
+
+    container.innerHTML = vendors.map(v => {
+      const st = stats.find(s => s.vendor === v.name) || { staff: 0, courses: 0, completed: 0, certificates: 0 };
+      return `
+        <div class="border border-slate-200 rounded-2xl p-5 bg-white shadow-xs flex flex-col justify-between">
+          <div>
+            <div class="flex items-center justify-between mb-2">
+              <h4 class="font-display font-extrabold text-base text-slate-900">${esc(v.name)}</h4>
+              <span class="chip bg-emerald-50 text-emerald-700 font-bold">${esc(v.status || 'Active')}</span>
+            </div>
+            <div class="text-xs font-semibold text-blue-700 font-mono mb-2">${esc(v.agreementRef)}</div>
+            <p class="text-xs text-slate-500 mb-3">${esc(v.purpose)}</p>
+            <div class="p-3 rounded-xl bg-slate-50 border border-slate-100 text-xs text-slate-700 space-y-1">
+              <div><b>Subscription Tier:</b> ${esc(v.subscription)}</div>
+              <div><b>Annual Investment:</b> NLe ${Number(v.annualCost || 0).toLocaleString()}</div>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-3 gap-2 text-center text-xs mt-4 pt-4 border-t border-slate-100">
+            <div class="bg-blue-50/60 p-2 rounded-xl">
+              <div class="text-[10px] text-slate-400 font-bold uppercase">Staff Enrolled</div>
+              <div class="font-bold text-slate-900 text-sm mt-0.5">${st.staff}</div>
+            </div>
+            <div class="bg-indigo-50/60 p-2 rounded-xl">
+              <div class="text-[10px] text-slate-400 font-bold uppercase">Active Courses</div>
+              <div class="font-bold text-slate-900 text-sm mt-0.5">${st.courses}</div>
+            </div>
+            <div class="bg-emerald-50/60 p-2 rounded-xl">
+              <div class="text-[10px] text-slate-400 font-bold uppercase">Verified Certs</div>
+              <div class="font-bold text-emerald-700 text-sm mt-0.5">${st.certificates}</div>
+            </div>
+          </div>
+        </div>`;
+    }).join('');
+  }
+
+  // ── 1-Click Batch Account Provisioning for All Staff ──
+  function updateBatchProvisionCard() {
+    const badge = document.getElementById('batch-coverage-display');
+    const sub = document.getElementById('batch-status-sub');
+    if (!badge) return;
+
+    const allStaff = getAllStaffDirectory();
+    const accounts = getLearningAccounts();
+    const provIds = new Set(accounts.map(a => (a.employeeId || '').toUpperCase()));
+    const total = allStaff.length;
+    const active = allStaff.filter(s => provIds.has((s.id || '').toUpperCase())).length;
+    const pending = total - active;
+    const pct = total ? Math.round((active / total) * 100) : 0;
+
+    badge.textContent = `${active}/${total} Active (${pct}%)`;
+    if (sub) {
+      sub.textContent = pending > 0 ? `${pending} staff awaiting account setup` : 'All staff fully provisioned (100%)';
+    }
+  }
+
+  function openBatchProvisionModal() {
+    if (!isHRAdmin()) {
+      toast('Access Denied: Only BCF-SL Administrators can batch provision accounts.', false);
+      return;
+    }
+
+    const modal = document.getElementById('batch-provision-modal');
+    if (!modal) return;
+
+    const allStaff = getAllStaffDirectory();
+    const accounts = getLearningAccounts();
+    const provIds = new Set(accounts.map(a => (a.employeeId || '').toUpperCase()));
+    const total = allStaff.length;
+    const active = allStaff.filter(s => provIds.has((s.id || '').toUpperCase())).length;
+    const pending = total - active;
+
+    document.getElementById('batch-modal-total').textContent = `${total} Staff`;
+    document.getElementById('batch-modal-active').textContent = `${active} Active`;
+    document.getElementById('batch-modal-pending').textContent = `${pending} Pending`;
+
+    const list = document.getElementById('batch-modal-staff-list');
+    list.innerHTML = allStaff.map(s => {
+      const isProv = provIds.has((s.id || '').toUpperCase());
+      return `
+        <div class="p-3 rounded-2xl bg-white border border-slate-200 flex items-center justify-between gap-3 shadow-2xs">
+          <div class="flex items-center gap-3 min-w-0">
+            <div class="w-9 h-9 rounded-xl ${isProv ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' : 'bg-amber-50 text-amber-700 border border-amber-200'} font-bold flex items-center justify-center text-xs shrink-0">
+              ${initials(s.name)}
+            </div>
+            <div class="min-w-0">
+              <div class="text-xs font-bold text-slate-900 truncate">${esc(s.name)}</div>
+              <div class="text-[11px] text-slate-500 truncate">${esc(s.title || s.dept)} · <span class="font-mono text-blue-700">${esc(s.id)}</span></div>
+              <div class="text-[10px] text-slate-400 font-mono truncate">${esc(s.email)} · user: ${esc(s.username)}</div>
+            </div>
+          </div>
+          <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-bold ${isProv ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-800'} shrink-0">
+            <span class="material-symbols-outlined text-[12px]">${isProv ? 'check_circle' : 'pending'}</span>
+            ${isProv ? 'Active Account' : 'Ready to Provision'}
+          </span>
+        </div>
+      `;
+    }).join('');
+
+    const btn = document.getElementById('batch-confirm-btn');
+    const btnText = document.getElementById('batch-confirm-btn-text');
+    btn.disabled = false;
+    btnText.textContent = pending > 0 ? `⚡ Confirm & Provision All Staff (${pending} New)` : `⚡ Re-sync All Staff Accounts (${total})`;
+
+    modal.classList.remove('hidden');
+  }
+
+  function closeBatchProvisionModal() {
+    const modal = document.getElementById('batch-provision-modal');
+    if (modal) modal.classList.add('hidden');
+  }
+
+  async function executeBatchProvision() {
+    if (!isHRAdmin()) {
+      toast('Access Denied: Administrator role required.', false);
+      return;
+    }
+
+    const btn = document.getElementById('batch-confirm-btn');
+    const btnText = document.getElementById('batch-confirm-btn-text');
+    btn.disabled = true;
+    btnText.innerHTML = '<span class="material-symbols-outlined text-sm animate-spin mr-1">sync</span> Provisioning & Dispatching Emails...';
+
+    const sendEmail = document.getElementById('batch-send-email').checked;
+    const resendEmail = document.getElementById('batch-resend-email').checked;
+
+    try {
+      const res = window.batchProvisionAllStaff({
+        sendEmail: sendEmail,
+        resendEmails: resendEmail,
+        actor: getCurrentEmployee() ? getCurrentEmployee().fullName : 'HR Administrator'
+      });
+
+      if (res && res.success) {
+        toast(`⚡ Successfully batch provisioned ${res.provisionedCount} staff accounts! Credentials notifications dispatched.`, true);
+        renderAll();
+        setTimeout(() => {
+          closeBatchProvisionModal();
+          btn.disabled = false;
+          btnText.textContent = '⚡ Confirm & Provision All Staff';
+        }, 800);
+      } else {
+        toast((res && res.message) || 'Batch provisioning encountered an error.', false);
+        btn.disabled = false;
+        btnText.textContent = '⚡ Retry Provision All Staff';
+      }
+    } catch (err) {
+      console.error('Batch provision error:', err);
+      toast('Batch provision error: ' + err.message, false);
+      btn.disabled = false;
+      btnText.textContent = '⚡ Retry Provision All Staff';
+    }
+  }
+
+  // ── Executive Learning Analytics Renderer ──
+  function renderLearningAnalytics() {
+    if (!isHRAdmin()) return;
+
+    // Populate semester select if not yet loaded
+    const semSelect = document.getElementById('analytics-sem-select');
+    if (semSelect && semSelect.options.length === 0) {
+      const sems = getSemesters();
+      const activeSem = getActiveSemester();
+      semSelect.innerHTML = sems.map(s => `
+        <option value="${esc(s.id)}" ${s.id === activeSem.id ? 'selected' : ''}>${esc(s.name)} (${s.status})</option>
+      `).join('');
+    }
+
+    const semId = semSelect ? semSelect.value : '';
+    const deptFilter = document.getElementById('analytics-dept-select') ? document.getElementById('analytics-dept-select').value : 'All';
+
+    const data = window.getLearningAnalyticsData ? window.getLearningAnalyticsData(semId, deptFilter) : null;
+    if (!data || !data.authorized) {
+      return;
+    }
+
+    // Invert KPIs
+    const k = data.kpis;
+    document.getElementById('an-kpi-coverage').textContent = `${k.coverageRate}%`;
+    document.getElementById('an-kpi-coverage-sub').textContent = `${k.accountsProvisioned} of ${k.totalStaff} Staff Provisioned`;
+
+    document.getElementById('an-kpi-completion').textContent = `${k.completionRate}%`;
+    document.getElementById('an-kpi-completion-sub').textContent = `${k.completedEnrollments} Courses Completed`;
+
+    document.getElementById('an-kpi-hours').textContent = `${k.totalHours}h`;
+    document.getElementById('an-kpi-hours-sub').textContent = `Across ${k.totalEnrollments} Enrolled Courses`;
+
+    document.getElementById('an-kpi-score').textContent = `${k.avgScore}%`;
+    document.getElementById('an-kpi-score-sub').textContent = `Pass Threshold: 80%`;
+
+    document.getElementById('an-kpi-budget').textContent = `NLe ${Number(k.totalBudgetCommitted).toLocaleString()}`;
+    document.getElementById('an-kpi-budget-sub').textContent = `Committed Licenses & Fees`;
+
+    // Departmental Table
+    const deptTbody = document.getElementById('an-dept-tbody');
+    if (deptTbody) {
+      deptTbody.innerHTML = data.departments.map(d => {
+        const rateColor = d.completionRate >= 70 ? 'bg-emerald-500' : d.completionRate >= 40 ? 'bg-blue-600' : 'bg-amber-500';
+        return `
+          <tr class="hover:bg-slate-50/80 transition">
+            <td class="py-3 font-semibold text-slate-900 flex items-center gap-2">
+              <span class="w-6 h-6 rounded-lg bg-blue-50 text-blue-700 flex items-center justify-center font-bold text-[10px]">
+                <span class="material-symbols-outlined text-[13px]">domain</span>
+              </span>
+              <span>${esc(d.department)}</span>
+            </td>
+            <td class="py-3 text-center font-bold text-slate-700">${d.totalStaff}</td>
+            <td class="py-3 text-center text-slate-600">${d.provisionedAccounts}</td>
+            <td class="py-3 text-center font-bold text-blue-700">${d.enrolledCount}</td>
+            <td class="py-3 text-center text-slate-600">${d.totalHours}h</td>
+            <td class="py-3 text-center">
+              <span class="px-2 py-0.5 rounded-full text-[10px] font-bold ${d.avgScore >= 80 ? 'bg-emerald-100 text-emerald-800' : 'bg-slate-100 text-slate-700'}">
+                ${d.avgScore ? d.avgScore + '%' : '—'}
+              </span>
+            </td>
+            <td class="py-3 text-right">
+              <div class="flex items-center justify-end gap-2">
+                <span class="font-extrabold text-slate-900 min-w-[32px]">${d.completionRate}%</span>
+                <div class="w-16 h-2 rounded-full bg-slate-100 overflow-hidden shrink-0">
+                  <div class="h-full ${rateColor} rounded-full" style="width: ${d.completionRate}%"></div>
+                </div>
+              </div>
+            </td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    // Top Courses Table
+    const coursesTbody = document.getElementById('an-courses-tbody');
+    if (coursesTbody) {
+      coursesTbody.innerHTML = data.topCourses.map(c => `
+        <tr class="hover:bg-slate-50/80 transition">
+          <td class="py-3">
+            <div class="font-bold text-slate-900 truncate max-w-[220px]">${esc(c.title)}</div>
+            <span class="text-[10px] text-slate-400 font-semibold uppercase tracking-wider">${esc(c.category)}</span>
+          </td>
+          <td class="py-3 text-slate-600 font-medium">
+            <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-slate-100 text-slate-700 border border-slate-200">
+              ${esc(c.vendor)}
+            </span>
+          </td>
+          <td class="py-3 text-center font-bold text-slate-800">${c.enrolled} staff</td>
+          <td class="py-3 text-center font-bold text-emerald-700">${c.avgScore}%</td>
+          <td class="py-3 text-right">
+            <div class="flex items-center justify-end gap-2">
+              <span class="font-extrabold text-slate-900 min-w-[32px]">${c.completionRate}%</span>
+              <div class="w-16 h-2 rounded-full bg-slate-100 overflow-hidden shrink-0">
+                <div class="h-full bg-blue-600 rounded-full" style="width: ${c.completionRate}%"></div>
+              </div>
+            </div>
+          </td>
+        </tr>
+      `).join('');
+    }
+
+    // Partner Academy Cards
+    const vendorsContainer = document.getElementById('an-vendors-container');
+    if (vendorsContainer) {
+      vendorsContainer.innerHTML = data.vendors.map(v => `
+        <div class="p-3.5 rounded-2xl bg-slate-50 border border-slate-200 flex flex-col gap-2">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-2">
+              <span class="w-7 h-7 rounded-lg bg-blue-100 text-blue-800 font-bold flex items-center justify-center text-xs">
+                ${v.name[0]}
+              </span>
+              <div>
+                <div class="text-xs font-bold text-slate-900 leading-tight">${esc(v.name)}</div>
+                <div class="text-[10px] text-slate-400 truncate">${esc(v.agreementRef || 'Agreement Active')}</div>
+              </div>
+            </div>
+            <span class="text-xs font-extrabold text-blue-700">${v.marketShare}%</span>
+          </div>
+          <div class="w-full h-1.5 rounded-full bg-slate-200 overflow-hidden">
+            <div class="h-full bg-blue-600 rounded-full" style="width: ${v.marketShare}%"></div>
+          </div>
+          <div class="flex items-center justify-between text-[11px] text-slate-500 font-medium pt-1 border-t border-slate-200/60">
+            <span>${v.enrolledCount} Active Learners</span>
+            <span class="text-emerald-700 font-bold">${v.completedCount} Completed</span>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    // Grade Distribution Cards
+    const gradesContainer = document.getElementById('an-grades-container');
+    if (gradesContainer) {
+      const g = data.grades;
+      gradesContainer.innerHTML = `
+        <div class="p-3 rounded-xl bg-emerald-50 border border-emerald-200 flex items-center justify-between">
+          <div>
+            <div class="text-xs font-bold text-emerald-950">Distinction (90% – 100%)</div>
+            <div class="text-[11px] text-emerald-700">${g.distinctions.count} Learners Achieving Distinction</div>
+          </div>
+          <span class="font-display font-extrabold text-base text-emerald-800">${g.distinctions.pct}%</span>
+        </div>
+        <div class="p-3 rounded-xl bg-blue-50 border border-blue-200 flex items-center justify-between">
+          <div>
+            <div class="text-xs font-bold text-blue-950">Proficient / Merit (80% – 89%)</div>
+            <div class="text-[11px] text-blue-700">${g.merits.count} Learners Passing Above Passmark</div>
+          </div>
+          <span class="font-display font-extrabold text-base text-blue-800">${g.merits.pct}%</span>
+        </div>
+        <div class="p-3 rounded-xl bg-amber-50 border border-amber-200 flex items-center justify-between">
+          <div>
+            <div class="text-xs font-bold text-amber-950">Pass Threshold (70% – 79%)</div>
+            <div class="text-[11px] text-amber-700">${g.passes.count} Learners In Review</div>
+          </div>
+          <span class="font-display font-extrabold text-base text-amber-800">${g.passes.pct}%</span>
+        </div>
+        <div class="p-3 rounded-xl bg-slate-50 border border-slate-200 flex items-center justify-between">
+          <div>
+            <div class="text-xs font-bold text-slate-800">In Progress / Retake (&lt; 70%)</div>
+            <div class="text-[11px] text-slate-500">${g.inProgressRetake.count} Active Enrolments Studying</div>
+          </div>
+          <span class="font-display font-extrabold text-base text-slate-700">${g.inProgressRetake.pct}%</span>
+        </div>
+      `;
+    }
+  }
+
+  document.addEventListener('click', e => {
+    const p = document.getElementById('notif-panel');
+    if (p && !p.classList.contains('hidden') && !p.contains(e.target) && !document.getElementById('btn-notif').contains(e.target)) {
+      p.classList.add('hidden');
+    }
+    const userDrop = document.getElementById('user-dropdown');
+    if (userDrop && !userDrop.contains(e.target) && !e.target.closest('button[onclick*="toggleUserDropdown"]')) {
+      userDrop.classList.add('hidden');
+    }
+  });
+
+  window.addEventListener('bcf_employee_changed', () => renderAll());
+  window.addEventListener('bcf_email_dispatched', (e) => {
+    const detail = e.detail;
+    if (!detail) return;
+    const modal = document.getElementById('email-receipt-modal');
+    if (modal && !modal.classList.contains('hidden')) {
+      const statusEl = document.getElementById('modal-email-status');
+      if (statusEl) {
+        if (detail.status && detail.status.startsWith('Delivered')) {
+          statusEl.className = 'inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-bold font-mono bg-emerald-50 text-emerald-700 border border-emerald-200';
+          statusEl.innerHTML = '<span class="material-symbols-outlined text-[14px]">check_circle</span> Delivered (Gmail SMTP Live)';
+        } else {
+          statusEl.className = 'inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-bold font-mono bg-amber-50 text-amber-700 border border-amber-200';
+          statusEl.innerHTML = `<span class="material-symbols-outlined text-[14px]">warning</span> ${detail.status || 'Sent'}`;
+        }
+      }
+    }
+    renderEmailsLedger();
+  });
+
+  function renderAll() {
+    if (!checkStaffAccess()) return;
+    renderHeader();
+    populateStaffDirectoryDropdown();
+    updateBatchProvisionCard();
+    renderAccountsList();
+    renderApprovalsQueue();
+    renderGovernanceSettings();
+    renderVendors();
+    renderEmailsLedger();
+    const analyticsTab = document.getElementById('tab-analytics');
+    if (analyticsTab && !analyticsTab.classList.contains('hidden')) {
+      renderLearningAnalytics();
+    }
+  }
+
+  // Initial load
+  document.addEventListener('DOMContentLoaded', () => {
+    initLearningDB();
+    renderAll();
+    syncStaffDirectoryFromBackend();
+    const urlParams = new URLSearchParams(window.location.search);
+    let initialTab = urlParams.get('tab');
+    if (initialTab === 'dashboard' || initialTab === 'learning-dashboard') initialTab = 'analytics';
+    if (initialTab === 'account-creation') initialTab = 'accounts';
+    if (initialTab && ['accounts', 'approvals', 'analytics', 'quotas', 'vendors', 'emails'].includes(initialTab)) {
+      switchTab(initialTab);
+    }
+  });
+  initLearningDB();
+  renderAll();
+  syncStaffDirectoryFromBackend();
+  const urlParams = new URLSearchParams(window.location.search);
+  let initialTab = urlParams.get('tab');
+  if (initialTab === 'dashboard' || initialTab === 'learning-dashboard') initialTab = 'analytics';
+  if (initialTab === 'account-creation') initialTab = 'accounts';
+  if (initialTab && ['accounts', 'approvals', 'analytics', 'quotas', 'vendors', 'emails'].includes(initialTab)) {
+    switchTab(initialTab);
+  }
+</script>
+</body>
+</html>

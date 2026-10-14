@@ -1,0 +1,1236 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover"/>
+  <title>BCF-SL Leave Application Form — Annual Leave &amp; Allowance Filing</title>
+  
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
+  
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: {
+            primary: "#004328",
+            "primary-dark": "#002d1a",
+            secondary: "#465f88",
+            tertiary: "#ca8a04",
+            surface: "#f8fafd",
+            "surface-container": "#eff5f8",
+            "on-surface": "#0f191d"
+          },
+          fontFamily: {
+            sans: ['"Inter"', 'sans-serif'],
+            headline: ['"Plus Jakarta Sans"', 'sans-serif'],
+            mono: ['"JetBrains Mono"', 'monospace']
+          }
+        }
+      }
+    };
+  </script>
+
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"/>
+  <meta http-equiv="Pragma" content="no-cache"/>
+  <meta http-equiv="Expires" content="0"/>
+
+  <style>
+    body { font-family: 'Inter', sans-serif; background-color: #f8fafd; }
+    h1, h2, h3, h4, h5, .font-headline { font-family: 'Plus Jakarta Sans', sans-serif; }
+    .badge-soft { display: inline-flex; align-items: center; gap: 0.25rem; font-size: 0.72rem; font-weight: 700; padding: 0.25rem 0.6rem; border-radius: 9999px; }
+    .hidden { display: none !important; }
+  </style>
+
+  <script src="../bcf_leave_shared.js?v=20261006_FINAL_REV1"></script>
+</head>
+<body class="text-on-surface flex flex-col min-h-screen">
+
+  <!-- TOP HEADER -->
+  <header class="bg-white border-b border-slate-200 sticky top-0 z-40 shadow-xs">
+    <div class="max-w-4xl mx-auto px-4 h-16 flex items-center justify-between gap-4">
+      <div class="flex items-center gap-3 min-w-0">
+        <a href="../bcf_sl_leave_allowance_dashboard/code.html" class="p-1.5 rounded-lg border border-slate-200 hover:bg-slate-100 text-slate-600 transition" title="Back to Leave Dashboard">
+          <span class="material-symbols-outlined text-[20px]">arrow_back</span>
+        </a>
+        <img src="/bcf-logo.jpg" onerror="this.src='../bcf-logo.jpg'; this.onerror=function(){this.src='../../bcf-logo.jpg'}" alt="BCF-SL Logo" class="h-8 w-auto object-contain shrink-0 rounded"/>
+        <div class="flex flex-col min-w-0">
+          <span class="font-extrabold text-sm text-primary tracking-tight truncate uppercase leading-none">
+            Bandama Charity Foundation
+          </span>
+          <span class="text-[11px] font-semibold text-slate-500 truncate mt-0.5">
+            Leave &amp; Allowance Application Filing (Sec. 12 &amp; 13)
+          </span>
+        </div>
+      </div>
+
+      <div class="flex items-center gap-2">
+        <!-- Employee Switcher -->
+        <div class="flex items-center gap-1.5 bg-slate-100 border border-slate-300 rounded-xl px-2.5 py-1">
+          <span class="material-symbols-outlined text-[15px] text-primary">person</span>
+          <select id="form-user-switcher" onchange="onFormUserSwitch(this.value)" class="bg-transparent text-xs font-bold text-slate-800 outline-none cursor-pointer">
+            <!-- Dynamically populated -->
+          </select>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- MAIN FORM CONTAINER -->
+  <main class="flex-grow p-4 sm:p-6 max-w-4xl mx-auto w-full flex flex-col gap-6">
+
+    <!-- IF INELIGIBLE BANNER (Section 5 & 37) -->
+    <div id="form-ineligible-banner" class="hidden bg-rose-50 border-2 border-rose-300 rounded-2xl p-6 shadow-sm">
+      <div class="flex items-start gap-4">
+        <div class="w-12 h-12 rounded-2xl bg-rose-600 text-white flex items-center justify-center shrink-0 shadow-md">
+          <span class="material-symbols-outlined text-3xl">lock</span>
+        </div>
+        <div class="space-y-2">
+          <div class="flex items-center gap-2">
+            <h3 class="text-lg font-black text-rose-950">Leave Application Unavailable</h3>
+            <span class="badge-soft bg-rose-200 text-rose-900">🔒 Policy Restriction Active</span>
+          </div>
+          <p class="text-xs text-rose-900 font-bold leading-relaxed" id="form-ineligible-reason">
+            Reason: You have not yet completed one year of continuous service under the BCF-SL Leave Policy.
+          </p>
+          <div class="p-3.5 rounded-xl bg-white/80 border border-rose-200 grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs font-mono">
+            <div>
+              <span class="text-[10px] text-slate-500 uppercase block font-sans">Employment Date</span>
+              <strong class="text-slate-900" id="inelig-emp-date">15/10/2025</strong>
+            </div>
+            <div>
+              <span class="text-[10px] text-slate-500 uppercase block font-sans">Eligibility Anniversary</span>
+              <strong class="text-slate-900" id="inelig-elig-date">15/10/2026</strong>
+            </div>
+            <div>
+              <span class="text-[10px] text-slate-500 uppercase block font-sans">Remaining Service</span>
+              <strong class="text-rose-700" id="inelig-remaining-time">9 days</strong>
+            </div>
+          </div>
+          <p class="text-[11px] text-rose-800 mt-2">
+            The <strong>[Apply for Leave]</strong> and <strong>[Claim Leave Allowance]</strong> buttons remain disabled until your first service anniversary is confirmed by the HR Registry.
+          </p>
+          <div class="pt-2">
+            <a href="../bcf_sl_leave_allowance_dashboard/code.html" class="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-rose-700 hover:bg-rose-800 text-white font-extrabold text-xs shadow-2xs">
+              <span>Return to Dashboard</span>
+              <span class="material-symbols-outlined text-[15px]">arrow_forward</span>
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- MAIN FORM BODY (Unlocked if eligible) -->
+    <div id="form-active-container" class="space-y-6">
+
+      <!-- Automatically Populated Employee Information Card (Section 13) -->
+      <div class="bg-white rounded-2xl border border-slate-200 p-5 shadow-xs">
+        <div class="flex items-center justify-between pb-3 border-b border-slate-100">
+          <div class="flex items-center gap-2">
+            <span class="material-symbols-outlined text-primary text-xl">badge</span>
+            <h3 class="font-extrabold text-sm text-slate-900 uppercase tracking-tight">Employee Master Record (Read-Only)</h3>
+          </div>
+          <span class="badge-soft bg-emerald-100 text-emerald-800">✅ Service Verified (&ge; 1 Yr)</span>
+        </div>
+
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 mt-4 text-xs">
+          <div class="p-2.5 rounded-xl bg-slate-50 border border-slate-100">
+            <span class="text-[10px] text-slate-400 uppercase font-bold block">Employee ID</span>
+            <span class="font-mono font-bold text-primary block mt-0.5" id="form-emp-id">BCF-EMP-00025</span>
+          </div>
+          <div class="p-2.5 rounded-xl bg-slate-50 border border-slate-100">
+            <span class="text-[10px] text-slate-400 uppercase font-bold block">Employee Name</span>
+            <span class="font-bold text-slate-900 block mt-0.5 truncate" id="form-emp-name">John Kamara</span>
+          </div>
+          <div class="p-2.5 rounded-xl bg-slate-50 border border-slate-100">
+            <span class="text-[10px] text-slate-400 uppercase font-bold block">Department</span>
+            <span class="font-bold text-slate-800 block mt-0.5 truncate" id="form-emp-dept">Programmes</span>
+          </div>
+          <div class="p-2.5 rounded-xl bg-slate-50 border border-slate-100">
+            <span class="text-[10px] text-slate-400 uppercase font-bold block">Position</span>
+            <span class="font-bold text-slate-800 block mt-0.5 truncate" id="form-emp-pos">Programme Officer</span>
+          </div>
+          <div class="p-2.5 rounded-xl bg-slate-50 border border-slate-100">
+            <span class="text-[10px] text-slate-400 uppercase font-bold block">Employment Date</span>
+            <span class="font-mono font-bold text-slate-900 block mt-0.5" id="form-emp-hire">01/10/2025</span>
+          </div>
+          <div class="p-2.5 rounded-xl bg-slate-50 border border-slate-100">
+            <span class="text-[10px] text-slate-400 uppercase font-bold block">Supervisor</span>
+            <span class="font-bold text-slate-800 block mt-0.5 truncate" id="form-emp-sup">Dr. Sorie Sesay</span>
+          </div>
+          <div class="p-2.5 rounded-xl bg-slate-50 border border-slate-100">
+            <span class="text-[10px] text-slate-400 uppercase font-bold block">Eligibility Date</span>
+            <span class="font-mono font-bold text-emerald-700 block mt-0.5" id="form-emp-elig">01/10/2026</span>
+          </div>
+          <div class="p-2.5 rounded-xl bg-emerald-50 border border-emerald-200">
+            <span class="text-[10px] text-emerald-800 uppercase font-bold block">Current Balance</span>
+            <span class="font-mono font-black text-primary text-sm block mt-0.5" id="form-emp-balance">31 Days</span>
+          </div>
+          <div class="p-2.5 rounded-xl bg-slate-50 border border-slate-200 col-span-2 sm:col-span-4">
+            <div class="flex items-center justify-between">
+              <span class="text-[10px] text-slate-500 uppercase font-bold flex items-center gap-1">
+                <span class="material-symbols-outlined text-primary text-[14px]">mail</span>
+                <span>Employee Notification Email (Official Decision Recipient)</span>
+              </span>
+              <span class="text-[10px] text-emerald-700 font-semibold">Executive approval letter sent here</span>
+            </div>
+            <input type="email" id="form-emp-email" required placeholder="employee.email@domain.com" class="w-full mt-1 px-3 py-1.5 rounded-lg border border-slate-300 bg-white text-xs font-bold text-slate-900 outline-none focus:border-primary font-mono"/>
+          </div>
+        </div>
+      </div>
+
+      <!-- 31-DAY EXHAUSTION LOCKOUT BANNER (Section 14 & Policy Rule) -->
+      <div id="form-exhausted-banner" class="hidden p-4 rounded-2xl bg-amber-50 border-2 border-amber-300 shadow-xs">
+        <div class="flex items-start gap-3.5">
+          <div class="w-10 h-10 rounded-xl bg-amber-600 text-white flex items-center justify-center shrink-0 shadow-sm">
+            <span class="material-symbols-outlined text-2xl">event_busy</span>
+          </div>
+          <div class="flex-grow">
+            <div class="flex items-center gap-2">
+              <h3 class="text-sm font-extrabold text-amber-950">Annual Leave Quota Exhausted (31 / 31 Days Consumed)</h3>
+              <span class="badge-soft bg-amber-200 text-amber-900 font-bold">🔒 Locked Until Next Anniversary</span>
+            </div>
+            <p class="text-xs text-amber-900 mt-1 font-semibold leading-relaxed">
+              All 31 statutory annual leave days have been consumed for the current service cycle (<span id="exhausted-cycle" class="font-mono font-bold">2026/2027</span>). Under BCF-SL HR Policy, staff is unable to apply for another annual leave until their employment anniversary date is met again on <strong id="exhausted-unlock-date">10/05/2027</strong>.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <!-- COMBINED REQUEST MODE SELECTOR (Section 22 & 23) -->
+      <div class="bg-white rounded-2xl border border-slate-200 p-5 shadow-xs">
+        <label class="font-extrabold text-sm text-slate-900 uppercase tracking-tight block mb-2">
+          Select Application Type
+        </label>
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+          <label class="cursor-pointer border-2 rounded-xl p-3.5 flex flex-col justify-between transition hover:border-primary border-slate-200" id="mode-card-leave">
+            <div class="flex items-center justify-between">
+              <span class="font-extrabold text-xs text-slate-900">Option 1</span>
+              <input type="radio" name="filingMode" value="leave_only" onchange="onFilingModeChange('leave_only')" class="accent-primary"/>
+            </div>
+            <div class="mt-2">
+              <h4 class="font-black text-sm text-slate-900">Apply for Leave Only</h4>
+              <p class="text-[11px] text-slate-500 mt-0.5">Submit annual leave days (Ref: BCF-LEV-2026)</p>
+            </div>
+          </label>
+
+          <label class="cursor-pointer border-2 rounded-xl p-3.5 flex flex-col justify-between transition hover:border-primary border-slate-200" id="mode-card-allowance">
+            <div class="flex items-center justify-between">
+              <span class="font-extrabold text-xs text-slate-900">Option 2</span>
+              <input type="radio" name="filingMode" value="allowance_only" onchange="onFilingModeChange('allowance_only')" class="accent-primary"/>
+            </div>
+            <div class="mt-2">
+              <h4 class="font-black text-sm text-slate-900">Claim Allowance Only</h4>
+              <p class="text-[11px] text-slate-500 mt-0.5">Statutory 5% Leave Allowance (Ref: BCF-LA-2026)</p>
+            </div>
+          </label>
+
+          <label class="cursor-pointer border-2 border-primary bg-emerald-50/50 rounded-xl p-3.5 flex flex-col justify-between transition" id="mode-card-both">
+            <div class="flex items-center justify-between">
+              <span class="badge-soft bg-emerald-700 text-white">Recommended</span>
+              <input type="radio" name="filingMode" value="both" checked onchange="onFilingModeChange('both')" class="accent-primary"/>
+            </div>
+            <div class="mt-2">
+              <h4 class="font-black text-sm text-slate-900">Option 3: Apply for Both</h4>
+              <p class="text-[11px] text-emerald-900 font-semibold mt-0.5">Annual Leave + 5% Allowance (Ref: BCF-LR-2026)</p>
+            </div>
+          </label>
+        </div>
+      </div>
+
+      <!-- INTERACTIVE APPLICATION FORM -->
+      <form id="application-form" onsubmit="handleApplicationSubmit(event)" class="bg-white rounded-2xl border border-slate-200 p-6 shadow-xs space-y-6">
+
+        <!-- SECTION A: LEAVE PARTICULARS (Hidden if Allowance Only) -->
+        <div id="section-leave-fields" class="space-y-4">
+          <div class="flex items-center justify-between pb-2 border-b border-slate-100">
+            <h4 class="font-extrabold text-sm text-slate-900 uppercase tracking-tight flex items-center gap-1.5">
+              <span class="material-symbols-outlined text-[18px] text-primary">calendar_month</span>
+              <span>1. Leave Dates &amp; Classification</span>
+            </h4>
+            <span class="text-xs font-mono font-bold text-primary" id="calc-days-display">0 Working Days</span>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            <div>
+              <label class="font-bold text-xs text-slate-700 block mb-1">Leave Classification</label>
+              <select id="input-leave-type" onchange="onLeaveTypeChange(this.value)" class="w-full px-3 py-2 rounded-xl border border-slate-300 text-xs font-bold outline-none focus:border-primary">
+                <option value="Annual Leave" selected>Annual Leave (31-Day Service Quota)</option>
+                <option value="Sick Leave">Sick Leave (Medical Certificate req.)</option>
+                <option value="Maternity Leave">Maternity Leave (14 Weeks)</option>
+                <option value="Paternity Leave">Paternity Leave (10 Days)</option>
+                <option value="Compassionate/Bereavement Leave">Compassionate / Bereavement Leave</option>
+                <option value="Study Leave">Study / Professional Development Leave</option>
+                <option value="Unpaid Leave">Unpaid / Exceptional Leave</option>
+                <option value="Special Leave">Special Civic Leave</option>
+              </select>
+            </div>
+
+            <div>
+              <label class="font-bold text-xs text-slate-700 block mb-1">Commencement Date (Start)</label>
+              <input type="date" id="input-start-date" required oninput="onStartDateChange()" onchange="onStartDateChange()" onkeyup="onStartDateChange()" onblur="onStartDateChange()" class="w-full px-3 py-2 rounded-xl border border-slate-300 text-xs font-bold font-mono outline-none focus:border-primary focus:ring-1 focus:ring-primary/30 transition"/>
+            </div>
+
+            <div>
+              <div class="flex items-center justify-between mb-1">
+                <label class="font-bold text-xs text-slate-700 block">Resumption Date (End)</label>
+                <span class="text-[10px] text-emerald-700 font-extrabold flex items-center gap-0.5 bg-emerald-50 px-1.5 py-0.5 rounded border border-emerald-200" title="Calculates automatically from Commencement Date based on selected working days (31, 21, 15, 10, or 5 days)">
+                  <span class="material-symbols-outlined text-[13px]">auto_mode</span> Auto-Calculated
+                </span>
+              </div>
+              <input type="date" id="input-end-date" required oninput="onEndDateManualChange()" onchange="onEndDateManualChange()" class="w-full px-3 py-2 rounded-xl border border-slate-300 text-xs font-bold font-mono outline-none focus:border-primary focus:ring-1 focus:ring-primary/30 transition"/>
+            </div>
+          </div>
+
+          <!-- DURATION PRESETS & LIVE SCHEDULE BREAKDOWN -->
+          <div class="p-3.5 rounded-xl bg-slate-50 border border-slate-200 space-y-2.5">
+            <div class="flex flex-wrap items-center justify-between gap-2">
+              <div class="flex items-center gap-1.5 text-xs text-slate-700 font-bold">
+                <span class="material-symbols-outlined text-primary text-[17px]">timelapse</span>
+                <span>Select Leave Duration (Days to be taken):</span>
+              </div>
+              <div class="flex flex-wrap items-center gap-1.5" id="duration-preset-chips">
+                <button type="button" onclick="setDurationPreset(31)" id="chip-dur-31" class="px-3 py-1.5 rounded-lg text-xs font-black bg-primary text-white shadow-xs transition cursor-pointer active:scale-95 flex items-center gap-1 ring-2 ring-primary/40">
+                  <span class="material-symbols-outlined text-[14px]">check_circle</span>
+                  <span>31 Days (Full Quota)</span>
+                </button>
+                <button type="button" onclick="setDurationPreset(21)" id="chip-dur-21" class="px-3 py-1.5 rounded-lg text-xs font-bold bg-white hover:bg-slate-100 text-slate-800 border border-slate-300 shadow-2xs transition cursor-pointer active:scale-95">
+                  <span>21 Days</span>
+                </button>
+                <button type="button" onclick="setDurationPreset(15)" id="chip-dur-15" class="px-3 py-1.5 rounded-lg text-xs font-bold bg-white hover:bg-slate-100 text-slate-800 border border-slate-300 shadow-2xs transition cursor-pointer active:scale-95">
+                  <span>15 Days</span>
+                </button>
+                <button type="button" onclick="setDurationPreset(10)" id="chip-dur-10" class="px-3 py-1.5 rounded-lg text-xs font-bold bg-white hover:bg-slate-100 text-slate-800 border border-slate-300 shadow-2xs transition cursor-pointer active:scale-95">
+                  <span>10 Days</span>
+                </button>
+                <button type="button" onclick="setDurationPreset(5)" id="chip-dur-5" class="px-3 py-1.5 rounded-lg text-xs font-bold bg-white hover:bg-slate-100 text-slate-800 border border-slate-300 shadow-2xs transition cursor-pointer active:scale-95">
+                  <span>5 Days</span>
+                </button>
+              </div>
+            </div>
+
+            <!-- 31-DAY ANNUAL LEAVE LEDGER SUBTRACTION & BALANCE PREVIEW (Policy Rule) -->
+            <div id="quota-deduction-card" class="mt-2.5 p-3.5 rounded-xl bg-white border border-slate-200 shadow-2xs space-y-2.5">
+              <div class="flex items-center justify-between pb-2 border-b border-slate-100 text-xs">
+                <div class="flex items-center gap-1.5">
+                  <span class="material-symbols-outlined text-primary text-[17px]">account_balance_wallet</span>
+                  <span class="font-extrabold text-slate-900 uppercase tracking-tight">Annual Leave 31-Day Quota Ledger Subtraction</span>
+                </div>
+                <span id="quota-status-pill" class="badge-soft bg-emerald-100 text-emerald-800 font-mono font-bold">Within Balance</span>
+              </div>
+
+              <!-- Subtraction Breakdown Grid -->
+              <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 text-center text-xs">
+                <div class="p-2 rounded-lg bg-slate-50 border border-slate-200">
+                  <span class="text-[10px] text-slate-500 uppercase font-bold block">1. Annual Quota</span>
+                  <span class="font-mono text-base font-black text-slate-900 block mt-0.5" id="quota-stat-total">31 Days</span>
+                  <span class="text-[10px] text-slate-400">Statutory Entitlement</span>
+                </div>
+                <div class="p-2 rounded-lg bg-rose-50 border border-rose-200">
+                  <span class="text-[10px] text-rose-700 uppercase font-bold block">2. Days Already Taken</span>
+                  <span class="font-mono text-base font-black text-rose-600 block mt-0.5" id="quota-stat-used">0 Days</span>
+                  <span class="text-[10px] text-rose-700 font-semibold" id="quota-stat-used-sub">Consumed So Far</span>
+                </div>
+                <div class="p-2 rounded-lg bg-blue-50 border border-blue-200">
+                  <span class="text-[10px] text-blue-800 uppercase font-bold block">3. This Application</span>
+                  <span class="font-mono text-base font-black text-blue-900 block mt-0.5" id="quota-stat-requested">0 Days</span>
+                  <span class="text-[10px] text-blue-700 font-semibold" id="quota-stat-requested-sub">Requested Days</span>
+                </div>
+                <div class="p-2 rounded-lg bg-emerald-50 border border-emerald-200" id="quota-card-balance-after">
+                  <span class="text-[10px] text-emerald-800 uppercase font-bold block">4. Balance Remaining</span>
+                  <span class="font-mono text-base font-black text-primary block mt-0.5" id="quota-stat-after">31 Days</span>
+                  <span class="text-[10px] text-emerald-700 font-semibold" id="quota-stat-after-sub">Available Balance</span>
+                </div>
+              </div>
+
+              <!-- Over-Quota Warning Alert -->
+              <div id="quota-warning-banner" class="hidden p-3 rounded-xl bg-rose-100 border-2 border-rose-400 text-rose-950 font-bold text-xs flex items-center justify-between gap-3">
+                <div class="flex items-center gap-2">
+                  <span class="material-symbols-outlined text-rose-700 text-2xl shrink-0">cancel</span>
+                  <div>
+                    <span class="block font-black text-rose-900" id="quota-warning-title">Quota Limit Exceeded!</span>
+                    <span class="block text-[11px] font-medium text-rose-950 mt-0.5" id="quota-warning-text">
+                      You cannot take more than the remaining days.
+                    </span>
+                  </div>
+                </div>
+                <button type="button" onclick="clampToRemainingDays()" class="shrink-0 px-3 py-1.5 rounded-lg bg-rose-700 hover:bg-rose-800 text-white text-xs font-black shadow-xs cursor-pointer transition active:scale-95 flex items-center gap-1">
+                  <span class="material-symbols-outlined text-[15px]">auto_fix_high</span>
+                  <span>Adjust to Max Remaining</span>
+                </button>
+              </div>
+            </div>
+
+            <!-- Detailed Date Calculation Breakdown -->
+            <div class="pt-2 border-t border-slate-200/60 grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
+              <div class="flex items-center gap-2 p-2 rounded-lg bg-emerald-50/70 border border-emerald-200/80">
+                <span class="material-symbols-outlined text-primary text-[18px] shrink-0">date_range</span>
+                <div>
+                  <span class="text-[10px] text-slate-500 uppercase font-bold block">Leave Period (Inclusive)</span>
+                  <span class="font-bold text-slate-900" id="display-leave-span">—</span>
+                </div>
+              </div>
+              <div class="flex items-center gap-2 p-2 rounded-lg bg-blue-50/70 border border-blue-200/80">
+                <span class="material-symbols-outlined text-blue-700 text-[18px] shrink-0">work_history</span>
+                <div>
+                  <span class="text-[10px] text-blue-800 uppercase font-bold block">Duty Resumption Date (Back to Work)</span>
+                  <strong class="text-blue-950 font-black" id="display-resumption-date">—</strong>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Conflict & Staffing Alert Callout (Section 18) -->
+          <div id="staffing-alert-box" class="hidden p-3 rounded-xl bg-amber-50 border border-amber-300 text-amber-950 text-xs flex items-center gap-2">
+            <span class="material-symbols-outlined text-amber-600 text-[18px]">warning</span>
+            <span id="staffing-alert-text">Staffing Alert: 2 employees from this department are already scheduled for leave during this period.</span>
+          </div>
+
+          <div>
+            <label class="font-bold text-xs text-slate-700 block mb-1">Reason / Comments for Leave</label>
+            <textarea id="input-reason" rows="2" required placeholder="Specify primary reason, restorative purpose, or medical justification..." class="w-full px-3 py-2 rounded-xl border border-slate-300 text-xs outline-none focus:border-primary"></textarea>
+          </div>
+        </div>
+
+        <!-- SECTION B: HANDOVER & EMERGENCY CONTACT -->
+        <div id="section-handover-fields" class="space-y-4 pt-4 border-t border-slate-100">
+          <div class="flex items-center justify-between pb-2 border-b border-slate-100">
+            <h4 class="font-extrabold text-sm text-slate-900 uppercase tracking-tight flex items-center gap-1.5">
+              <span class="material-symbols-outlined text-[18px] text-primary">swap_horiz</span>
+              <span>2. Duty Handover &amp; Emergency Contact</span>
+            </h4>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <label class="font-bold text-xs text-slate-700 block mb-1">Handover Officer</label>
+              <select id="input-handover-officer" required class="w-full px-3 py-2 rounded-xl border border-slate-300 text-xs font-bold outline-none focus:border-primary">
+                <option value="Francis M. Sesay (Senior Program Officer)">Francis M. Sesay — Senior Program Officer (Programmes)</option>
+                <option value="Aminata Turay (Senior Finance Specialist)">Aminata Turay — Senior Finance Specialist (Finance &amp; Accounts)</option>
+                <option value="Mohamed Bangura (Contracts & Procurement Specialist)">Mohamed Bangura — Contracts &amp; Procurement Specialist (Procurement Department)</option>
+                <option value="Joseph Conteh (Fleet & Inventory Supervisor)">Joseph Conteh — Fleet &amp; Inventory Supervisor (Logistics &amp; Supply Chain)</option>
+                <option value="Fatmata Koroma (HR & Welfare Associate)">Fatmata Koroma — HR &amp; Welfare Associate (Human Resources)</option>
+                <option value="Sahr Morris (Programme Officer)">Sahr Morris — Programme Officer (Programmes)</option>
+                <option value="Mariama Conteh (WASH & Community Health Officer)">Mariama Conteh — WASH &amp; Community Health Officer (Health &amp; Safety)</option>
+              </select>
+            </div>
+
+            <div>
+              <label class="font-bold text-xs text-slate-700 block mb-1">Emergency Contact (Phone &amp; Name)</label>
+              <input type="text" id="input-emergency-contact" required placeholder="Fatmata Kamara (Spouse) - +232 76 998877" class="w-full px-3 py-2 rounded-xl border border-slate-300 text-xs outline-none focus:border-primary"/>
+            </div>
+          </div>
+
+          <div>
+            <label class="font-bold text-xs text-slate-700 block mb-1">Handover Notes &amp; Coverage Plan</label>
+            <textarea id="input-handover-notes" rows="2" placeholder="Summary of active project files, ongoing donor deliverables, or email coverage..." class="w-full px-3 py-2 rounded-xl border border-slate-300 text-xs outline-none focus:border-primary"></textarea>
+          </div>
+        </div>
+
+        <!-- SECTION C: 5% LEAVE ALLOWANCE CLAIM SUMMARY (Section 9 & 19) -->
+        <div id="section-allowance-summary" class="p-4 rounded-xl bg-emerald-50 border border-emerald-200 text-xs space-y-2">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-1.5 font-extrabold text-emerald-950">
+              <span class="material-symbols-outlined text-[18px] text-primary">payments</span>
+              <span>Statutory 5% Leave Allowance Claim Included</span>
+            </div>
+            <span class="badge-soft bg-emerald-200 text-emerald-900 font-mono">BCF-LA-2026</span>
+          </div>
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-2 pt-1 font-mono">
+            <div>
+              <span class="text-[10px] text-slate-500 uppercase block font-sans">Monthly Basic</span>
+              <strong class="text-slate-900" id="claim-monthly-basic">NLe 40,000.00</strong>
+            </div>
+            <div>
+              <span class="text-[10px] text-slate-500 uppercase block font-sans">Annual Basic (x 12)</span>
+              <strong class="text-slate-900" id="claim-annual-basic">NLe 480,000.00</strong>
+            </div>
+            <div>
+              <span class="text-[10px] text-emerald-800 uppercase block font-sans font-bold">5% Allowance Amount</span>
+              <strong class="text-primary text-sm font-black" id="claim-allowance-amount">NLe 24,000.00</strong>
+            </div>
+          </div>
+          <p class="text-[11px] text-emerald-800 italic pt-1 border-t border-emerald-200/60">
+            * Upon approval, this transaction will route automatically to FOMS Payroll and Finance for bank disbursement.
+          </p>
+        </div>
+
+        <!-- DECLARATION & SUBMISSION -->
+        <div class="pt-4 border-t border-slate-100 space-y-4">
+          <label class="flex items-start gap-2.5 cursor-pointer">
+            <input type="checkbox" id="input-declaration" required class="mt-0.5 accent-primary w-4 h-4 rounded"/>
+            <span class="text-xs text-slate-600 leading-snug">
+              I officially declare that the information provided above is true and accurate. I understand that my leave days will be deducted from my BCF-SL entitlement ledger upon final approval and that handover coverage has been mutually agreed.
+            </span>
+          </label>
+
+          <div class="flex items-center justify-end gap-3 pt-2">
+            <a href="../bcf_sl_leave_allowance_dashboard/code.html" class="px-4 py-2.5 rounded-xl border border-slate-300 text-slate-700 text-xs font-bold hover:bg-slate-50">
+              Cancel
+            </a>
+            <button type="submit" id="btn-submit-form" class="px-6 py-2.5 rounded-xl bg-primary hover:bg-primary-dark text-white text-xs font-extrabold flex items-center gap-1.5 shadow-md active:scale-95 transition cursor-pointer">
+              <span class="material-symbols-outlined text-[17px]">send</span>
+              <span id="btn-submit-label">Submit Application &amp; Claim</span>
+            </button>
+          </div>
+        </div>
+
+      </form>
+
+    </div>
+
+  </main>
+
+  <script>
+    let currentFilingMode = 'both';
+
+    document.addEventListener('DOMContentLoaded', () => {
+      initForm();
+    });
+
+    function initForm() {
+      if (typeof BCF_LEAVE === 'undefined') {
+        setTimeout(initForm, 40);
+        return;
+      }
+      populateFormUserSwitcher();
+      populateHandoverDropdown();
+      renderFormFields();
+      setDefaultDates();
+
+      // Bind all real-time events to Commencement Date input
+      const startInput = document.getElementById('input-start-date');
+      if (startInput) {
+        ['input', 'change', 'keyup', 'blur'].forEach(evt => {
+          startInput.addEventListener(evt, onStartDateChange);
+        });
+      }
+    }
+
+    function populateFormUserSwitcher() {
+      const select = document.getElementById('form-user-switcher');
+      if (!select) return;
+      const employees = BCF_LEAVE.getEmployees();
+      const curId = BCF_LEAVE.getCurrentUserId();
+
+      select.innerHTML = employees.map(e => {
+        const elig = BCF_LEAVE.calculateEligibility(e);
+        const icon = elig.isEligible ? '✅' : '🔒';
+        return `<option value="${e.id}" ${e.id === curId ? 'selected' : ''}>
+          ${icon} ${e.fullName} (${e.id})
+        </option>`;
+      }).join('');
+    }
+
+    function onFormUserSwitch(empId) {
+      BCF_LEAVE.setCurrentUserId(empId);
+      renderFormFields();
+      populateHandoverDropdown();
+      BCF_LEAVE.showToast(`Active employee switched to ${BCF_LEAVE.getCurrentEmployee()?.fullName}`, 'info');
+    }
+
+    function populateHandoverDropdown() {
+      const select = document.getElementById('input-handover-officer');
+      if (!select) return;
+      try {
+        const curEmp = (typeof BCF_LEAVE !== 'undefined' && BCF_LEAVE.getCurrentEmployee) ? BCF_LEAVE.getCurrentEmployee() : null;
+        let allEmps = (typeof BCF_LEAVE !== 'undefined' && BCF_LEAVE.getEmployees) ? BCF_LEAVE.getEmployees() : [];
+        if (!allEmps || allEmps.length === 0) {
+          allEmps = [
+            { id: 'BCF-EMP-00142', fullName: 'Francis M. Sesay', position: 'Senior Program Officer', department: 'Programmes' },
+            { id: 'BCF-EMP-00018', fullName: 'Aminata Turay', position: 'Senior Finance Specialist', department: 'Finance & Accounts' },
+            { id: 'BCF-EMP-00042', fullName: 'Mohamed Bangura', position: 'Contracts & Procurement Specialist', department: 'Procurement Department' },
+            { id: 'BCF-EMP-00055', fullName: 'Joseph Conteh', position: 'Fleet & Inventory Supervisor', department: 'Logistics & Supply Chain' },
+            { id: 'BCF-EMP-00095', fullName: 'Fatmata Koroma', position: 'HR & Welfare Associate', department: 'Human Resources' },
+            { id: 'BCF-EMP-00108', fullName: 'Sahr Morris', position: 'Programme Officer', department: 'Programmes' },
+            { id: 'BCF-EMP-00088', fullName: 'Mariama Conteh', position: 'WASH & Community Health Officer', department: 'Health & Safety' }
+          ];
+        }
+        const filtered = allEmps.filter(e => !curEmp || e.id !== curEmp.id);
+        if (filtered.length > 0) {
+          select.innerHTML = filtered.map((e, idx) => `
+            <option value="${e.fullName} (${e.position})" ${idx === 0 ? 'selected' : ''}>${e.fullName} — ${e.position} (${e.department})</option>
+          `).join('');
+        }
+      } catch (err) {
+        console.error('populateHandoverDropdown error:', err);
+      }
+    }
+
+    let selectedDurationDays = 31;
+
+    function calculateResumptionEndDate(startDateStr, daysCount) {
+      if (!startDateStr) return '';
+      const targetDays = parseInt(daysCount, 10) || 31;
+
+      // 1. Shared business logic calculation
+      if (typeof BCF_LEAVE !== 'undefined' && typeof BCF_LEAVE.calculateEndDate === 'function') {
+        try {
+          const res = BCF_LEAVE.calculateEndDate(startDateStr, targetDays);
+          if (res) return res;
+        } catch (e) {
+          console.warn('BCF_LEAVE.calculateEndDate fallback:', e);
+        }
+      }
+
+      // 2. High-reliability built-in working days calculation (Mon-Fri excluding Sierra Leone holidays)
+      try {
+        const parts = startDateStr.split('-');
+        if (parts.length !== 3) return '';
+        let cur = new Date(parseInt(parts[0], 10), parseInt(parts[1], 10) - 1, parseInt(parts[2], 10));
+        if (isNaN(cur.getTime())) return '';
+
+        const holidays = [
+          '2026-01-01', '2026-02-18', '2026-03-20', '2026-04-27',
+          '2026-05-27', '2026-12-25', '2026-12-26',
+          '2027-01-01', '2027-02-18', '2027-04-27', '2027-12-25'
+        ];
+
+        let count = 0;
+        for (let i = 0; i < 365; i++) {
+          const dayOfWeek = cur.getDay(); // 0 = Sun, 6 = Sat
+          const y = cur.getFullYear();
+          const m = String(cur.getMonth() + 1).padStart(2, '0');
+          const day = String(cur.getDate()).padStart(2, '0');
+          const iso = `${y}-${m}-${day}`;
+
+          const isWeekend = (dayOfWeek === 0 || dayOfWeek === 6);
+          const isHoliday = holidays.includes(iso);
+
+          if (!isWeekend && !isHoliday) {
+            count++;
+            if (count === targetDays) {
+              return iso;
+            }
+          }
+          cur.setDate(cur.getDate() + 1);
+        }
+        const y = cur.getFullYear();
+        const m = String(cur.getMonth() + 1).padStart(2, '0');
+        const day = String(cur.getDate()).padStart(2, '0');
+        return `${y}-${m}-${day}`;
+      } catch (err) {
+        console.error('Date calculator error:', err);
+        return '';
+      }
+    }
+
+    function setDefaultDates() {
+      const emp = (typeof BCF_LEAVE !== 'undefined' && BCF_LEAVE.getCurrentEmployee) ? BCF_LEAVE.getCurrentEmployee() : null;
+      const balance = (emp && typeof BCF_LEAVE !== 'undefined') ? BCF_LEAVE.getLeaveBalance(emp.id) : { remainingDays: 31 };
+
+      const start = new Date();
+      start.setDate(start.getDate() + 7);
+      if (start.getDay() === 0) start.setDate(start.getDate() + 1);
+      if (start.getDay() === 6) start.setDate(start.getDate() + 2);
+
+      const y = start.getFullYear();
+      const m = String(start.getMonth() + 1).padStart(2, '0');
+      const d = String(start.getDate()).padStart(2, '0');
+      const startStr = `${y}-${m}-${d}`;
+
+      const startInput = document.getElementById('input-start-date');
+      if (startInput) {
+        startInput.value = startStr;
+      }
+
+      selectedDurationDays = (balance && balance.remainingDays > 0) ? Math.min(31, balance.remainingDays) : 31;
+      renderDurationPresetChips(selectedDurationDays);
+
+      const endStr = calculateResumptionEndDate(startStr, selectedDurationDays);
+      const endInput = document.getElementById('input-end-date');
+      if (endInput && endStr) {
+        endInput.value = endStr;
+      }
+      recalculateDaysAndConflicts();
+    }
+
+    function renderFormFields() {
+      const emp = BCF_LEAVE.getCurrentEmployee();
+      if (!emp) return;
+
+      const elig = BCF_LEAVE.calculateEligibility(emp);
+      const balance = BCF_LEAVE.getLeaveBalance(emp.id);
+
+      const ineligBanner = document.getElementById('form-ineligible-banner');
+      const activeContainer = document.getElementById('form-active-container');
+
+      if (!elig.isEligible) {
+        ineligBanner.classList.remove('hidden');
+        ineligBanner.style.display = 'block';
+        activeContainer.classList.add('hidden');
+        activeContainer.style.display = 'none';
+
+        document.getElementById('form-ineligible-reason').textContent = elig.reason;
+        document.getElementById('inelig-emp-date').textContent = BCF_LEAVE.formatDate(emp.empDate);
+        document.getElementById('inelig-elig-date').textContent = BCF_LEAVE.formatDate(elig.eligibilityDate);
+        document.getElementById('inelig-remaining-time').textContent = elig.remainingText;
+        return;
+      }
+
+      ineligBanner.classList.add('hidden');
+      ineligBanner.style.display = 'none';
+      activeContainer.classList.remove('hidden');
+      activeContainer.style.display = 'block';
+
+      // Fill Employee Info Card
+      document.getElementById('form-emp-id').textContent = emp.id;
+      document.getElementById('form-emp-name').textContent = emp.fullName;
+      document.getElementById('form-emp-dept').textContent = emp.department;
+      document.getElementById('form-emp-pos').textContent = emp.position;
+      document.getElementById('form-emp-hire').textContent = BCF_LEAVE.formatDate(emp.empDate);
+      document.getElementById('form-emp-sup').textContent = emp.supervisor || 'Management';
+      document.getElementById('form-emp-elig').textContent = BCF_LEAVE.formatDate(elig.eligibilityDate);
+      document.getElementById('form-emp-balance').textContent = `${balance.remainingDays} Days`;
+      const emailInput = document.getElementById('form-emp-email');
+      if (emailInput) {
+        emailInput.value = emp.email || '';
+      }
+
+      if (emp.emergencyContact) {
+        document.getElementById('input-emergency-contact').value = emp.emergencyContact;
+      }
+
+      // ─────────────────────────────────────────────────────────────
+      // RULE 1: Claimed leave allowance only ONE time in a year
+      // ─────────────────────────────────────────────────────────────
+      const alwStatus = BCF_LEAVE.hasClaimedAllowanceInCycle(emp.id);
+      const modeLeave = document.getElementById('mode-card-leave');
+      const modeAlw = document.getElementById('mode-card-allowance');
+      const modeBoth = document.getElementById('mode-card-both');
+      const alwSummary = document.getElementById('section-allowance-summary');
+
+      if (alwStatus.hasClaimed) {
+        // Disable Option 2 & 3
+        modeAlw.classList.add('opacity-40', 'cursor-not-allowed', 'pointer-events-none');
+        modeAlw.querySelector('input').disabled = true;
+
+        modeBoth.classList.add('opacity-40', 'cursor-not-allowed', 'pointer-events-none');
+        modeBoth.querySelector('input').disabled = true;
+
+        // Force switch to Option 1: Leave Only
+        modeLeave.querySelector('input').checked = true;
+        currentFilingMode = 'leave_only';
+
+        // Render Notice in Section C
+        alwSummary.className = 'p-4 rounded-xl bg-amber-50/70 border-2 border-amber-300 text-xs space-y-2';
+        alwSummary.innerHTML = `
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-1.5 font-extrabold text-amber-950">
+              <span class="material-symbols-outlined text-[18px] text-amber-700">lock</span>
+              <span>5% Statutory Leave Allowance Already Claimed for Current Year</span>
+            </div>
+            <span class="badge-soft bg-amber-200 text-amber-900 font-mono">${alwStatus.allowance.id} (${alwStatus.allowance.status})</span>
+          </div>
+          <p class="text-[11px] text-amber-900 font-medium leading-relaxed">
+            Under BCF-SL HR Policy (Section 10 &amp; 11), statutory 5% leave allowance is <strong>claimable only ONE time per service anniversary year</strong> (${alwStatus.cycleLabel}). You have already claimed this allowance on <strong>${BCF_LEAVE.formatDate(alwStatus.claimDate)}</strong>. You can proceed to apply for your leave dates without re-claiming allowance.
+          </p>
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-2 pt-1 font-mono text-amber-950">
+            <div>
+              <span class="text-[10px] text-amber-800 uppercase block font-sans">Claimed Amount</span>
+              <strong class="font-black text-amber-900">${BCF_LEAVE.formatCurrency(alwStatus.allowance.allowanceAmount)}</strong>
+            </div>
+            <div>
+              <span class="text-[10px] text-amber-800 uppercase block font-sans">Claim Date</span>
+              <strong>${BCF_LEAVE.formatDate(alwStatus.claimDate)}</strong>
+            </div>
+            <div>
+              <span class="text-[10px] text-amber-800 uppercase block font-sans">Payment Status</span>
+              <strong class="text-emerald-700 font-black">${alwStatus.allowance.status}</strong>
+            </div>
+          </div>
+        `;
+      } else {
+        // Enable Option 2 & 3
+        modeAlw.classList.remove('opacity-40', 'cursor-not-allowed', 'pointer-events-none');
+        modeAlw.querySelector('input').disabled = false;
+
+        modeBoth.classList.remove('opacity-40', 'cursor-not-allowed', 'pointer-events-none');
+        modeBoth.querySelector('input').disabled = false;
+
+        // Render Regular Section C
+        alwSummary.className = 'p-4 rounded-xl bg-emerald-50 border border-emerald-200 text-xs space-y-2';
+        alwSummary.innerHTML = `
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-1.5 font-extrabold text-emerald-950">
+              <span class="material-symbols-outlined text-[18px] text-primary">payments</span>
+              <span>Statutory 5% Leave Allowance Claim Included</span>
+            </div>
+            <span class="badge-soft bg-emerald-200 text-emerald-900 font-mono">BCF-LA-2026</span>
+          </div>
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-2 pt-1 font-mono">
+            <div>
+              <span class="text-[10px] text-slate-500 uppercase block font-sans">Monthly Basic</span>
+              <strong class="text-slate-900">${BCF_LEAVE.formatCurrency(elig.monthlyBasic)}</strong>
+            </div>
+            <div>
+              <span class="text-[10px] text-slate-500 uppercase block font-sans">Annual Basic (x 12)</span>
+              <strong class="text-slate-900">${BCF_LEAVE.formatCurrency(elig.annualBasic)}</strong>
+            </div>
+            <div>
+              <span class="text-[10px] text-emerald-800 uppercase block font-sans font-bold">5% Allowance Amount</span>
+              <strong class="text-primary text-sm font-black">${BCF_LEAVE.formatCurrency(elig.leaveAllowance)}</strong>
+            </div>
+          </div>
+          <p class="text-[11px] text-emerald-800 italic pt-1 border-t border-emerald-200/60">
+            * Upon approval, this transaction will route automatically to FOMS Payroll and Finance for bank disbursement. (Claimed once per service year).
+          </p>
+        `;
+      }
+
+      onFilingModeChange(currentFilingMode);
+
+      // ─────────────────────────────────────────────────────────────
+      // RULE 2: When all 31 days taken, staff cannot apply for another leave
+      // until employment date is met again!
+      // ─────────────────────────────────────────────────────────────
+      const exhaustedBanner = document.getElementById('form-exhausted-banner');
+      const inputLeaveType = document.getElementById('input-leave-type');
+      const btnSubmit = document.getElementById('btn-submit-form');
+      const btnSubmitLabel = document.getElementById('btn-submit-label');
+
+      if (balance.remainingDays <= 0) {
+        exhaustedBanner.classList.remove('hidden');
+        exhaustedBanner.style.display = 'block';
+        document.getElementById('exhausted-cycle').textContent = balance.cycle.cycleLabel;
+        document.getElementById('exhausted-unlock-date').textContent = BCF_LEAVE.formatDate(balance.nextAnniversary);
+
+        // Update dropdown option for Annual Leave
+        const annualOpt = inputLeaveType.querySelector('option[value="Annual Leave"]');
+        if (annualOpt) {
+          annualOpt.textContent = `Annual Leave (0 Days Left — Locked until ${BCF_LEAVE.formatDate(balance.nextAnniversary)})`;
+        }
+
+        // If Annual Leave is selected and filing mode involves leave, lock submit button
+        if (inputLeaveType.value === 'Annual Leave' && currentFilingMode !== 'allowance_only') {
+          btnSubmit.setAttribute('disabled', 'true');
+          btnSubmit.classList.add('opacity-50', 'cursor-not-allowed', 'bg-slate-400');
+          btnSubmit.classList.remove('bg-primary', 'hover:bg-primary-dark');
+          btnSubmitLabel.textContent = `Locked — 31 Days Consumed (Unlocks ${BCF_LEAVE.formatDate(balance.nextAnniversary)})`;
+        }
+      } else {
+        exhaustedBanner.classList.add('hidden');
+        exhaustedBanner.style.display = 'none';
+
+        const annualOpt = inputLeaveType.querySelector('option[value="Annual Leave"]');
+        if (annualOpt) {
+          annualOpt.textContent = `Annual Leave (${balance.remainingDays} Days Available)`;
+        }
+
+        btnSubmit.removeAttribute('disabled');
+        btnSubmit.classList.remove('opacity-50', 'cursor-not-allowed', 'bg-slate-400');
+        btnSubmit.classList.add('bg-primary', 'hover:bg-primary-dark');
+
+        if (currentFilingMode === 'both') {
+          btnSubmitLabel.textContent = 'Submit Application & Claim';
+        } else if (currentFilingMode === 'allowance_only') {
+          btnSubmitLabel.textContent = 'Submit Leave Allowance Claim Only';
+        } else {
+          btnSubmitLabel.textContent = 'Submit Leave Application Only';
+        }
+      }
+
+      // Synchronize duration presets and live subtraction calculation with employee balance
+      if (inputLeaveType.value === 'Annual Leave') {
+        if (!selectedDurationDays || selectedDurationDays <= 0) {
+          selectedDurationDays = (balance && balance.remainingDays > 0) ? Math.min(31, balance.remainingDays) : 31;
+        }
+      }
+      renderDurationPresetChips(selectedDurationDays);
+      recalculateDaysAndConflicts();
+    }
+
+    function onFilingModeChange(mode) {
+      currentFilingMode = mode;
+      const leaveFields = document.getElementById('section-leave-fields');
+      const handoverFields = document.getElementById('section-handover-fields');
+      const alwSummary = document.getElementById('section-allowance-summary');
+      const label = document.getElementById('btn-submit-label');
+
+      // Adjust borders
+      document.getElementById('mode-card-leave').className = mode === 'leave_only' ? 'cursor-pointer border-2 border-primary bg-emerald-50/50 rounded-xl p-3.5 flex flex-col justify-between transition' : 'cursor-pointer border-2 rounded-xl p-3.5 flex flex-col justify-between transition hover:border-primary border-slate-200';
+      document.getElementById('mode-card-allowance').className = mode === 'allowance_only' ? 'cursor-pointer border-2 border-primary bg-emerald-50/50 rounded-xl p-3.5 flex flex-col justify-between transition' : 'cursor-pointer border-2 rounded-xl p-3.5 flex flex-col justify-between transition hover:border-primary border-slate-200';
+      document.getElementById('mode-card-both').className = mode === 'both' ? 'cursor-pointer border-2 border-primary bg-emerald-50/50 rounded-xl p-3.5 flex flex-col justify-between transition' : 'cursor-pointer border-2 rounded-xl p-3.5 flex flex-col justify-between transition hover:border-primary border-slate-200';
+
+      if (mode === 'allowance_only') {
+        leaveFields.style.display = 'none';
+        handoverFields.style.display = 'none';
+        alwSummary.style.display = 'block';
+        label.textContent = 'Submit Leave Allowance Claim Only';
+      } else if (mode === 'leave_only') {
+        leaveFields.style.display = 'block';
+        handoverFields.style.display = 'block';
+        alwSummary.style.display = 'block';
+        label.textContent = 'Submit Leave Application Only';
+      } else {
+        leaveFields.style.display = 'block';
+        handoverFields.style.display = 'block';
+        alwSummary.style.display = 'block';
+        label.textContent = 'Submit Leave Application & Allowance Claim';
+      }
+    }
+
+    function setDurationPreset(days) {
+      const d = parseInt(days, 10) || 31;
+      selectedDurationDays = d;
+      renderDurationPresetChips(selectedDurationDays);
+
+      const startInput = document.getElementById('input-start-date');
+      const endInput = document.getElementById('input-end-date');
+      if (startInput && startInput.value) {
+        const endStr = calculateResumptionEndDate(startInput.value, selectedDurationDays);
+        if (endStr && endInput) {
+          endInput.value = endStr;
+        }
+      }
+      recalculateDaysAndConflicts();
+      if (typeof BCF_LEAVE !== 'undefined' && BCF_LEAVE.showToast) {
+        BCF_LEAVE.showToast(`Leave duration set to ${selectedDurationDays} working days.`, 'info');
+      }
+    }
+
+    function renderDurationPresetChips(activeDays) {
+      const container = document.getElementById('duration-preset-chips');
+      if (!container) return;
+
+      const presets = [
+        { days: 31, label: '31 Days (Full Quota)' },
+        { days: 21, label: '21 Days' },
+        { days: 15, label: '15 Days' },
+        { days: 10, label: '10 Days' },
+        { days: 5, label: '5 Days' }
+      ];
+
+      container.innerHTML = presets.map(p => {
+        const isSelected = (p.days === activeDays);
+        if (isSelected) {
+          return `
+            <button type="button" onclick="setDurationPreset(${p.days})" id="chip-dur-${p.days}" class="px-3 py-1.5 rounded-lg text-xs font-black bg-primary text-white shadow-xs transition cursor-pointer active:scale-95 flex items-center gap-1 ring-2 ring-primary/40">
+              <span class="material-symbols-outlined text-[14px]">check_circle</span>
+              <span>${p.label}</span>
+            </button>
+          `;
+        } else {
+          return `
+            <button type="button" onclick="setDurationPreset(${p.days})" id="chip-dur-${p.days}" class="px-3 py-1.5 rounded-lg text-xs font-bold bg-white hover:bg-slate-100 text-slate-800 border border-slate-300 shadow-2xs transition cursor-pointer active:scale-95">
+              <span>${p.days === 31 ? '31 Days' : p.label}</span>
+            </button>
+          `;
+        }
+      }).join('');
+    }
+
+    function updatePresetChipsUI(activeDays) {
+      renderDurationPresetChips(activeDays);
+    }
+
+    function clampToRemainingDays() {
+      const emp = (typeof BCF_LEAVE !== 'undefined' && BCF_LEAVE.getCurrentEmployee) ? BCF_LEAVE.getCurrentEmployee() : null;
+      const balance = (emp && typeof BCF_LEAVE !== 'undefined') ? BCF_LEAVE.getLeaveBalance(emp.id) : { remainingDays: 31 };
+      const startVal = document.getElementById('input-start-date').value;
+      if (startVal && balance.remainingDays > 0) {
+        selectedDurationDays = balance.remainingDays;
+        const endStr = calculateResumptionEndDate(startVal, balance.remainingDays);
+        if (endStr) {
+          document.getElementById('input-end-date').value = endStr;
+        }
+        renderDurationPresetChips(balance.remainingDays);
+        recalculateDaysAndConflicts();
+        if (typeof BCF_LEAVE !== 'undefined' && BCF_LEAVE.showToast) {
+          BCF_LEAVE.showToast(`Adjusted duration to exact remaining balance (${balance.remainingDays} working days).`, 'info');
+        }
+      }
+    }
+
+    function onStartDateChange() {
+      const startInput = document.getElementById('input-start-date');
+      const endInput = document.getElementById('input-end-date');
+      if (!startInput || !endInput) return;
+
+      const startVal = startInput.value;
+      if (!startVal) {
+        endInput.value = '';
+        recalculateDaysAndConflicts();
+        return;
+      }
+
+      const targetDays = selectedDurationDays || 31;
+      const endStr = calculateResumptionEndDate(startVal, targetDays);
+      if (endStr) {
+        endInput.value = endStr;
+      }
+      recalculateDaysAndConflicts();
+    }
+
+    function onEndDateManualChange() {
+      const start = document.getElementById('input-start-date').value;
+      const end = document.getElementById('input-end-date').value;
+      if (start && end) {
+        const days = BCF_LEAVE.calculateLeaveDays(start, end);
+        selectedDurationDays = days;
+        renderDurationPresetChips(days);
+      }
+      recalculateDaysAndConflicts();
+    }
+
+    function onLeaveTypeChange(type) {
+      const emp = BCF_LEAVE.getCurrentEmployee();
+      const balance = emp ? BCF_LEAVE.getLeaveBalance(emp.id) : { remainingDays: 31 };
+      const btnSubmit = document.getElementById('btn-submit-form');
+      const btnSubmitLabel = document.getElementById('btn-submit-label');
+
+      if (type === 'Annual Leave') {
+        if (balance.remainingDays <= 0) {
+          selectedDurationDays = 0;
+          btnSubmit.setAttribute('disabled', 'true');
+          btnSubmit.classList.add('opacity-50', 'cursor-not-allowed', 'bg-slate-400');
+          btnSubmit.classList.remove('bg-primary', 'hover:bg-primary-dark');
+          btnSubmitLabel.textContent = `Locked — 31 Days Consumed (Unlocks ${BCF_LEAVE.formatDate(balance.nextAnniversary)})`;
+          BCF_LEAVE.showToast(`All 31 annual leave days have been consumed. Locked until anniversary date (${BCF_LEAVE.formatDate(balance.nextAnniversary)}).`, 'warning');
+        } else {
+          selectedDurationDays = selectedDurationDays || 31;
+          btnSubmit.removeAttribute('disabled');
+          btnSubmit.classList.remove('opacity-50', 'cursor-not-allowed', 'bg-slate-400');
+          btnSubmit.classList.add('bg-primary', 'hover:bg-primary-dark');
+          btnSubmitLabel.textContent = (currentFilingMode === 'both') ? 'Submit Application & Claim' : 'Submit Leave Application Only';
+        }
+      } else {
+        btnSubmit.removeAttribute('disabled');
+        btnSubmit.classList.remove('opacity-50', 'cursor-not-allowed', 'bg-slate-400');
+        btnSubmit.classList.add('bg-primary', 'hover:bg-primary-dark');
+        btnSubmitLabel.textContent = 'Submit Special Leave Application';
+
+        if (type === 'Paternity Leave') selectedDurationDays = 10;
+        else if (type === 'Compassionate/Bereavement Leave') selectedDurationDays = 5;
+        else if (type === 'Maternity Leave') selectedDurationDays = 70;
+        else selectedDurationDays = 5;
+      }
+
+      renderDurationPresetChips(selectedDurationDays);
+      onStartDateChange();
+    }
+
+    function recalculateDaysAndConflicts() {
+      const emp = BCF_LEAVE.getCurrentEmployee();
+      const balance = emp ? BCF_LEAVE.getLeaveBalance(emp.id) : { remainingDays: 31, usedDays: 0, annualQuota: 31 };
+      const leaveType = document.getElementById('input-leave-type')?.value || 'Annual Leave';
+      const start = document.getElementById('input-start-date').value;
+      const end = document.getElementById('input-end-date').value;
+      const days = BCF_LEAVE.calculateLeaveDays(start, end);
+
+      const isAnnual = (leaveType === 'Annual Leave');
+      const exceeds = isAnnual && (days > balance.remainingDays);
+      const remainingAfter = balance.remainingDays - days;
+
+      // Update Quota Ledger Subtraction Meter
+      const totalEl = document.getElementById('quota-stat-total');
+      const usedEl = document.getElementById('quota-stat-used');
+      const reqEl = document.getElementById('quota-stat-requested');
+      const afterEl = document.getElementById('quota-stat-after');
+      const afterBox = document.getElementById('quota-card-balance-after');
+      const pill = document.getElementById('quota-status-pill');
+      const warnBanner = document.getElementById('quota-warning-banner');
+      const warnText = document.getElementById('quota-warning-text');
+      const btnSubmit = document.getElementById('btn-submit-form');
+      const btnSubmitLabel = document.getElementById('btn-submit-label');
+      const badge = document.getElementById('calc-days-display');
+
+      if (totalEl) totalEl.textContent = `${balance.annualQuota} Days`;
+      if (usedEl) usedEl.textContent = `${balance.usedDays} Days`;
+      if (reqEl) reqEl.textContent = `${days} Days`;
+
+      if (exceeds) {
+        if (afterEl) afterEl.textContent = `-${Math.abs(remainingAfter)} Days (DEFICIT)`;
+        if (afterBox) afterBox.className = 'p-2 rounded-lg bg-rose-100 border border-rose-300 text-rose-900';
+        if (pill) {
+          pill.textContent = '⛔ Quota Deficit';
+          pill.className = 'badge-soft bg-rose-600 text-white font-mono font-bold';
+        }
+
+        if (warnBanner) {
+          warnBanner.classList.remove('hidden');
+          warnBanner.style.display = 'flex';
+        }
+        if (warnText) {
+          warnText.textContent = `Limit Exceeded: You have requested ${days} working days, but you only have ${balance.remainingDays} days remaining out of your official 31-day annual quota (${balance.usedDays} days already taken). Under BCF-SL policy, you can only take up to ${balance.remainingDays} days (not more than)!`;
+        }
+
+        if (btnSubmit) {
+          btnSubmit.setAttribute('disabled', 'true');
+          btnSubmit.classList.add('opacity-50', 'cursor-not-allowed', 'bg-rose-600');
+          btnSubmit.classList.remove('bg-primary', 'hover:bg-primary-dark');
+        }
+        if (btnSubmitLabel) {
+          btnSubmitLabel.textContent = `Cannot Exceed Remaining Quota (${balance.remainingDays} Days Max)`;
+        }
+
+        if (badge) {
+          badge.textContent = `${days} Working Days (Exceeds ${balance.remainingDays}d Max)`;
+          badge.className = 'text-xs font-mono font-black text-rose-600 animate-pulse';
+        }
+      } else {
+        if (afterEl) afterEl.textContent = `${Math.max(0, remainingAfter)} Days`;
+        if (afterBox) afterBox.className = 'p-2 rounded-lg bg-emerald-50 border border-emerald-200';
+        if (pill) {
+          if (remainingAfter === 0) {
+            pill.textContent = '31 Days Complete';
+            pill.className = 'badge-soft bg-amber-200 text-amber-900 font-mono font-bold';
+          } else {
+            pill.textContent = 'Within Balance';
+            pill.className = 'badge-soft bg-emerald-100 text-emerald-800 font-mono font-bold';
+          }
+        }
+
+        if (warnBanner) {
+          warnBanner.classList.add('hidden');
+          warnBanner.style.display = 'none';
+        }
+
+        if (balance.remainingDays <= 0 && isAnnual) {
+          if (btnSubmit) {
+            btnSubmit.setAttribute('disabled', 'true');
+            btnSubmit.classList.add('opacity-50', 'cursor-not-allowed', 'bg-slate-400');
+            btnSubmit.classList.remove('bg-primary', 'hover:bg-primary-dark');
+          }
+          if (btnSubmitLabel) {
+            btnSubmitLabel.textContent = `Locked — 31 Days Consumed (Unlocks ${BCF_LEAVE.formatDate(balance.nextAnniversary)})`;
+          }
+        } else {
+          if (btnSubmit) {
+            btnSubmit.removeAttribute('disabled');
+            btnSubmit.classList.remove('opacity-50', 'cursor-not-allowed', 'bg-rose-600', 'bg-slate-400');
+            btnSubmit.classList.add('bg-primary', 'hover:bg-primary-dark');
+          }
+          if (btnSubmitLabel) {
+            if (currentFilingMode === 'both') {
+              btnSubmitLabel.textContent = 'Submit Application & Claim';
+            } else if (currentFilingMode === 'allowance_only') {
+              btnSubmitLabel.textContent = 'Submit Leave Allowance Claim Only';
+            } else {
+              btnSubmitLabel.textContent = 'Submit Leave Application Only';
+            }
+          }
+        }
+
+        if (badge) {
+          badge.textContent = `${days} Working Days`;
+          badge.className = 'text-xs font-mono font-bold text-primary';
+        }
+      }
+
+      const spanDisplay = document.getElementById('display-leave-span');
+      if (spanDisplay) {
+        if (start && end) {
+          spanDisplay.textContent = `${BCF_LEAVE.formatDate(start)} – ${BCF_LEAVE.formatDate(end)} (${days} Working Days)`;
+        } else {
+          spanDisplay.textContent = '—';
+        }
+      }
+
+      const resumptionDisplay = document.getElementById('display-resumption-date');
+      if (resumptionDisplay) {
+        if (end) {
+          const nextWorkDay = BCF_LEAVE.getNextWorkDay(end);
+          if (nextWorkDay) {
+            const nextDate = BCF_LEAVE.parseDate(nextWorkDay);
+            const weekdayName = nextDate.toLocaleDateString('en-GB', { weekday: 'short' });
+            resumptionDisplay.textContent = `${weekdayName}, ${BCF_LEAVE.formatDate(nextWorkDay)}`;
+          } else {
+            resumptionDisplay.textContent = '—';
+          }
+        } else {
+          resumptionDisplay.textContent = '—';
+        }
+      }
+
+      // Check Staffing Conflicts (Section 18)
+      if (emp && start && end) {
+        const conflict = BCF_LEAVE.checkStaffingConflicts(emp.department, start, end);
+        const alertBox = document.getElementById('staffing-alert-box');
+        const alertText = document.getElementById('staffing-alert-text');
+
+        if (conflict.conflictCount > 0) {
+          alertBox.classList.remove('hidden');
+          alertBox.style.display = 'flex';
+          alertText.textContent = conflict.alertMessage;
+        } else {
+          alertBox.classList.add('hidden');
+          alertBox.style.display = 'none';
+        }
+      }
+    }
+
+    function handleApplicationSubmit(e) {
+      e.preventDefault();
+      const emp = BCF_LEAVE.getCurrentEmployee();
+      if (!emp) return;
+
+      const balance = BCF_LEAVE.getLeaveBalance(emp.id);
+      const leaveType = document.getElementById('input-leave-type').value;
+
+      // RULE 2 Validation: Block if 31 days taken
+      if (currentFilingMode !== 'allowance_only' && leaveType === 'Annual Leave' && balance.remainingDays <= 0) {
+        BCF_LEAVE.showToast(`Cannot submit annual leave: All 31 statutory days have been taken. Next entitlement unlocks on ${BCF_LEAVE.formatDate(balance.nextAnniversary)}.`, 'error');
+        return;
+      }
+
+      const startDate = document.getElementById('input-start-date').value;
+      const endDate = document.getElementById('input-end-date').value;
+      const daysRequested = BCF_LEAVE.calculateLeaveDays(startDate, endDate);
+
+      // STRICT SUBTRACTION RULE: Not more than remaining days!
+      if (currentFilingMode !== 'allowance_only' && leaveType === 'Annual Leave' && daysRequested > balance.remainingDays) {
+        BCF_LEAVE.showToast(
+          `Cannot submit leave: Requested ${daysRequested} days exceeds your remaining balance of ${balance.remainingDays} days (out of 31 days, ${balance.usedDays} days already taken). Not more than ${balance.remainingDays} days can be taken!`,
+          'error'
+        );
+        return;
+      }
+
+      // RULE 1 Validation: Block if allowance already claimed
+      if (currentFilingMode === 'both' || currentFilingMode === 'allowance_only') {
+        const alwCheck = BCF_LEAVE.hasClaimedAllowanceInCycle(emp.id);
+        if (alwCheck.hasClaimed) {
+          BCF_LEAVE.showToast(`Statutory 5% Leave Allowance has already been claimed for current cycle (${alwCheck.cycleLabel}). Allowance can only be claimed once per year.`, 'error');
+          return;
+        }
+      }
+
+      const employeeEmail = (document.getElementById('form-emp-email')?.value || emp.email || '').trim();
+
+      try {
+        if (currentFilingMode === 'allowance_only') {
+          const alw = BCF_LEAVE.submitAllowanceOnlyClaim(emp.id);
+          BCF_LEAVE.showToast(`Statutory leave allowance claim (${alw.id}) submitted successfully!`, 'success');
+        } else {
+          const reqRef = BCF_LEAVE.generateCombinedReqId();
+          const app = BCF_LEAVE.submitLeaveApplication({
+            employeeId: emp.id,
+            employeeEmail,
+            reqRef,
+            leaveType,
+            startDate,
+            endDate,
+            reason: document.getElementById('input-reason').value.trim(),
+            emergencyContact: document.getElementById('input-emergency-contact').value.trim(),
+            handoverOfficer: document.getElementById('input-handover-officer').value,
+            handoverNotes: document.getElementById('input-handover-notes').value.trim(),
+            claimAllowance: (currentFilingMode === 'both')
+          });
+
+          BCF_LEAVE.showToast(`Leave application ${app.id} submitted! Official approvals will be sent to ${employeeEmail || 'your email'}.`, 'success');
+        }
+
+        setTimeout(() => {
+          window.location.href = '../bcf_sl_leave_allowance_dashboard/code.html';
+        }, 1200);
+
+      } catch (err) {
+        BCF_LEAVE.showToast(err.message, 'error');
+      }
+    }
+  </script>
+</body>
+</html>

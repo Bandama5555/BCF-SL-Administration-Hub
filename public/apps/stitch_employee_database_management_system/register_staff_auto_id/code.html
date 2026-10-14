@@ -1,0 +1,2799 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover"/>
+    <title>Staff Registration - BCF-SL</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- BCF-SL MongoDB Live Persistence Bridge -->
+    <script src="../bcf_mongo_bridge.js"></script>
+    <!-- MediaPipe Selfie Segmentation for AI Pure White Background Cutout -->
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/selfie_segmentation/selfie_segmentation.js" crossorigin="anonymous"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: "#16a34a", // Green
+                        "primary-dark": "#15803d",
+                        secondary: "#2563eb", // Blue
+                        tertiary: "#9333ea", // Purple
+                        surface: "#ffffff",
+                        "surface-container": "#f3f4f6",
+                        "on-surface": "#111827",
+                        "on-surface-variant": "#4b5563",
+                        outline: "#d1d5db",
+                        error: "#dc2626"
+                    },
+                    fontFamily: {
+                        sans: ['Calibri', 'Inter', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body { font-size: 11pt; overscroll-behavior-y: none; }
+        .hidden-step { display: none !important; }
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-thumb { background-color: #cbd5e1; border-radius: 3px; }
+        .step-bubble.active { background-color: #16a34a; color: white; border-color: #16a34a; }
+        .step-bubble.completed { background-color: #2563eb; color: white; border-color: #2563eb; }
+        .step-label.active { color: #16a34a; font-weight: 700; }
+        .req { color: #dc2626; }
+    </style>
+</head>
+<body class="bg-surface-container text-on-surface flex flex-col min-h-screen font-sans">
+
+<!-- HEADER -->
+<header class="bg-surface border-b border-outline shadow-sm z-50 sticky top-0">
+    <div class="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between">
+        <div class="flex items-center gap-4">
+            <img src="../bcf-logo.png" onerror="this.src='/bcf-logo.jpg'" alt="BCF-SL Logo" class="h-10 w-auto object-contain"/>
+            <div class="hidden sm:block">
+                <h1 class="font-bold text-lg text-primary leading-tight">BANDAMA CHARITY FOUNDATION SIERRA LEONE</h1>
+                <p class="text-[9pt] font-semibold text-secondary">Motto: Save Lives <span class="text-tertiary px-1">|</span> Slogan: Empowering Communities Through Services</p>
+            </div>
+        </div>
+        <div class="flex items-center gap-2">
+            <a href="../staff_directory/code.html" class="px-4 py-2 text-sm font-semibold text-on-surface-variant hover:text-primary transition-colors">Cancel</a>
+        </div>
+    </div>
+</header>
+
+<!-- SEQUENTIAL WORKFLOW NAVIGATION BAR -->
+<div class="bg-surface border-b border-outline px-4 py-2 text-xs font-bold shadow-2xs">
+    <div class="max-w-7xl mx-auto flex items-center justify-between">
+        <a href="../staff_directory/code.html" onclick="navToApp('/employees/staff-directory', '../staff_directory/code.html', event)" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-slate-300 hover:bg-slate-100 text-slate-700 transition">
+            <span>← Back to Staff Directory</span>
+        </a>
+        <span class="text-slate-300 font-bold">|</span>
+        <a href="../staff_analysis_reporting/code.html" onclick="navToApp('/employees/staff-analytics', '../staff_analysis_reporting/code.html', event)" class="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg bg-primary hover:bg-primary-dark text-white shadow-2xs transition">
+            <span>Next →</span>
+        </a>
+    </div>
+</div>
+
+
+<main class="flex-1 w-full max-w-7xl mx-auto flex flex-col md:flex-row gap-6 p-4">
+    
+    <!-- LEFT NAV -->
+    <aside class="w-full md:w-64 shrink-0 bg-surface rounded-xl border border-outline shadow-sm p-4 hidden md:flex flex-col gap-2 sticky top-24 h-max">
+        <h2 class="font-bold text-sm text-on-surface-variant mb-2 px-2 uppercase tracking-wide">Registration Steps</h2>
+        <div id="nav-container" class="flex flex-col gap-1">
+            <!-- Nav buttons generated by JS -->
+        </div>
+    </aside>
+
+    <!-- MOBILE NAV -->
+    <div class="w-full bg-surface rounded-xl border border-outline shadow-sm p-2 flex md:hidden overflow-x-auto no-scrollbar items-center gap-2 sticky top-20 z-40" id="mobile-nav-container">
+        <!-- Mobile nav buttons generated by JS -->
+    </div>
+
+    <!-- CONTENT FORM -->
+    <div class="flex-1 bg-surface rounded-xl border border-outline shadow-sm p-6 flex flex-col relative pb-24">
+        
+        <form id="registrationForm" onsubmit="event.preventDefault();">
+        
+        <!-- STEP 1: PERSONAL -->
+        <div id="step-1" class="step-content">
+            <h3 class="text-xl font-bold text-primary mb-6 flex items-center gap-2"><span class="material-symbols-outlined">person</span> PERSONAL INFORMATION</h3>
+
+            <!-- PASSPORT SIZE PHOTO SECTION -->
+            <div class="mb-6 p-4 sm:p-5 bg-surface-container-low rounded-xl border border-outline flex flex-col sm:flex-row items-center sm:items-start gap-5 shadow-2xs">
+                <!-- Passport Frame (Official 35x45mm / 2x2" proportion) -->
+                <div class="flex flex-col items-center gap-2 shrink-0">
+                    <div id="passport-frame" class="relative w-36 h-44 rounded-lg border-2 border-dashed border-primary/60 bg-white flex flex-col items-center justify-center overflow-hidden shadow-inner group">
+                        <img id="passport-preview" src="" alt="Staff Passport Photo" class="w-full h-full object-cover hidden" />
+                        <div id="passport-placeholder" class="flex flex-col items-center justify-center p-3 text-center text-on-surface-variant">
+                            <span class="material-symbols-outlined text-4xl text-primary mb-1">add_a_photo</span>
+                            <span class="text-xs font-bold text-slate-800">Passport Photo</span>
+                            <span class="text-[10px] text-slate-500 mt-0.5">2 × 2" / 35×45mm</span>
+                            <span class="text-[9px] bg-emerald-50 text-emerald-700 border border-emerald-200 px-1.5 py-0.5 rounded-full mt-1.5 font-semibold">White Background</span>
+                        </div>
+                        <!-- Hover Overlay to edit/fit -->
+                        <div id="passport-hover-overlay" onclick="openPhotoStudioModal()" class="hidden absolute inset-0 bg-black/50 text-white flex flex-col items-center justify-center opacity-0 group-hover:opacity-100 transition cursor-pointer z-10">
+                            <span class="material-symbols-outlined text-2xl">crop</span>
+                            <span class="text-[11px] font-bold mt-1">Fit &amp; Adjust</span>
+                        </div>
+                        <!-- Delete / Clear Button -->
+                        <button type="button" id="btn-remove-photo" onclick="clearPassportPhoto(event)" class="hidden absolute top-1.5 right-1.5 w-6 h-6 rounded-full bg-red-600 hover:bg-red-700 text-white flex items-center justify-center shadow transition z-20" title="Remove Photo">
+                            <span class="material-symbols-outlined text-[14px]">close</span>
+                        </button>
+                    </div>
+                    <div id="photo-status-badge" class="hidden text-[10px] font-bold text-emerald-800 bg-emerald-100 border border-emerald-300 px-2.5 py-0.5 rounded-full flex items-center gap-1 shadow-2xs">
+                        <span class="material-symbols-outlined text-[13px] text-emerald-700">verified</span>
+                        <span>White Background &amp; Passport Fit</span>
+                    </div>
+                </div>
+
+                <!-- Upload & Camera Controls -->
+                <div class="flex-1 w-full space-y-3 text-left">
+                    <div>
+                        <div class="flex items-center gap-2">
+                            <span class="material-symbols-outlined text-primary text-[20px]">account_circle</span>
+                            <h4 class="font-bold text-sm text-slate-900">Official Staff Passport-Size Photograph</h4>
+                        </div>
+                        <p class="text-xs text-on-surface-variant mt-1 leading-relaxed">
+                            Upload a portrait from your device or capture directly using your camera. Every staff photo is automatically framed to standard passport proportions (head &amp; shoulders filling 70–80% of the frame) and trimmed to a solid institutional white background (<span class="font-mono font-bold text-slate-800">#FFFFFF</span>).
+                        </p>
+                    </div>
+
+                    <div class="flex flex-wrap items-center gap-2.5 pt-1">
+                        <!-- Upload from device -->
+                        <label class="cursor-pointer inline-flex items-center gap-2 px-3.5 py-2 rounded-lg bg-surface border border-outline hover:border-primary hover:bg-primary/5 text-slate-800 text-xs font-bold transition shadow-2xs">
+                            <span class="material-symbols-outlined text-[18px] text-primary">upload_file</span>
+                            <span>Upload from Device</span>
+                            <input type="file" id="photo-file-input" accept="image/*" class="hidden" onchange="handleDevicePhotoUpload(event)">
+                        </label>
+
+                        <!-- Capture from camera -->
+                        <button type="button" onclick="openCameraModal()" class="inline-flex items-center gap-2 px-3.5 py-2 rounded-lg bg-primary hover:bg-primary-dark text-white text-xs font-bold transition shadow-xs cursor-pointer">
+                            <span class="material-symbols-outlined text-[18px]">photo_camera</span>
+                            <span>Capture from Camera</span>
+                        </button>
+
+                        <!-- Fit & Adjust Button -->
+                        <button type="button" id="btn-fit-adjust" onclick="openPhotoStudioModal()" class="hidden inline-flex items-center gap-1.5 px-3.5 py-2 rounded-lg bg-secondary hover:bg-blue-700 text-white text-xs font-bold transition shadow-xs cursor-pointer">
+                            <span class="material-symbols-outlined text-[16px]">crop</span>
+                            <span>Fit &amp; Adjust Photo</span>
+                        </button>
+
+                        <!-- Whiten background button -->
+                        <button type="button" id="btn-retrim-bg" onclick="reapplyWhiteBackground()" class="hidden inline-flex items-center gap-1.5 px-3 py-2 rounded-lg border border-emerald-300 bg-emerald-50 hover:bg-emerald-100 text-emerald-800 text-xs font-semibold transition cursor-pointer">
+                            <span class="material-symbols-outlined text-[16px] text-emerald-600">auto_fix_high</span>
+                            <span>AI Whiten Background</span>
+                        </button>
+                    </div>
+
+                    <!-- Policy note -->
+                    <div class="text-[11px] text-slate-500 bg-surface p-2.5 rounded-lg border border-outline/70 flex items-start gap-2">
+                        <span class="material-symbols-outlined text-secondary text-[16px] shrink-0 mt-0.5">info</span>
+                        <span>Standard ICAO / BCF-SL Passport Specification: Head &amp; shoulders centered, neutral expression, and solid pure white background (#FFFFFF).</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                <label class="flex flex-col gap-1 font-semibold">Full Name <span class="req">*</span>
+                    <input type="text" id="f-name" class="h-10 px-3 rounded border border-outline focus:border-primary focus:ring-1 focus:ring-primary outline-none font-normal" required>
+                </label>
+                <label class="flex flex-col gap-1 font-semibold">Gender <span class="req">*</span>
+                    <select id="f-gender" class="h-10 px-3 rounded border border-outline focus:border-primary outline-none font-normal" required>
+                        <option value="">Select Gender...</option><option value="Male">Male</option><option value="Female">Female</option><option value="Other">Other</option><option value="Prefer not to say">Prefer not to say</option>
+                    </select>
+                </label>
+                <label class="flex flex-col gap-1 font-semibold">Date of Birth <span class="req">*</span>
+                    <input type="date" id="f-dob" class="h-10 px-3 rounded border border-outline focus:border-primary outline-none font-normal" required>
+                </label>
+                <label class="flex flex-col gap-1 font-semibold">Nationality <span class="req">*</span>
+                    <input type="text" id="f-nation" value="Sierra Leonean" class="h-10 px-3 rounded border border-outline focus:border-primary outline-none font-normal" required>
+                </label>
+                <label class="flex flex-col gap-1 font-semibold">Phone Number <span class="req">*</span>
+                    <input type="tel" id="f-phone" class="h-10 px-3 rounded border border-outline focus:border-primary outline-none font-normal" required>
+                </label>
+                <label class="flex flex-col gap-1 font-semibold">Email Address <span class="req">*</span>
+                    <input type="email" id="f-email" class="h-10 px-3 rounded border border-outline focus:border-primary outline-none font-normal" required>
+                </label>
+                <label class="flex flex-col gap-1 font-semibold">Marital Status <span class="req">*</span>
+                    <select id="f-marital" class="h-10 px-3 rounded border border-outline focus:border-primary outline-none font-normal" required>
+                        <option value="">Select Status...</option><option value="Single">Single</option><option value="Married">Married</option><option value="Divorced">Divorced</option><option value="Widowed">Widowed</option><option value="Separated">Separated</option>
+                    </select>
+                </label>
+                <label class="flex flex-col gap-1 font-semibold">No. of Children <span class="req">*</span>
+                    <select id="f-children" onchange="toggleOtherChildren()" class="h-10 px-3 rounded border border-outline focus:border-primary outline-none font-normal" required>
+                        <option value="0">0</option><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option><option value="6">6</option><option value="7">7</option><option value="8">8</option><option value="Other">Other</option>
+                    </select>
+                    <input type="number" id="f-children-other" class="h-10 px-3 mt-1 rounded border border-outline hidden focus:border-primary outline-none font-normal" placeholder="Specify number">
+                </label>
+                <label class="flex flex-col gap-1 font-semibold">NIN / Passport <span class="req">*</span>
+                    <input type="text" id="f-nin" class="h-10 px-3 rounded border border-outline focus:border-primary outline-none font-normal" required>
+                    <div id="f-nin-warn" class="hidden text-xs text-error font-semibold flex items-center gap-1 mt-1 bg-red-50 p-2 rounded border border-red-200">
+                        <span class="material-symbols-outlined text-[16px] text-error shrink-0">warning</span>
+                        <span id="f-nin-warn-text">This has already been entered</span>
+                    </div>
+                </label>
+                <label class="flex flex-col gap-1 font-semibold">NASSIT No. <span class="req">*</span>
+                    <input type="text" id="f-nassit" class="h-10 px-3 rounded border border-outline focus:border-primary outline-none font-normal" required>
+                    <div id="f-nassit-warn" class="hidden text-xs text-error font-semibold flex items-center gap-1 mt-1 bg-red-50 p-2 rounded border border-red-200">
+                        <span class="material-symbols-outlined text-[16px] text-error shrink-0">warning</span>
+                        <span id="f-nassit-warn-text">This has already been entered</span>
+                    </div>
+                </label>
+                <label class="flex flex-col gap-1 font-semibold md:col-span-2">Residential Address <span class="req">*</span>
+                    <textarea id="f-address" class="h-20 py-2 px-3 rounded border border-outline focus:border-primary outline-none font-normal" required></textarea>
+                </label>
+            </div>
+        </div>
+
+        <!-- STEP 2: EMERGENCY -->
+        <div id="step-2" class="step-content hidden-step">
+            <h3 class="text-xl font-bold text-error mb-6 flex items-center gap-2"><span class="material-symbols-outlined">emergency</span> EMERGENCY CONTACT INFORMATION</h3>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                <label class="flex flex-col gap-1 font-semibold">Emergency Contact Person <span class="req">*</span>
+                    <input type="text" id="e-name" class="h-10 px-3 rounded border border-outline focus:border-primary outline-none font-normal" required>
+                </label>
+                <label class="flex flex-col gap-1 font-semibold">Relationship <span class="req">*</span>
+                    <select id="e-rel" class="h-10 px-3 rounded border border-outline focus:border-primary outline-none font-normal" required>
+                        <option value="">Select Relationship...</option><option value="Spouse">Spouse</option><option value="Parent">Parent</option><option value="Brother">Brother</option><option value="Sister">Sister</option><option value="Child">Child</option><option value="Relative">Relative</option><option value="Friend">Friend</option><option value="Guardian">Guardian</option><option value="Other">Other</option>
+                    </select>
+                </label>
+                <label class="flex flex-col gap-1 font-semibold">Phone Number <span class="req">*</span>
+                    <input type="tel" id="e-phone" class="h-10 px-3 rounded border border-outline focus:border-primary outline-none font-normal" required>
+                </label>
+                <label class="flex flex-col gap-1 font-semibold">Email Address (Optional)
+                    <input type="email" id="e-email" class="h-10 px-3 rounded border border-outline focus:border-primary outline-none font-normal">
+                </label>
+                <label class="flex flex-col gap-1 font-semibold md:col-span-2">Address <span class="req">*</span>
+                    <textarea id="e-address" class="h-20 py-2 px-3 rounded border border-outline focus:border-primary outline-none font-normal" required></textarea>
+                </label>
+            </div>
+        </div>
+
+        <!-- STEP 3: EMPLOYMENT -->
+        <div id="step-3" class="step-content hidden-step">
+            <h3 class="text-xl font-bold text-secondary mb-6 flex items-center gap-2"><span class="material-symbols-outlined">work</span> EMPLOYMENT INFORMATION</h3>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                <label class="flex flex-col gap-1 font-semibold">Department <span class="req">*</span>
+                    <select id="emp-dept" onchange="autoSyncDepartmentDirector()" class="h-10 px-3 rounded border border-outline focus:border-primary outline-none font-normal" required>
+                        <option value="">Select Department...</option><option value="Executive Management">Executive Management</option><option value="Finance Department">Finance Department</option><option value="Health & Safety Department">Health & Safety Department</option><option value="Human Resources Management Department">Human Resources Management Department</option><option value="Information Technology (IT) Department">Information Technology (IT) Department</option><option value="Internal Risk & Audits Department">Internal Risk & Audits Department</option><option value="Legal & Communication Department">Legal & Communication Department</option><option value="Procurement Department">Procurement Department</option><option value="Programs Department">Programs Department</option>
+                    </select>
+                </label>
+                <label class="flex flex-col gap-1 font-semibold">Position / Title <span class="req">*</span>
+                    <input type="text" id="emp-title" class="h-10 px-3 rounded border border-outline focus:border-primary outline-none font-normal" required>
+                </label>
+                <label class="flex flex-col gap-1 font-semibold">Unit <span class="req">*</span>
+                    <input type="text" id="emp-unit" class="h-10 px-3 rounded border border-outline focus:border-primary outline-none font-normal" required>
+                </label>
+                <label class="flex flex-col gap-1 font-semibold">Management Level <span class="req">*</span>
+                    <select id="emp-mgmt" class="h-10 px-3 rounded border border-outline focus:border-primary outline-none font-normal" required>
+                        <option value="">Select Level...</option><option value="Governing Board">Governing Board</option><option value="Board of Trustees">Board of Trustees</option><option value="Board of Directors">Board of Directors</option><option value="Top Management">Top Management</option><option value="Middle Management">Middle Management</option><option value="Lower Management">Lower Management</option><option value="Employee">Employee</option><option value="Volunteer">Volunteer</option><option value="Intern">Intern</option>
+                    </select>
+                </label>
+                <label class="flex flex-col gap-1 font-semibold">Classification Type <span class="req">*</span>
+                    <select id="emp-class" onchange="handleClassification()" class="h-10 px-3 rounded border border-outline focus:border-primary outline-none font-normal" required>
+                        <option value="">Select Type...</option><option value="Permanent">Permanent</option><option value="Fixed-Term Contract">Fixed-Term Contract</option><option value="Part-Time">Part-Time</option><option value="Casual">Casual</option><option value="Consultant">Consultant</option><option value="Volunteer">Volunteer</option><option value="Intern">Intern</option>
+                    </select>
+                </label>
+                <label class="flex flex-col gap-1 font-semibold">Job Level <span class="req">*</span>
+                    <select id="emp-level" onchange="autoSyncDepartmentDirector()" class="h-10 px-3 rounded border border-outline focus:border-primary outline-none font-normal" required>
+                        <option value="">Select Job Level...</option><option value="Executive">Executive</option><option value="Director">Director</option><option value="Manager">Manager</option><option value="Assistant Manager">Assistant Manager</option><option value="Officer">Officer</option><option value="Assistant">Assistant</option><option value="Support Staff">Support Staff</option>
+                    </select>
+                </label>
+                <label class="flex flex-col gap-1 font-semibold">Employment Date <span class="req">*</span>
+                    <input type="date" id="emp-date" class="h-10 px-3 rounded border border-outline focus:border-primary outline-none font-normal" required>
+                </label>
+                <label class="flex flex-col gap-1 font-semibold">Current Status <span class="req">*</span>
+                    <select id="emp-status" class="h-10 px-3 rounded border border-outline focus:border-primary outline-none font-normal" required>
+                        <option value="Active">Active</option><option value="Probation">Probation</option><option value="Leave">Leave</option><option value="Suspended">Suspended</option><option value="Resigned">Resigned</option><option value="Terminated">Terminated</option><option value="Retired">Retired</option><option value="Inactive">Inactive</option>
+                    </select>
+                </label>
+                
+                <div id="contract-dates-wrap" class="col-span-1 md:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-5 hidden">
+                    <label class="flex flex-col gap-1 font-semibold text-tertiary">Contract Start Date <span class="req">*</span>
+                        <input type="date" id="emp-con-start" class="h-10 px-3 rounded border border-outline focus:border-primary outline-none font-normal">
+                    </label>
+                    <label class="flex flex-col gap-1 font-semibold text-tertiary">Contract End Date <span class="req">*</span>
+                        <input type="date" id="emp-con-end" class="h-10 px-3 rounded border border-outline focus:border-primary outline-none font-normal">
+                    </label>
+                </div>
+            </div>
+        </div>
+
+        <!-- STEP 4: WORK LOCATION -->
+        <div id="step-4" class="step-content hidden-step">
+            <h3 class="text-xl font-bold text-primary mb-6 flex items-center gap-2"><span class="material-symbols-outlined">location_on</span> WORK LOCATION AND REPORTING</h3>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                <label class="flex flex-col gap-1 font-semibold md:col-span-2">Working Location/Address <span class="req">*</span>
+                    <input type="text" id="w-loc" class="h-10 px-3 rounded border border-outline focus:border-primary outline-none font-normal" required>
+                </label>
+                <label class="flex flex-col gap-1 font-semibold">Reports To (Supervisor/Manager) <span class="req">*</span>
+                    <input type="text" id="w-reports" class="h-10 px-3 rounded border border-outline focus:border-primary outline-none font-normal" required placeholder="Name of Manager/Director">
+                </label>
+                <label class="flex flex-col gap-1 font-semibold">Working Phone Number <span class="req">*</span>
+                    <input type="tel" id="w-phone" class="h-10 px-3 rounded border border-outline focus:border-primary outline-none font-normal" required>
+                </label>
+                <label class="flex flex-col gap-1 font-semibold md:col-span-2">Working Email Address <span class="req">*</span>
+                    <input type="email" id="w-email" class="h-10 px-3 rounded border border-outline focus:border-primary outline-none font-normal" required>
+                </label>
+            </div>
+            
+            <h4 class="font-bold text-secondary text-sm border-b border-outline pb-2 mt-8 mb-4 uppercase">Probation Period (3 Months Auto-Calc)</h4>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                <label class="flex flex-col gap-1 font-semibold">Probation Start Date
+                    <input type="date" id="w-prob-start" onchange="calcProbation()" class="h-10 px-3 rounded border border-outline focus:border-primary outline-none font-normal">
+                    <span class="text-[11px] text-primary font-medium mt-0.5">Automatically synced with Employment Date (can be customized if required).</span>
+                </label>
+                <label class="flex flex-col gap-1 font-semibold text-on-surface-variant">Probation End Date (Calculated)
+                    <input type="date" id="w-prob-end" class="h-10 px-3 rounded border border-outline bg-surface-container font-normal text-primary font-bold outline-none" readonly>
+                </label>
+            </div>
+        </div>
+
+        <!-- STEP 5: EDUCATION -->
+        <div id="step-5" class="step-content hidden-step">
+            <div class="flex items-center justify-between mb-6">
+                <h3 class="text-xl font-bold text-primary flex items-center gap-2"><span class="material-symbols-outlined">school</span> EDUCATION</h3>
+                <button type="button" onclick="addEdu()" class="bg-primary text-white px-3 py-1.5 rounded text-sm font-semibold hover:bg-primary-dark transition">+ Add Qualification</button>
+            </div>
+            
+            <div id="edu-container" class="flex flex-col gap-6">
+                <!-- Edu items populated here -->
+            </div>
+        </div>
+
+        <!-- STEP 6: EXPERIENCE -->
+        <div id="step-6" class="step-content hidden-step">
+            <div class="flex items-center justify-between mb-6">
+                <h3 class="text-xl font-bold text-secondary flex items-center gap-2"><span class="material-symbols-outlined">history</span> EXPERIENCE</h3>
+                <button type="button" onclick="addExp()" class="bg-secondary text-white px-3 py-1.5 rounded text-sm font-semibold hover:bg-blue-700 transition">+ Add Experience</button>
+            </div>
+            <p class="text-sm text-on-surface-variant mb-4 italic">This section is optional. Leave blank if not applicable.</p>
+            
+            <div id="exp-container" class="flex flex-col gap-6">
+                <!-- Exp items populated here -->
+            </div>
+        </div>
+
+        <!-- STEP 7: SKILLS -->
+        <div id="step-7" class="step-content hidden-step">
+            <h3 class="text-xl font-bold text-tertiary mb-6 flex items-center gap-2"><span class="material-symbols-outlined">psychology</span> SKILLS & COMPETENCIES</h3>
+            <p class="text-sm text-on-surface-variant mb-4 italic">Optional. Enter skills separated by commas.</p>
+            <div class="grid grid-cols-1 gap-5">
+                <label class="flex flex-col gap-1 font-semibold">Skills
+                    <textarea id="skills-text" placeholder="Microsoft Excel, Power BI, SQL, Python, Project Management..." class="h-32 py-3 px-4 rounded border border-outline focus:border-primary outline-none font-normal"></textarea>
+                </label>
+            </div>
+        </div>
+
+        <!-- STEP 8: FINANCE & BANKING -->
+        <div id="step-8" class="step-content hidden-step">
+            <h3 class="text-xl font-bold text-primary mb-6 flex items-center gap-2"><span class="material-symbols-outlined">account_balance</span> FINANCE & BANKING</h3>
+            <p class="text-sm text-error mb-4 font-semibold">All fields are required. For security, sensitive banking information should only be visible to authorized users.</p>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                <label class="flex flex-col gap-1 font-semibold">Bank Name <span class="req">*</span>
+                    <input type="text" id="bank-name" class="h-10 px-3 rounded border border-outline focus:border-primary outline-none font-normal" required placeholder="e.g. Sierra Leone Commercial Bank (SLCB)">
+                </label>
+                <label class="flex flex-col gap-1 font-semibold">Account Name <span class="req">*</span>
+                    <input type="text" id="bank-acc-name" class="h-10 px-3 rounded border border-outline focus:border-primary outline-none font-normal" required placeholder="Account Holder Name as on Bank Records">
+                </label>
+                <label class="flex flex-col gap-1 font-semibold">Account Number <span class="req">*</span>
+                    <input type="text" id="bank-acc" class="h-10 px-3 rounded border border-outline focus:border-primary outline-none font-normal" required minlength="8">
+                    <div id="bank-acc-warn" class="hidden text-xs text-error font-semibold flex items-center gap-1 mt-1 bg-red-50 p-2 rounded border border-red-200">
+                        <span class="material-symbols-outlined text-[16px] text-error shrink-0">warning</span>
+                        <span id="bank-acc-warn-text">This has already been entered</span>
+                    </div>
+                </label>
+                <label class="flex flex-col gap-1 font-semibold">Account Type <span class="req">*</span>
+                    <select id="bank-type" class="h-10 px-3 rounded border border-outline focus:border-primary outline-none font-normal" required>
+                        <option value="">Select Type...</option><option value="Savings">Savings</option><option value="Fixed">Fixed</option><option value="Current">Current</option>
+                    </select>
+                </label>
+                <label class="flex flex-col gap-1 font-semibold">BBAN Number <span class="req">*</span>
+                    <input type="text" id="bank-bban" class="h-10 px-3 rounded border border-outline focus:border-primary outline-none font-normal" required>
+                    <div id="bank-bban-warn" class="hidden text-xs text-error font-semibold flex items-center gap-1 mt-1 bg-red-50 p-2 rounded border border-red-200">
+                        <span class="material-symbols-outlined text-[16px] text-error shrink-0">warning</span>
+                        <span id="bank-bban-warn-text">This has already been entered</span>
+                    </div>
+                </label>
+            </div>
+        </div>
+
+        <!-- STEP 9: SALARY & PAYROLL -->
+        <div id="step-9" class="step-content hidden-step">
+            <h3 class="text-xl font-bold text-secondary mb-6 flex items-center gap-2"><span class="material-symbols-outlined">payments</span> SALARY & PAYROLL CONFIGURATION</h3>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 bg-surface-container-low p-5 rounded border border-outline mb-6">
+                <label class="flex flex-col gap-1 font-semibold">Basic Salary (NLe)
+                    <input type="number" id="pay-basic" value="0" oninput="calcPayroll()" class="h-10 px-3 rounded border border-outline focus:border-primary outline-none font-normal">
+                </label>
+                <label class="flex flex-col gap-1 font-semibold">Salary Increase (%)
+                    <input type="number" id="pay-inc" value="0" oninput="calcPayroll()" class="h-10 px-3 rounded border border-outline focus:border-primary outline-none font-normal">
+                </label>
+                <label class="flex flex-col gap-1 font-semibold">Mid-Month Advance Applied
+                    <select id="pay-adv" onchange="calcPayroll()" class="h-10 px-3 rounded border border-outline focus:border-primary outline-none font-normal">
+                        <option value="10">10% Advance</option><option value="5">5% Advance</option><option value="0">No Advance</option>
+                    </select>
+                </label>
+                <label class="flex flex-col gap-1 font-semibold">Staff Loan Deduction (Monthly NLe)
+                    <input type="number" id="pay-loan" value="0" oninput="calcPayroll()" class="h-10 px-3 rounded border border-outline focus:border-primary outline-none font-normal">
+                </label>
+            </div>
+            
+            <div id="payroll-allowances" class="mb-6 flex flex-col gap-3">
+                <div class="flex items-center justify-between">
+                    <h4 class="font-bold text-sm">Other Allowances & Deductions</h4>
+                    <button type="button" onclick="addPayItem()" class="text-xs text-primary font-bold hover:underline">+ Add Custom Item</button>
+                </div>
+                <div id="pay-items-container" class="flex flex-col gap-2"></div>
+            </div>
+
+            <!-- PAYROLL PREVIEW -->
+            <div class="border border-outline rounded overflow-hidden">
+                <table class="w-full text-left text-[10pt] border-collapse bg-surface">
+                    <thead>
+                        <tr class="bg-primary text-white"><th class="p-2 border-r border-primary-dark">DESCRIPTION</th><th class="p-2 border-r border-primary-dark">DETAILS</th><th class="p-2 text-right border-r border-primary-dark">AMOUNT</th><th class="p-2 text-right">FINAL</th></tr>
+                    </thead>
+                    <tbody class="divide-y divide-outline">
+                        <tr class="bg-surface-container-low font-bold text-primary"><td colspan="4" class="p-1.5 pl-2">A. EARNINGS</td></tr>
+                        <tr><td class="p-2">Basic Salary</td><td class="p-2 text-on-surface-variant text-xs">Current Monthly Basic</td><td class="p-2 text-right" id="v-pay-b">0.00</td><td class="p-2 text-right font-bold" id="v-pay-b-fin">0.00</td></tr>
+                        <tr><td class="p-2">% Salary Increase</td><td class="p-2 text-on-surface-variant text-xs" id="v-pay-inc-p">0%</td><td class="p-2 text-right" id="v-pay-inc">0.00</td><td class="p-2 text-right"></td></tr>
+                        <tr class="bg-surface-container"><td class="p-2 font-bold">Gross Monthly Salary</td><td class="p-2 text-on-surface-variant text-xs">Basic + Increase</td><td class="p-2 text-right font-bold" id="v-pay-gross">0.00</td><td class="p-2 text-right font-bold" id="v-pay-gross-fin">0.00</td></tr>
+                        
+                        <tr class="bg-error/10 font-bold text-error"><td colspan="4" class="p-1.5 pl-2">B. STATUTORY DEDUCTIONS</td></tr>
+                        <tr><td class="p-2 text-error">NRA — PAYE Tax (30%)</td><td class="p-2 text-on-surface-variant text-xs">Gross × 30%</td><td class="p-2 text-right text-error" id="v-pay-nra">0.00</td><td class="p-2 text-right font-bold text-error" id="v-pay-after">0.00</td></tr>
+                        <tr><td class="p-2">NASSIT Employer (10%)</td><td class="p-2 text-on-surface-variant text-xs">10% of Net-of-Tax</td><td class="p-2 text-right" id="v-pay-naser">0.00</td><td class="p-2 text-right"></td></tr>
+                        <tr><td class="p-2">NASSIT Employee (5%)</td><td class="p-2 text-on-surface-variant text-xs">5% of Net-of-Tax</td><td class="p-2 text-right text-error" id="v-pay-nasee">0.00</td><td class="p-2 text-right"></td></tr>
+                        <tr class="bg-surface-container"><td class="p-2 font-bold">Total NASSIT</td><td class="p-2 text-on-surface-variant text-xs">Employer + Employee</td><td class="p-2 text-right font-bold" id="v-pay-nastot">0.00</td><td class="p-2 text-right font-bold" id="v-pay-nastot-fin">0.00</td></tr>
+                        
+                        <tr class="bg-surface-container-low font-bold text-secondary"><td colspan="4" class="p-1.5 pl-2">C. MID-MONTH SALARY ADVANCE</td></tr>
+                        <tr><td class="p-2">Mid-Month Advance Applied</td><td class="p-2 text-on-surface-variant text-xs" id="v-pay-adv-lbl">10% Advance</td><td class="p-2 text-right text-error" id="v-pay-adv">0.00</td><td class="p-2 text-right font-bold text-error" id="v-pay-adv-fin">0.00</td></tr>
+                        
+                        <tr class="bg-error/10 font-bold text-error"><td colspan="4" class="p-1.5 pl-2">D. OTHER DEDUCTIONS</td></tr>
+                        <tr><td class="p-2">Staff Loan Deduction</td><td class="p-2 text-on-surface-variant text-xs">Monthly Repayment</td><td class="p-2 text-right text-error" id="v-pay-loan">0.00</td><td class="p-2 text-right font-bold text-error" id="v-pay-loan-fin">0.00</td></tr>
+                        <tr><td class="p-2">Custom Deductions</td><td class="p-2 text-on-surface-variant text-xs">Combined</td><td class="p-2 text-right text-error" id="v-pay-cust-ded">0.00</td><td class="p-2 text-right text-error" id="v-pay-cust-ded-fin">0.00</td></tr>
+                        
+                        <tr class="bg-surface-container-low font-bold text-primary"><td colspan="4" class="p-1.5 pl-2">E. ALLOWANCES</td></tr>
+                        <tr><td class="p-2">Duty Allowance (2% of Gross)</td><td class="p-2 text-on-surface-variant text-xs">Gross × 2%</td><td class="p-2 text-right text-primary" id="v-pay-duty">0.00</td><td class="p-2 text-right font-bold text-primary" id="v-pay-duty-fin">0.00</td></tr>
+                        <tr><td class="p-2">Custom Allowances</td><td class="p-2 text-on-surface-variant text-xs">Combined</td><td class="p-2 text-right text-primary" id="v-pay-cust-all">0.00</td><td class="p-2 text-right text-primary" id="v-pay-cust-all-fin">0.00</td></tr>
+                        
+                        <tr class="bg-on-surface text-white text-lg"><td class="p-3 font-bold" colspan="2">TOTAL NET PAY</td><td class="p-3 text-right" id="v-pay-net-1">0.00</td><td class="p-3 text-right font-bold text-secondary-container" style="color: #6cf8bb;" id="v-pay-net">0.00</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- STEP 10: REVIEW -->
+        <div id="step-10" class="step-content hidden-step">
+            <h3 class="text-xl font-bold text-primary mb-6 flex items-center gap-2"><span class="material-symbols-outlined">rule</span> REVIEW STAFF REGISTRATION</h3>
+            <p class="text-sm text-on-surface-variant mb-6">Please review all information carefully before saving. You can edit any section by clicking the Edit buttons.</p>
+            
+            <div id="review-container" class="flex flex-col gap-4">
+                <!-- Injected by JS -->
+            </div>
+            
+            <div id="validation-errors" class="mt-6 p-4 bg-error/10 border border-error/30 rounded text-error text-sm font-semibold hidden flex flex-col gap-1"></div>
+        </div>
+
+        </form>
+        
+        <!-- BOTTOM ACTIONS -->
+        <div class="absolute bottom-0 left-0 w-full h-20 border-t border-outline bg-surface rounded-b-xl flex items-center justify-between px-6 z-10 shadow-[0_-4px_10px_rgba(0,0,0,0.02)]">
+            <button type="button" id="btn-prev" onclick="navStep(-1)" class="px-5 py-2.5 rounded font-bold text-on-surface-variant border border-outline hover:bg-surface-container transition disabled:opacity-50 disabled:cursor-not-allowed">← Previous</button>
+            <div class="flex gap-3">
+                <button type="button" id="btn-draft" onclick="saveDraft()" class="hidden md:block px-5 py-2.5 rounded font-bold text-secondary border border-secondary hover:bg-secondary/10 transition">Save & Draft</button>
+                <button type="button" id="btn-next" onclick="navStep(1)" class="px-8 py-2.5 rounded font-bold text-white bg-primary hover:bg-primary-dark transition shadow-md">Next →</button>
+                <button type="button" id="btn-save" onclick="saveAndRegister()" class="hidden px-8 py-2.5 rounded font-bold text-white bg-secondary hover:bg-blue-800 transition shadow-md">Save & Register</button>
+            </div>
+        </div>
+    </div>
+</main>
+
+<script>
+    const STEPS = [
+        { id: 1, label: 'Personal', icon: 'person' },
+        { id: 2, label: 'Emergency', icon: 'emergency' },
+        { id: 3, label: 'Employment', icon: 'work' },
+        { id: 4, label: 'Work Loc.', icon: 'location_on' },
+        { id: 5, label: 'Education', icon: 'school' },
+        { id: 6, label: 'Experience', icon: 'history' },
+        { id: 7, label: 'Skills', icon: 'psychology' },
+        { id: 8, label: 'Finance', icon: 'account_balance' },
+        { id: 9, label: 'Salary', icon: 'payments' },
+        { id: 10, label: 'Review', icon: 'rule' },
+    ];
+    let currentStep = 1;
+
+    // ─── PASSPORT PHOTO & WHITE BACKGROUND TRIMMING ENGINE ──────────────
+    let currentPassportPhoto = null;
+    let rawOriginalPhoto = null;
+    let cameraStream = null;
+    let currentCameraFacing = 'user';
+    const PASSPORT_WIDTH = 420;
+    const PASSPORT_HEIGHT = 540;
+
+    // MediaPipe Selfie Segmentation instance
+    let selfieSegmenter = null;
+    let isMediaPipeReady = false;
+
+    function initMediaPipe() {
+        if (typeof SelfieSegmentation !== 'undefined' && !selfieSegmenter) {
+            try {
+                selfieSegmenter = new SelfieSegmentation({
+                    locateFile: (file) => `https://cdn.jsdelivr.net/npm/@mediapipe/selfie_segmentation/${file}`
+                });
+                selfieSegmenter.setOptions({
+                    modelSelection: 1 // 1 = landscape/portrait model (more detailed for portraits)
+                });
+                isMediaPipeReady = true;
+            } catch (err) {
+                console.warn('MediaPipe initialization notice:', err);
+            }
+        }
+    }
+
+    // Attempt init on page load
+    window.addEventListener('load', () => {
+        setTimeout(initMediaPipe, 200);
+    });
+
+    // 1. AI Cutout via MediaPipe Selfie Segmentation
+    function runMediaPipeCutout(canvasSource) {
+        return new Promise((resolve, reject) => {
+            initMediaPipe();
+            if (!selfieSegmenter) {
+                return reject(new Error('MediaPipe not initialized'));
+            }
+
+            let timeoutId = setTimeout(() => {
+                reject(new Error('MediaPipe segmentation timeout'));
+            }, 5000);
+
+            selfieSegmenter.onResults((results) => {
+                clearTimeout(timeoutId);
+                try {
+                    const outCanvas = document.createElement('canvas');
+                    outCanvas.width = canvasSource.width;
+                    outCanvas.height = canvasSource.height;
+                    const ctx = outCanvas.getContext('2d');
+
+                    // A. Solid pure white background (#FFFFFF)
+                    ctx.fillStyle = '#FFFFFF';
+                    ctx.fillRect(0, 0, outCanvas.width, outCanvas.height);
+
+                    // B. Draw segmentation mask
+                    const maskCanvas = document.createElement('canvas');
+                    maskCanvas.width = canvasSource.width;
+                    maskCanvas.height = canvasSource.height;
+                    const maskCtx = maskCanvas.getContext('2d');
+                    maskCtx.drawImage(results.segmentationMask, 0, 0, outCanvas.width, outCanvas.height);
+
+                    // C. Composite source image masked over white
+                    const personCanvas = document.createElement('canvas');
+                    personCanvas.width = outCanvas.width;
+                    personCanvas.height = outCanvas.height;
+                    const pCtx = personCanvas.getContext('2d');
+                    pCtx.drawImage(canvasSource, 0, 0);
+
+                    // Mask person
+                    pCtx.globalCompositeOperation = 'destination-in';
+                    pCtx.drawImage(maskCanvas, 0, 0);
+
+                    // Draw person onto solid white
+                    ctx.drawImage(personCanvas, 0, 0);
+
+                    resolve(outCanvas);
+                } catch(e) {
+                    reject(e);
+                }
+            });
+
+            selfieSegmenter.send({ image: canvasSource }).catch(reject);
+        });
+    }
+
+    // 2. High-Precision Smart Deep Cutout (Offline & Fallback Algorithmic Engine)
+    function smartDeepCutout(canvas) {
+        return new Promise((resolve) => {
+            try {
+                const W = canvas.width;
+                const H = canvas.height;
+                const ctx = canvas.getContext('2d', { willReadFrequently: true });
+                const imgData = ctx.getImageData(0, 0, W, H);
+                const data = imgData.data;
+
+                // Central passport head & torso zones
+                const headCenterX = W / 2;
+                const headCenterY = H * 0.38;
+                const headRadiusX = W * 0.36;
+                const headRadiusY = H * 0.38;
+
+                function inHeadZone(x, y) {
+                    const dx = (x - headCenterX) / headRadiusX;
+                    const dy = (y - headCenterY) / headRadiusY;
+                    return (dx * dx + dy * dy) <= 1.0;
+                }
+
+                function inBodyZone(x, y) {
+                    if (y < H * 0.35) return false;
+                    const dx = Math.abs(x - W / 2);
+                    const spread = (W * 0.26) + ((y - H * 0.35) / (H * 0.65)) * (W * 0.39);
+                    return dx <= spread;
+                }
+
+                function isSkinTone(r, g, b) {
+                    return (r > 90 && g > 40 && b > 20 && (r > g) && (r > b) && (Math.abs(r - g) > 12));
+                }
+
+                function isPlantGreen(r, g, b) {
+                    return (g > r + 10 && g > b + 10) || (g > 70 && r < 125 && b < 120);
+                }
+
+                function isWarmLampOrBeige(r, g, b) {
+                    return (r > 150 && g > 115 && b < 110) || (r > 180 && g > 150 && b < 140);
+                }
+
+                function isNeutralWall(r, g, b) {
+                    const lum = 0.299 * r + 0.587 * g + 0.114 * b;
+                    return lum > 140 && Math.abs(r - g) < 26 && Math.abs(g - b) < 26;
+                }
+
+                const visited = new Uint8Array(W * H);
+                const isBg = new Uint8Array(W * H);
+                const queue = [];
+
+                // Push top border
+                for (let x = 0; x < W; x++) {
+                    queue.push(x, 0);
+                    visited[x] = 1;
+                }
+                // Push left & right borders down to 85%
+                for (let y = 1; y < Math.floor(H * 0.85); y++) {
+                    queue.push(0, y);
+                    visited[y * W] = 1;
+                    queue.push(W - 1, y);
+                    visited[y * W + (W - 1)] = 1;
+                }
+
+                let qHead = 0;
+                while (qHead < queue.length) {
+                    const cx = queue[qHead++];
+                    const cy = queue[qHead++];
+                    const pIdx = cy * W + cx;
+                    const dIdx = pIdx * 4;
+
+                    const r = data[dIdx];
+                    const g = data[dIdx + 1];
+                    const b = data[dIdx + 2];
+
+                    let isBackgroundPixel = false;
+
+                    if (!inHeadZone(cx, cy) && !inBodyZone(cx, cy)) {
+                        isBackgroundPixel = true;
+                    } else if (isPlantGreen(r, g, b) || isWarmLampOrBeige(r, g, b) || isNeutralWall(r, g, b)) {
+                        if (!isSkinTone(r, g, b)) {
+                            isBackgroundPixel = true;
+                        }
+                    }
+
+                    if (isBackgroundPixel) {
+                        isBg[pIdx] = 1;
+                        const nbrs = [
+                            [cx + 1, cy],
+                            [cx - 1, cy],
+                            [cx, cy + 1],
+                            [cx, cy - 1]
+                        ];
+                        for (let i = 0; i < 4; i++) {
+                            const nx = nbrs[i][0];
+                            const ny = nbrs[i][1];
+                            if (nx >= 0 && nx < W && ny >= 0 && ny < H) {
+                                const nIdx = ny * W + nx;
+                                if (!visited[nIdx]) {
+                                    visited[nIdx] = 1;
+                                    queue.push(nx, ny);
+                                }
+                            }
+                        }
+                    }
+                }
+
+                // Bleach corners and outside-head non-skin artifacts
+                for (let y = 0; y < H; y++) {
+                    for (let x = 0; x < W; x++) {
+                        const pIdx = y * W + x;
+                        const dIdx = pIdx * 4;
+                        const r = data[dIdx];
+                        const g = data[dIdx + 1];
+                        const b = data[dIdx + 2];
+
+                        if (y < H * 0.32 && (x < W * 0.22 || x > W * 0.78)) {
+                            isBg[pIdx] = 1;
+                        }
+                        if (!inHeadZone(x, y) && (isPlantGreen(r, g, b) || isWarmLampOrBeige(r, g, b) || isNeutralWall(r, g, b))) {
+                            if (!isSkinTone(r, g, b)) {
+                                isBg[pIdx] = 1;
+                            }
+                        }
+                    }
+                }
+
+                // Render solid #FFFFFF with soft edge blending
+                for (let y = 0; y < H; y++) {
+                    for (let x = 0; x < W; x++) {
+                        const pIdx = y * W + x;
+                        const dIdx = pIdx * 4;
+
+                        if (isBg[pIdx]) {
+                            data[dIdx] = 255;
+                            data[dIdx + 1] = 255;
+                            data[dIdx + 2] = 255;
+                            data[dIdx + 3] = 255;
+                        } else {
+                            let bgNeighbors = 0;
+                            if (x > 0 && isBg[pIdx - 1]) bgNeighbors++;
+                            if (x < W - 1 && isBg[pIdx + 1]) bgNeighbors++;
+                            if (y > 0 && isBg[pIdx - W]) bgNeighbors++;
+                            if (y < H - 1 && isBg[pIdx + W]) bgNeighbors++;
+
+                            if (bgNeighbors > 0) {
+                                const blend = 0.28 * bgNeighbors;
+                                data[dIdx] = Math.round(data[dIdx] * (1 - blend) + 255 * blend);
+                                data[dIdx + 1] = Math.round(data[dIdx] * (1 - blend) + 255 * blend);
+                                data[dIdx + 2] = Math.round(data[dIdx] * (1 - blend) + 255 * blend);
+                            }
+                        }
+                    }
+                }
+
+                ctx.putImageData(imgData, 0, 0);
+                resolve(canvas.toDataURL('image/jpeg', 0.95));
+            } catch (err) {
+                console.error('smartDeepCutout failed:', err);
+                resolve(canvas.toDataURL('image/jpeg', 0.90));
+            }
+        });
+    }
+
+    // ─── PASSPORT STUDIO STATE & CONTROLS ───────────────────────────────
+    let studioState = {
+        img: null,            // Image object
+        zoom: 1.25,           // Default passport zoom (1.25x fits head & shoulders with clearance)
+        panX: 0,              // Horizontal offset
+        panY: -15,            // Gentle lift to center head & shoulders inside the passport oval
+        isDragging: false,
+        dragStartX: 0,
+        dragStartY: 0,
+        brushMode: false,
+        brushSize: 26,
+        isBrushing: false,
+        history: []           // For Undo
+    };
+
+    function openPhotoStudioModal() {
+        if (!rawOriginalPhoto && !currentPassportPhoto) {
+            alert('Please upload or capture a photo first.');
+            return;
+        }
+
+        const modal = document.getElementById('photo-studio-modal');
+        if (modal) modal.classList.remove('hidden');
+
+        if (!studioState.img) {
+            if (rawOriginalPhoto) {
+                studioState.img = rawOriginalPhoto;
+            } else if (currentPassportPhoto) {
+                const img = new Image();
+                img.onload = () => {
+                    studioState.img = img;
+                    renderStudioCanvas();
+                };
+                img.src = currentPassportPhoto;
+                return;
+            }
+        }
+
+        updateZoomLabel();
+        renderStudioCanvas();
+        setupStudioDragEvents();
+    }
+
+    function closePhotoStudioModal() {
+        const modal = document.getElementById('photo-studio-modal');
+        if (modal) modal.classList.add('hidden');
+        studioState.brushMode = false;
+        const chk = document.getElementById('chk-brush-mode');
+        if (chk) chk.checked = false;
+        toggleBrushMode();
+    }
+
+    function autoFitHeadAndShoulders() {
+        saveStudioSnapshot();
+        studioState.zoom = 1.25;
+        studioState.panX = 0;
+        studioState.panY = -15;
+        const zoomInput = document.getElementById('studio-zoom');
+        if (zoomInput) zoomInput.value = '1.25';
+        updateZoomLabel();
+        renderStudioCanvas();
+    }
+
+    function centerFraming() {
+        saveStudioSnapshot();
+        studioState.panX = 0;
+        renderStudioCanvas();
+    }
+
+    function resetFraming() {
+        saveStudioSnapshot();
+        studioState.zoom = 1.0;
+        studioState.panX = 0;
+        studioState.panY = 0;
+        const zoomInput = document.getElementById('studio-zoom');
+        if (zoomInput) zoomInput.value = '1.0';
+        updateZoomLabel();
+        renderStudioCanvas();
+    }
+
+    function adjustZoom(delta) {
+        saveStudioSnapshot();
+        const zoomInput = document.getElementById('studio-zoom');
+        let newZoom = Math.min(3.5, Math.max(0.8, (studioState.zoom || 1.65) + delta));
+        studioState.zoom = parseFloat(newZoom.toFixed(2));
+        if (zoomInput) zoomInput.value = studioState.zoom;
+        updateZoomLabel();
+        renderStudioCanvas();
+    }
+
+    function onStudioZoomChange(val) {
+        studioState.zoom = parseFloat(val);
+        updateZoomLabel();
+        renderStudioCanvas();
+    }
+
+    function updateZoomLabel() {
+        const lbl = document.getElementById('zoom-value-label');
+        if (lbl) lbl.textContent = Math.round(studioState.zoom * 100) + '%';
+    }
+
+    function toggleStudioGuide() {
+        const chk = document.getElementById('chk-show-guide');
+        const overlay = document.getElementById('studio-guide-overlay');
+        if (overlay) {
+            if (chk && !chk.checked) overlay.classList.add('hidden');
+            else overlay.classList.remove('hidden');
+        }
+    }
+
+    function renderStudioCanvas() {
+        const canvas = document.getElementById('studio-canvas');
+        if (!canvas || !studioState.img) return;
+
+        const ctx = canvas.getContext('2d', { willReadFrequently: true });
+        const W = canvas.width;  // 420
+        const H = canvas.height; // 540
+
+        // Pure solid white background
+        ctx.fillStyle = '#FFFFFF';
+        ctx.fillRect(0, 0, W, H);
+
+        const img = studioState.img;
+        const imgW = img.naturalWidth || img.videoWidth || img.width || W;
+        const imgH = img.naturalHeight || img.videoHeight || img.height || H;
+
+        const targetRatio = W / H;
+        const srcRatio = imgW / imgH;
+
+        let baseW, baseH;
+        if (srcRatio > targetRatio) {
+            baseH = H;
+            baseW = H * srcRatio;
+        } else {
+            baseW = W;
+            baseH = W / srcRatio;
+        }
+
+        const drawW = baseW * studioState.zoom;
+        const drawH = baseH * studioState.zoom;
+        const drawX = (W - drawW) / 2 + studioState.panX;
+        const drawY = (H - drawH) / 2 + studioState.panY;
+
+        ctx.drawImage(img, drawX, drawY, drawW, drawH);
+    }
+
+    function saveStudioSnapshot() {
+        const canvas = document.getElementById('studio-canvas');
+        if (!canvas) return;
+        studioState.history.push(canvas.toDataURL('image/jpeg', 0.92));
+        if (studioState.history.length > 12) studioState.history.shift();
+        const undoBtn = document.getElementById('btn-studio-undo');
+        if (undoBtn) undoBtn.disabled = false;
+    }
+
+    function undoStudioAction() {
+        if (!studioState.history || studioState.history.length === 0) return;
+        const last = studioState.history.pop();
+        const canvas = document.getElementById('studio-canvas');
+        if (!canvas || !last) return;
+        const img = new Image();
+        img.onload = () => {
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(img, 0, 0);
+        };
+        img.src = last;
+        const undoBtn = document.getElementById('btn-studio-undo');
+        if (undoBtn) undoBtn.disabled = studioState.history.length === 0;
+    }
+
+    function whitenOutsideGuideOval() {
+        const canvas = document.getElementById('studio-canvas');
+        if (!canvas) return;
+        saveStudioSnapshot();
+
+        const ctx = canvas.getContext('2d');
+        const W = canvas.width;
+        const H = canvas.height;
+
+        const cx = W / 2;
+        const cy = H * 0.44;
+        const rx = W * 0.42;
+        const ry = H * 0.46;
+
+        ctx.save();
+        ctx.beginPath();
+        ctx.rect(0, 0, W, H);
+        ctx.ellipse(cx, cy, rx, ry, 0, 0, Math.PI * 2, true);
+        ctx.fillStyle = '#FFFFFF';
+        ctx.fill();
+        ctx.restore();
+    }
+
+    async function triggerStudioAIWhiten() {
+        const canvas = document.getElementById('studio-canvas');
+        if (!canvas) return;
+        saveStudioSnapshot();
+
+        const btn = document.getElementById('btn-studio-ai-whiten');
+        const origHtml = btn ? btn.innerHTML : '';
+        if (btn) {
+            btn.disabled = true;
+            btn.innerHTML = `<span class="material-symbols-outlined text-[18px] animate-spin">refresh</span><span>Processing Pure White (#FFFFFF)...</span>`;
+        }
+
+        try {
+            const aiCanvas = await runMediaPipeCutout(canvas);
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(aiCanvas, 0, 0);
+        } catch(e) {
+            console.warn('AI MediaPipe notice, falling back to smart deep cutout:', e);
+            const dataUrl = await smartDeepCutout(canvas);
+            const loaded = new Image();
+            await new Promise(r => { loaded.onload = r; loaded.src = dataUrl; });
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(loaded, 0, 0);
+        } finally {
+            if (btn) {
+                btn.disabled = false;
+                btn.innerHTML = origHtml;
+            }
+        }
+    }
+
+    function toggleBrushMode() {
+        const chk = document.getElementById('chk-brush-mode');
+        studioState.brushMode = chk ? chk.checked : false;
+        const status = document.getElementById('brush-mode-status');
+        const panel = document.getElementById('brush-controls-panel');
+        const canvas = document.getElementById('studio-canvas');
+        const dragHint = document.getElementById('drag-hint');
+
+        if (studioState.brushMode) {
+            if (status) { status.textContent = 'Active (Painting #FFFFFF)'; status.className = 'text-[10px] text-emerald-600 font-bold'; }
+            if (panel) panel.classList.remove('hidden');
+            if (canvas) canvas.style.cursor = 'crosshair';
+            if (dragHint) dragHint.classList.add('hidden');
+        } else {
+            if (status) { status.textContent = 'Off'; status.className = 'text-[10px] text-slate-400 font-semibold'; }
+            if (panel) panel.classList.add('hidden');
+            if (canvas) canvas.style.cursor = 'grab';
+            if (dragHint) dragHint.classList.remove('hidden');
+        }
+    }
+
+    function setBrushSize(size) {
+        studioState.brushSize = size;
+        ['sm', 'md', 'lg'].forEach(s => {
+            const btn = document.getElementById('btn-brush-' + s);
+            if (btn) btn.className = 'px-2 py-0.5 rounded text-[11px] border border-slate-300 hover:bg-slate-100 cursor-pointer';
+        });
+        const activeId = size <= 16 ? 'sm' : (size <= 32 ? 'md' : 'lg');
+        const activeBtn = document.getElementById('btn-brush-' + activeId);
+        if (activeBtn) activeBtn.className = 'px-2 py-0.5 rounded text-[11px] border border-primary bg-primary/10 text-primary font-bold cursor-pointer';
+    }
+
+    function setupStudioDragEvents() {
+        const canvas = document.getElementById('studio-canvas');
+        if (!canvas || canvas._eventsAttached) return;
+        canvas._eventsAttached = true;
+
+        function getCanvasPos(e) {
+            const rect = canvas.getBoundingClientRect();
+            const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+            const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+            const scaleX = canvas.width / rect.width;
+            const scaleY = canvas.height / rect.height;
+            return {
+                x: (clientX - rect.left) * scaleX,
+                y: (clientY - rect.top) * scaleY
+            };
+        }
+
+        function paintWhite(pos) {
+            const ctx = canvas.getContext('2d');
+            ctx.save();
+            ctx.fillStyle = '#FFFFFF';
+            ctx.beginPath();
+            ctx.arc(pos.x, pos.y, studioState.brushSize, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.restore();
+        }
+
+        canvas.addEventListener('mousedown', (e) => {
+            if (studioState.brushMode) {
+                saveStudioSnapshot();
+                studioState.isBrushing = true;
+                paintWhite(getCanvasPos(e));
+            } else {
+                studioState.isDragging = true;
+                studioState.dragStartX = e.clientX - studioState.panX;
+                studioState.dragStartY = e.clientY - studioState.panY;
+                canvas.style.cursor = 'grabbing';
+            }
+        });
+
+        window.addEventListener('mousemove', (e) => {
+            if (studioState.isBrushing && studioState.brushMode) {
+                paintWhite(getCanvasPos(e));
+            } else if (studioState.isDragging && !studioState.brushMode) {
+                studioState.panX = e.clientX - studioState.dragStartX;
+                studioState.panY = e.clientY - studioState.dragStartY;
+                renderStudioCanvas();
+            }
+        });
+
+        window.addEventListener('mouseup', () => {
+            if (studioState.isDragging) {
+                studioState.isDragging = false;
+                if (!studioState.brushMode) canvas.style.cursor = 'grab';
+            }
+            if (studioState.isBrushing) {
+                studioState.isBrushing = false;
+            }
+        });
+
+        // Touch support
+        canvas.addEventListener('touchstart', (e) => {
+            if (e.cancelable) e.preventDefault();
+            if (studioState.brushMode) {
+                saveStudioSnapshot();
+                studioState.isBrushing = true;
+                paintWhite(getCanvasPos(e));
+            } else {
+                studioState.isDragging = true;
+                const touch = e.touches[0];
+                studioState.dragStartX = touch.clientX - studioState.panX;
+                studioState.dragStartY = touch.clientY - studioState.panY;
+            }
+        }, { passive: false });
+
+        window.addEventListener('touchmove', (e) => {
+            if (studioState.isBrushing && studioState.brushMode) {
+                if (e.cancelable) e.preventDefault();
+                paintWhite(getCanvasPos(e));
+            } else if (studioState.isDragging && !studioState.brushMode) {
+                if (e.cancelable) e.preventDefault();
+                const touch = e.touches[0];
+                studioState.panX = touch.clientX - studioState.dragStartX;
+                studioState.panY = touch.clientY - studioState.dragStartY;
+                renderStudioCanvas();
+            }
+        }, { passive: false });
+
+        window.addEventListener('touchend', () => {
+            studioState.isDragging = false;
+            studioState.isBrushing = false;
+        });
+    }
+
+    function saveStudioAndApply() {
+        const canvas = document.getElementById('studio-canvas');
+        if (!canvas) return;
+
+        const dataUrl = canvas.toDataURL('image/jpeg', 0.95);
+        applyPassportPhoto(dataUrl);
+
+        const updatedImg = new Image();
+        updatedImg.src = dataUrl;
+        rawOriginalPhoto = updatedImg;
+
+        closePhotoStudioModal();
+    }
+
+    // ─── APPLY & CLEAR PASSPORT PHOTO ───────────────────────────────────
+    function applyPassportPhoto(dataUrl) {
+        currentPassportPhoto = dataUrl;
+        const preview = document.getElementById('passport-preview');
+        const placeholder = document.getElementById('passport-placeholder');
+        const badge = document.getElementById('photo-status-badge');
+        const btnRemove = document.getElementById('btn-remove-photo');
+        const btnRetrim = document.getElementById('btn-retrim-bg');
+        const btnFit = document.getElementById('btn-fit-adjust');
+        const hoverOverlay = document.getElementById('passport-hover-overlay');
+
+        if (preview) {
+            preview.src = dataUrl;
+            preview.classList.remove('hidden');
+        }
+        if (placeholder) placeholder.classList.add('hidden');
+        if (badge) badge.classList.remove('hidden');
+        if (btnRemove) btnRemove.classList.remove('hidden');
+        if (btnRetrim) btnRetrim.classList.remove('hidden');
+        if (btnFit) btnFit.classList.remove('hidden');
+        if (hoverOverlay) hoverOverlay.classList.remove('hidden');
+    }
+
+    function clearPassportPhoto(e) {
+        if (e) e.stopPropagation();
+        currentPassportPhoto = null;
+        rawOriginalPhoto = null;
+        studioState.img = null;
+        const preview = document.getElementById('passport-preview');
+        const placeholder = document.getElementById('passport-placeholder');
+        const badge = document.getElementById('photo-status-badge');
+        const btnRemove = document.getElementById('btn-remove-photo');
+        const btnRetrim = document.getElementById('btn-retrim-bg');
+        const btnFit = document.getElementById('btn-fit-adjust');
+        const hoverOverlay = document.getElementById('passport-hover-overlay');
+        const fileInput = document.getElementById('photo-file-input');
+
+        if (preview) {
+            preview.src = '';
+            preview.classList.add('hidden');
+        }
+        if (placeholder) placeholder.classList.remove('hidden');
+        if (badge) badge.classList.add('hidden');
+        if (btnRemove) btnRemove.classList.add('hidden');
+        if (btnRetrim) btnRetrim.classList.add('hidden');
+        if (btnFit) btnFit.classList.add('hidden');
+        if (hoverOverlay) hoverOverlay.classList.add('hidden');
+        if (fileInput) fileInput.value = '';
+    }
+
+    // Process newly provided photo: auto-framing + auto-whitening
+    async function processAndApplyNewPhoto(imgSource) {
+        rawOriginalPhoto = imgSource;
+        studioState.img = imgSource;
+        studioState.zoom = 1.25;
+        studioState.panX = 0;
+        studioState.panY = -15;
+
+        // Temporary canvas with passport aspect ratio
+        const canvas = document.createElement('canvas');
+        canvas.width = PASSPORT_WIDTH;
+        canvas.height = PASSPORT_HEIGHT;
+        const ctx = canvas.getContext('2d');
+        ctx.fillStyle = '#FFFFFF';
+        ctx.fillRect(0, 0, PASSPORT_WIDTH, PASSPORT_HEIGHT);
+
+        const imgW = imgSource.naturalWidth || imgSource.videoWidth || imgSource.width || PASSPORT_WIDTH;
+        const imgH = imgSource.naturalHeight || imgSource.videoHeight || imgSource.height || PASSPORT_HEIGHT;
+        const targetRatio = PASSPORT_WIDTH / PASSPORT_HEIGHT;
+        const srcRatio = imgW / imgH;
+
+        let baseW, baseH;
+        if (srcRatio > targetRatio) {
+            baseH = PASSPORT_HEIGHT;
+            baseW = PASSPORT_HEIGHT * srcRatio;
+        } else {
+            baseW = PASSPORT_WIDTH;
+            baseH = PASSPORT_WIDTH / srcRatio;
+        }
+
+        const drawW = baseW * studioState.zoom;
+        const drawH = baseH * studioState.zoom;
+        const drawX = (PASSPORT_WIDTH - drawW) / 2 + studioState.panX;
+        const drawY = (PASSPORT_HEIGHT - drawH) / 2 + studioState.panY;
+
+        ctx.drawImage(imgSource, drawX, drawY, drawW, drawH);
+
+        let trimmedDataUrl = '';
+        try {
+            const aiCanvas = await runMediaPipeCutout(canvas);
+            trimmedDataUrl = aiCanvas.toDataURL('image/jpeg', 0.95);
+        } catch (aiErr) {
+            console.warn('AI segmentation fallback to smart deep cutout:', aiErr);
+            trimmedDataUrl = await smartDeepCutout(canvas);
+        }
+
+        applyPassportPhoto(trimmedDataUrl);
+
+        const outImg = new Image();
+        outImg.onload = () => {
+            studioState.img = outImg;
+            studioState.zoom = 1.0;
+            studioState.panX = 0;
+            studioState.panY = 0;
+        };
+        outImg.src = trimmedDataUrl;
+    }
+
+    function handleDevicePhotoUpload(event) {
+        const file = event.target.files && event.target.files[0];
+        if (!file) return;
+
+        if (!file.type.startsWith('image/')) {
+            alert('Please select a valid image file (JPEG, PNG, WebP).');
+            return;
+        }
+
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            const img = new Image();
+            img.onload = async function() {
+                await processAndApplyNewPhoto(img);
+            };
+            img.src = e.target.result;
+        };
+        reader.readAsDataURL(file);
+    }
+
+    async function reapplyWhiteBackground() {
+        if (!rawOriginalPhoto && !currentPassportPhoto) return;
+        openPhotoStudioModal();
+        setTimeout(async () => {
+            await triggerStudioAIWhiten();
+        }, 150);
+    }
+
+    // Camera handling
+    async function openCameraModal() {
+        const modal = document.getElementById('camera-modal');
+        const banner = document.getElementById('camera-error-banner');
+        if (banner) banner.classList.add('hidden');
+        if (modal) modal.classList.remove('hidden');
+
+        await startCameraStream();
+    }
+
+    async function startCameraStream() {
+        stopCameraStream();
+        const video = document.getElementById('camera-video');
+        const banner = document.getElementById('camera-error-banner');
+        const errorMsg = document.getElementById('camera-error-msg');
+
+        if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+            if (banner) {
+                banner.classList.remove('hidden');
+                if (errorMsg) errorMsg.textContent = 'Camera API is not supported in this browser or environment. Please use "Upload from Device" instead.';
+            }
+            return;
+        }
+
+        try {
+            const stream = await navigator.mediaDevices.getUserMedia({
+                video: {
+                    facingMode: currentCameraFacing,
+                    width: { ideal: 1280 },
+                    height: { ideal: 720 }
+                },
+                audio: false
+            });
+            cameraStream = stream;
+            if (video) {
+                video.srcObject = stream;
+                video.play();
+            }
+        } catch(err) {
+            console.warn('Camera access failed:', err);
+            if (banner) {
+                banner.classList.remove('hidden');
+                if (errorMsg) errorMsg.textContent = 'Unable to access camera (' + (err.message || 'permission denied') + '). Please allow camera access in your browser or use "Upload from Device".';
+            }
+        }
+    }
+
+    function stopCameraStream() {
+        if (cameraStream) {
+            cameraStream.getTracks().forEach(track => track.stop());
+            cameraStream = null;
+        }
+        const video = document.getElementById('camera-video');
+        if (video) video.srcObject = null;
+    }
+
+    function closeCameraModal() {
+        stopCameraStream();
+        const modal = document.getElementById('camera-modal');
+        if (modal) modal.classList.add('hidden');
+    }
+
+    async function switchCamera() {
+        currentCameraFacing = currentCameraFacing === 'user' ? 'environment' : 'user';
+        await startCameraStream();
+    }
+
+    async function captureCameraSnapshot() {
+        const video = document.getElementById('camera-video');
+        if (!video || !video.videoWidth) {
+            alert('Camera stream is not active. Please wait or upload from device.');
+            return;
+        }
+
+        const snapCanvas = document.createElement('canvas');
+        snapCanvas.width = video.videoWidth;
+        snapCanvas.height = video.videoHeight;
+        const snapCtx = snapCanvas.getContext('2d');
+        snapCtx.drawImage(video, 0, 0, video.videoWidth, video.videoHeight);
+
+        const snapImg = new Image();
+        snapImg.onload = async function() {
+            closeCameraModal();
+            await processAndApplyNewPhoto(snapImg);
+        };
+        snapImg.src = snapCanvas.toDataURL('image/jpeg', 0.95);
+    }
+
+    // ─── UNIQUE FIELD VALIDATION & DUPLICATE WARNINGS ───────────────────
+    const UNIQUE_FIELDS = [
+        { id: 'f-nin', key: 'nin', label: 'NIN / Passport', warnId: 'f-nin-warn', textId: 'f-nin-warn-text', step: 1 },
+        { id: 'f-nassit', key: 'nassit', label: 'NASSIT No.', warnId: 'f-nassit-warn', textId: 'f-nassit-warn-text', step: 1 },
+        { id: 'bank-acc', key: 'accNo', label: 'Account Number', warnId: 'bank-acc-warn', textId: 'bank-acc-warn-text', step: 8 },
+        { id: 'bank-bban', key: 'bban', label: 'BBAN Number', warnId: 'bank-bban-warn', textId: 'bank-bban-warn-text', step: 8 }
+    ];
+
+    function getEmpFieldValue(emp, key) {
+        if (!emp) return '';
+        if (key === 'nin') return emp.nin || emp.passport || emp.ninPassport || '';
+        if (key === 'nassit') return emp.nassit || emp.nassitNo || '';
+        if (key === 'accNo') return emp.accNo || emp.accountNumber || emp.bankAcc || '';
+        if (key === 'bban') return emp.bban || emp.bbanNo || emp.bbanNumber || '';
+        return emp[key] || '';
+    }
+
+    function checkFieldDuplicate(fieldConfig, currentEmpId) {
+        const el = document.getElementById(fieldConfig.id);
+        if (!el) return null;
+        const val = (el.value || '').trim();
+        if (!val) {
+            clearFieldWarning(fieldConfig);
+            return null;
+        }
+
+        const reg = JSON.parse(localStorage.getItem('bcf_staff_registry') || '[]');
+        const match = reg.find(e => {
+            if (currentEmpId && e.employeeId === currentEmpId) return false;
+            const existVal = (getEmpFieldValue(e, fieldConfig.key) || '').trim();
+            return existVal.length > 0 && existVal.toLowerCase() === val.toLowerCase();
+        });
+
+        if (match) {
+            setFieldWarning(fieldConfig, match, val);
+            return { field: fieldConfig.label, value: val, match: match, config: fieldConfig };
+        } else {
+            clearFieldWarning(fieldConfig);
+            return null;
+        }
+    }
+
+    function setFieldWarning(fieldConfig, match, val) {
+        const el = document.getElementById(fieldConfig.id);
+        const warn = document.getElementById(fieldConfig.warnId);
+        const warnText = document.getElementById(fieldConfig.textId);
+        if (el) {
+            el.classList.add('border-error', 'bg-red-50/20', 'ring-1', 'ring-error');
+        }
+        if (warn && warnText) {
+            warn.classList.remove('hidden');
+            warnText.innerHTML = `⚠️ <strong>This has already been entered!</strong> (${fieldConfig.label} &quot;${val}&quot; belongs to <em>${match.fullName || 'Employee'}</em> [${match.employeeId || 'ID'}])`;
+        }
+    }
+
+    function clearFieldWarning(fieldConfig) {
+        const el = document.getElementById(fieldConfig.id);
+        const warn = document.getElementById(fieldConfig.warnId);
+        if (el) {
+            el.classList.remove('border-error', 'bg-red-50/20', 'ring-1', 'ring-error');
+        }
+        if (warn) {
+            warn.classList.add('hidden');
+        }
+    }
+
+    function checkAllDuplicates(currentEmpId) {
+        const duplicates = [];
+        UNIQUE_FIELDS.forEach(f => {
+            const dup = checkFieldDuplicate(f, currentEmpId);
+            if (dup) duplicates.push(dup);
+        });
+        return duplicates;
+    }
+
+    function showDuplicateAlertModal(duplicates) {
+        const list = document.getElementById('dup-modal-list');
+        if (!list) {
+            const msg = duplicates.map(d => `• ${d.field}: "${d.value}"\n  This has already been entered for: ${d.match.fullName || 'Employee'} (${d.match.employeeId || 'ID'})`).join('\n\n');
+            alert("⚠️ Duplicate Entry Warning!\n\nThis has already been entered:\n" + msg + "\n\nPlease enter unique information for each employee.");
+            return;
+        }
+        list.innerHTML = duplicates.map(d => `
+            <div class="p-3 bg-white rounded-lg border border-red-200 shadow-xs">
+                <div class="flex items-center justify-between text-xs font-bold text-red-700 uppercase tracking-wide mb-1">
+                    <span>${d.field}</span>
+                    <span class="bg-red-100 text-red-800 px-2 py-0.5 rounded font-mono">${d.value}</span>
+                </div>
+                <div class="text-xs text-slate-700 font-medium">
+                    ⚠️ <strong>This has already been entered</strong> for:
+                </div>
+                <div class="text-xs text-slate-900 font-bold mt-0.5 flex items-center gap-1.5">
+                    <span class="material-symbols-outlined text-[15px] text-slate-400">person</span>
+                    <span>${d.match.fullName || 'Registered Employee'}</span>
+                    <span class="text-slate-500 font-mono text-[11px]">(${d.match.employeeId || '-'})</span>
+                </div>
+            </div>
+        `).join('');
+        document.getElementById('dup-warning-modal').classList.remove('hidden');
+    }
+
+    function closeDupModal() {
+        document.getElementById('dup-warning-modal').classList.add('hidden');
+        for (const f of UNIQUE_FIELDS) {
+            const dup = checkFieldDuplicate(f);
+            if (dup) {
+                jumpTo(f.step);
+                setTimeout(() => {
+                    const el = document.getElementById(f.id);
+                    if (el) el.focus();
+                }, 100);
+                break;
+            }
+        }
+    }
+
+    // Attach live validation and synchronizations on load
+    document.addEventListener('DOMContentLoaded', () => {
+        const empDateEl = document.getElementById('emp-date');
+        if (empDateEl) {
+            if (!empDateEl.value) {
+                empDateEl.value = new Date().toISOString().split('T')[0];
+            }
+            syncProbationFromEmploymentDate();
+            empDateEl.addEventListener('input', syncProbationFromEmploymentDate);
+            empDateEl.addEventListener('change', syncProbationFromEmploymentDate);
+        }
+
+        // Auto-suggest Full Name into Account Name in Step 8 (Finance & Banking)
+        const nameInput = document.getElementById('f-name');
+        const accNameInput = document.getElementById('bank-acc-name');
+        if (nameInput && accNameInput) {
+            nameInput.addEventListener('input', function() {
+                if (!accNameInput.dataset.manuallyEdited) {
+                    accNameInput.value = this.value;
+                }
+            });
+            accNameInput.addEventListener('input', function() {
+                accNameInput.dataset.manuallyEdited = 'true';
+            });
+        }
+
+        UNIQUE_FIELDS.forEach(f => {
+            const el = document.getElementById(f.id);
+            if (el) {
+                el.addEventListener('input', () => checkFieldDuplicate(f));
+                el.addEventListener('blur', () => checkFieldDuplicate(f));
+            }
+        });
+    });
+
+    
+    function initNav() {
+        let navHtml = '';
+        let mobHtml = '';
+        STEPS.forEach((s, idx) => {
+            navHtml += `
+                <button type="button" id="nav-${s.id}" onclick="jumpTo(${s.id})" class="flex items-center gap-3 p-2 rounded text-left transition-colors hover:bg-surface-container group">
+                    <div id="bubble-${s.id}" class="step-bubble w-7 h-7 rounded-full border-2 border-outline flex items-center justify-center text-xs font-bold text-on-surface-variant transition-colors">${s.id}</div>
+                    <span id="label-${s.id}" class="step-label text-sm text-on-surface-variant group-hover:text-primary transition-colors">${s.label}</span>
+                </button>
+            `;
+            mobHtml += `
+                <button type="button" id="mob-nav-${s.id}" onclick="jumpTo(${s.id})" class="step-bubble shrink-0 w-10 h-10 rounded-full border-2 border-outline flex items-center justify-center text-sm font-bold text-on-surface-variant transition-colors">${s.id}</button>
+            `;
+        });
+        document.getElementById('nav-container').innerHTML = navHtml;
+        document.getElementById('mobile-nav-container').innerHTML = mobHtml;
+        updateNavUI();
+    }
+    
+    function updateNavUI() {
+        STEPS.forEach(s => {
+            const b = document.getElementById(`bubble-${s.id}`);
+            const l = document.getElementById(`label-${s.id}`);
+            const m = document.getElementById(`mob-nav-${s.id}`);
+            const stepDiv = document.getElementById(`step-${s.id}`);
+            
+            if(s.id < currentStep) {
+                b.className = 'step-bubble completed w-7 h-7 rounded-full border-2 flex items-center justify-center text-xs font-bold transition-colors';
+                b.innerHTML = '<span class="material-symbols-outlined text-[14px]">check</span>';
+                l.className = 'step-label text-sm text-on-surface-variant';
+                m.className = 'step-bubble completed shrink-0 w-10 h-10 rounded-full border-2 flex items-center justify-center text-sm font-bold transition-colors';
+                stepDiv.classList.add('hidden-step');
+            } else if (s.id === currentStep) {
+                b.className = 'step-bubble active w-7 h-7 rounded-full border-2 flex items-center justify-center text-xs font-bold transition-colors';
+                b.innerHTML = s.id;
+                l.className = 'step-label active text-sm transition-colors';
+                m.className = 'step-bubble active shrink-0 w-10 h-10 rounded-full border-2 flex items-center justify-center text-sm font-bold transition-colors';
+                stepDiv.classList.remove('hidden-step');
+            } else {
+                b.className = 'step-bubble w-7 h-7 rounded-full border-2 border-outline flex items-center justify-center text-xs font-bold text-on-surface-variant transition-colors';
+                b.innerHTML = s.id;
+                l.className = 'step-label text-sm text-on-surface-variant';
+                m.className = 'step-bubble shrink-0 w-10 h-10 rounded-full border-2 border-outline flex items-center justify-center text-sm font-bold text-on-surface-variant transition-colors';
+                stepDiv.classList.add('hidden-step');
+            }
+        });
+        
+        document.getElementById('btn-prev').disabled = currentStep === 1;
+        if(currentStep === 10) {
+            document.getElementById('btn-next').classList.add('hidden');
+            document.getElementById('btn-save').classList.remove('hidden');
+            buildReview();
+        } else {
+            document.getElementById('btn-next').classList.remove('hidden');
+            document.getElementById('btn-save').classList.add('hidden');
+        }
+    }
+    
+    function jumpTo(step) {
+        // Option to validate current step before jumping? 
+        currentStep = step;
+        updateNavUI();
+    }
+    function navStep(dir) {
+        if(dir > 0) {
+            // Guard uniqueness on current step before advancing
+            const stepFields = UNIQUE_FIELDS.filter(f => f.step === currentStep);
+            for(const sf of stepFields) {
+                const dup = checkFieldDuplicate(sf);
+                if(dup) {
+                    showDuplicateAlertModal([dup]);
+                    const el = document.getElementById(sf.id);
+                    if(el) el.focus();
+                    return;
+                }
+            }
+        }
+        if(currentStep + dir >= 1 && currentStep + dir <= 10) {
+            currentStep += dir;
+            updateNavUI();
+        }
+    }
+
+    // Toggle logic for Personal
+    function toggleOtherChildren() {
+        const val = document.getElementById('f-children').value;
+        const other = document.getElementById('f-children-other');
+        if(val === 'Other') {
+            other.classList.remove('hidden');
+            other.required = true;
+        } else {
+            other.classList.add('hidden');
+            other.required = false;
+        }
+    }
+
+    // Auto-sync department director when department and job level change
+    function autoSyncDepartmentDirector() {
+        const deptEl = document.getElementById('emp-dept');
+        const levelEl = document.getElementById('emp-level');
+        const reportsEl = document.getElementById('w-reports');
+        if (!deptEl || !levelEl || !reportsEl) return;
+
+        const dept = deptEl.value;
+        const level = levelEl.value;
+
+        if (level === 'Director' || level === 'Executive') {
+            reportsEl.value = 'Albert Joseph Bandama (CEO)';
+            return;
+        }
+
+        const deptDirectors = {
+            'Finance Department': 'Mariama Bangura (Finance Director)',
+            'Human Resources Management Department': 'Joe Ansumana Conteh (Human Resources Director)',
+            'Information Technology (IT) Department': 'Augustine Toro (IT Director)',
+            'Procurement Department': 'Hassan Kanu (Procurement Director)',
+            'Programs Department': 'Fatmata Sesay (Programs Director)',
+            'Internal Risk & Audits Department': 'Samuel Kamara (Internal Audit & Risk Director)',
+            'Executive Management': 'Albert Joseph Bandama (Chief Executive Officer)',
+            'Health & Safety Department': 'Albert Joseph Bandama (CEO)',
+            'Legal & Communication Department': 'Albert Joseph Bandama (CEO)'
+        };
+
+        if (dept && deptDirectors[dept]) {
+            reportsEl.value = deptDirectors[dept];
+        }
+    }
+
+    // Toggle logic for Employment
+    function handleClassification() {
+        const cls = document.getElementById('emp-class').value;
+        const wrap = document.getElementById('contract-dates-wrap');
+        const st = document.getElementById('emp-con-start');
+        const en = document.getElementById('emp-con-end');
+        if(cls && cls !== 'Permanent' && cls !== 'Volunteer') {
+            wrap.classList.remove('hidden');
+            st.required = true;
+            en.required = true;
+        } else {
+            wrap.classList.add('hidden');
+            st.required = false;
+            en.required = false;
+        }
+    }
+
+    // Work Loc Probation Calc
+    function calcProbation() {
+        const start = document.getElementById('w-prob-start').value;
+        if(!start) { document.getElementById('w-prob-end').value = ''; return; }
+        const d = new Date(start);
+        if(isNaN(d.getTime())) { document.getElementById('w-prob-end').value = ''; return; }
+        d.setMonth(d.getMonth() + 3);
+        document.getElementById('w-prob-end').value = d.toISOString().split('T')[0];
+    }
+
+    function syncProbationFromEmploymentDate() {
+        const empDate = document.getElementById('emp-date');
+        const probStart = document.getElementById('w-prob-start');
+        if (empDate && probStart && empDate.value) {
+            probStart.value = empDate.value;
+            calcProbation();
+        }
+    }
+
+    // DYNAMIC EDUCATION
+    let eduCount = 0;
+    const unis = [
+        "Njala University", "Fourah Bay College (FBC)", "College of Medicine and Allied Health Sciences (COMAHS)",
+        "Institute of Public Administration and Management (IPAM)", "Milton Margai Technical University (MMTU)",
+        "Eastern Technical University (ETU)", "Ernest Bai Koroma University of Science and Technology (EBKUST)",
+        "University of Makeni (UNIMAK)", "University of Management and Technology (UNIMTECH)",
+        "United Methodist University Sierra Leone (UMU/UMUSL)", "Limkokwing University of Creative Technology",
+        "University of Lunsar (UoL)", "Freetown Polytechnic"
+    ];
+    function addEdu() {
+        eduCount++;
+        const id = eduCount;
+        const div = document.createElement('div');
+        div.className = "bg-surface-container-low border border-outline rounded p-4 relative";
+        div.id = `edu-item-${id}`;
+        
+        let uniOpts = unis.map(u => `<option value="${u}">${u}</option>`).join('');
+        
+        div.innerHTML = `
+            <button type="button" onclick="document.getElementById('edu-item-${id}').remove()" class="absolute top-4 right-4 text-error hover:text-red-800"><span class="material-symbols-outlined text-[18px]">delete</span></button>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <label class="flex flex-col gap-1 font-semibold text-sm">Institution Type <span class="req">*</span>
+                    <select id="edu-type-${id}" onchange="handleEduType(${id})" class="h-9 px-2 rounded border border-outline focus:border-primary outline-none font-normal" required>
+                        <option value="">Select Type...</option><option value="University">University</option><option value="School">School</option><option value="Technical Vocational Institution">Technical Vocational Institution</option>
+                    </select>
+                </label>
+                <div id="edu-name-wrap-${id}"></div>
+                <label class="flex flex-col gap-1 font-semibold text-sm">Highest Qualification <span class="req">*</span>
+                    <select id="edu-qual-${id}" class="h-9 px-2 rounded border border-outline focus:border-primary outline-none font-normal" required>
+                        <option value="">Select...</option>
+                        <option value="BECE">BECE</option><option value="WASSCE">WASSCE</option><option value="Certificate">Certificate</option><option value="Diploma (OD)">Diploma (OD)</option><option value="Higher National Diploma (HND)">Higher National Diploma (HND)</option><option value="Bachelor's Degree">Bachelor's Degree</option><option value="Postgraduate Diploma (PGD)">Postgraduate Diploma (PGD)</option><option value="Master's Degree">Master's Degree</option><option value="MBA">MBA</option><option value="PhD/Doctorate">PhD/Doctorate</option><option value="Professional Certificate">Professional Certificate</option>
+                    </select>
+                </label>
+                <label class="flex flex-col gap-1 font-semibold text-sm">Field/Programme of Study <span class="req">*</span>
+                    <input type="text" id="edu-prog-${id}" class="h-9 px-2 rounded border border-outline focus:border-primary outline-none font-normal" required>
+                </label>
+                <label class="flex flex-col gap-1 font-semibold text-sm">Classification / Grade <span class="req">*</span>
+                    <select id="edu-class-${id}" class="h-9 px-2 rounded border border-outline focus:border-primary outline-none font-normal" required>
+                        <option value="">Select...</option>
+                        <option value="First Class">First Class</option><option value="Second Class First Division">Second Class First Division</option><option value="Second Class Second Division">Second Class Second Division</option><option value="Third Class">Third Class</option><option value="Distinction">Distinction</option><option value="Credit">Credit</option><option value="Pass">Pass</option><option value="WAEC">WAEC</option><option value="BECE">BECE</option><option value="N/A">N/A</option>
+                    </select>
+                </label>
+                <div class="grid grid-cols-2 gap-2">
+                    <label class="flex flex-col gap-1 font-semibold text-sm">Start Year <span class="req">*</span>
+                        <input type="number" id="edu-sy-${id}" placeholder="YYYY" class="h-9 px-2 rounded border border-outline focus:border-primary outline-none font-normal" required>
+                    </label>
+                    <label class="flex flex-col gap-1 font-semibold text-sm">End Year <span class="req">*</span>
+                        <input type="number" id="edu-ey-${id}" placeholder="YYYY" class="h-9 px-2 rounded border border-outline focus:border-primary outline-none font-normal" required>
+                    </label>
+                </div>
+            </div>
+        `;
+        document.getElementById('edu-container').appendChild(div);
+    }
+    function handleEduType(id) {
+        const type = document.getElementById(`edu-type-${id}`).value;
+        const wrap = document.getElementById(`edu-name-wrap-${id}`);
+        let uniOpts = unis.map(u => `<option value="${u}">${u}</option>`).join('');
+        if(type === 'University') {
+            wrap.innerHTML = `
+                <label class="flex flex-col gap-1 font-semibold text-sm text-primary">University Name <span class="req">*</span>
+                    <select id="edu-inst-${id}" class="h-9 px-2 rounded border border-outline focus:border-primary outline-none font-normal" required>
+                        <option value="">Select University...</option>${uniOpts}<option value="Other">Other</option>
+                    </select>
+                </label>`;
+        } else if (type === 'School') {
+            wrap.innerHTML = `
+                <label class="flex flex-col gap-1 font-semibold text-sm text-secondary">School Name <span class="req">*</span>
+                    <input type="text" id="edu-inst-${id}" class="h-9 px-2 rounded border border-outline focus:border-primary outline-none font-normal" required>
+                </label>`;
+        } else if (type === 'Technical Vocational Institution') {
+            wrap.innerHTML = `
+                <label class="flex flex-col gap-1 font-semibold text-sm text-tertiary">Tech/Voc Institution Name <span class="req">*</span>
+                    <input type="text" id="edu-inst-${id}" class="h-9 px-2 rounded border border-outline focus:border-primary outline-none font-normal" required>
+                </label>`;
+        } else {
+            wrap.innerHTML = '';
+        }
+    }
+    
+    // DYNAMIC EXPERIENCE
+    let expCount = 0;
+    function addExp() {
+        expCount++;
+        const id = expCount;
+        const div = document.createElement('div');
+        div.className = "bg-surface-container-low border border-outline rounded p-4 relative";
+        div.id = `exp-item-${id}`;
+        div.innerHTML = `
+            <button type="button" onclick="document.getElementById('exp-item-${id}').remove()" class="absolute top-4 right-4 text-error hover:text-red-800"><span class="material-symbols-outlined text-[18px]">delete</span></button>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <label class="flex flex-col gap-1 font-semibold text-sm md:col-span-2">Institution / Company Name
+                    <input type="text" id="exp-inst-${id}" class="h-9 px-2 rounded border border-outline focus:border-primary outline-none font-normal">
+                </label>
+                <label class="flex flex-col gap-1 font-semibold text-sm">Position / Role
+                    <input type="text" id="exp-role-${id}" class="h-9 px-2 rounded border border-outline focus:border-primary outline-none font-normal">
+                </label>
+                <div class="flex flex-col gap-1 font-semibold text-sm justify-end pb-2">
+                    <label class="flex items-center gap-2 cursor-pointer">
+                        <input type="checkbox" id="exp-curr-${id}" onchange="handleExpDates(${id})" class="w-4 h-4 text-primary">
+                        Currently Working Here
+                    </label>
+                </div>
+                <label class="flex flex-col gap-1 font-semibold text-sm">Start Date
+                    <input type="date" id="exp-sd-${id}" onchange="calcExp(${id})" class="h-9 px-2 rounded border border-outline focus:border-primary outline-none font-normal">
+                </label>
+                <label class="flex flex-col gap-1 font-semibold text-sm">End Date
+                    <input type="date" id="exp-ed-${id}" onchange="calcExp(${id})" class="h-9 px-2 rounded border border-outline focus:border-primary outline-none font-normal">
+                </label>
+                <label class="flex flex-col gap-1 font-semibold text-sm text-secondary md:col-span-2">Years of Experience (Auto)
+                    <input type="text" id="exp-years-${id}" class="h-9 px-2 rounded border border-outline bg-surface-container outline-none font-bold text-secondary" readonly>
+                </label>
+                <label class="flex flex-col gap-1 font-semibold text-sm md:col-span-2 text-on-surface-variant border-t border-outline pt-2">Supervisor Name
+                    <input type="text" id="exp-sup-${id}" class="h-9 px-2 rounded border border-outline focus:border-primary outline-none font-normal">
+                </label>
+                <label class="flex flex-col gap-1 font-semibold text-sm text-on-surface-variant">Supervisor Phone
+                    <input type="tel" id="exp-suph-${id}" class="h-9 px-2 rounded border border-outline focus:border-primary outline-none font-normal">
+                </label>
+                <label class="flex flex-col gap-1 font-semibold text-sm text-on-surface-variant">Supervisor Email
+                    <input type="email" id="exp-supe-${id}" class="h-9 px-2 rounded border border-outline focus:border-primary outline-none font-normal">
+                </label>
+            </div>
+        `;
+        document.getElementById('exp-container').appendChild(div);
+    }
+    function handleExpDates(id) {
+        const curr = document.getElementById(`exp-curr-${id}`).checked;
+        const ed = document.getElementById(`exp-ed-${id}`);
+        ed.disabled = curr;
+        if(curr) ed.value = '';
+        calcExp(id);
+    }
+    function calcExp(id) {
+        const sd = document.getElementById(`exp-sd-${id}`).value;
+        const ed = document.getElementById(`exp-ed-${id}`).value;
+        const curr = document.getElementById(`exp-curr-${id}`).checked;
+        const out = document.getElementById(`exp-years-${id}`);
+        
+        if(!sd) { out.value = ''; return; }
+        let d1 = new Date(sd);
+        let d2 = curr ? new Date() : (ed ? new Date(ed) : null);
+        if(!d2) { out.value = ''; return; }
+        
+        if(d2 < d1) { out.value = "Invalid dates"; return; }
+        
+        let years = d2.getFullYear() - d1.getFullYear();
+        let months = d2.getMonth() - d1.getMonth();
+        let days = d2.getDate() - d1.getDate();
+        if(days < 0) { months -= 1; }
+        if(months < 0) { years -= 1; months += 12; }
+        
+        let res = [];
+        if(years > 0) res.push(years + " Year" + (years>1?"s":""));
+        if(months > 0) res.push(months + " Month" + (months>1?"s":""));
+        out.value = res.join(", ") || "< 1 Month";
+    }
+
+    // PAYROLL CALCULATION
+    let customPayItems = [];
+    function addPayItem() {
+        const type = prompt("Enter Type (Allowance or Deduction):", "Allowance");
+        if(!type) return;
+        const name = prompt("Enter Name:", "Transport");
+        if(!name) return;
+        const amt = prompt("Enter Amount:", "100");
+        if(!amt) return;
+        customPayItems.push({type: type.toLowerCase().includes('deduct') ? 'deduction' : 'allowance', name: name, amt: Number(amt)});
+        renderCustomPayItems();
+        calcPayroll();
+    }
+    function delPayItem(idx) {
+        customPayItems.splice(idx, 1);
+        renderCustomPayItems();
+        calcPayroll();
+    }
+    function renderCustomPayItems() {
+        const html = customPayItems.map((c, i) => `
+            <div class="flex items-center justify-between bg-surface p-2 border border-outline rounded">
+                <span class="text-sm font-semibold text-on-surface-variant">${c.type.toUpperCase()}: ${c.name} (NLe ${c.amt})</span>
+                <button type="button" onclick="delPayItem(${i})" class="text-error font-bold text-xs">Remove</button>
+            </div>
+        `).join('');
+        document.getElementById('pay-items-container').innerHTML = html;
+    }
+    
+    function fmt(n) { return Number(n || 0).toLocaleString('en-US', {minimumFractionDigits:2, maximumFractionDigits:2}); }
+    
+    function calcPayroll() {
+        const basic = Number(document.getElementById('pay-basic').value) || 0;
+        const incPct = Number(document.getElementById('pay-inc').value) || 0;
+        const advPct = Number(document.getElementById('pay-adv').value) || 0;
+        const loan = Number(document.getElementById('pay-loan').value) || 0;
+        
+        const incAmt = basic * (incPct / 100);
+        const gross = basic + incAmt;
+        const paye = gross * 0.30;
+        const afterTax = gross - paye;
+        
+        const nassitEr = afterTax * 0.10;
+        const nassitEe = afterTax * 0.05;
+        const totNas = nassitEr + nassitEe;
+        
+        const advAmt = afterTax * (advPct / 100);
+        
+        let cDeducts = 0;
+        let cAllows = 0;
+        customPayItems.forEach(c => {
+            if(c.type === 'deduction') cDeducts += c.amt;
+            else cAllows += c.amt;
+        });
+        
+        const duty = gross * 0.02;
+        
+        const net = afterTax - nassitEe - advAmt - loan - cDeducts + duty + cAllows;
+        
+        // Update DOM
+        document.getElementById('v-pay-b').textContent = fmt(basic);
+        document.getElementById('v-pay-b-fin').textContent = fmt(basic);
+        document.getElementById('v-pay-inc-p').textContent = incPct + '%';
+        document.getElementById('v-pay-inc').textContent = fmt(incAmt);
+        document.getElementById('v-pay-gross').textContent = fmt(gross);
+        document.getElementById('v-pay-gross-fin').textContent = fmt(gross);
+        
+        document.getElementById('v-pay-nra').textContent = fmt(paye);
+        document.getElementById('v-pay-after').textContent = fmt(afterTax);
+        document.getElementById('v-pay-naser').textContent = fmt(nassitEr);
+        document.getElementById('v-pay-nasee').textContent = fmt(nassitEe);
+        document.getElementById('v-pay-nastot').textContent = fmt(totNas);
+        document.getElementById('v-pay-nastot-fin').textContent = fmt(totNas);
+        
+        document.getElementById('v-pay-adv-lbl').textContent = advPct + '% Advance';
+        document.getElementById('v-pay-adv').textContent = fmt(advAmt);
+        document.getElementById('v-pay-adv-fin').textContent = fmt(advAmt);
+        
+        document.getElementById('v-pay-loan').textContent = fmt(loan);
+        document.getElementById('v-pay-loan-fin').textContent = fmt(loan);
+        document.getElementById('v-pay-cust-ded').textContent = fmt(cDeducts);
+        document.getElementById('v-pay-cust-ded-fin').textContent = fmt(cDeducts);
+        
+        document.getElementById('v-pay-duty').textContent = fmt(duty);
+        document.getElementById('v-pay-duty-fin').textContent = fmt(duty);
+        document.getElementById('v-pay-cust-all').textContent = fmt(cAllows);
+        document.getElementById('v-pay-cust-all-fin').textContent = fmt(cAllows);
+        
+        document.getElementById('v-pay-net-1').textContent = fmt(net);
+        document.getElementById('v-pay-net').textContent = fmt(net);
+    }
+
+    // REVIEW PAGE GENERATION
+    function buildReview() {
+        const rc = document.getElementById('review-container');
+        let html = '';
+        
+        function makeCard(title, step, dataArr) {
+            let trs = dataArr.map(d => `<div class="grid grid-cols-3 py-1 border-b border-outline/50"><span class="font-semibold text-on-surface-variant col-span-1">${d[0]}</span><span class="col-span-2">${d[1]||'-'}</span></div>`).join('');
+            return `
+            <div class="bg-surface-container-low border border-outline rounded overflow-hidden">
+                <div class="bg-surface-container flex items-center justify-between p-3 border-b border-outline">
+                    <h4 class="font-bold text-sm text-primary uppercase">${title}</h4>
+                    <button onclick="jumpTo(${step})" class="text-xs font-bold text-secondary hover:underline">Edit</button>
+                </div>
+                <div class="p-4 text-sm flex flex-col gap-1">${trs}</div>
+            </div>`;
+        }
+        
+        html += makeCard('Personal Information', 1, [
+            ['Passport Photo', currentPassportPhoto ? `<img src="${currentPassportPhoto}" class="w-16 h-20 object-cover rounded border border-outline shadow-xs bg-white inline-block" alt="Passport Photo"/>` : '<span class="text-slate-400 italic">No Photo Uploaded</span>'],
+            ['Name', document.getElementById('f-name').value],
+            ['Gender', document.getElementById('f-gender').value],
+            ['DOB', document.getElementById('f-dob').value],
+            ['Nationality', document.getElementById('f-nation').value],
+            ['Phone', document.getElementById('f-phone').value],
+            ['Email', document.getElementById('f-email').value],
+            ['NIN / Passport', document.getElementById('f-nin').value],
+            ['NASSIT No.', document.getElementById('f-nassit').value]
+        ]);
+        
+        html += makeCard('Employment', 3, [
+            ['Department', document.getElementById('emp-dept').value],
+            ['Position', document.getElementById('emp-title').value],
+            ['Classification', document.getElementById('emp-class').value],
+            ['Employment Date', document.getElementById('emp-date').value],
+            ['Status', document.getElementById('emp-status').value]
+        ]);
+
+        html += makeCard('Work Location & Probation', 4, [
+            ['Working Location', document.getElementById('w-loc').value],
+            ['Reports To', document.getElementById('w-reports').value],
+            ['Probation Start Date', document.getElementById('w-prob-start').value],
+            ['Probation End Date', document.getElementById('w-prob-end').value]
+        ]);
+
+        html += makeCard('Finance & Banking', 8, [
+            ['Bank Name', document.getElementById('bank-name').value],
+            ['Account Name', document.getElementById('bank-acc-name').value],
+            ['Account Number', document.getElementById('bank-acc').value],
+            ['Account Type', document.getElementById('bank-type').value],
+            ['BBAN Number', document.getElementById('bank-bban').value]
+        ]);
+        
+        rc.innerHTML = html;
+        validateAll();
+    }
+    
+    function validateAll() {
+        const errs = [];
+        const reqs = document.querySelectorAll('input[required]:not(.hidden), select[required]:not(.hidden), textarea[required]:not(.hidden)');
+        reqs.forEach(r => {
+            if(!r.value || !r.value.trim()) {
+                const label = r.closest('label');
+                let fieldName = label ? label.textContent.replace('*','').trim() : (r.name || r.id || 'Required Field');
+                fieldName = fieldName.split('\n')[0].trim();
+                errs.push(`Missing: ${fieldName}`);
+            }
+        });
+        
+        const duplicates = checkAllDuplicates();
+        if(duplicates.length > 0) {
+            duplicates.forEach(d => {
+                errs.push(`⚠️ Duplicate: ${d.field} "${d.value}" has already been entered (belongs to ${d.match.fullName || 'Employee'} [${d.match.employeeId || 'ID'}])`);
+            });
+        }
+
+        const errDiv = document.getElementById('validation-errors');
+        if(errDiv) {
+            if(errs.length > 0) {
+                errDiv.classList.remove('hidden');
+                errDiv.innerHTML = errs.map(e => `<div>• ${e}</div>`).join('');
+            } else {
+                errDiv.classList.add('hidden');
+                errDiv.innerHTML = '';
+            }
+        }
+
+        const btnSave = document.getElementById('btn-save');
+        if (btnSave) {
+            btnSave.disabled = (errs.length > 0);
+            if(errs.length > 0) btnSave.classList.add('opacity-50');
+            else btnSave.classList.remove('opacity-50');
+        }
+        return errs;
+    }
+
+    // SAVE LOGIC
+    function generateId(cls) {
+        const year = new Date().getFullYear();
+        let stored = [];
+        try { stored = JSON.parse(localStorage.getItem('bcf_staff_registry') || '[]'); } catch(e){}
+        let maxSeq = 0;
+        stored.forEach(s => {
+          if (s && s.employeeId) {
+            const m = String(s.employeeId).match(/(\d+)$/);
+            if (m) {
+              const val = parseInt(m[1], 10);
+              if (!isNaN(val) && val > maxSeq) maxSeq = val;
+            }
+          }
+        });
+        const currentSavedSeq = parseInt(localStorage.getItem('bcf_seq') || '0', 10);
+        let nextSeqNum = Math.max(maxSeq, currentSavedSeq) + 1;
+        const seq = String(nextSeqNum).padStart(4, '0');
+        localStorage.setItem('bcf_seq', seq);
+        
+        let prefix = 'BCF-EMP';
+        if(cls === 'Volunteer') prefix = `VLJAN-${year}-1`;
+        else if(cls === 'Fixed-Term Contract') prefix = 'BCF-FTC';
+        else if(cls === 'Part-Time') prefix = 'BCF-PT';
+        else if(cls === 'Casual') prefix = 'BCF-CAS';
+        else if(cls === 'Consultant') prefix = 'BCF-CON';
+        else if(cls === 'Intern') prefix = 'BCF-INT';
+        
+        if(cls === 'Volunteer') return `${prefix}-${seq}`;
+        return `${prefix}-${year}-${seq}`;
+    }
+    
+    function extractEdu() {
+        let res = [];
+        for(let i=1; i<=eduCount; i++) {
+            if(document.getElementById(`edu-type-${i}`)) {
+                res.push({
+                    type: document.getElementById(`edu-type-${i}`).value,
+                    inst: document.getElementById(`edu-inst-${i}`) ? document.getElementById(`edu-inst-${i}`).value : '',
+                    qual: document.getElementById(`edu-qual-${i}`).value,
+                    prog: document.getElementById(`edu-prog-${i}`).value,
+                    grade: document.getElementById(`edu-class-${i}`).value,
+                    sy: document.getElementById(`edu-sy-${i}`).value,
+                    ey: document.getElementById(`edu-ey-${i}`).value
+                });
+            }
+        }
+        return res;
+    }
+
+    function extractExp() {
+        let res = [];
+        for(let i=1; i<=expCount; i++) {
+            if(document.getElementById(`exp-inst-${i}`)) {
+                res.push({
+                    inst: document.getElementById(`exp-inst-${i}`).value,
+                    role: document.getElementById(`exp-role-${i}`).value,
+                    curr: document.getElementById(`exp-curr-${i}`).checked,
+                    sd: document.getElementById(`exp-sd-${i}`).value,
+                    ed: document.getElementById(`exp-ed-${i}`).value,
+                    dur: document.getElementById(`exp-years-${i}`).value,
+                    supName: document.getElementById(`exp-sup-${i}`).value,
+                    supPhone: document.getElementById(`exp-suph-${i}`).value,
+                    supEmail: document.getElementById(`exp-supe-${i}`).value
+                });
+            }
+        }
+        return res;
+    }
+
+    function compileEmpData(isDraft) {
+        const cls = document.getElementById('emp-class').value || 'Permanent';
+        const empId = isDraft ? "DRAFT" : generateId(cls);
+        const todayStr = new Date().toISOString().split('T')[0];
+        const empDateVal = document.getElementById('emp-date').value || todayStr;
+
+        let multCat = 'Officer';
+        const jobLvl = (document.getElementById('emp-level').value || '').toLowerCase();
+        const titleLvl = (document.getElementById('emp-title').value || '').toLowerCase();
+        const mgmtLvl = (document.getElementById('emp-mgmt').value || '').toLowerCase();
+        if (jobLvl.includes('executive') || mgmtLvl.includes('top') || titleLvl.includes('ceo') || titleLvl.includes('executive director')) {
+            multCat = 'CEO/Governing Board';
+        } else if (jobLvl.includes('director') || titleLvl.includes('director')) {
+            multCat = 'Director';
+        } else if (jobLvl.includes('manager') || titleLvl.includes('manager') || jobLvl.includes('assistant')) {
+            multCat = 'Manager/Assistant Manager';
+        } else {
+            multCat = 'Officer';
+        }
+        
+        return {
+            employeeId: empId,
+            fullName: document.getElementById('f-name').value,
+            gender: document.getElementById('f-gender').value,
+            dob: document.getElementById('f-dob').value,
+            nationality: document.getElementById('f-nation').value,
+            phone: document.getElementById('f-phone').value,
+            email: document.getElementById('f-email').value,
+            marital: document.getElementById('f-marital').value,
+            children: document.getElementById('f-children').value === 'Other' ? document.getElementById('f-children-other').value : document.getElementById('f-children').value,
+            nin: document.getElementById('f-nin').value,
+            nassit: document.getElementById('f-nassit').value,
+            address: document.getElementById('f-address').value,
+            
+            emName: document.getElementById('e-name').value,
+            emRel: document.getElementById('e-rel').value,
+            emPhone: document.getElementById('e-phone').value,
+            emEmail: document.getElementById('e-email').value,
+            emAddress: document.getElementById('e-address').value,
+            
+            department: document.getElementById('emp-dept').value,
+            title: document.getElementById('emp-title').value,
+            unit: document.getElementById('emp-unit').value,
+            mgmtLevel: document.getElementById('emp-mgmt').value,
+            classification: cls,
+            jobLevel: document.getElementById('emp-level').value,
+            empDate: empDateVal,
+            employmentDate: empDateVal,
+            registrationDate: todayStr,
+            registeredAt: todayStr,
+            multiplierCategory: multCat,
+            disciplinaryStatus: 'Clean Record',
+            contractStanding: 'Active - Good Standing',
+            status: document.getElementById('emp-status').value || 'Active',
+            conStart: document.getElementById('emp-con-start').value,
+            conEnd: document.getElementById('emp-con-end').value,
+            
+            workLoc: document.getElementById('w-loc').value,
+            reportsTo: document.getElementById('w-reports').value,
+            workPhone: document.getElementById('w-phone').value,
+            workEmail: document.getElementById('w-email').value,
+            probStart: document.getElementById('w-prob-start').value,
+            probEnd: document.getElementById('w-prob-end').value,
+            
+            education: extractEdu(),
+            experience: extractExp(),
+            skills: document.getElementById('skills-text').value.split(',').map(s=>s.trim()).filter(s=>s.length>0),
+            
+            photo: currentPassportPhoto || '',
+            passportPhoto: currentPassportPhoto || '',
+            bankName: document.getElementById('bank-name').value,
+            accountName: document.getElementById('bank-acc-name').value,
+            accName: document.getElementById('bank-acc-name').value,
+            accNo: document.getElementById('bank-acc').value,
+            accType: document.getElementById('bank-type').value,
+            bban: document.getElementById('bank-bban').value,
+            
+            payBasic: document.getElementById('pay-basic').value,
+            payInc: document.getElementById('pay-inc').value,
+            payAdvType: document.getElementById('pay-adv').value,
+            payLoan: document.getElementById('pay-loan').value,
+            payCustomItems: customPayItems
+        };
+    }
+
+    function saveDraft() {
+        const duplicates = checkAllDuplicates();
+        if(duplicates.length > 0) {
+            showDuplicateAlertModal(duplicates);
+            return;
+        }
+        const emp = compileEmpData(true);
+        localStorage.setItem('bcf_draft_registration', JSON.stringify(emp));
+        alert("Registration saved as Draft!");
+        window.location.href = '../staff_directory/code.html';
+    }
+
+    async function saveAndRegister() {
+        const duplicates = checkAllDuplicates();
+        if(duplicates.length > 0) {
+            showDuplicateAlertModal(duplicates);
+            return;
+        }
+
+        const errs = validateAll();
+        if(errs && errs.length > 0) {
+            const errDiv = document.getElementById('validation-errors');
+            if (errDiv) {
+                errDiv.classList.remove('hidden');
+                errDiv.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+            alert("Please complete all required fields before saving:\n\n" + errs.slice(0, 8).join('\n'));
+            return;
+        }
+
+        const saveBtn = document.getElementById('btn-save');
+        const originalBtnHtml = saveBtn ? saveBtn.innerHTML : 'Save & Register';
+        if (saveBtn) {
+            saveBtn.disabled = true;
+            saveBtn.innerHTML = '<span class="material-symbols-outlined animate-spin text-[18px]">sync</span> Saving to MongoDB Atlas Database...';
+            saveBtn.classList.remove('opacity-50');
+        }
+
+        const emp = compileEmpData(false);
+        let reg = JSON.parse(localStorage.getItem('bcf_staff_registry') || '[]');
+        reg.push(emp);
+        localStorage.setItem('bcf_staff_registry', JSON.stringify(reg));
+        localStorage.setItem('bcf_selected_profile', JSON.stringify(emp));
+
+        let newAccount = null;
+        let logs = [];
+        // Auto-provision User Account & RBAC in Super Admin module
+        try {
+            let accounts = JSON.parse(localStorage.getItem('bcf_user_accounts') || '[]');
+            const nextIdNum = accounts.length + 1;
+            const newUserId = `USR-BCF-${String(nextIdNum).padStart(4, '0')}`;
+            
+            let assignedRole = 'Officer';
+            const pos = (emp.title || '').toLowerCase();
+            if(pos.includes('ceo') || pos.includes('executive director')) assignedRole = 'Super Admin';
+            else if(pos.includes('board') || pos.includes('trustee')) assignedRole = 'Governing Board';
+            else if(pos.includes('hr director')) assignedRole = 'HRM Director';
+            else if(pos.includes('finance director')) assignedRole = 'Finance Director';
+            else if(pos.includes('programs director')) assignedRole = 'Programs Director';
+            else if(pos.includes('director')) assignedRole = 'Unit Manager';
+            else if(pos.includes('manager')) assignedRole = 'Unit Manager';
+            else if(pos.includes('assistant')) assignedRole = 'Assistant Manager';
+            else if((emp.classification||'').toLowerCase() === 'volunteer') assignedRole = 'Volunteer';
+            else if((emp.classification||'').toLowerCase() === 'intern') assignedRole = 'Intern';
+
+            const ROLE_ACCESS_MAP = {
+                'Super Admin': { level: 'Level 1 — Super Administration', group: 'Full System Control' },
+                'Governing Board': { level: 'Executive / Strategic View', group: 'Governance & Audit' },
+                'HRM Director': { level: 'Departmental / Executive', group: 'HR & People Operations' },
+                'Finance Director': { level: 'Departmental / Executive', group: 'Financial Management' },
+                'Programs Director': { level: 'Departmental / Executive', group: 'Programmes & Portfolio' },
+                'Health & Safety Director': { level: 'Departmental / Executive', group: 'H&S and Compliance' },
+                'IT Director': { level: 'Departmental / Technical', group: 'Systems & Infrastructure' },
+                'Internal Risk & Audits Director': { level: 'Executive / Audit View', group: 'Internal Audit & Controls' },
+                'Legal & Communication Director': { level: 'Departmental / Executive', group: 'Legal & Communications' },
+                'Procurement Director': { level: 'Departmental / Executive', group: 'Procurement & Assets' },
+                'Unit Manager': { level: 'Department / Unit', group: 'Operational Unit Oversight' },
+                'Assistant Manager': { level: 'Operational', group: 'Unit Supervisory' },
+                'Officer': { level: 'Data Entry / Operational', group: 'Frontline Operations' },
+                'Volunteer': { level: 'Restricted', group: 'Assigned Project Fieldwork' },
+                'Intern': { level: 'Restricted', group: 'Assigned Department Tasks' }
+            };
+
+            const mapping = ROLE_ACCESS_MAP[assignedRole] || ROLE_ACCESS_MAP['Officer'];
+            const nameParts = (emp.fullName||'User').trim().split(' ');
+            const fInitial = nameParts[0].charAt(0).toLowerCase();
+            const lName = nameParts[nameParts.length - 1].toLowerCase().replace(/[^a-z]/g,'');
+            const username = `${fInitial}.${lName}`;
+            const email = emp.email || `${fInitial}.${lName}@bcf-sl.org`;
+
+            newAccount = {
+                userId: newUserId,
+                employeeId: emp.employeeId,
+                fullName: emp.fullName,
+                department: emp.department,
+                position: emp.title || 'Staff Member',
+                employmentType: emp.classification || 'Permanent',
+                email: email,
+                username: username,
+                role: assignedRole,
+                accessLevel: mapping.level,
+                permissionGroup: mapping.group,
+                status: 'ACTIVE',
+                createdDate: new Date().toLocaleDateString('en-GB'),
+                lastLogin: 'Never',
+                lastActivity: 'Auto-Provisioned on Staff Registration'
+            };
+
+            accounts.push(newAccount);
+            localStorage.setItem('bcf_user_accounts', JSON.stringify(accounts));
+
+            // Log into Audit Trail
+            logs = JSON.parse(localStorage.getItem('bcf_audit_logs') || '[]');
+            const auditId = 'AUD-' + String(logs.length + 1).padStart(6, '0');
+            const now = new Date();
+            const dateStr = now.toLocaleDateString('en-GB') + ' ' + now.toLocaleTimeString('en-GB', {hour:'2-digit', minute:'2-digit'});
+            logs.unshift({
+                auditId: auditId,
+                userId: newUserId,
+                employeeId: emp.employeeId,
+                action: 'Registered Staff & Auto-Provisioned Account',
+                module: 'HR / Super Admin',
+                dateTime: dateStr,
+                ipSession: '192.168.1.10',
+                previousValue: 'None',
+                newValue: `Account ${newUserId} (${assignedRole}) for ${emp.fullName}`,
+                result: 'Successful'
+            });
+            // Auto-enroll in Staff Payroll Schedule & Loan Facility if applicable
+            try {
+                let loans = JSON.parse(localStorage.getItem('bcf_staff_loans') || '[]');
+                const loanAmount = parseFloat(emp.payLoan) || 0;
+                if (loanAmount > 0 && !loans.some(l => l.employeeId === emp.employeeId)) {
+                    const nextLoanNum = loans.length + 1;
+                    loans.push({
+                        loanId: `LOAN-BCF-2026-${String(nextLoanNum).padStart(3, '0')}`,
+                        employeeId: emp.employeeId,
+                        employeeName: emp.fullName,
+                        totalPrincipal: loanAmount * 10,
+                        monthlyDeduction: loanAmount,
+                        balanceRemaining: loanAmount * 10,
+                        monthsPaid: 1,
+                        totalMonths: 10,
+                        status: "ACTIVE"
+                    });
+                    localStorage.setItem('bcf_staff_loans', JSON.stringify(loans));
+                }
+            } catch(e) {}
+
+            localStorage.setItem('bcf_audit_logs', JSON.stringify(logs));
+        } catch(e) {
+            console.error(e);
+        }
+
+        // ─── Direct Persistent Write to MongoDB Atlas Cluster ──────────
+        const apiBase = (window.location && window.location.origin && window.location.origin.startsWith('http')) 
+            ? window.location.origin 
+            : '';
+
+        let savedToAtlas = false;
+        let atlasSource = 'mongodb_atlas';
+        let atlasErrorMsg = '';
+
+        try {
+            // 1. Direct POST to master /api/employees endpoint (upserts directly to MongoDB Atlas)
+            const empRes = await fetch(`${apiBase}/api/employees`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(emp),
+            });
+            const empJson = await empRes.json();
+            if (empRes.ok && empJson.success) {
+                savedToAtlas = true;
+                atlasSource = empJson.source || 'mongodb_atlas';
+            } else {
+                atlasErrorMsg = empJson.error || ('HTTP ' + empRes.status);
+            }
+        } catch (fetchErr) {
+            atlasErrorMsg = fetchErr.message;
+        }
+
+        // 2. Secondary sync to /api/db/sync for related collections & backup
+        try {
+            const syncEmpRes = await fetch(`${apiBase}/api/db/sync`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ collection: 'employees', documents: [emp], keyField: 'employeeId' }),
+            });
+            if (syncEmpRes.ok) {
+                const syncEmpJson = await syncEmpRes.json();
+                if (syncEmpJson.success && !savedToAtlas) {
+                    savedToAtlas = true;
+                    atlasSource = syncEmpJson.source || 'mongodb_atlas';
+                }
+            }
+            if (newAccount) {
+                await fetch(`${apiBase}/api/db/sync`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ collection: 'user_accounts', documents: [newAccount], keyField: 'userId' }),
+                });
+            }
+            if (logs && logs.length > 0) {
+                await fetch(`${apiBase}/api/db/sync`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ collection: 'audit_logs', documents: [logs[0]], keyField: 'auditId' }),
+                });
+            }
+        } catch (syncErr) {
+            console.warn('[Staff Register] Secondary sync notice:', syncErr);
+        }
+
+        // 3. Trigger Bridge and parent postMessage for guaranteed real-time synchronization
+        try {
+            if (window.BCF_MONGO && typeof window.BCF_MONGO.saveEmployee === 'function') {
+                await window.BCF_MONGO.saveEmployee(emp);
+                if (newAccount) {
+                    await window.BCF_MONGO.sync('user_accounts', [newAccount], 'userId');
+                }
+            }
+        } catch (bridgeErr) {
+            console.warn('[Staff Register] Bridge notice:', bridgeErr);
+        }
+
+        try {
+            if (window.parent && window.parent !== window) {
+                window.parent.postMessage({ type: 'BCF_SYNC_EMPLOYEE', payload: emp }, '*');
+                if (newAccount) {
+                    window.parent.postMessage({ type: 'BCF_SYNC_COLLECTION', collection: 'user_accounts', documents: [newAccount], keyField: 'userId' }, '*');
+                }
+            }
+        } catch (_) {}
+
+        if (saveBtn) {
+            if (savedToAtlas) {
+                saveBtn.innerHTML = '<span class="material-symbols-outlined text-[18px]">verified</span> Saved to MongoDB Atlas!';
+                saveBtn.classList.remove('bg-secondary', 'hover:bg-blue-800');
+                saveBtn.classList.add('bg-green-600', 'hover:bg-green-700');
+            } else {
+                saveBtn.disabled = false;
+                saveBtn.innerHTML = originalBtnHtml;
+            }
+        }
+
+        if (savedToAtlas) {
+            alert(`✅ Staff Successfully Registered and Saved to MongoDB Atlas!\n\nEmployee ID: ${emp.employeeId}\nFull Name: ${emp.fullName}\nDepartment: ${emp.department}\nDatabase Status: Verified Saved to Atlas (${atlasSource})\n\nUser Account & Audit Logs have been automatically provisioned!`);
+            window.location.href = '../employee_profile_detail/code.html';
+        } else {
+            alert(`⚠️ Registration Preserved Locally\n\nNotice: Could not confirm live write to MongoDB Atlas backend (${atlasErrorMsg}).\nThe record has been saved locally and will auto-sync once the database connection is available.`);
+            window.location.href = '../employee_profile_detail/code.html';
+        }
+    }
+
+    function getEffectiveSystemRole() {
+        let auth = null;
+        try {
+            if (typeof window !== 'undefined' && window.parent && window.parent !== window) {
+                const raw = window.parent.sessionStorage.getItem('bcf_sl_auth') || window.parent.localStorage.getItem('bcf_sl_auth');
+                if (raw) auth = typeof raw === 'string' ? JSON.parse(raw) : raw;
+            }
+        } catch (_) {}
+        if (!auth) {
+            try {
+                const raw = sessionStorage.getItem('bcf_sl_auth') || localStorage.getItem('bcf_sl_auth');
+                if (raw) auth = typeof raw === 'string' ? JSON.parse(raw) : raw;
+            } catch (_) {}
+        }
+        const user = auth && auth.user ? auth.user : auth;
+        if (!user) {
+            const savedRole = localStorage.getItem('bcf_user_role');
+            if (savedRole) {
+                const sr = savedRole.toLowerCase();
+                if (sr === 'sa' || sr === 'super_admin' || sr === 'superadmin' || sr === 'admin') return 'super_admin';
+                if (sr === 'hr' || sr === 'hr_director') return 'hr_director';
+                return sr;
+            }
+            return 'staff';
+        }
+        const r = (user.role || '').toUpperCase();
+        const u = (user.username || '').toLowerCase();
+        const em = (user.email || '').toLowerCase();
+        const name = (user.name || '').toLowerCase();
+        const id = (user.employeeId || '').toUpperCase();
+
+        // Albert Joseph Bandama is Super Admin with full system control
+        if (r === 'SA' || r === 'SUPER ADMIN' || r === 'SUPER ADMINISTRATOR' || u === 'admin' || u === 'abandama' || em === 'admin@bcfsl.org' || em === 'admin@bcf-sl.org' || name.includes('bandama') || id === 'BCF-PTE-2026-0001') {
+            return 'super_admin';
+        }
+        if (r === 'HR' || r === 'HR DIRECTOR' || u === 'hr_director' || em.startsWith('hr@')) {
+            return 'hr_director';
+        }
+        if (r === 'CEO' || u === 'ceo_user' || em.startsWith('ceo@')) {
+            return 'ceo';
+        }
+        if (r === 'FIN' || r === 'FINANCE' || u === 'fin_director' || em.startsWith('fin@') || em.startsWith('finance@')) {
+            return 'finance_director';
+        }
+        if (r === 'IAR' || r === 'INTERNAL AUDIT' || u === 'iar_director' || em.startsWith('audit@')) {
+            return 'audit_director';
+        }
+        return 'staff';
+    }
+
+    function checkRBAC() {
+        const role = getEffectiveSystemRole();
+        // Super Admin and HR Director have full access to register staff
+        if (role === 'super_admin' || role === 'hr_director' || role === 'sa' || role === 'hr' || role === 'admin') {
+            return true;
+        }
+        document.body.innerHTML = `
+            <div class="min-h-screen bg-slate-100 flex items-center justify-center p-4 font-sans">
+                <div class="bg-white rounded-2xl border border-slate-200 shadow-xl max-w-md w-full p-8 text-center flex flex-col items-center">
+                    <div class="w-16 h-16 rounded-full bg-red-50 text-red-600 flex items-center justify-center mb-4">
+                        <span class="material-symbols-outlined text-4xl">lock</span>
+                    </div>
+                    <h2 class="text-xl font-extrabold text-slate-800 mb-2">Restricted Access</h2>
+                    <p class="text-sm text-slate-600 mb-6 leading-relaxed">
+                        Only <strong>Super Admin</strong> and <strong>HR Director</strong> (Full Access) have permission to register new staff.<br><br>
+                        Your current role has <strong>View Access</strong> only.
+                    </p>
+                    <a href="../staff_directory/code.html" class="px-6 py-2.5 bg-green-600 text-white font-bold text-sm rounded-lg hover:bg-green-700 transition shadow">
+                        Return to Directory
+                    </a>
+                </div>
+            </div>
+        `;
+        return false;
+    }
+
+    // Real-time synchronization when parent Next.js session updates
+    window.addEventListener('message', function(e) {
+        if (e.data && e.data.type === 'BCF_AUTH_SYNC') {
+            const role = getEffectiveSystemRole();
+            if (role === 'super_admin' || role === 'hr_director' || role === 'sa' || role === 'hr' || role === 'admin') {
+                const restrictedDiv = document.querySelector('.min-h-screen.bg-slate-100');
+                if (restrictedDiv) {
+                    window.location.reload();
+                }
+            }
+        }
+    });
+
+    window.onload = function() {
+        if(!checkRBAC()) return;
+        initNav();
+        addEdu(); // Start with 1 edu empty
+    }
+</script>
+
+<!-- PASSPORT PHOTO CAMERA MODAL -->
+<div id="camera-modal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm hidden flex items-center justify-center p-4">
+    <div class="bg-surface rounded-2xl max-w-lg w-full overflow-hidden shadow-2xl border border-outline flex flex-col transform transition-all">
+        <!-- Header -->
+        <div class="bg-surface-container-high px-5 py-3.5 border-b border-outline flex items-center justify-between">
+            <div class="flex items-center gap-2.5">
+                <div class="w-8 h-8 rounded-lg bg-primary/10 text-primary flex items-center justify-center">
+                    <span class="material-symbols-outlined text-[20px]">photo_camera</span>
+                </div>
+                <div>
+                    <h3 class="text-sm font-bold text-slate-900 leading-tight">Live Passport Camera Capture</h3>
+                    <p class="text-[11px] text-slate-500">Official Staff Identification Photograph</p>
+                </div>
+            </div>
+            <button type="button" onclick="closeCameraModal()" class="w-8 h-8 rounded-lg text-slate-500 hover:text-slate-800 hover:bg-slate-200 flex items-center justify-center transition">
+                <span class="material-symbols-outlined text-[18px]">close</span>
+            </button>
+        </div>
+
+        <!-- Camera View Area -->
+        <div class="relative bg-black flex items-center justify-center overflow-hidden aspect-[4/5] max-h-[380px]">
+            <video id="camera-video" autoplay playsinline muted class="w-full h-full object-cover"></video>
+            
+            <!-- Facial Alignment Oval Guide -->
+            <div class="pointer-events-none absolute inset-0 flex flex-col items-center justify-center">
+                <div class="w-48 h-60 rounded-full border-2 border-dashed border-white/80 shadow-[0_0_0_9999px_rgba(0,0,0,0.35)] flex flex-col items-center justify-between p-4">
+                    <span class="text-[10px] font-bold text-white bg-black/60 px-2 py-0.5 rounded-full mt-2 tracking-wide uppercase">Top of Head</span>
+                    <span class="text-[10px] font-bold text-white bg-black/60 px-2 py-0.5 rounded-full mb-2 tracking-wide uppercase">Chin Level</span>
+                </div>
+                <div class="absolute bottom-3 text-center text-white/90 text-xs font-medium bg-black/50 px-3 py-1 rounded-full backdrop-blur-xs flex items-center gap-1.5">
+                    <span class="material-symbols-outlined text-[14px] text-emerald-400">face</span>
+                    <span>Align face inside the oval. Background trims to white (#FFFFFF).</span>
+                </div>
+            </div>
+
+            <!-- Error fallback banner -->
+            <div id="camera-error-banner" class="hidden absolute inset-0 bg-slate-900/90 text-white p-6 flex flex-col items-center justify-center text-center gap-3">
+                <span class="material-symbols-outlined text-4xl text-amber-400">videocam_off</span>
+                <p id="camera-error-msg" class="text-xs font-semibold max-w-xs">Camera could not be accessed. Please ensure camera permissions are allowed, or use "Upload from Device" instead.</p>
+                <button type="button" onclick="closeCameraModal()" class="px-4 py-2 bg-white/20 hover:bg-white/30 text-white rounded-lg text-xs font-bold transition">Close &amp; Use File Upload</button>
+            </div>
+        </div>
+
+        <!-- Controls Footer -->
+        <div class="p-4 bg-surface-container flex items-center justify-between gap-3 border-t border-outline">
+            <button type="button" id="btn-camera-switch" onclick="switchCamera()" class="px-3 py-2 rounded-lg border border-outline bg-surface hover:bg-slate-100 text-slate-700 text-xs font-bold transition flex items-center gap-1.5 shadow-2xs">
+                <span class="material-symbols-outlined text-[16px]">flip_camera_ios</span>
+                <span>Switch Camera</span>
+            </button>
+            <div class="flex items-center gap-2">
+                <button type="button" onclick="closeCameraModal()" class="px-4 py-2 rounded-lg border border-outline hover:bg-slate-100 text-slate-700 text-xs font-bold transition">Cancel</button>
+                <button type="button" onclick="captureCameraSnapshot()" class="px-5 py-2 rounded-lg bg-primary hover:bg-primary-dark text-white text-xs font-bold transition shadow-xs flex items-center gap-1.5 cursor-pointer">
+                    <span class="material-symbols-outlined text-[16px]">photo_camera</span>
+                    <span>Capture &amp; Trim Background</span>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- PASSPORT PHOTO STUDIO & FRAMING EDITOR MODAL -->
+<div id="photo-studio-modal" class="fixed inset-0 z-50 bg-black/75 backdrop-blur-sm hidden flex items-center justify-center p-3 sm:p-5 overflow-y-auto">
+    <div class="bg-surface rounded-2xl max-w-4xl w-full max-h-[92vh] flex flex-col shadow-2xl border border-outline overflow-hidden">
+        <!-- Studio Header -->
+        <div class="px-5 py-3.5 bg-surface-container flex items-center justify-between border-b border-outline">
+            <div class="flex items-center gap-2.5">
+                <div class="w-9 h-9 rounded-lg bg-primary/10 text-primary flex items-center justify-center font-bold">
+                    <span class="material-symbols-outlined text-[22px]">tune</span>
+                </div>
+                <div>
+                    <h3 class="text-base font-bold text-slate-900 leading-tight">Passport Photo Studio &amp; Framing Editor</h3>
+                    <p class="text-[11px] text-slate-500">Auto-fit head &amp; shoulders, pan/zoom, and create pure solid white background (#FFFFFF)</p>
+                </div>
+            </div>
+            <button type="button" onclick="closePhotoStudioModal()" class="w-8 h-8 rounded-lg text-slate-500 hover:text-slate-800 hover:bg-slate-200 flex items-center justify-center transition">
+                <span class="material-symbols-outlined text-[20px]">close</span>
+            </button>
+        </div>
+
+        <!-- Studio Body: Split View (Canvas on Left, Controls on Right) -->
+        <div class="flex-1 p-4 sm:p-6 overflow-y-auto grid grid-cols-1 md:grid-cols-12 gap-6 bg-slate-50/50">
+            <!-- Left Column: Interactive Canvas & Guide -->
+            <div class="md:col-span-6 flex flex-col items-center justify-center">
+                <div class="relative bg-white rounded-xl shadow-lg border-2 border-slate-300 p-2 flex flex-col items-center">
+                    <div class="relative w-[280px] h-[360px] bg-white rounded-lg overflow-hidden select-none border border-slate-200 cursor-grab active:cursor-grabbing shadow-inner" id="studio-canvas-container">
+                        <!-- Canvas where user drags/pans -->
+                        <canvas id="studio-canvas" width="420" height="540" class="w-full h-full object-cover touch-none"></canvas>
+
+                        <!-- Passport Alignment Oval Guide (Toggleable) -->
+                        <div id="studio-guide-overlay" class="pointer-events-none absolute inset-0 flex flex-col items-center justify-center">
+                            <!-- Outer darkened vignette -->
+                            <div class="absolute inset-0 bg-black/15"></div>
+                            <!-- Passport Oval (Head ~70-75% height) -->
+                            <div class="relative w-[190px] h-[245px] rounded-[50%] border-2 border-dashed border-emerald-500 shadow-[0_0_0_9999px_rgba(255,255,255,0.2)] flex flex-col items-center justify-between p-2">
+                                <span class="text-[9px] font-bold text-white bg-emerald-700/90 px-2 py-0.5 rounded-full mt-1 tracking-wider uppercase shadow-xs">Top of Head</span>
+                                <!-- Eye line guide -->
+                                <div class="w-full border-t border-dotted border-emerald-400/90 flex justify-center">
+                                    <span class="text-[8px] font-bold text-white bg-emerald-800/80 px-1.5 py-0.2 rounded -mt-2">Eye Line</span>
+                                </div>
+                                <span class="text-[9px] font-bold text-white bg-emerald-700/90 px-2 py-0.5 rounded-full mb-1 tracking-wider uppercase shadow-xs">Chin Level</span>
+                            </div>
+                        </div>
+
+                        <!-- Drag Prompt Hint -->
+                        <div id="drag-hint" class="pointer-events-none absolute bottom-2 left-2 right-2 bg-black/60 backdrop-blur-xs text-white text-[10px] text-center py-1 rounded px-2 transition-opacity">
+                            <span class="inline-flex items-center gap-1">
+                                <span class="material-symbols-outlined text-[12px]">drag_pan</span>
+                                Drag photo to center face inside the oval
+                            </span>
+                        </div>
+                    </div>
+
+                    <!-- Guide & Fit quick status under canvas -->
+                    <div class="mt-3 flex items-center justify-between w-full text-xs text-slate-600 px-1">
+                        <label class="inline-flex items-center gap-1.5 cursor-pointer font-medium">
+                            <input type="checkbox" id="chk-show-guide" checked onchange="toggleStudioGuide()" class="rounded text-primary focus:ring-0">
+                            <span>Show Passport Guide Oval</span>
+                        </label>
+                        <span class="text-[11px] text-slate-400 font-mono">Aspect Ratio: 35×45mm</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Column: Control Panels -->
+            <div class="md:col-span-6 flex flex-col gap-4">
+                
+                <!-- Card 1: Fitting & Sizing (Fit it!) -->
+                <div class="bg-surface rounded-xl p-4 border border-outline shadow-2xs space-y-3">
+                    <div class="flex items-center justify-between border-b border-outline/60 pb-2">
+                        <h4 class="text-xs font-bold uppercase tracking-wider text-primary flex items-center gap-1.5">
+                            <span class="material-symbols-outlined text-[16px]">crop_free</span>
+                            1. Passport Framing &amp; Fit
+                        </h4>
+                        <button type="button" onclick="autoFitHeadAndShoulders()" class="text-xs font-bold text-secondary hover:text-blue-700 bg-secondary/10 hover:bg-secondary/20 px-2.5 py-1 rounded-md transition flex items-center gap-1 cursor-pointer">
+                            <span class="material-symbols-outlined text-[14px]">face</span>
+                            Auto-Fit Head &amp; Shoulders
+                        </button>
+                    </div>
+
+                    <!-- Zoom Slider -->
+                    <div>
+                        <div class="flex justify-between items-center text-xs font-semibold text-slate-700 mb-1">
+                            <span class="flex items-center gap-1"><span class="material-symbols-outlined text-[15px] text-slate-500">zoom_in</span> Zoom / Scale:</span>
+                            <span id="zoom-value-label" class="font-mono text-primary font-bold">125%</span>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <button type="button" onclick="adjustZoom(-0.1)" class="w-7 h-7 rounded border border-outline hover:bg-slate-100 font-bold text-slate-600 flex items-center justify-center text-sm cursor-pointer">-</button>
+                            <input type="range" id="studio-zoom" min="0.8" max="3.5" step="0.05" value="1.25" oninput="onStudioZoomChange(this.value)" class="flex-1 accent-primary cursor-pointer">
+                            <button type="button" onclick="adjustZoom(0.1)" class="w-7 h-7 rounded border border-outline hover:bg-slate-100 font-bold text-slate-600 flex items-center justify-center text-sm cursor-pointer">+</button>
+                        </div>
+                    </div>
+
+                    <!-- Quick framing presets -->
+                    <div class="grid grid-cols-3 gap-2 pt-1">
+                        <button type="button" onclick="autoFitHeadAndShoulders()" class="px-2 py-1.5 text-[11px] font-bold rounded-lg border border-primary/40 text-primary bg-primary/5 hover:bg-primary/10 transition text-center cursor-pointer">
+                            🎯 Passport Fit
+                        </button>
+                        <button type="button" onclick="centerFraming()" class="px-2 py-1.5 text-[11px] font-bold rounded-lg border border-slate-300 text-slate-700 hover:bg-slate-100 transition text-center cursor-pointer">
+                            ↔ Center Face
+                        </button>
+                        <button type="button" onclick="resetFraming()" class="px-2 py-1.5 text-[11px] font-bold rounded-lg border border-slate-300 text-slate-700 hover:bg-slate-100 transition text-center cursor-pointer">
+                            ↺ Reset 100%
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Card 2: Background Whitening (#FFFFFF) -->
+                <div class="bg-surface rounded-xl p-4 border border-outline shadow-2xs space-y-3">
+                    <div class="flex items-center justify-between border-b border-outline/60 pb-2">
+                        <h4 class="text-xs font-bold uppercase tracking-wider text-emerald-700 flex items-center gap-1.5">
+                            <span class="material-symbols-outlined text-[16px]">format_paint</span>
+                            2. Pure White Background (#FFFFFF)
+                        </h4>
+                        <span class="text-[10px] bg-emerald-100 text-emerald-800 font-bold px-2 py-0.5 rounded-full">Solid #FFFFFF</span>
+                    </div>
+
+                    <p class="text-[11px] text-slate-500 leading-normal">
+                        Remove room backgrounds, walls, lamps, and plants to make the portrait background 100% solid institutional white.
+                    </p>
+
+                    <!-- Primary AI Whiten Button -->
+                    <button type="button" id="btn-studio-ai-whiten" onclick="triggerStudioAIWhiten()" class="w-full py-2.5 px-3 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs shadow-xs transition flex items-center justify-center gap-2 cursor-pointer">
+                        <span class="material-symbols-outlined text-[18px]">auto_fix_high</span>
+                        <span>AI Remove Background &amp; Make Pure White</span>
+                    </button>
+
+                    <!-- Whiten Outside Guide Oval Button -->
+                    <div class="pt-1 flex gap-2">
+                        <button type="button" onclick="whitenOutsideGuideOval()" class="flex-1 py-1.5 px-2 rounded-lg border border-emerald-300 bg-emerald-50 hover:bg-emerald-100 text-emerald-800 text-[11px] font-bold transition flex items-center justify-center gap-1 cursor-pointer">
+                            <span class="material-symbols-outlined text-[15px]">vignette</span>
+                            <span>Whiten Outside Oval Guide</span>
+                        </button>
+                        <button type="button" onclick="undoStudioAction()" id="btn-studio-undo" class="px-3 py-1.5 rounded-lg border border-slate-300 hover:bg-slate-100 text-slate-700 text-[11px] font-bold transition flex items-center gap-1 cursor-pointer disabled:opacity-50" title="Undo Last Change">
+                            <span class="material-symbols-outlined text-[15px]">undo</span>
+                            <span>Undo</span>
+                        </button>
+                    </div>
+
+                    <!-- Touch-up Eraser Brush Tool -->
+                    <div class="pt-2 border-t border-outline/50 space-y-2">
+                        <div class="flex items-center justify-between">
+                            <label class="inline-flex items-center gap-2 text-xs font-bold text-slate-800 cursor-pointer">
+                                <input type="checkbox" id="chk-brush-mode" onchange="toggleBrushMode()" class="rounded text-primary focus:ring-0">
+                                <span class="flex items-center gap-1">
+                                    <span class="material-symbols-outlined text-[15px] text-primary">brush</span>
+                                    <span>Manual White Touch-up Brush</span>
+                                </span>
+                            </label>
+                            <span id="brush-mode-status" class="text-[10px] text-slate-400 font-semibold">Off</span>
+                        </div>
+                        <div id="brush-controls-panel" class="hidden pl-6 space-y-2">
+                            <div class="flex items-center gap-2 text-xs text-slate-600">
+                                <span>Brush Size:</span>
+                                <div class="flex items-center gap-1">
+                                    <button type="button" onclick="setBrushSize(14)" class="px-2 py-0.5 rounded text-[11px] border border-slate-300 hover:bg-slate-100 cursor-pointer" id="btn-brush-sm">Small</button>
+                                    <button type="button" onclick="setBrushSize(26)" class="px-2 py-0.5 rounded text-[11px] border border-primary bg-primary/10 text-primary font-bold cursor-pointer" id="btn-brush-md">Medium</button>
+                                    <button type="button" onclick="setBrushSize(44)" class="px-2 py-0.5 rounded text-[11px] border border-slate-300 hover:bg-slate-100 cursor-pointer" id="btn-brush-lg">Large</button>
+                                </div>
+                            </div>
+                            <p class="text-[10px] text-slate-400">Paint over any stubborn background artifacts (lamps, plants, walls) with pure white.</p>
+                        </div>
+                    </div>
+
+                </div>
+
+            </div>
+        </div>
+
+        <!-- Studio Footer Actions -->
+        <div class="px-6 py-3.5 bg-surface-container flex items-center justify-between border-t border-outline">
+            <button type="button" onclick="closePhotoStudioModal()" class="px-4 py-2 rounded-lg border border-outline hover:bg-slate-200 text-slate-700 text-xs font-bold transition">
+                Cancel
+            </button>
+            <div class="flex items-center gap-2.5">
+                <button type="button" onclick="saveStudioAndApply()" class="px-6 py-2.5 rounded-xl bg-primary hover:bg-primary-dark text-white text-xs font-bold transition shadow-md flex items-center gap-2 cursor-pointer">
+                    <span class="material-symbols-outlined text-[18px]">verified</span>
+                    <span>Apply &amp; Save Passport Photo</span>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- DUPLICATE ENTRY WARNING MODAL -->
+<div id="dup-warning-modal" class="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs hidden flex items-center justify-center p-4">
+    <div class="bg-surface rounded-2xl max-w-lg w-full p-6 shadow-2xl border border-red-300 transform transition-all">
+        <div class="flex items-center gap-3 text-red-600 mb-4 pb-3 border-b border-red-100">
+            <div class="w-12 h-12 rounded-full bg-red-100 flex items-center justify-center shrink-0">
+                <span class="material-symbols-outlined text-3xl text-red-600">error</span>
+            </div>
+            <div>
+                <h3 class="text-lg font-bold text-slate-900">Duplicate Record Detected</h3>
+                <p class="text-xs text-red-600 font-semibold uppercase tracking-wider">Uniqueness Policy Warning</p>
+            </div>
+        </div>
+        <p class="text-sm text-slate-600 mb-3">
+            The following information <strong>has already been entered</strong> for another employee in the database. Each employee must have a unique <strong>NIN / Passport, NASSIT No., Account Number, and BBAN Number</strong>:
+        </p>
+        <div id="dup-modal-list" class="space-y-2.5 mb-6 bg-red-50/70 p-3.5 rounded-xl border border-red-200 text-sm max-h-60 overflow-y-auto">
+            <!-- Dynamic entries inserted here -->
+        </div>
+        <div class="flex justify-end gap-3 pt-2">
+            <button type="button" onclick="closeDupModal()" class="px-5 py-2.5 rounded-xl bg-red-600 hover:bg-red-700 text-white font-bold text-sm shadow transition flex items-center gap-2">
+                <span class="material-symbols-outlined text-[18px]">edit</span>
+                Review &amp; Correct
+            </button>
+        </div>
+    </div>
+</div>
+
+
+<script>
+    function navToApp(nextRoute, fallbackPath, e) {
+        if (e) e.preventDefault();
+        try {
+            if (window.top && window.top !== window && window.top.location) {
+                window.top.location.href = nextRoute;
+                return;
+            }
+        } catch(err) {}
+        window.location.href = fallbackPath;
+    }
+</script>
+
+</body>
+</html>

@@ -1,0 +1,480 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover"/>
+    <title>HR Approval Console - BCF-SL</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: "#004328",
+                        "primary-dark": "#002b1a",
+                        secondary: "#1A56DB",
+                        tertiary: "#7B2FBE",
+                        surface: "#ffffff",
+                        "surface-container": "#f8f9fc",
+                        "on-surface": "#0d1c2e",
+                        "on-surface-variant": "#4b5563",
+                        outline: "#d1d5db",
+                        error: "#dc2626",
+                        success: "#16a34a"
+                    },
+                    fontFamily: {
+                        sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+                        mono: ['"JetBrains Mono"', 'monospace']
+                    }
+                }
+            }
+        };
+    </script>
+    <style>
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #f4f6fa; }
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-thumb { background-color: #cbd5e1; border-radius: 3px; }
+        .score-pill { transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
+    </style>
+</head>
+<body class="text-on-surface flex flex-col min-h-screen">
+
+    <!-- Unified Top Navigation & 8 Tabs Bar -->
+    <div id="bcf-loans-nav-header"></div>
+
+    <main class="flex-grow p-4 sm:p-6 max-w-7xl mx-auto w-full flex flex-col gap-6">
+
+        <!-- INCOMING EMAIL BANNER FOR HR DIRECTOR -->
+        <div id="hr-email-alert" class="bg-gradient-to-r from-emerald-900 to-teal-900 text-white p-4 rounded-2xl shadow-md flex items-center justify-between gap-4 border border-emerald-700/50">
+            <div class="flex items-center gap-3.5">
+                <div class="w-10 h-10 rounded-xl bg-emerald-500/20 text-emerald-300 flex items-center justify-center shrink-0 border border-emerald-400/30">
+                    <span class="material-symbols-outlined text-2xl">mark_email_unread</span>
+                </div>
+                <div>
+                    <div class="flex items-center gap-2">
+                        <span class="text-xs uppercase font-extrabold tracking-wider text-emerald-400">Incoming Official Email</span>
+                        <span class="px-2 py-0.2 text-[10px] font-bold rounded-full bg-emerald-500/20 text-emerald-300">Received for HR Director Review</span>
+                    </div>
+                    <p id="hr-alert-text" class="text-sm font-semibold text-slate-100 mt-0.5">
+                        New loan application submitted by <span id="alert-staff-name" class="text-emerald-300 font-bold">Mariama Kamara</span> — Verification required.
+                    </p>
+                </div>
+            </div>
+            <button onclick="BCF_LOANS.toggleEmailDrawer()" class="hidden sm:inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-white/10 hover:bg-white/20 text-xs font-bold text-white transition border border-white/10 shadow-xs">
+                <span>View Full Email</span>
+                <span class="material-symbols-outlined text-[16px]">open_in_new</span>
+            </button>
+        </div>
+
+        <!-- APPLICATION SUMMARY CARD -->
+        <div class="bg-surface rounded-2xl border border-slate-200 shadow-sm p-5 sm:p-6 flex flex-col gap-4">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-100 pb-3">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-xl bg-primary/10 text-primary flex items-center justify-center">
+                        <span class="material-symbols-outlined text-xl">person</span>
+                    </div>
+                    <div>
+                        <h2 class="text-base sm:text-lg font-extrabold text-slate-900 tracking-tight" id="disp-fullname">Mariama Kamara</h2>
+                        <span class="text-xs text-slate-500" id="disp-pos-dept">Senior Field Coordinator &bull; Programs Department</span>
+                    </div>
+                </div>
+
+                <div class="flex items-center gap-2 flex-wrap">
+                    <span class="font-mono text-xs font-extrabold px-3 py-1 rounded-lg bg-slate-100 text-slate-800 border border-slate-200" id="disp-ref">
+                        REF: BCF-LN-2026-0842
+                    </span>
+                    <span id="disp-status-badge" class="px-3 py-1 rounded-full text-xs font-extrabold bg-amber-100 text-amber-800 border border-amber-300">
+                        Pending HR Verification
+                    </span>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 pt-1">
+                <div class="p-3 rounded-xl bg-slate-50 border border-slate-200 flex flex-col">
+                    <span class="text-[10px] font-extrabold uppercase text-slate-400">Employee ID</span>
+                    <span id="disp-empid" class="text-xs font-bold text-slate-800 mt-1 font-mono">BCF-SL-1048</span>
+                </div>
+                <div class="p-3 rounded-xl bg-slate-50 border border-slate-200 flex flex-col">
+                    <span class="text-[10px] font-extrabold uppercase text-slate-400">Service Duration</span>
+                    <span id="disp-service" class="text-xs font-bold text-emerald-800 mt-1">4.3 Years</span>
+                </div>
+                <div class="p-3 rounded-xl bg-slate-50 border border-slate-200 flex flex-col">
+                    <span class="text-[10px] font-extrabold uppercase text-slate-400">Monthly Basic Salary</span>
+                    <span id="disp-salary" class="text-xs font-bold text-slate-800 mt-1 font-mono">NLe 8,500.00</span>
+                </div>
+                <div class="p-3 rounded-xl bg-slate-50 border border-slate-200 flex flex-col">
+                    <span class="text-[10px] font-extrabold uppercase text-slate-400">Multiplier Category</span>
+                    <span id="disp-multiplier" class="text-xs font-bold text-slate-800 mt-1">Officer</span>
+                </div>
+                <div class="p-3 rounded-xl bg-slate-50 border border-slate-200 flex flex-col">
+                    <span class="text-[10px] font-extrabold uppercase text-slate-400">Requested Amount</span>
+                    <span id="disp-amount" class="text-xs font-bold text-primary mt-1 font-mono">NLe 8,500.00</span>
+                </div>
+                <div class="p-3 rounded-xl bg-slate-50 border border-slate-200 flex flex-col">
+                    <span class="text-[10px] font-extrabold uppercase text-slate-400">Tenor &amp; Monthly Ded.</span>
+                    <span id="disp-deduction" class="text-xs font-bold text-emerald-700 mt-1 font-mono">10 Mos @ NLe 850</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- ========================================================================= -->
+        <!-- HUMAN RESOURCES VERIFICATION CHECKLIST & SCORING                         -->
+        <!-- ========================================================================= -->
+        <section class="bg-surface rounded-2xl border border-slate-200 shadow-sm p-5 sm:p-8 flex flex-col gap-6">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-100 pb-4">
+                <div>
+                    <span class="text-xs font-extrabold uppercase text-primary tracking-wider">Mandatory Policy Review</span>
+                    <h3 class="text-lg sm:text-xl font-extrabold text-slate-900 tracking-tight flex items-center gap-2 mt-0.5">
+                        <span class="material-symbols-outlined text-primary">fact_check</span>
+                        <span>HUMAN RESOURCES VERIFICATION</span>
+                    </h3>
+                    <p class="text-xs text-slate-500 mt-1">
+                        Each item has a weighted percentage. Value is only awarded if confirmed; Not Confirmed is 0%. Minimum approval threshold is <strong>&gt;= 85%</strong>.
+                    </p>
+                </div>
+
+                <!-- LIVE SCORE COUNTER -->
+                <div class="flex items-center gap-4 bg-slate-50 px-5 py-3 rounded-2xl border border-slate-200 shadow-2xs">
+                    <div class="flex flex-col">
+                        <span class="text-[10px] font-extrabold uppercase text-slate-400">HR Score Threshold</span>
+                        <div class="flex items-baseline gap-1 mt-0.5">
+                            <span id="hr-score-display" class="text-2xl font-black text-slate-900 font-mono">0%</span>
+                            <span class="text-xs text-slate-400 font-bold">/ 100%</span>
+                        </div>
+                    </div>
+                    <div class="w-12 h-12 rounded-xl flex items-center justify-center font-bold text-sm shadow-xs score-pill bg-slate-200 text-slate-600" id="hr-score-icon-box">
+                        <span class="material-symbols-outlined text-2xl" id="hr-score-icon">hourglass_empty</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 4 VERIFICATION ITEMS TABLE -->
+            <div class="overflow-x-auto border border-slate-200 rounded-xl shadow-2xs">
+                <table class="w-full text-left border-collapse">
+                    <thead>
+                        <tr class="bg-slate-50 border-b border-slate-200 text-slate-700 text-xs uppercase font-extrabold">
+                            <th class="py-3 px-4 w-12 text-center">No.</th>
+                            <th class="py-3 px-4">Verification Item Description</th>
+                            <th class="py-3 px-4 w-28 text-center">Weight</th>
+                            <th class="py-3 px-4 w-36 text-center text-emerald-800">Confirmed</th>
+                            <th class="py-3 px-4 w-36 text-center text-red-700">Not Confirmed</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-slate-200 text-sm">
+                        <!-- Item 1 -->
+                        <tr class="hover:bg-slate-50/60 transition">
+                            <td class="py-4 px-4 text-center font-mono font-bold text-slate-400">1</td>
+                            <td class="py-4 px-4">
+                                <span class="font-bold text-slate-800">Staff member has completed a minimum of one (1) continuous year of service</span>
+                                <p class="text-xs text-slate-500 mt-0.5">Cross-referenced against staff employment start date and current date.</p>
+                            </td>
+                            <td class="py-4 px-4 text-center">
+                                <span class="px-2 py-0.5 rounded-full text-xs font-mono font-extrabold bg-blue-50 text-blue-800 border border-blue-200">
+                                    35%
+                                </span>
+                            </td>
+                            <td class="py-4 px-4 text-center">
+                                <label class="inline-flex items-center gap-1.5 cursor-pointer font-bold text-xs text-emerald-800 hover:text-emerald-950">
+                                    <input type="radio" name="hr_v1" value="35" class="hr-check w-4 h-4 text-emerald-600 focus:ring-emerald-500 accent-emerald-600" onchange="calculateHrScore()" checked/>
+                                    <span>Tick &#9745;</span>
+                                </label>
+                            </td>
+                            <td class="py-4 px-4 text-center">
+                                <label class="inline-flex items-center gap-1.5 cursor-pointer font-bold text-xs text-red-600 hover:text-red-800">
+                                    <input type="radio" name="hr_v1" value="0" class="hr-check w-4 h-4 text-red-600 focus:ring-red-500 accent-red-600" onchange="calculateHrScore()"/>
+                                    <span>Tick &#9744;</span>
+                                </label>
+                            </td>
+                        </tr>
+
+                        <!-- Item 2 -->
+                        <tr class="hover:bg-slate-50/60 transition">
+                            <td class="py-4 px-4 text-center font-mono font-bold text-slate-400">2</td>
+                            <td class="py-4 px-4">
+                                <span class="font-bold text-slate-800">No outstanding or unsettled loan exists on the staff member's account</span>
+                                <p class="text-xs text-slate-500 mt-0.5">Staff ledger verified; zero prior balance or fully amortized and discharged.</p>
+                            </td>
+                            <td class="py-4 px-4 text-center">
+                                <span class="px-2 py-0.5 rounded-full text-xs font-mono font-extrabold bg-blue-50 text-blue-800 border border-blue-200">
+                                    30%
+                                </span>
+                            </td>
+                            <td class="py-4 px-4 text-center">
+                                <label class="inline-flex items-center gap-1.5 cursor-pointer font-bold text-xs text-emerald-800 hover:text-emerald-950">
+                                    <input type="radio" name="hr_v2" value="30" class="hr-check w-4 h-4 text-emerald-600 focus:ring-emerald-500 accent-emerald-600" onchange="calculateHrScore()" checked/>
+                                    <span>Tick &#9745;</span>
+                                </label>
+                            </td>
+                            <td class="py-4 px-4 text-center">
+                                <label class="inline-flex items-center gap-1.5 cursor-pointer font-bold text-xs text-red-600 hover:text-red-800">
+                                    <input type="radio" name="hr_v2" value="0" class="hr-check w-4 h-4 text-red-600 focus:ring-red-500 accent-red-600" onchange="calculateHrScore()"/>
+                                    <span>Tick &#9744;</span>
+                                </label>
+                            </td>
+                        </tr>
+
+                        <!-- Item 3 -->
+                        <tr class="hover:bg-slate-50/60 transition">
+                            <td class="py-4 px-4 text-center font-mono font-bold text-slate-400">3</td>
+                            <td class="py-4 px-4">
+                                <span class="font-bold text-slate-800">Employment status and contract are confirmed as active and in good standing</span>
+                                <p class="text-xs text-slate-500 mt-0.5">Valid contract file active; not under notice of termination or probation.</p>
+                            </td>
+                            <td class="py-4 px-4 text-center">
+                                <span class="px-2 py-0.5 rounded-full text-xs font-mono font-extrabold bg-blue-50 text-blue-800 border border-blue-200">
+                                    20%
+                                </span>
+                            </td>
+                            <td class="py-4 px-4 text-center">
+                                <label class="inline-flex items-center gap-1.5 cursor-pointer font-bold text-xs text-emerald-800 hover:text-emerald-950">
+                                    <input type="radio" name="hr_v3" value="20" class="hr-check w-4 h-4 text-emerald-600 focus:ring-emerald-500 accent-emerald-600" onchange="calculateHrScore()" checked/>
+                                    <span>Tick &#9745;</span>
+                                </label>
+                            </td>
+                            <td class="py-4 px-4 text-center">
+                                <label class="inline-flex items-center gap-1.5 cursor-pointer font-bold text-xs text-red-600 hover:text-red-800">
+                                    <input type="radio" name="hr_v3" value="0" class="hr-check w-4 h-4 text-red-600 focus:ring-red-500 accent-red-600" onchange="calculateHrScore()"/>
+                                    <span>Tick &#9744;</span>
+                                </label>
+                            </td>
+                        </tr>
+
+                        <!-- Item 4 -->
+                        <tr class="hover:bg-slate-50/60 transition">
+                            <td class="py-4 px-4 text-center font-mono font-bold text-slate-400">4</td>
+                            <td class="py-4 px-4">
+                                <span class="font-bold text-slate-800">Staff member's conduct record is satisfactory with no pending disciplinary matters</span>
+                                <p class="text-xs text-slate-500 mt-0.5">HR grievance and disciplinary registry clear of outstanding citations.</p>
+                            </td>
+                            <td class="py-4 px-4 text-center">
+                                <span class="px-2 py-0.5 rounded-full text-xs font-mono font-extrabold bg-blue-50 text-blue-800 border border-blue-200">
+                                    15%
+                                </span>
+                            </td>
+                            <td class="py-4 px-4 text-center">
+                                <label class="inline-flex items-center gap-1.5 cursor-pointer font-bold text-xs text-emerald-800 hover:text-emerald-950">
+                                    <input type="radio" name="hr_v4" value="15" class="hr-check w-4 h-4 text-emerald-600 focus:ring-emerald-500 accent-emerald-600" onchange="calculateHrScore()" checked/>
+                                    <span>Tick &#9745;</span>
+                                </label>
+                            </td>
+                            <td class="py-4 px-4 text-center">
+                                <label class="inline-flex items-center gap-1.5 cursor-pointer font-bold text-xs text-red-600 hover:text-red-800">
+                                    <input type="radio" name="hr_v4" value="0" class="hr-check w-4 h-4 text-red-600 focus:ring-red-500 accent-red-600" onchange="calculateHrScore()"/>
+                                    <span>Tick &#9744;</span>
+                                </label>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- HR REMARKS / NOTES (TEXT) -->
+            <div class="flex flex-col gap-2">
+                <label class="text-xs font-extrabold uppercase text-slate-700">HR Remarks / Notes (Text)</label>
+                <textarea id="hr-remarks" rows="3" class="w-full p-3.5 bg-slate-50 border border-slate-300 rounded-xl text-sm focus:border-primary outline-none resize-none leading-relaxed" placeholder="Enter HR Director verification notes, file citations, and endorsement observations..."></textarea>
+            </div>
+
+            <!-- DECISION & ROUTING CONTROLS -->
+            <div class="p-4 rounded-xl bg-slate-50 border border-slate-200 flex flex-col sm:flex-row items-center justify-between gap-4">
+                <div class="flex items-center gap-3">
+                    <div id="hr-verdict-indicator" class="w-3 h-3 rounded-full bg-emerald-500 animate-pulse"></div>
+                    <div>
+                        <span id="hr-verdict-title" class="text-sm font-bold text-slate-900">Score &gt;= 85%: Criteria Met for Finance Clearance</span>
+                        <p class="text-xs text-slate-500" id="hr-verdict-desc">Application is qualified to proceed to Finance Director review.</p>
+                    </div>
+                </div>
+
+                <!-- ACTION BUTTONS -->
+                <div class="flex items-center gap-3 w-full sm:w-auto">
+                    <!-- Approved Button (Clickable only if score >= 85%) -->
+                    <button type="button" id="btn-hr-approve" onclick="approveAndRouteToFinance()" class="w-full sm:w-auto px-6 py-3 bg-primary hover:bg-primary-dark text-white rounded-xl text-sm font-extrabold shadow-md flex items-center justify-center gap-2 transition active:scale-95">
+                        <span class="material-symbols-outlined text-[18px]">verified</span>
+                        <span>Approve &amp; Route to Finance</span>
+                    </button>
+
+                    <!-- Not Approved Button (Appears if does not meet requirement < 85%) -->
+                    <button type="button" id="btn-hr-reject" onclick="rejectApplicationHR()" class="hidden w-full sm:w-auto px-6 py-3 bg-red-600 hover:bg-red-700 text-white rounded-xl text-sm font-extrabold shadow-md flex items-center justify-center gap-2 transition active:scale-95">
+                        <span class="material-symbols-outlined text-[18px]">block</span>
+                        <span>Not Approved (Score &lt; 85%)</span>
+                    </button>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Shared Library -->
+    <script src="../bcf_loans_shared.js"></script>
+
+    <script>
+        let currentApp = null;
+
+        document.addEventListener('DOMContentLoaded', () => {
+            BCF_LOANS.renderHeaderAndTabs('hr-approval');
+            loadApplication();
+            calculateHrScore();
+        });
+
+        function loadApplication() {
+            currentApp = BCF_LOANS.getActiveLoanApplication();
+            if (!currentApp) return;
+
+            document.getElementById('disp-fullname').textContent = currentApp.staff.fullName || '-';
+            const deptDisplay = BCF_LOANS.normalizeDepartment ? BCF_LOANS.normalizeDepartment(currentApp.staff.department) : (currentApp.staff.department || '-');
+            document.getElementById('disp-pos-dept').textContent = `${currentApp.staff.title || '-'} • ${deptDisplay}`;
+            document.getElementById('disp-ref').textContent = `REF: ${currentApp.refNo}`;
+            document.getElementById('disp-empid').textContent = currentApp.staff.employeeId || '-';
+            document.getElementById('disp-service').textContent = currentApp.staff.serviceYears || '-';
+            document.getElementById('disp-salary').textContent = `NLe ${parseFloat(currentApp.staff.basicSalary || 0).toLocaleString('en-US', { minimumFractionDigits: 2 })}`;
+            document.getElementById('disp-multiplier').textContent = currentApp.staff.multiplierCategory || 'Officer';
+            document.getElementById('disp-amount').textContent = `NLe ${parseFloat(currentApp.request.loanAmount || 0).toLocaleString('en-US', { minimumFractionDigits: 2 })}`;
+            
+            const proposedMonthly = parseFloat(currentApp.request.proposedMonthlyDeduction || currentApp.request.loanAmount * 0.10);
+            document.getElementById('disp-deduction').textContent = `10 Mos @ NLe ${proposedMonthly.toLocaleString('en-US')}`;
+
+            document.getElementById('alert-staff-name').textContent = currentApp.staff.fullName;
+
+            if (currentApp.hrReview && currentApp.hrReview.remarks) {
+                document.getElementById('hr-remarks').value = currentApp.hrReview.remarks;
+            } else {
+                document.getElementById('hr-remarks').value = "Staff member employment contract, tenure verification, and good conduct standing confirmed via HR database.";
+            }
+
+            // Update badge
+            const statusBadge = document.getElementById('disp-status-badge');
+            if (currentApp.status === 'HR_APPROVED') {
+                statusBadge.className = 'px-3 py-1 rounded-full text-xs font-extrabold bg-blue-100 text-blue-800 border border-blue-300';
+                statusBadge.textContent = 'HR Approved (At Finance)';
+            } else if (currentApp.status === 'HR_REJECTED') {
+                statusBadge.className = 'px-3 py-1 rounded-full text-xs font-extrabold bg-red-100 text-red-800 border border-red-300';
+                statusBadge.textContent = 'HR Rejected';
+            }
+        }
+
+        function calculateHrScore() {
+            let total = 0;
+            ['hr_v1', 'hr_v2', 'hr_v3', 'hr_v4'].forEach(name => {
+                const el = document.querySelector(`input[name="${name}"]:checked`);
+                if (el) {
+                    total += parseInt(el.value, 10);
+                }
+            });
+
+            const scoreDisplay = document.getElementById('hr-score-display');
+            const scoreIconBox = document.getElementById('hr-score-icon-box');
+            const scoreIcon = document.getElementById('hr-score-icon');
+            const btnApprove = document.getElementById('btn-hr-approve');
+            const btnReject = document.getElementById('btn-hr-reject');
+            const indicator = document.getElementById('hr-verdict-indicator');
+            const title = document.getElementById('hr-verdict-title');
+            const desc = document.getElementById('hr-verdict-desc');
+
+            scoreDisplay.textContent = total + '%';
+
+            if (total >= 85) {
+                // Meets Requirement (>= 85%)
+                scoreDisplay.className = "text-2xl font-black text-emerald-800 font-mono";
+                scoreIconBox.className = "w-12 h-12 rounded-xl flex items-center justify-center font-bold text-sm shadow-xs score-pill bg-emerald-100 text-emerald-800 border border-emerald-300";
+                scoreIcon.textContent = "check_circle";
+
+                indicator.className = "w-3 h-3 rounded-full bg-emerald-500 animate-pulse";
+                title.textContent = `Score ${total}% >= 85%: Criteria Met for Finance Clearance`;
+                desc.textContent = "Application satisfies BCF-SL HR verification threshold. Click below to approve and route to Finance.";
+
+                // Button controls
+                btnApprove.disabled = false;
+                btnApprove.classList.remove('hidden', 'opacity-50', 'cursor-not-allowed');
+                btnReject.classList.add('hidden');
+            } else {
+                // Does NOT meet requirement (< 85%)
+                scoreDisplay.className = "text-2xl font-black text-red-700 font-mono";
+                scoreIconBox.className = "w-12 h-12 rounded-xl flex items-center justify-center font-bold text-sm shadow-xs score-pill bg-red-100 text-red-700 border border-red-300";
+                scoreIcon.textContent = "cancel";
+
+                indicator.className = "w-3 h-3 rounded-full bg-red-500";
+                title.textContent = `Score ${total}% < 85%: Minimum Threshold Not Satisfied`;
+                desc.textContent = "Application does not meet the minimum 85% requirement to proceed to Finance Director.";
+
+                // Button controls: Approved disabled, Not Approved button appears
+                btnApprove.disabled = true;
+                btnApprove.classList.add('hidden');
+                btnReject.classList.remove('hidden');
+            }
+        }
+
+        function approveAndRouteToFinance() {
+            if (!currentApp) return;
+
+            let total = 0;
+            ['hr_v1', 'hr_v2', 'hr_v3', 'hr_v4'].forEach(name => {
+                const el = document.querySelector(`input[name="${name}"]:checked`);
+                if (el) total += parseInt(el.value, 10);
+            });
+
+            if (total < 85) {
+                alert("Cannot approve: Score is below 85% threshold.");
+                return;
+            }
+
+            currentApp.status = 'HR_APPROVED';
+            currentApp.hrReview = {
+                score: total,
+                status: 'APPROVED',
+                verifiedBy: 'Dr. Sorie Sesay (HR Director)',
+                date: new Date().toISOString(),
+                remarks: document.getElementById('hr-remarks').value
+            };
+
+            BCF_LOANS.saveLoanApplication(currentApp);
+
+            // Dispatch simulated email to Finance Director
+            BCF_LOANS.dispatchEmail({
+                to: "finance.director@bcf-sl.org",
+                toName: "Aminata Turay (Finance Director)",
+                subject: `[FINANCE CLEARANCE REQUIRED] Loan Application: ${currentApp.refNo} - ${currentApp.staff.fullName}`,
+                body: `Loan application for ${currentApp.staff.fullName} (NLe ${currentApp.request.loanAmount.toLocaleString('en-US')}) has received HR Director clearance with an endorsement score of ${total}%. Please perform Finance Department Review and Loan Affirmation calculation.`,
+                badgeText: "Awaiting Finance Review",
+                tabId: "finance-approval"
+            });
+
+            alert(`Application ${currentApp.refNo} successfully APPROVED by HR Director (Score: ${total}%).\n\nOfficial notification email has been dispatched to Finance Director (Aminata Turay) for financial review & assessment.`);
+
+            BCF_LOANS.switchTab('finance-approval');
+        }
+
+        function rejectApplicationHR() {
+            if (!currentApp) return;
+
+            let total = 0;
+            ['hr_v1', 'hr_v2', 'hr_v3', 'hr_v4'].forEach(name => {
+                const el = document.querySelector(`input[name="${name}"]:checked`);
+                if (el) total += parseInt(el.value, 10);
+            });
+
+            currentApp.status = 'HR_REJECTED';
+            currentApp.hrReview = {
+                score: total,
+                status: 'NOT_APPROVED',
+                verifiedBy: 'Dr. Sorie Sesay (HR Director)',
+                date: new Date().toISOString(),
+                remarks: document.getElementById('hr-remarks').value
+            };
+
+            BCF_LOANS.saveLoanApplication(currentApp);
+
+            BCF_LOANS.dispatchEmail({
+                to: currentApp.staff.email || "applicant@bcf-sl.org",
+                toName: currentApp.staff.fullName,
+                subject: `[LOAN STATUS UPDATE] Application ${currentApp.refNo} - HR Review Result`,
+                body: `Your staff loan application has not met the mandatory 85% HR verification threshold (Score: ${total}%). Remarks: ${document.getElementById('hr-remarks').value}`,
+                badgeText: "HR Rejected",
+                tabId: "loan-application"
+            });
+
+            alert(`Application marked as NOT APPROVED by HR Director (Score: ${total}%).\nApplicant has been notified.`);
+            loadApplication();
+        }
+    </script>
+</body>
+</html>

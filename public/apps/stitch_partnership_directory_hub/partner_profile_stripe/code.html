@@ -1,0 +1,702 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover"/>
+  <title>BCF-SL — Institutional Partner Master Profile &amp; Dossier Repository</title>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: {
+            primary: "#0037b0",
+            "primary-dark": "#00247d",
+            secondary: "#565e74",
+            tertiary: "#006948",
+            "tertiary-dark": "#004f35",
+            surface: "#f8f9ff",
+            "surface-container": "#eff4ff",
+            "surface-container-high": "#e5eeff",
+            "on-surface": "#0b1c30",
+            "on-surface-variant": "#434655",
+            outline: "#747686",
+            error: "#ba1a1a"
+          },
+          fontFamily: {
+            sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+            body: ['"Inter"', 'sans-serif'],
+            mono: ['"JetBrains Mono"', 'monospace']
+          }
+        }
+      }
+    };
+  </script>
+  <style>
+    body { font-family: 'Inter', sans-serif; background-color: #f8f9ff; }
+    h1, h2, h3, h4, .font-headline { font-family: 'Plus Jakarta Sans', sans-serif; }
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-thumb { background-color: #cbd5e1; border-radius: 4px; }
+    .badge-pill { display: inline-flex; align-items: center; gap: 0.25rem; font-size: 0.72rem; font-weight: 700; padding: 0.2rem 0.6rem; border-radius: 9999px; }
+  </style>
+</head>
+<body class="text-on-surface flex flex-col min-h-screen">
+
+  <!-- TOP INSTITUTIONAL BRAND HEADER -->
+  <header class="bg-surface border-b border-outline/30 sticky top-0 z-40 shadow-xs">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between gap-4">
+      <div class="flex items-center gap-3 min-w-0">
+        <img src="/bcf-logo.jpg" onerror="this.src='../bcf-logo.jpg'; this.onerror=function(){this.src='../../bcf-logo.jpg'}" alt="BCF-SL Logo" class="h-9 w-auto object-contain shrink-0 rounded"/>
+        <div class="flex flex-col min-w-0">
+          <div class="flex items-center gap-2">
+            <span class="font-extrabold text-sm sm:text-base text-primary tracking-tight truncate uppercase leading-none">
+              Bandama Charity Foundation
+            </span>
+            <span class="hidden sm:inline-block px-2 py-0.5 text-[10px] font-extrabold rounded bg-emerald-100 text-emerald-800 border border-emerald-200">
+              SIERRA LEONE
+            </span>
+          </div>
+          <span class="text-[11px] font-semibold text-secondary truncate mt-0.5">
+            Partner Master Dossier &amp; Cross-Module Relationship Intelligence
+          </span>
+        </div>
+      </div>
+
+      <!-- Quick Nav & Actions -->
+      <div class="flex items-center gap-2 shrink-0">
+        <a href="../partners_directory/code.html" class="h-9 px-3 rounded-xl border border-slate-300 hover:border-primary/50 bg-white hover:bg-slate-50 text-xs font-bold flex items-center gap-1.5 text-slate-700 shadow-2xs transition active:scale-95" title="Back to Master Register">
+          <span class="material-symbols-outlined text-[16px]">contacts</span>
+          <span class="hidden md:inline">Master Register</span>
+        </a>
+        <a href="../deal_pipeline/code.html" class="h-9 px-3 rounded-xl border border-slate-300 hover:border-primary/50 bg-white hover:bg-slate-50 text-xs font-bold flex items-center gap-1.5 text-slate-700 shadow-2xs transition active:scale-95" title="11-Stage Pipeline">
+          <span class="material-symbols-outlined text-[16px]">view_kanban</span>
+          <span class="hidden md:inline">Pipeline</span>
+        </a>
+        <a href="../partnership_analytics/code.html" class="h-9 px-3 rounded-xl border border-slate-300 hover:border-primary/50 bg-white hover:bg-slate-50 text-xs font-bold flex items-center gap-1.5 text-slate-700 shadow-2xs transition active:scale-95" title="Analytics">
+          <span class="material-symbols-outlined text-[16px]">insights</span>
+          <span class="hidden md:inline">Analytics</span>
+        </a>
+        <button onclick="window.print()" class="h-9 px-3.5 rounded-xl bg-slate-900 hover:bg-black text-white text-xs font-extrabold flex items-center gap-1.5 shadow-sm transition active:scale-95 cursor-pointer">
+          <span class="material-symbols-outlined text-[16px]">print</span>
+          <span>Print Dossier</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- PARTNER SELECTOR BAR -->
+  <section class="bg-slate-900 text-white px-4 sm:px-6 py-3 border-b border-slate-800">
+    <div class="max-w-7xl mx-auto flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+      <div class="flex items-center gap-2">
+        <span class="material-symbols-outlined text-amber-400 text-[20px]">account_circle</span>
+        <span class="text-xs font-bold text-slate-300 uppercase tracking-wider">Select Partner Dossier:</span>
+        <select id="partner-selector" onchange="onPartnerSelected(this.value)" class="text-xs font-bold bg-slate-800 text-white border border-slate-700 rounded-xl px-3 py-1.5 focus:border-primary focus:outline-hidden max-w-xs">
+          <!-- Populated dynamically -->
+        </select>
+      </div>
+
+      <div class="flex items-center gap-2 text-xs">
+        <span class="text-slate-400 font-mono text-[11px]">BCF-REL Master Key:</span>
+        <span id="header-rel-badge" class="px-2.5 py-0.5 rounded-full bg-blue-500/20 text-blue-300 font-mono font-bold border border-blue-500/30">
+          BCF-REL-2026-XXXXXX
+        </span>
+        <button onclick="copyRelKey()" class="text-slate-400 hover:text-white transition" title="Copy Key">
+          <span class="material-symbols-outlined text-[15px]">content_copy</span>
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <!-- MAIN DOSSIER CONTENT -->
+  <main class="max-w-7xl mx-auto w-full px-4 sm:px-6 py-6 space-y-6 flex-1">
+
+    <!-- HERO DOSSIER CARD -->
+    <div class="bg-white rounded-2xl border border-slate-200 p-6 shadow-xs relative overflow-hidden">
+      <div class="flex flex-col md:flex-row md:items-start justify-between gap-6">
+        <!-- Partner Identification -->
+        <div class="flex items-start gap-4">
+          <div class="w-16 h-16 rounded-2xl bg-gradient-to-br from-blue-700 to-indigo-900 flex items-center justify-center text-white text-xl font-black shrink-0 shadow-sm border border-blue-600/30" id="partner-avatar">
+            UN
+          </div>
+          <div class="space-y-1">
+            <div class="flex flex-wrap items-center gap-2">
+              <h1 id="dossier-name" class="text-xl sm:text-2xl font-black text-slate-900 tracking-tight">
+                UNICEF Sierra Leone
+              </h1>
+              <span id="dossier-status-pill" class="badge-pill bg-emerald-100 text-emerald-800 border border-emerald-300">
+                Active Partner
+              </span>
+              <span id="dossier-stage-pill" class="badge-pill bg-blue-100 text-blue-800 border border-blue-200">
+                Active Partnership
+              </span>
+            </div>
+
+            <p id="dossier-category" class="text-xs text-slate-500 font-medium">
+              Funding &amp; Programme Partnership &bull; Strategic Public Sector &bull; Primary Tier 1
+            </p>
+
+            <div class="flex flex-wrap items-center gap-4 text-xs text-slate-600 pt-1">
+              <span class="flex items-center gap-1 font-mono text-[11px] font-bold text-primary" id="dossier-id">
+                BCF-PAR-2026-0001
+              </span>
+              <span class="flex items-center gap-1" id="dossier-district">
+                <span class="material-symbols-outlined text-[14px] text-slate-400">location_on</span>
+                Western Area Urban, Freetown
+              </span>
+              <span class="flex items-center gap-1" id="dossier-reg">
+                <span class="material-symbols-outlined text-[14px] text-slate-400">badge</span>
+                Reg: UN-SL-1991-004
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Financial & Risk Badges -->
+        <div class="grid grid-cols-2 sm:grid-cols-3 gap-3 shrink-0">
+          <div class="bg-slate-50 rounded-xl p-3 border border-slate-200 text-center min-w-[110px]">
+            <span class="text-[9px] uppercase font-bold text-slate-400 block">Total Financial</span>
+            <span id="dossier-fin-val" class="text-base font-black text-slate-900 font-mono">NLe 1.8M</span>
+            <span class="text-[9px] text-emerald-600 font-medium block">Committed</span>
+          </div>
+
+          <div class="bg-slate-50 rounded-xl p-3 border border-slate-200 text-center min-w-[110px]">
+            <span class="text-[9px] uppercase font-bold text-slate-400 block">In-Kind Value</span>
+            <span id="dossier-inkind-val" class="text-base font-black text-slate-900 font-mono">NLe 250k</span>
+            <span class="text-[9px] text-blue-600 font-medium block">Supplies / TA</span>
+          </div>
+
+          <div class="bg-slate-50 rounded-xl p-3 border border-slate-200 text-center min-w-[110px] col-span-2 sm:col-span-1">
+            <span class="text-[9px] uppercase font-bold text-slate-400 block">Due Diligence</span>
+            <span id="dossier-dd-score" class="text-base font-black text-emerald-700 font-mono">94%</span>
+            <span id="dossier-risk-tier" class="text-[9px] text-emerald-600 font-bold block">Tier A (Low Risk)</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Quick Action Toolbar -->
+      <div class="mt-5 pt-4 border-t border-slate-100 flex flex-wrap items-center justify-between gap-3">
+        <div class="flex items-center gap-2">
+          <span class="text-xs font-bold text-slate-500">BCF Lead:</span>
+          <span id="dossier-officer" class="text-xs font-semibold text-slate-800">Mohamed Bangura (Partnerships Manager)</span>
+        </div>
+
+        <div class="flex items-center gap-2">
+          <button onclick="logInteractionModal()" class="px-3 py-1.5 rounded-xl border border-slate-200 text-slate-700 hover:bg-slate-50 text-xs font-bold flex items-center gap-1 transition">
+            <span class="material-symbols-outlined text-[15px]">event_note</span>
+            <span>Record Meeting</span>
+          </button>
+          <button onclick="createMoUModal()" class="px-3 py-1.5 rounded-xl border border-slate-200 text-slate-700 hover:bg-slate-50 text-xs font-bold flex items-center gap-1 transition">
+            <span class="material-symbols-outlined text-[15px]">description</span>
+            <span>Draft MoU / Agreement</span>
+          </button>
+          <a id="link-pr-procurement" href="/procurement/purchase-requisition" class="px-3 py-1.5 rounded-xl bg-primary hover:bg-primary-dark text-white text-xs font-bold flex items-center gap-1 transition shadow-xs">
+            <span class="material-symbols-outlined text-[15px]">shopping_cart_checkout</span>
+            <span>Link Procurement PR</span>
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <!-- DOSSIER TABS NAVIGATION -->
+    <div class="border-b border-slate-200 flex items-center gap-2 overflow-x-auto text-xs font-bold text-slate-600">
+      <button onclick="switchTab('tab-overview')" id="btn-tab-overview" class="tab-btn px-4 py-2.5 border-b-2 border-primary text-primary transition whitespace-nowrap">
+        1. Institutional Identity &amp; Compliance
+      </button>
+      <button onclick="switchTab('tab-due-diligence')" id="btn-tab-due-diligence" class="tab-btn px-4 py-2.5 border-b-2 border-transparent hover:text-slate-900 transition whitespace-nowrap">
+        2. 5-Pillar Due Diligence Scorecard
+      </button>
+      <button onclick="switchTab('tab-agreements')" id="btn-tab-agreements" class="tab-btn px-4 py-2.5 border-b-2 border-transparent hover:text-slate-900 transition whitespace-nowrap">
+        3. Active Agreements &amp; MoUs
+      </button>
+      <button onclick="switchTab('tab-deliverables')" id="btn-tab-deliverables" class="tab-btn px-4 py-2.5 border-b-2 border-transparent hover:text-slate-900 transition whitespace-nowrap">
+        4. Deliverables &amp; Milestones
+      </button>
+      <button onclick="switchTab('tab-history')" id="btn-tab-history" class="tab-btn px-4 py-2.5 border-b-2 border-transparent hover:text-slate-900 transition whitespace-nowrap">
+        5. Engagement Log &amp; Interactions
+      </button>
+    </div>
+
+    <!-- TAB 1: INSTITUTIONAL IDENTITY & COMPLIANCE -->
+    <div id="tab-overview" class="space-y-6">
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <!-- Statutory & Legal Details Card -->
+        <div class="bg-white rounded-2xl border border-slate-200 p-5 shadow-xs space-y-4">
+          <h2 class="text-sm font-black text-slate-900 flex items-center gap-2">
+            <span class="material-symbols-outlined text-primary text-[18px]">verified</span>
+            Legal Registration &amp; Statutory Standing
+          </h2>
+
+          <div class="grid grid-cols-2 gap-3 text-xs">
+            <div class="p-3 rounded-xl bg-slate-50 border border-slate-100">
+              <span class="text-slate-400 text-[10px] uppercase font-bold block">Organization Type</span>
+              <span id="stat-type" class="font-bold text-slate-900 mt-0.5 block">UN Agency</span>
+            </div>
+            <div class="p-3 rounded-xl bg-slate-50 border border-slate-100">
+              <span class="text-slate-400 text-[10px] uppercase font-bold block">Country of Origin</span>
+              <span id="stat-country" class="font-bold text-slate-900 mt-0.5 block">Sierra Leone</span>
+            </div>
+            <div class="p-3 rounded-xl bg-slate-50 border border-slate-100">
+              <span class="text-slate-400 text-[10px] uppercase font-bold block">Registration No / TIN</span>
+              <span id="stat-reg-no" class="font-bold text-slate-900 font-mono mt-0.5 block">UN-SL-1991-004</span>
+            </div>
+            <div class="p-3 rounded-xl bg-slate-50 border border-slate-100">
+              <span class="text-slate-400 text-[10px] uppercase font-bold block">District Focus</span>
+              <span id="stat-district" class="font-bold text-slate-900 mt-0.5 block">Western Area Urban</span>
+            </div>
+            <div class="p-3 rounded-xl bg-slate-50 border border-slate-100 col-span-2">
+              <span class="text-slate-400 text-[10px] uppercase font-bold block">Headquarters / Office Address</span>
+              <span id="stat-address" class="font-bold text-slate-900 mt-0.5 block">Medical Stores Compound, New England Ville, Freetown</span>
+            </div>
+            <div class="p-3 rounded-xl bg-slate-50 border border-slate-100 col-span-2">
+              <span class="text-slate-400 text-[10px] uppercase font-bold block">Website &amp; Digital Presence</span>
+              <a id="stat-website" href="#" target="_blank" class="font-bold text-primary hover:underline mt-0.5 block">https://www.unicef.org/sierraleone</a>
+            </div>
+          </div>
+        </div>
+
+        <!-- Focal Contact Persons Card -->
+        <div class="bg-white rounded-2xl border border-slate-200 p-5 shadow-xs space-y-4">
+          <h2 class="text-sm font-black text-slate-900 flex items-center gap-2">
+            <span class="material-symbols-outlined text-primary text-[18px]">contacts</span>
+            Authorized Contact Persons &amp; Governance
+          </h2>
+
+          <div class="space-y-3 text-xs">
+            <div class="p-3.5 rounded-xl bg-slate-50 border border-slate-100 flex items-start justify-between">
+              <div>
+                <span class="text-[10px] font-bold uppercase text-primary block">Primary Representative</span>
+                <span id="contact-primary-name" class="font-extrabold text-sm text-slate-900 block mt-0.5">Dr. Sarah Johnson</span>
+                <span id="contact-primary-pos" class="text-slate-500 block">Country Representative</span>
+              </div>
+              <span class="badge-pill bg-blue-100 text-blue-800">Legal Signatory</span>
+            </div>
+
+            <div class="grid grid-cols-2 gap-3">
+              <div class="p-3 rounded-xl bg-slate-50 border border-slate-100">
+                <span class="text-slate-400 text-[10px] uppercase font-bold block">Official Email</span>
+                <span id="contact-email" class="font-bold text-slate-900 mt-0.5 block truncate">freetown_partnerships@unicef.org</span>
+              </div>
+              <div class="p-3 rounded-xl bg-slate-50 border border-slate-100">
+                <span class="text-slate-400 text-[10px] uppercase font-bold block">Telephone</span>
+                <span id="contact-phone" class="font-bold text-slate-900 mt-0.5 block">+232 22 234 567</span>
+              </div>
+            </div>
+
+            <div class="p-3 rounded-xl bg-slate-50 border border-slate-100">
+              <span class="text-slate-400 text-[10px] uppercase font-bold block">Assigned BCF-SL Relationship Lead</span>
+              <span id="contact-bcf-lead" class="font-bold text-slate-900 mt-0.5 block">Mohamed Bangura (Partnerships Manager)</span>
+              <span class="text-[11px] text-slate-500">Directorate of Strategic Partnerships &amp; Grants</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB 2: 5-PILLAR DUE DILIGENCE SCORECARD -->
+    <div id="tab-due-diligence" class="hidden space-y-6">
+      <div class="bg-white rounded-2xl border border-slate-200 p-6 shadow-xs space-y-6">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-slate-100">
+          <div>
+            <h2 class="text-base font-black text-slate-900">5-Pillar Due Diligence &amp; Risk Assessment Matrix</h2>
+            <p class="text-xs text-slate-500 mt-0.5">Comprehensive audit verifying institutional legality, fiscal rigor, and safeguarding posture.</p>
+          </div>
+          <div class="text-right shrink-0">
+            <span class="text-[10px] uppercase font-bold text-slate-400 block">Overall DD Score</span>
+            <span id="dd-total-score-badge" class="text-2xl font-black text-emerald-700 font-mono">94%</span>
+            <span id="dd-recommendation-badge" class="badge-pill bg-emerald-100 text-emerald-800 text-[10px]">Tier A: Approved (Low Risk)</span>
+          </div>
+        </div>
+
+        <!-- 5 Pillars Progress Bars -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 text-xs">
+          <!-- Pillar 1 -->
+          <div class="p-4 rounded-xl bg-slate-50 border border-slate-200 space-y-2">
+            <div class="flex items-center justify-between">
+              <span class="font-bold text-slate-800">1. Legal &amp; Regulatory Framework (Weight: 20%)</span>
+              <span class="font-mono font-bold text-emerald-700" id="dd-p1-score">95%</span>
+            </div>
+            <div class="w-full bg-slate-200 h-2 rounded-full overflow-hidden">
+              <div class="bg-emerald-600 h-2 rounded-full" id="dd-p1-bar" style="width: 95%;"></div>
+            </div>
+            <p class="text-[11px] text-slate-500">Valid constitution, NGO board registration, statutory authority in Sierra Leone.</p>
+          </div>
+
+          <!-- Pillar 2 -->
+          <div class="p-4 rounded-xl bg-slate-50 border border-slate-200 space-y-2">
+            <div class="flex items-center justify-between">
+              <span class="font-bold text-slate-800">2. Governance &amp; Organizational Structure (Weight: 20%)</span>
+              <span class="font-mono font-bold text-emerald-700" id="dd-p2-score">92%</span>
+            </div>
+            <div class="w-full bg-slate-200 h-2 rounded-full overflow-hidden">
+              <div class="bg-emerald-600 h-2 rounded-full" id="dd-p2-bar" style="width: 92%;"></div>
+            </div>
+            <p class="text-[11px] text-slate-500">Independent board of directors, transparent organogram, anti-conflict of interest policy.</p>
+          </div>
+
+          <!-- Pillar 3 -->
+          <div class="p-4 rounded-xl bg-slate-50 border border-slate-200 space-y-2">
+            <div class="flex items-center justify-between">
+              <span class="font-bold text-slate-800">3. Financial Integrity &amp; Audit Systems (Weight: 25%)</span>
+              <span class="font-mono font-bold text-emerald-700" id="dd-p3-score">90%</span>
+            </div>
+            <div class="w-full bg-slate-200 h-2 rounded-full overflow-hidden">
+              <div class="bg-emerald-600 h-2 rounded-full" id="dd-p3-bar" style="width: 90%;"></div>
+            </div>
+            <p class="text-[11px] text-slate-500">Audited financial statements, segregation of duties, multi-signatory bank mandates.</p>
+          </div>
+
+          <!-- Pillar 4 -->
+          <div class="p-4 rounded-xl bg-slate-50 border border-slate-200 space-y-2">
+            <div class="flex items-center justify-between">
+              <span class="font-bold text-slate-800">4. Technical &amp; Operational Capability (Weight: 15%)</span>
+              <span class="font-mono font-bold text-emerald-700" id="dd-p4-score">94%</span>
+            </div>
+            <div class="w-full bg-slate-200 h-2 rounded-full overflow-hidden">
+              <div class="bg-emerald-600 h-2 rounded-full" id="dd-p4-bar" style="width: 94%;"></div>
+            </div>
+            <p class="text-[11px] text-slate-500">Demonstrated field track record, project managers in target Sierra Leone districts.</p>
+          </div>
+
+          <!-- Pillar 5 -->
+          <div class="p-4 rounded-xl bg-slate-50 border border-slate-200 space-y-2 md:col-span-2">
+            <div class="flex items-center justify-between">
+              <span class="font-bold text-slate-800">5. Safeguarding, SEA &amp; Ethics Protection (Weight: 20%)</span>
+              <span class="font-mono font-bold text-emerald-700" id="dd-p5-score">98%</span>
+            </div>
+            <div class="w-full bg-slate-200 h-2 rounded-full overflow-hidden">
+              <div class="bg-emerald-600 h-2 rounded-full" id="dd-p5-bar" style="width: 98%;"></div>
+            </div>
+            <p class="text-[11px] text-slate-500">Zero-tolerance child protection and PSEAH policies, anonymous whistleblower channel.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB 3: ACTIVE AGREEMENTS & MOUS -->
+    <div id="tab-agreements" class="hidden space-y-6">
+      <div class="bg-white rounded-2xl border border-slate-200 p-6 shadow-xs space-y-4">
+        <div class="flex items-center justify-between">
+          <div>
+            <h2 class="text-sm font-black text-slate-900">Signed Agreements, MoUs &amp; Legal Instruments</h2>
+            <p class="text-xs text-slate-500 mt-0.5">Contractual instruments governing collaboration, funding tranches, and legal obligations.</p>
+          </div>
+          <button onclick="createMoUModal()" class="px-3 py-1.5 rounded-xl bg-primary hover:bg-primary-dark text-white text-xs font-bold flex items-center gap-1 shadow-xs transition">
+            <span class="material-symbols-outlined text-[15px]">add</span>
+            <span>New Agreement</span>
+          </button>
+        </div>
+
+        <div id="agreements-container" class="space-y-3">
+          <!-- Dynamically populated -->
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB 4: DELIVERABLES & MILESTONES -->
+    <div id="tab-deliverables" class="hidden space-y-6">
+      <div class="bg-white rounded-2xl border border-slate-200 p-6 shadow-xs space-y-4">
+        <div class="flex items-center justify-between">
+          <div>
+            <h2 class="text-sm font-black text-slate-900">Joint Deliverables, Milestones &amp; Linkages</h2>
+            <p class="text-xs text-slate-500 mt-0.5">Progress of deliverables stipulated in active agreements and cross-linked procurement PRs.</p>
+          </div>
+        </div>
+
+        <div id="deliverables-container" class="space-y-3">
+          <!-- Dynamically populated -->
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB 5: ENGAGEMENT LOG & INTERACTIONS -->
+    <div id="tab-history" class="hidden space-y-6">
+      <div class="bg-white rounded-2xl border border-slate-200 p-6 shadow-xs space-y-4">
+        <div class="flex items-center justify-between">
+          <div>
+            <h2 class="text-sm font-black text-slate-900">Engagement &amp; Communications History</h2>
+            <p class="text-xs text-slate-500 mt-0.5">Audit log of all strategic meetings, formal letters, emails, and stage progressions.</p>
+          </div>
+          <button onclick="logInteractionModal()" class="px-3 py-1.5 rounded-xl bg-primary hover:bg-primary-dark text-white text-xs font-bold flex items-center gap-1 shadow-xs transition">
+            <span class="material-symbols-outlined text-[15px]">add</span>
+            <span>Record Interaction</span>
+          </button>
+        </div>
+
+        <div id="comms-container" class="space-y-3">
+          <!-- Dynamically populated -->
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- LOAD SHARED BCF ENGINE -->
+  <script src="../bcf_procurement_shared.js"></script>
+
+  <!-- DOSSIER JAVASCRIPT LOGIC -->
+  <script>
+    let currentPartner = null;
+
+    document.addEventListener('DOMContentLoaded', () => {
+      populatePartnerSelector();
+    });
+
+    function populatePartnerSelector() {
+      const partners = BCF_PROCUREMENT.getPartners();
+      const selector = document.getElementById('partner-selector');
+      if (!selector || partners.length === 0) return;
+
+      selector.innerHTML = partners.map(p => `
+        <option value="${p.id}">${p.name} (${p.id})</option>
+      `).join('');
+
+      // Check URL search params for ?id=
+      const urlParams = new URLSearchParams(window.location.search);
+      const queryId = urlParams.get('id');
+
+      if (queryId && partners.some(p => p.id === queryId)) {
+        selector.value = queryId;
+      } else {
+        selector.value = partners[0].id;
+      }
+
+      loadPartnerDossier(selector.value);
+    }
+
+    function onPartnerSelected(partnerId) {
+      // Update URL without reload
+      const url = new URL(window.location);
+      url.searchParams.set('id', partnerId);
+      window.history.pushState({}, '', url);
+
+      loadPartnerDossier(partnerId);
+    }
+
+    function loadPartnerDossier(partnerId) {
+      currentPartner = BCF_PROCUREMENT.getPartner(partnerId);
+      if (!currentPartner) return;
+
+      // Header Badges & IDs
+      document.getElementById('header-rel-badge').textContent = currentPartner.relId || 'BCF-REL-2026-000101';
+      document.getElementById('dossier-name').textContent = currentPartner.name;
+      document.getElementById('dossier-id').textContent = currentPartner.id;
+      document.getElementById('dossier-category').textContent = `${currentPartner.category || 'Strategic Partnership'} • ${currentPartner.type || 'Institutional Partner'}`;
+      document.getElementById('dossier-district').innerHTML = `<span class="material-symbols-outlined text-[14px] text-slate-400">location_on</span> ${currentPartner.district || 'National Coverage'}, Sierra Leone`;
+      document.getElementById('dossier-reg').innerHTML = `<span class="material-symbols-outlined text-[14px] text-slate-400">badge</span> Reg: ${currentPartner.registrationNumber || 'NRA-SL-COMPLIANT'}`;
+      document.getElementById('dossier-officer').textContent = currentPartner.partnershipOfficer || 'Mohamed Bangura (Partnerships Manager)';
+
+      // Avatar
+      const initials = (currentPartner.name || 'UN').split(' ').map(w => w[0]).filter(Boolean).slice(0, 2).join('').toUpperCase();
+      document.getElementById('partner-avatar').textContent = initials;
+
+      // Status Pill
+      const statusPill = document.getElementById('dossier-status-pill');
+      statusPill.textContent = currentPartner.partnershipStatus || 'Active';
+      statusPill.className = currentPartner.partnershipStatus === 'Active' 
+        ? 'badge-pill bg-emerald-100 text-emerald-800 border border-emerald-300'
+        : 'badge-pill bg-blue-100 text-blue-800 border border-blue-200';
+
+      const stagePill = document.getElementById('dossier-stage-pill');
+      stagePill.textContent = currentPartner.pipelineStage || 'Active Partnership';
+
+      // Financials
+      document.getElementById('dossier-fin-val').textContent = BCF_PROCUREMENT.formatCurrency(currentPartner.financialValue || 0);
+      document.getElementById('dossier-inkind-val').textContent = BCF_PROCUREMENT.formatCurrency(currentPartner.inKindValue || 0);
+
+      // Due Diligence Score
+      const ddScore = currentPartner.dueDiligenceScore || 92;
+      document.getElementById('dossier-dd-score').textContent = `${ddScore}%`;
+      document.getElementById('dd-total-score-badge').textContent = `${ddScore}%`;
+      const riskTier = ddScore >= 80 ? 'Tier A: Approved (Low Risk)' : (ddScore >= 60 ? 'Tier B: Conditional (Moderate Risk)' : 'Tier C: High Risk');
+      document.getElementById('dossier-risk-tier').textContent = riskTier;
+      document.getElementById('dd-recommendation-badge').textContent = riskTier;
+
+      // Tab 1 Fields
+      document.getElementById('stat-type').textContent = currentPartner.type || 'Government Agency';
+      document.getElementById('stat-country').textContent = currentPartner.country || 'Sierra Leone';
+      document.getElementById('stat-reg-no').textContent = currentPartner.registrationNumber || 'NRA-TIN-889421-SL';
+      document.getElementById('stat-district').textContent = currentPartner.district || 'National Coverage';
+      document.getElementById('stat-address').textContent = currentPartner.address || 'Freetown Central Secretariat, Sierra Leone';
+      const webEl = document.getElementById('stat-website');
+      webEl.textContent = currentPartner.website || 'Official Partner Portal';
+      webEl.href = currentPartner.website || '#';
+
+      document.getElementById('contact-primary-name').textContent = currentPartner.primaryContact || 'Authorized Representative';
+      document.getElementById('contact-primary-pos').textContent = currentPartner.position || 'Focal Director';
+      document.getElementById('contact-email').textContent = currentPartner.email || 'partner@sierraleone.gov.sl';
+      document.getElementById('contact-phone').textContent = currentPartner.telephone || '+232 78 000 000';
+      document.getElementById('contact-bcf-lead').textContent = currentPartner.partnershipOfficer || 'Director of Strategic Partnerships';
+
+      // Render Agreements
+      renderPartnerAgreements(currentPartner);
+
+      // Render Deliverables
+      renderPartnerDeliverables(currentPartner);
+
+      // Render Comms
+      renderPartnerComms(currentPartner);
+    }
+
+    function renderPartnerAgreements(p) {
+      const allAgreements = BCF_PROCUREMENT.getAgreements();
+      const pAgreements = allAgreements.filter(a => a.partnerId === p.id || a.relId === p.relId);
+      const container = document.getElementById('agreements-container');
+
+      if (pAgreements.length === 0) {
+        container.innerHTML = `
+          <div class="p-6 text-center text-slate-400 bg-slate-50 rounded-xl border border-dashed border-slate-200">
+            No formal agreements signed yet. Click "New Agreement" to register a MoU or Sub-grant.
+          </div>
+        `;
+        return;
+      }
+
+      container.innerHTML = pAgreements.map(a => `
+        <div class="p-4 rounded-xl border border-slate-200 bg-white hover:border-primary/40 transition flex flex-col md:flex-row md:items-center justify-between gap-3 shadow-2xs">
+          <div class="space-y-1">
+            <div class="flex items-center gap-2">
+              <span class="font-mono text-[10px] font-bold text-primary">${a.id}</span>
+              <span class="badge-pill bg-blue-50 text-blue-700">${a.agreementType}</span>
+              <span class="badge-pill ${a.status === 'Active' ? 'bg-emerald-50 text-emerald-700' : 'bg-slate-100 text-slate-700'}">${a.status}</span>
+            </div>
+            <h4 class="font-extrabold text-sm text-slate-900">${a.agreementTitle}</h4>
+            <div class="text-[11px] text-slate-500 flex items-center gap-3">
+              <span>Valid: ${a.startDate} &rarr; ${a.endDate}</span>
+              <span>Scope: ${a.scopeSummary || 'National Humanitarian Support'}</span>
+            </div>
+          </div>
+          <div class="text-right shrink-0">
+            <span class="text-[10px] uppercase font-bold text-slate-400 block">Financial Commitment</span>
+            <span class="text-base font-black text-slate-900 font-mono">${BCF_PROCUREMENT.formatCurrency(a.financialValue || 0)}</span>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function renderPartnerDeliverables(p) {
+      const allDel = BCF_PROCUREMENT.getDeliverables();
+      const pDel = allDel.filter(d => d.partnerId === p.id);
+      const container = document.getElementById('deliverables-container');
+
+      if (pDel.length === 0) {
+        container.innerHTML = `
+          <div class="p-6 text-center text-slate-400 bg-slate-50 rounded-xl border border-dashed border-slate-200">
+            No specific deliverable milestones assigned to this partner yet.
+          </div>
+        `;
+        return;
+      }
+
+      container.innerHTML = pDel.map(d => `
+        <div class="p-4 rounded-xl border border-slate-200 bg-white flex flex-col md:flex-row md:items-center justify-between gap-3">
+          <div>
+            <div class="flex items-center gap-2">
+              <span class="font-mono text-[10px] font-bold text-primary">${d.id}</span>
+              <span class="badge-pill ${d.status === 'Approved' ? 'bg-emerald-50 text-emerald-700' : 'bg-blue-50 text-blue-700'}">${d.status}</span>
+            </div>
+            <h4 class="font-bold text-xs text-slate-900 mt-0.5">${d.deliverable}</h4>
+            <span class="text-[11px] text-slate-500">Target Deadline: ${d.dueDate} &bull; Lead: ${d.responsiblePerson}</span>
+          </div>
+          <div class="w-32 bg-slate-100 rounded-full h-2 overflow-hidden shrink-0">
+            <div class="bg-primary h-2 rounded-full" style="width: ${d.status === 'Approved' ? '100%' : '60%'}"></div>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function renderPartnerComms(p) {
+      const allComms = BCF_PROCUREMENT.getCommunications();
+      const pComms = allComms.filter(c => c.partnerId === p.id);
+      const container = document.getElementById('comms-container');
+
+      if (pComms.length === 0) {
+        container.innerHTML = `
+          <div class="p-6 text-center text-slate-400 bg-slate-50 rounded-xl border border-dashed border-slate-200">
+            No meeting records or correspondence logged yet.
+          </div>
+        `;
+        return;
+      }
+
+      container.innerHTML = pComms.map(c => `
+        <div class="p-3.5 rounded-xl border border-slate-200 bg-white space-y-1">
+          <div class="flex items-center justify-between text-[11px]">
+            <span class="font-bold text-slate-900">${c.subject || 'Engagement Discussion'}</span>
+            <span class="text-slate-400">${c.date || 'Recent'}</span>
+          </div>
+          <p class="text-xs text-slate-600">${c.summary || 'Minutes recorded in official register.'}</p>
+          <div class="text-[10px] text-slate-400 flex items-center justify-between pt-1">
+            <span>Channel: ${c.channel || 'Official Meeting'}</span>
+            <span>Recorded By: ${c.recordedBy || 'Partnerships Office'}</span>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function switchTab(tabId) {
+      const tabs = ['tab-overview', 'tab-due-diligence', 'tab-agreements', 'tab-deliverables', 'tab-history'];
+      tabs.forEach(t => {
+        const el = document.getElementById(t);
+        const btn = document.getElementById(`btn-${t}`);
+        if (t === tabId) {
+          el.classList.remove('hidden');
+          btn.className = "tab-btn px-4 py-2.5 border-b-2 border-primary text-primary transition whitespace-nowrap font-bold";
+        } else {
+          el.classList.add('hidden');
+          btn.className = "tab-btn px-4 py-2.5 border-b-2 border-transparent hover:text-slate-900 transition whitespace-nowrap";
+        }
+      });
+    }
+
+    function copyRelKey() {
+      const key = document.getElementById('header-rel-badge').textContent.trim();
+      navigator.clipboard.writeText(key).then(() => {
+        BCF_PROCUREMENT.showToast(`Master Key ${key} copied to clipboard!`, 'success');
+      });
+    }
+
+    function logInteractionModal() {
+      if (!currentPartner) return;
+      const note = prompt(`Enter engagement summary or meeting notes for ${currentPartner.name}:`);
+      if (note) {
+        BCF_PROCUREMENT.saveCommunication({
+          partnerId: currentPartner.id,
+          direction: 'Engagement Dialog',
+          channel: 'Direct Meeting',
+          subject: 'Strategic Engagement Notes',
+          summary: note,
+          recordedBy: 'Mohamed Bangura'
+        });
+        BCF_PROCUREMENT.showToast('Interaction logged successfully!', 'success');
+        renderPartnerComms(currentPartner);
+      }
+    }
+
+    function createMoUModal() {
+      if (!currentPartner) return;
+      const title = prompt(`Enter MoU / Agreement Title for ${currentPartner.name}:`, `Strategic Partnership Agreement — ${currentPartner.name}`);
+      if (title) {
+        const val = prompt('Enter Financial Commitment in NLe (optional):', '500000');
+        const agr = {
+          partnerId: currentPartner.id,
+          relId: currentPartner.relId,
+          agreementTitle: title,
+          agreementType: 'Memorandum of Understanding (MoU)',
+          status: 'Active',
+          startDate: new Date().toISOString().split('T')[0],
+          endDate: '2027-12-31',
+          financialValue: Number(val || 0),
+          inKindValue: 0,
+          scopeSummary: 'Joint Programme Delivery & Logistics'
+        };
+        BCF_PROCUREMENT.saveAgreement(agr);
+        BCF_PROCUREMENT.showToast('New Agreement recorded!', 'success');
+        renderPartnerAgreements(currentPartner);
+      }
+    }
+  </script>
+</body>
+</html>

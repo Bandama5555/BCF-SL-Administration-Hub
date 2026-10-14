@@ -1,0 +1,1323 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover"/>
+    <title>Employee Account & Access Management - BCF-SL Super Admin</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+
+    function navToApp(nextRoute, fallbackPath, e) {
+        if (e) e.preventDefault();
+        try {
+            if (window.top && window.top !== window && window.top.location) {
+                window.top.location.href = nextRoute;
+                return;
+            }
+        } catch(err) {}
+        window.location.href = fallbackPath;
+    }
+
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: "#15803d",
+                        "primary-dark": "#166534",
+                        secondary: "#2563eb",
+                        tertiary: "#9333ea",
+                        surface: "#ffffff",
+                        "surface-container": "#f8fafc",
+                        "on-surface": "#0f172a",
+                        "on-surface-variant": "#475569",
+                        outline: "#e2e8f0",
+                        error: "#dc2626"
+                    },
+                    fontFamily: {
+                        sans: ['Calibri', 'Inter', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace']
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body { font-size: 11pt; overscroll-behavior-y: none; }
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-thumb { background-color: #cbd5e1; border-radius: 3px; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+        .animate-fade { animation: fadeIn 0.2s ease-out; }
+    </style>
+</head>
+<body class="bg-[#f1f5f9] text-on-surface flex flex-col min-h-screen font-sans">
+
+<!-- HEADER -->
+<header class="bg-surface border-b border-outline shadow-sm z-30 sticky top-0">
+    <div class="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between gap-4">
+        <div class="flex items-center gap-4">
+            <img src="../../bcf-logo.png" onerror="this.src='/bcf-logo.jpg'" alt="BCF-SL Logo" class="h-10 w-auto object-contain"/>
+            <div class="hidden sm:block">
+                <div class="flex items-center gap-2">
+                    <h1 class="font-bold text-base sm:text-lg text-primary leading-tight">BANDAMA CHARITY FOUNDATION SIERRA LEONE</h1>
+                    <span class="px-2 py-0.5 rounded bg-amber-100 text-amber-900 font-extrabold text-[10px] tracking-wider uppercase">Super Admin</span>
+                </div>
+                <p class="text-[9pt] font-semibold text-secondary">Employee Account Creation &amp; Role-Based Access Control (RBAC)</p>
+            </div>
+        </div>
+
+        <!-- Sub-App Navigation Links -->
+            <a href="../login_creation/code.html" onclick="navToApp('/super-admin/login-creation', '../login_creation/code.html', event)" class="h-9 px-3 rounded-lg border border-emerald-300 bg-emerald-50 hover:bg-emerald-100 text-xs font-bold text-emerald-800 flex items-center gap-1.5 transition">
+                <span class="material-symbols-outlined text-[17px] text-emerald-700">badge</span>
+                <span class="hidden md:inline">Login Creation</span>
+            </a>
+            <a href="../executive_analytics/code.html" onclick="navToApp('/super-admin/executive-analytics', '../executive_analytics/code.html', event)" class="h-9 px-3 rounded-lg border border-outline bg-surface hover:bg-slate-100 text-xs font-semibold flex items-center gap-1.5 transition">
+                <span class="material-symbols-outlined text-[17px] text-primary">insights</span>
+                <span class="hidden md:inline">Analytics Dashboard</span>
+            </a>
+            <a href="../access_matrix/code.html" onclick="navToApp('/super-admin/access-matrix', '../access_matrix/code.html', event)" class="h-9 px-3 rounded-lg border border-outline bg-surface hover:bg-slate-100 text-xs font-semibold flex items-center gap-1.5 transition">
+                <span class="material-symbols-outlined text-[17px] text-secondary">security</span>
+                <span class="hidden md:inline">Access Matrix</span>
+            </a>
+            <a href="../audit_logs/code.html" onclick="navToApp('/super-admin/audit-logs', '../audit_logs/code.html', event)" class="h-9 px-3 rounded-lg border border-outline bg-surface hover:bg-slate-100 text-xs font-semibold flex items-center gap-1.5 transition">
+                <span class="material-symbols-outlined text-[17px] text-tertiary">history_edu</span>
+                <span class="hidden md:inline">Audit Logs</span>
+            </a>
+        </div>
+    </div>
+</header>
+
+<div class="max-w-7xl mx-auto w-full px-4 py-6 flex flex-col gap-6">
+
+    <!-- PAGE HEADER TITLE & SUMMARY -->
+    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+        <div>
+            <h2 class="text-2xl sm:text-3xl font-extrabold text-on-surface tracking-tight flex items-center gap-2.5">
+                <span class="material-symbols-outlined text-primary text-3xl">manage_accounts</span>
+                User &amp; Access Management
+            </h2>
+            <p class="text-on-surface-variant text-sm mt-0.5">Automated system account provisioning, RBAC role assignment, and lifecycle monitoring</p>
+        </div>
+        <div class="flex items-center gap-2">
+            <!-- EXPORT CSV BUTTON -->
+            <button type="button" id="btn-export-accounts" onclick="exportAccountsCsv()" title="Export system accounts to CSV spreadsheet" class="h-10 px-4 bg-surface hover:bg-slate-100 text-slate-700 border border-outline rounded-lg text-xs font-bold flex items-center gap-2 transition shadow-sm cursor-pointer active:scale-95">
+                <span class="material-symbols-outlined text-[18px] text-emerald-700">download</span>
+                <span>Export CSV</span>
+            </button>
+            <button id="btn-sync-hr" onclick="syncHrEmployees()" title="Sync and auto-provision accounts for registered HR staff" class="h-10 px-4 bg-emerald-50 hover:bg-emerald-100 text-primary border border-emerald-300 rounded-lg text-xs font-bold flex items-center gap-2 transition shadow-sm cursor-pointer active:scale-95">
+                <span id="sync-icon" class="material-symbols-outlined text-[18px] transition-transform">sync</span>
+                <span>Auto-Sync with HR</span>
+            </button>
+            <button onclick="openCreateUserModal()" class="h-10 px-4 bg-primary hover:bg-primary-dark text-white rounded-lg text-xs font-bold flex items-center gap-2 transition shadow-sm">
+                <span class="material-symbols-outlined text-[18px]">person_add</span>
+                <span>+ Create User</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- STATS CARDS (Interactive Status Filter Buttons) -->
+    <div id="status-filter-cards" class="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-5 gap-3.5">
+        <button type="button" id="card-status-all" onclick="selectStatusFilter('ALL')" title="Show all user accounts" class="stat-card bg-surface border border-outline hover:border-slate-400 hover:bg-slate-50/50 rounded-xl p-4 shadow-sm flex flex-col text-left cursor-pointer transition-all duration-200 group focus:outline-none w-full">
+            <div class="flex items-center justify-between w-full mb-1">
+                <span class="text-xs font-bold text-on-surface-variant uppercase tracking-wider">Total Accounts</span>
+                <span class="material-symbols-outlined text-primary text-xl group-hover:scale-110 transition-transform">group</span>
+            </div>
+            <div class="text-2xl font-extrabold text-on-surface" id="kpi-total">0</div>
+            <div class="flex items-center justify-between w-full mt-1">
+                <span class="text-[10px] text-slate-500">System user profiles</span>
+                <span id="badge-status-all" class="text-[8px] font-black uppercase px-2 py-0.5 rounded-full hidden">● Active</span>
+            </div>
+        </button>
+
+        <button type="button" id="card-status-active" onclick="selectStatusFilter('ACTIVE')" title="Filter by Active users" class="stat-card bg-surface border border-outline hover:border-emerald-500 hover:bg-emerald-50/30 rounded-xl p-4 shadow-sm flex flex-col text-left cursor-pointer transition-all duration-200 group focus:outline-none w-full">
+            <div class="flex items-center justify-between w-full mb-1">
+                <span class="text-xs font-bold text-emerald-700 uppercase tracking-wider">Active Users</span>
+                <span class="material-symbols-outlined text-emerald-600 text-xl group-hover:scale-110 transition-transform">check_circle</span>
+            </div>
+            <div class="text-2xl font-extrabold text-emerald-700" id="kpi-active">0</div>
+            <div class="flex items-center justify-between w-full mt-1">
+                <span class="text-[10px] text-emerald-600">Authorized access</span>
+                <span id="badge-status-active" class="text-[8px] font-black uppercase px-2 py-0.5 rounded-full hidden">● Active</span>
+            </div>
+        </button>
+
+        <button type="button" id="card-status-pending" onclick="selectStatusFilter('PENDING')" title="Filter by Pending approval" class="stat-card bg-surface border border-outline hover:border-amber-500 hover:bg-amber-50/30 rounded-xl p-4 shadow-sm flex flex-col text-left cursor-pointer transition-all duration-200 group focus:outline-none w-full">
+            <div class="flex items-center justify-between w-full mb-1">
+                <span class="text-xs font-bold text-amber-700 uppercase tracking-wider">Pending Approval</span>
+                <span class="material-symbols-outlined text-amber-600 text-xl group-hover:scale-110 transition-transform">pending</span>
+            </div>
+            <div class="text-2xl font-extrabold text-amber-700" id="kpi-pending">0</div>
+            <div class="flex items-center justify-between w-full mt-1">
+                <span class="text-[10px] text-amber-600">Awaiting admin review</span>
+                <span id="badge-status-pending" class="text-[8px] font-black uppercase px-2 py-0.5 rounded-full hidden">● Active</span>
+            </div>
+        </button>
+
+        <button type="button" id="card-status-suspended" onclick="selectStatusFilter('SUSPENDED')" title="Filter by Suspended accounts" class="stat-card bg-surface border border-outline hover:border-rose-500 hover:bg-rose-50/30 rounded-xl p-4 shadow-sm flex flex-col text-left cursor-pointer transition-all duration-200 group focus:outline-none w-full">
+            <div class="flex items-center justify-between w-full mb-1">
+                <span class="text-xs font-bold text-rose-700 uppercase tracking-wider">Suspended</span>
+                <span class="material-symbols-outlined text-rose-600 text-xl group-hover:scale-110 transition-transform">block</span>
+            </div>
+            <div class="text-2xl font-extrabold text-rose-700" id="kpi-suspended">0</div>
+            <div class="flex items-center justify-between w-full mt-1">
+                <span class="text-[10px] text-rose-600">Temporarily locked</span>
+                <span id="badge-status-suspended" class="text-[8px] font-black uppercase px-2 py-0.5 rounded-full hidden">● Active</span>
+            </div>
+        </button>
+
+        <button type="button" id="card-status-deactivated" onclick="selectStatusFilter('DEACTIVATED')" title="Filter by Deactivated accounts" class="stat-card bg-surface border border-outline hover:border-slate-500 hover:bg-slate-100 rounded-xl p-4 shadow-sm flex flex-col col-span-2 sm:col-span-1 text-left cursor-pointer transition-all duration-200 group focus:outline-none w-full">
+            <div class="flex items-center justify-between w-full mb-1">
+                <span class="text-xs font-bold text-slate-700 uppercase tracking-wider">Deactivated</span>
+                <span class="material-symbols-outlined text-slate-500 text-xl group-hover:scale-110 transition-transform">person_off</span>
+            </div>
+            <div class="text-2xl font-extrabold text-slate-700" id="kpi-deactivated">0</div>
+            <div class="flex items-center justify-between w-full mt-1">
+                <span class="text-[10px] text-slate-500">Exited / Revoked</span>
+                <span id="badge-status-deactivated" class="text-[8px] font-black uppercase px-2 py-0.5 rounded-full hidden">● Active</span>
+            </div>
+        </button>
+    </div>
+
+    <!-- LIFECYCLE INFO BANNER -->
+    <div class="bg-slate-900 text-white rounded-2xl p-5 shadow-sm flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4">
+        <div class="flex items-center gap-3.5">
+            <div class="w-12 h-12 rounded-xl bg-white/10 flex items-center justify-center text-amber-400 shrink-0">
+                <span class="material-symbols-outlined text-2xl">autorenew</span>
+            </div>
+            <div>
+                <h4 class="font-extrabold text-sm sm:text-base">Automatic Account Provisioning &amp; Lifecycle Guard</h4>
+                <p class="text-xs text-slate-300 mt-0.5 max-w-2xl leading-relaxed">
+                    New employees registered in HR automatically receive linked system accounts (<code class="text-amber-300">USR-BCF-XXXX</code>). If an employee resigns, retires, or is terminated, access is immediately revoked while immutable audit trails are preserved.
+                </p>
+            </div>
+        </div>
+        <div class="flex items-center gap-2 shrink-0 text-xs font-semibold">
+            <span class="px-3 py-1.5 rounded-lg bg-white/10 text-slate-200 border border-white/20 flex items-center gap-1.5">
+                <span class="material-symbols-outlined text-[16px] text-emerald-400">verified</span>
+                2FA Enforced
+            </span>
+            <span class="px-3 py-1.5 rounded-lg bg-white/10 text-slate-200 border border-white/20 flex items-center gap-1.5">
+                <span class="material-symbols-outlined text-[16px] text-blue-400">security</span>
+                Role Guard Active
+            </span>
+        </div>
+    </div>
+
+    <!-- DIRECTORY & USER MANAGEMENT SECTION -->
+    <div class="bg-surface border border-outline rounded-2xl shadow-sm overflow-hidden flex flex-col">
+        <!-- Toolbar & Filter Row -->
+        <div class="p-5 border-b border-outline flex flex-col gap-4">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                <h3 class="font-bold text-lg text-on-surface flex items-center gap-2">
+                    <span class="material-symbols-outlined text-secondary">badge</span>
+                    BCF-SL System Accounts Directory
+                </h3>
+                <span id="account-results-badge" class="text-xs font-bold text-on-surface-variant bg-slate-100 px-3 py-1 rounded-full self-start sm:self-auto">
+                    Loading accounts...
+                </span>
+            </div>
+
+            <!-- Search + Filter Bar -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3">
+                <div class="relative lg:col-span-2">
+                    <span class="material-symbols-outlined absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400 text-[18px]">search</span>
+                    <input type="text" id="acc-search" placeholder="Search by name, User ID, Employee ID, email..." 
+                        class="w-full h-10 pl-10 pr-3 rounded-lg border border-outline text-xs sm:text-sm outline-none focus:border-primary focus:ring-1 focus:ring-primary font-medium"
+                        oninput="filterAccounts()">
+                </div>
+
+                <div>
+                    <select id="filter-dept" onchange="filterAccounts()" class="w-full h-10 px-3 rounded-lg border border-outline text-xs sm:text-sm outline-none focus:border-primary font-medium bg-surface">
+                        <option value="">All Departments</option>
+                        <option>Executive Management</option>
+                        <option>Finance Department</option>
+                        <option>Health & Safety Department</option>
+                        <option>Human Resources Management Department</option>
+                        <option>Information Technology (IT) Department</option>
+                        <option>Internal Risk & Audits Department</option>
+                        <option>Legal & Communication Department</option>
+                        <option>Procurement Department</option>
+                        <option>Programs Department</option>
+                    </select>
+                </div>
+
+                <div>
+                    <select id="filter-role" onchange="filterAccounts()" class="w-full h-10 px-3 rounded-lg border border-outline text-xs sm:text-sm outline-none focus:border-primary font-medium bg-surface">
+                        <option value="">All Roles</option>
+                        <option>Super Admin</option>
+                        <option>Governing Board</option>
+                        <option>HRM Director</option>
+                        <option>Finance Director</option>
+                        <option>Programs Director</option>
+                        <option>Health & Safety Director</option>
+                        <option>IT Director</option>
+                        <option>Internal Risk & Audits Director</option>
+                        <option>Legal & Communication Director</option>
+                        <option>Procurement Director</option>
+                        <option>Unit Manager</option>
+                        <option>Assistant Manager</option>
+                        <option>Officer</option>
+                        <option>Volunteer</option>
+                        <option>Intern</option>
+                    </select>
+                </div>
+
+                <div>
+                    <select id="filter-status" onchange="filterAccounts()" class="w-full h-10 px-3 rounded-lg border border-outline text-xs sm:text-sm outline-none focus:border-primary font-medium bg-surface">
+                        <option value="">All Statuses</option>
+                        <option value="ACTIVE">ACTIVE</option>
+                        <option value="PENDING">PENDING APPROVAL</option>
+                        <option value="SUSPENDED">SUSPENDED</option>
+                        <option value="DEACTIVATED">DEACTIVATED</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <!-- ACCOUNTS TABLE -->
+        <div class="overflow-x-auto">
+            <table class="w-full text-left text-sm border-collapse">
+                <thead class="bg-slate-100 text-slate-700 uppercase tracking-wider text-[11px] font-bold border-b border-outline">
+                    <tr>
+                        <th class="px-4 py-3.5 whitespace-nowrap">User ID</th>
+                        <th class="px-4 py-3.5 whitespace-nowrap">Employee</th>
+                        <th class="px-4 py-3.5 whitespace-nowrap">Department</th>
+                        <th class="px-4 py-3.5 whitespace-nowrap">Official Email &amp; Username</th>
+                        <th class="px-4 py-3.5 whitespace-nowrap">Role &amp; Access Tier</th>
+                        <th class="px-4 py-3.5 whitespace-nowrap">Status</th>
+                        <th class="px-4 py-3.5 whitespace-nowrap">Last Activity</th>
+                        <th class="px-4 py-3.5 text-right whitespace-nowrap">Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="accounts-tbody" class="divide-y divide-outline text-xs">
+                    <!-- Populated dynamically -->
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Empty State -->
+        <div id="accounts-empty" class="hidden py-16 text-center text-on-surface-variant">
+            <span class="material-symbols-outlined text-6xl text-slate-300 block mb-2">person_search</span>
+            <p class="font-bold text-base text-on-surface">No system user accounts found.</p>
+            <p class="text-xs text-on-surface-variant mt-1 mb-4">Click "Auto-Sync with HR" to generate accounts from registered employees.</p>
+            <button onclick="syncHrEmployees()" class="px-4 py-2 bg-primary text-white rounded-lg text-xs font-bold hover:bg-primary-dark transition">
+                Auto-Sync Now
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- ==================== VIEW USER ACCOUNT MODAL ==================== -->
+<div id="view-user-modal" class="fixed inset-0 z-50 hidden bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="bg-surface rounded-2xl border border-outline shadow-2xl max-w-xl w-full overflow-hidden flex flex-col animate-fade">
+        <div class="p-5 border-b border-outline bg-slate-50 flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <div class="w-11 h-11 rounded-full bg-primary/10 text-primary flex items-center justify-center font-extrabold text-base" id="uv-avatar">?</div>
+                <div>
+                    <h3 class="font-extrabold text-base text-on-surface" id="uv-name">User Account Details</h3>
+                    <p class="text-xs text-on-surface-variant font-mono" id="uv-ids"></p>
+                </div>
+            </div>
+            <button onclick="closeModal('view-user-modal')" class="w-8 h-8 rounded-full hover:bg-slate-200 text-slate-500 flex items-center justify-center transition">
+                <span class="material-symbols-outlined text-[20px]">close</span>
+            </button>
+        </div>
+        <div class="p-6 flex flex-col gap-4 max-h-[70vh] overflow-y-auto">
+            <div class="grid grid-cols-2 gap-3 text-xs">
+                <div class="p-3 bg-slate-50 rounded-xl border border-outline">
+                    <span class="text-slate-500 font-semibold block text-[10px] uppercase">User ID</span>
+                    <span class="font-mono font-bold text-secondary text-sm" id="uv-userid">-</span>
+                </div>
+                <div class="p-3 bg-slate-50 rounded-xl border border-outline">
+                    <span class="text-slate-500 font-semibold block text-[10px] uppercase">Employee ID</span>
+                    <span class="font-mono font-bold text-slate-800 text-sm" id="uv-empid">-</span>
+                </div>
+                <div class="p-3 bg-slate-50 rounded-xl border border-outline">
+                    <span class="text-slate-500 font-semibold block text-[10px] uppercase">Department</span>
+                    <span class="font-semibold text-slate-800" id="uv-dept">-</span>
+                </div>
+                <div class="p-3 bg-slate-50 rounded-xl border border-outline">
+                    <span class="text-slate-500 font-semibold block text-[10px] uppercase">Position</span>
+                    <span class="font-semibold text-slate-800" id="uv-position">-</span>
+                </div>
+                <div class="p-3 bg-slate-50 rounded-xl border border-outline">
+                    <span class="text-slate-500 font-semibold block text-[10px] uppercase">Official BCF Email</span>
+                    <span class="font-medium text-slate-800" id="uv-email">-</span>
+                </div>
+                <div class="p-3 bg-slate-50 rounded-xl border border-outline">
+                    <span class="text-slate-500 font-semibold block text-[10px] uppercase">System Username</span>
+                    <span class="font-mono font-bold text-primary" id="uv-username">-</span>
+                </div>
+                <div class="p-3 bg-slate-50 rounded-xl border border-outline">
+                    <span class="text-slate-500 font-semibold block text-[10px] uppercase">Assigned Role</span>
+                    <span class="font-bold text-slate-800" id="uv-role">-</span>
+                </div>
+                <div class="p-3 bg-slate-50 rounded-xl border border-outline">
+                    <span class="text-slate-500 font-semibold block text-[10px] uppercase">Access Level</span>
+                    <span class="font-bold text-slate-800" id="uv-access">-</span>
+                </div>
+                <div class="p-3 bg-slate-50 rounded-xl border border-outline">
+                    <span class="text-slate-500 font-semibold block text-[10px] uppercase">Account Status</span>
+                    <span id="uv-status" class="inline-block font-extrabold px-2 py-0.5 rounded text-[11px]">-</span>
+                </div>
+                <div class="p-3 bg-slate-50 rounded-xl border border-outline">
+                    <span class="text-slate-500 font-semibold block text-[10px] uppercase">Date Created</span>
+                    <span class="font-medium text-slate-800" id="uv-created">-</span>
+                </div>
+            </div>
+
+            <!-- Permission Scope Description -->
+            <div class="p-4 bg-blue-50 border border-blue-200 rounded-xl">
+                <span class="text-blue-800 font-bold text-xs flex items-center gap-1.5 mb-1">
+                    <span class="material-symbols-outlined text-[16px]">verified_user</span>
+                    Permission Scope
+                </span>
+                <p class="text-xs text-blue-900 leading-relaxed" id="uv-scope-desc">-</p>
+            </div>
+        </div>
+        <div class="p-4 border-t border-outline bg-slate-50 flex items-center justify-end">
+            <button onclick="closeModal('view-user-modal')" class="px-5 py-2 bg-primary text-white font-bold text-xs rounded-lg hover:bg-primary-dark transition shadow">
+                Close
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- ==================== EDIT USER ROLE & ACCESS MODAL ==================== -->
+<div id="edit-user-modal" class="fixed inset-0 z-50 hidden bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="bg-surface rounded-2xl border border-outline shadow-2xl max-w-md w-full overflow-hidden flex flex-col animate-fade">
+        <div class="p-5 border-b border-outline bg-slate-50 flex items-center justify-between">
+            <div class="flex items-center gap-2.5">
+                <span class="material-symbols-outlined text-secondary text-2xl">edit_note</span>
+                <h3 class="font-bold text-base text-on-surface">Edit User Role &amp; Access</h3>
+            </div>
+            <button onclick="closeModal('edit-user-modal')" class="w-8 h-8 rounded-full hover:bg-slate-200 text-slate-500 flex items-center justify-center transition">
+                <span class="material-symbols-outlined text-[20px]">close</span>
+            </button>
+        </div>
+        <form onsubmit="event.preventDefault(); saveUserEdit();" class="p-6 flex flex-col gap-4 text-xs">
+            <input type="hidden" id="edit-user-id"/>
+            <div class="p-3 bg-slate-50 rounded-xl border border-outline">
+                <span class="text-slate-500 font-semibold block text-[10px] uppercase">Employee</span>
+                <span class="font-bold text-sm text-slate-800" id="edit-user-name">-</span>
+                <span class="text-slate-500 font-mono block text-[11px]" id="edit-user-empid">-</span>
+            </div>
+
+            <div class="flex flex-col gap-1">
+                <label class="font-bold text-slate-700">Assign Role</label>
+                <select id="edit-role-select" onchange="onEditRoleChange()" class="h-10 px-3 rounded-lg border border-outline font-medium bg-surface outline-none focus:border-primary">
+                    <option value="Super Admin">Super Admin (Level 1 Full Access)</option>
+                    <option value="Governing Board">Governing Board (Executive View)</option>
+                    <option value="HRM Director">HRM Director</option>
+                    <option value="Finance Director">Finance Director</option>
+                    <option value="Programs Director">Programs Director</option>
+                    <option value="Health & Safety Director">Health & Safety Director</option>
+                    <option value="IT Director">IT Director</option>
+                    <option value="Internal Risk & Audits Director">Internal Risk & Audits Director</option>
+                    <option value="Legal & Communication Director">Legal & Communication Director</option>
+                    <option value="Procurement Director">Procurement Director</option>
+                    <option value="Unit Manager">Unit Manager (Department/Unit)</option>
+                    <option value="Assistant Manager">Assistant Manager (Operational)</option>
+                    <option value="Officer">Officer (Data Entry/Operational)</option>
+                    <option value="Volunteer">Volunteer (Restricted)</option>
+                    <option value="Intern">Intern (Restricted)</option>
+                </select>
+            </div>
+
+            <div class="flex flex-col gap-1">
+                <label class="font-bold text-slate-700">Access Level Tier</label>
+                <input type="text" id="edit-access-level" readonly class="h-10 px-3 rounded-lg border border-outline font-semibold bg-slate-100 text-slate-700 outline-none"/>
+            </div>
+
+            <div class="flex flex-col gap-1">
+                <label class="font-bold text-slate-700">Account Status</label>
+                <select id="edit-status-select" class="h-10 px-3 rounded-lg border border-outline font-medium bg-surface outline-none focus:border-primary">
+                    <option value="ACTIVE">ACTIVE</option>
+                    <option value="PENDING">PENDING APPROVAL</option>
+                    <option value="SUSPENDED">SUSPENDED</option>
+                    <option value="DEACTIVATED">DEACTIVATED</option>
+                </select>
+            </div>
+
+            <div class="flex items-center justify-end gap-2 pt-3 border-t border-outline">
+                <button type="button" onclick="closeModal('edit-user-modal')" class="px-4 py-2 border border-outline rounded-lg text-slate-600 font-bold hover:bg-slate-100 transition">
+                    Cancel
+                </button>
+                <button type="submit" class="px-5 py-2 bg-primary hover:bg-primary-dark text-white rounded-lg font-bold transition shadow">
+                    Save Changes
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- ==================== CREATE USER MODAL ==================== -->
+<div id="create-user-modal" class="fixed inset-0 z-50 hidden bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="bg-surface rounded-2xl border border-outline shadow-2xl max-w-lg w-full overflow-hidden flex flex-col animate-fade">
+        <div class="p-5 border-b border-outline bg-slate-50 flex items-center justify-between">
+            <div class="flex items-center gap-2.5">
+                <span class="material-symbols-outlined text-primary text-2xl">person_add</span>
+                <h3 class="font-bold text-base text-on-surface">Create New System Account</h3>
+            </div>
+            <button onclick="closeModal('create-user-modal')" class="w-8 h-8 rounded-full hover:bg-slate-200 text-slate-500 flex items-center justify-center transition">
+                <span class="material-symbols-outlined text-[20px]">close</span>
+            </button>
+        </div>
+        <form onsubmit="event.preventDefault(); submitCreateUser();" class="p-6 flex flex-col gap-3.5 text-xs">
+            <div class="grid grid-cols-2 gap-3">
+                <div class="flex flex-col gap-1">
+                    <label class="font-bold text-slate-700">Full Name <span class="text-error">*</span></label>
+                    <input type="text" id="cu-name" required placeholder="e.g. Mariama Sesay" class="h-9 px-3 rounded-lg border border-outline font-medium outline-none focus:border-primary"/>
+                </div>
+                <div class="flex flex-col gap-1">
+                    <label class="font-bold text-slate-700">Linked Employee ID</label>
+                    <input type="text" id="cu-empid" placeholder="e.g. BCF-EMP-2026-0012" class="h-9 px-3 rounded-lg border border-outline font-mono outline-none focus:border-primary"/>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-2 gap-3">
+                <div class="flex flex-col gap-1">
+                    <label class="font-bold text-slate-700">Department <span class="text-error">*</span></label>
+                    <select id="cu-dept" required class="h-9 px-2 rounded-lg border border-outline font-medium bg-surface outline-none focus:border-primary">
+                        <option value="Executive Management">Executive Management</option>
+                        <option value="Finance Department">Finance Department</option>
+                        <option value="Health & Safety Department">Health & Safety Department</option>
+                        <option value="Human Resources Management Department">Human Resources Management Department</option>
+                        <option value="Information Technology (IT) Department">Information Technology (IT) Department</option>
+                        <option value="Internal Risk & Audits Department">Internal Risk & Audits Department</option>
+                        <option value="Legal & Communication Department">Legal & Communication Department</option>
+                        <option value="Procurement Department">Procurement Department</option>
+                        <option value="Programs Department">Programs Department</option>
+                    </select>
+                </div>
+                <div class="flex flex-col gap-1">
+                    <label class="font-bold text-slate-700">Position / Title <span class="text-error">*</span></label>
+                    <input type="text" id="cu-pos" required placeholder="e.g. Finance Officer" class="h-9 px-3 rounded-lg border border-outline font-medium outline-none focus:border-primary"/>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-2 gap-3">
+                <div class="flex flex-col gap-1">
+                    <label class="font-bold text-slate-700">User Role <span class="text-error">*</span></label>
+                    <select id="cu-role" required class="h-9 px-2 rounded-lg border border-outline font-medium bg-surface outline-none focus:border-primary">
+                        <option value="Super Admin">Super Admin (Full Access)</option>
+                        <option value="Governing Board">Governing Board</option>
+                        <option value="HRM Director">HRM Director</option>
+                        <option value="Finance Director">Finance Director</option>
+                        <option value="Programs Director">Programs Director</option>
+                        <option value="Health & Safety Director">Health & Safety Director</option>
+                        <option value="IT Director">IT Director</option>
+                        <option value="Internal Risk & Audits Director">Internal Risk & Audits Director</option>
+                        <option value="Legal & Communication Director">Legal & Communication Director</option>
+                        <option value="Procurement Director">Procurement Director</option>
+                        <option value="Unit Manager">Unit Manager</option>
+                        <option value="Assistant Manager">Assistant Manager</option>
+                        <option value="Officer" selected>Officer</option>
+                        <option value="Volunteer">Volunteer</option>
+                        <option value="Intern">Intern</option>
+                    </select>
+                </div>
+                <div class="flex flex-col gap-1">
+                    <label class="font-bold text-slate-700">Employment Type</label>
+                    <select id="cu-type" class="h-9 px-2 rounded-lg border border-outline font-medium bg-surface outline-none focus:border-primary">
+                        <option>Permanent</option>
+                        <option>Fixed-Term Contract</option>
+                        <option>Part-Time</option>
+                        <option>Casual</option>
+                        <option>Consultant</option>
+                        <option>Volunteer</option>
+                        <option>Intern</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-2 gap-3">
+                <div class="flex flex-col gap-1">
+                    <label class="font-bold text-slate-700">Official BCF Email</label>
+                    <input type="email" id="cu-email" placeholder="first.last@bcf-sl.org" class="h-9 px-3 rounded-lg border border-outline font-medium outline-none focus:border-primary"/>
+                </div>
+                <div class="flex flex-col gap-1">
+                    <label class="font-bold text-slate-700">Initial Password</label>
+                    <input type="text" id="cu-pass" value="BCF@2026" class="h-9 px-3 rounded-lg border border-outline font-mono outline-none focus:border-primary"/>
+                </div>
+            </div>
+
+            <div class="flex items-center justify-end gap-2 pt-3 border-t border-outline">
+                <button type="button" onclick="closeModal('create-user-modal')" class="px-4 py-2 border border-outline rounded-lg text-slate-600 font-bold hover:bg-slate-100 transition">
+                    Cancel
+                </button>
+                <button type="submit" class="px-5 py-2 bg-primary hover:bg-primary-dark text-white rounded-lg font-bold transition shadow">
+                    Create Account
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- ==================== RESET PASSWORD MODAL ==================== -->
+<div id="reset-pass-modal" class="fixed inset-0 z-50 hidden bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="bg-surface rounded-2xl border border-outline shadow-2xl max-w-sm w-full p-6 text-center animate-fade">
+        <div class="w-12 h-12 rounded-full bg-amber-100 text-amber-800 flex items-center justify-center mx-auto mb-3">
+            <span class="material-symbols-outlined text-2xl">key</span>
+        </div>
+        <h3 class="font-bold text-base text-on-surface mb-1">Reset User Password</h3>
+        <p class="text-xs text-on-surface-variant mb-4" id="rp-desc">Generate temporary password for user</p>
+        
+        <div class="bg-slate-50 border border-outline rounded-xl p-3 mb-4">
+            <span class="text-[10px] uppercase font-bold text-slate-500 block mb-1">Temporary Password</span>
+            <span class="font-mono font-extrabold text-base text-primary select-all" id="rp-pass">BCF@2026</span>
+        </div>
+        
+        <p class="text-[11px] text-slate-500 mb-5">The employee will be prompted to change their password on next login. 2FA verification will be required.</p>
+        
+        <div class="flex items-center justify-center gap-2">
+            <button onclick="closeModal('reset-pass-modal')" class="px-4 py-2 border border-outline rounded-lg text-xs font-bold text-slate-600 hover:bg-slate-100 transition">Cancel</button>
+            <button onclick="confirmResetPass()" class="px-5 py-2 bg-primary text-white rounded-lg text-xs font-bold hover:bg-primary-dark transition shadow">Confirm Reset</button>
+        </div>
+    </div>
+</div>
+
+<script>
+
+    function navToApp(nextRoute, fallbackPath, e) {
+        if (e) e.preventDefault();
+        try {
+            if (window.top && window.top !== window && window.top.location) {
+                window.top.location.href = nextRoute;
+                return;
+            }
+        } catch(err) {}
+        window.location.href = fallbackPath;
+    }
+
+    // System Roles and Access Levels Configuration
+    const ROLE_ACCESS_MAP = {
+        'Super Admin': { level: 'Level 1 — Super Administration', group: 'Full System Control' },
+        'Governing Board': { level: 'Executive / Strategic View', group: 'Governance & Audit' },
+        'HRM Director': { level: 'Departmental / Executive', group: 'HR & People Operations' },
+        'Finance Director': { level: 'Departmental / Executive', group: 'Financial Management' },
+        'Programs Director': { level: 'Departmental / Executive', group: 'Programmes & Portfolio' },
+        'Health & Safety Director': { level: 'Departmental / Executive', group: 'H&S and Compliance' },
+        'IT Director': { level: 'Departmental / Technical', group: 'Systems & Infrastructure' },
+        'Internal Risk & Audits Director': { level: 'Executive / Audit View', group: 'Internal Audit & Controls' },
+        'Legal & Communication Director': { level: 'Departmental / Executive', group: 'Legal & Communications' },
+        'Procurement Director': { level: 'Departmental / Executive', group: 'Procurement & Assets' },
+        'Unit Manager': { level: 'Department / Unit', group: 'Operational Unit Oversight' },
+        'Assistant Manager': { level: 'Operational', group: 'Unit Supervisory' },
+        'Officer': { level: 'Data Entry / Operational', group: 'Frontline Operations' },
+        'Volunteer': { level: 'Restricted', group: 'Assigned Project Fieldwork' },
+        'Intern': { level: 'Restricted', group: 'Assigned Department Tasks' }
+    };
+
+    
+    let activeStatusFilter = 'ALL';
+
+    
+    // EXPORT USER ACCOUNTS TO CSV
+    function exportAccountsCsv() {
+        const dataToExport = (filteredAccounts && filteredAccounts.length > 0) ? filteredAccounts : userAccounts;
+        if (!dataToExport || dataToExport.length === 0) {
+            showAccountToast('⚠️ No user accounts found to export.');
+            return;
+        }
+
+        let csv = '=== BANDAMA CHARITY FOUNDATION SIERRA LEONE ===\n';
+        csv += 'USER & ACCESS MANAGEMENT (RBAC) ACCOUNTS REGISTRY\n';
+        csv += `Exported on,${new Date().toLocaleString('en-GB')}\n`;
+        csv += `Total Records,${dataToExport.length}\n`;
+        if (activeStatusFilter !== 'ALL') {
+            csv += `Active Filter,Status = ${activeStatusFilter}\n`;
+        }
+        csv += '\n';
+
+        // CSV Column Headers
+        const headers = [
+            "User ID",
+            "Employee ID",
+            "Full Name",
+            "Department",
+            "Position / Title",
+            "Employment Type",
+            "Official Email",
+            "Username",
+            "Assigned Role",
+            "Access Level",
+            "Permission Group",
+            "Account Status",
+            "Provisioned Date",
+            "Last Login",
+            "Last Activity"
+        ];
+        csv += headers.map(h => `"${h}"`).join(',') + '\n';
+
+        // Account Data Rows
+        dataToExport.forEach(u => {
+            const row = [
+                u.userId || '',
+                u.employeeId || '',
+                u.fullName || '',
+                u.department || '',
+                u.position || '',
+                u.employmentType || '',
+                u.email || '',
+                u.username || '',
+                u.role || '',
+                u.accessLevel || '',
+                u.permissionGroup || '',
+                u.status || '',
+                u.createdDate || '',
+                u.lastLogin || '',
+                u.lastActivity || ''
+            ];
+            csv += row.map(val => `"${String(val).replace(/"/g, '""')}"`).join(',') + '\n';
+        });
+
+        // Trigger Download
+        const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+        const link = document.createElement('a');
+        link.href = URL.createObjectURL(blob);
+        const dateStr = new Date().toISOString().split('T')[0];
+        const statusSuffix = activeStatusFilter !== 'ALL' ? `_${activeStatusFilter}` : '';
+        link.download = `BCF_SL_User_Accounts${statusSuffix}_${dateStr}.csv`;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+
+        showAccountToast(`✅ Exported ${dataToExport.length} accounts to CSV!`);
+    }
+
+    function showAccountToast(msg) {
+        const toast = document.getElementById('account-toast');
+        const text = document.getElementById('account-toast-msg');
+        if (!toast) return;
+        if (text) text.textContent = msg;
+        toast.classList.remove('translate-y-20', 'opacity-0');
+        toast.classList.add('translate-y-0', 'opacity-100');
+        setTimeout(() => {
+            toast.classList.add('translate-y-20', 'opacity-0');
+            toast.classList.remove('translate-y-0', 'opacity-100');
+        }, 3000);
+    }
+
+    function selectStatusFilter(statusKey) {
+        const statusSelect = document.getElementById('filter-status');
+        if (statusKey === 'ALL' || statusKey === '') {
+            activeStatusFilter = 'ALL';
+            if (statusSelect) statusSelect.value = '';
+        } else if (activeStatusFilter.toUpperCase() === statusKey.toUpperCase()) {
+            // Toggle off back to ALL
+            activeStatusFilter = 'ALL';
+            if (statusSelect) statusSelect.value = '';
+        } else {
+            activeStatusFilter = statusKey;
+            if (statusSelect) statusSelect.value = statusKey;
+        }
+
+        filterAccounts(true);
+        updateKpiCardStyles();
+
+        // Smooth scroll to table
+        const table = document.getElementById('accounts-tbody')?.closest('.bg-surface');
+        if (table) {
+            table.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+    }
+
+    function updateKpiCardStyles() {
+        const cards = {
+            'ALL': { id: 'card-status-all', badge: 'badge-status-all', color: '#15803d', bg: 'bg-emerald-50 text-emerald-800' },
+            'ACTIVE': { id: 'card-status-active', badge: 'badge-status-active', color: '#059669', bg: 'bg-emerald-100 text-emerald-800' },
+            'PENDING': { id: 'card-status-pending', badge: 'badge-status-pending', color: '#d97706', bg: 'bg-amber-100 text-amber-800' },
+            'SUSPENDED': { id: 'card-status-suspended', badge: 'badge-status-suspended', color: '#e11d48', bg: 'bg-rose-100 text-rose-800' },
+            'DEACTIVATED': { id: 'card-status-deactivated', badge: 'badge-status-deactivated', color: '#475569', bg: 'bg-slate-200 text-slate-800' }
+        };
+
+        Object.keys(cards).forEach(k => {
+            const config = cards[k];
+            const cardEl = document.getElementById(config.id);
+            const badgeEl = document.getElementById(config.badge);
+            if (!cardEl) return;
+
+            const isActive = (k === 'ALL' && activeStatusFilter === 'ALL') || (k.toUpperCase() === activeStatusFilter.toUpperCase());
+            if (isActive) {
+                cardEl.className = 'stat-card border-2 bg-white shadow-md -translate-y-1 ring-2 ring-offset-1 rounded-xl p-4 flex flex-col text-left cursor-pointer transition-all duration-200 group focus:outline-none w-full';
+                cardEl.style.borderColor = config.color;
+                cardEl.style.outlineColor = config.color;
+                if (badgeEl) {
+                    badgeEl.className = `text-[8px] font-black uppercase px-2 py-0.5 rounded-full inline-block ${config.bg}`;
+                    badgeEl.textContent = '● Active Filter';
+                }
+            } else {
+                cardEl.className = 'stat-card bg-surface border border-outline hover:bg-slate-50/80 hover:border-slate-400 hover:shadow-sm hover:-translate-y-0.5 rounded-xl p-4 flex flex-col text-left cursor-pointer transition-all duration-200 group focus:outline-none w-full';
+                cardEl.style.borderColor = '';
+                if (badgeEl) {
+                    badgeEl.className = 'hidden';
+                }
+            }
+        });
+    }
+
+    let userAccounts = JSON.parse(localStorage.getItem('bcf_user_accounts') || '[]');
+    let filteredAccounts = [];
+    let currentRpUserId = null;
+
+    // Default Seed Accounts if empty
+    function ensureInitialAccounts() {
+        if(!userAccounts || userAccounts.length === 0) {
+            userAccounts = [
+                {
+                    userId: 'USR-BCF-0001',
+                    employeeId: 'BCF-PTE-2026-0001',
+                    fullName: 'Albert Joseph Bandama',
+                    department: 'Executive Management',
+                    position: 'Chief Executive Officer (CEO)',
+                    employmentType: 'Permanent',
+                    email: 'albert.bandama@bcf-sl.org',
+                    username: 'a.bandama',
+                    role: 'Super Admin',
+                    accessLevel: 'Level 1 — Super Administration',
+                    permissionGroup: 'Full System Control',
+                    status: 'ACTIVE',
+                    createdDate: '10/09/2026',
+                    lastLogin: '13/09/2026 19:15',
+                    lastActivity: '13/09/2026 19:22'
+                },
+                {
+                    userId: 'USR-BCF-0002',
+                    employeeId: 'BCF-PTE-2026-0002',
+                    fullName: 'Joe Ansumana Conteh',
+                    department: 'Human Resources Management Department',
+                    position: 'Human Resources Director',
+                    employmentType: 'Permanent',
+                    email: 'joe.conteh@bcf-sl.org',
+                    username: 'j.conteh',
+                    role: 'HRM Director',
+                    accessLevel: 'Departmental / Executive',
+                    permissionGroup: 'HR & People Operations',
+                    status: 'ACTIVE',
+                    createdDate: '11/09/2026',
+                    lastLogin: '13/09/2026 18:40',
+                    lastActivity: '13/09/2026 18:55'
+                },
+                {
+                    userId: 'USR-BCF-0003',
+                    employeeId: 'BCF-EMP-2026-0003',
+                    fullName: 'Mariama Bangura',
+                    department: 'Finance Department',
+                    position: 'Finance Director',
+                    employmentType: 'Permanent',
+                    email: 'mariama.bangura@bcf-sl.org',
+                    username: 'm.bangura',
+                    role: 'Finance Director',
+                    accessLevel: 'Departmental / Executive',
+                    permissionGroup: 'Financial Management',
+                    status: 'ACTIVE',
+                    createdDate: '12/09/2026',
+                    lastLogin: '13/09/2026 17:30',
+                    lastActivity: '13/09/2026 17:50'
+                },
+                {
+                    userId: 'USR-BCF-0004',
+                    employeeId: 'BCF-EMP-2026-0004',
+                    fullName: 'Sahr David Williams',
+                    department: 'Internal Risk & Audits Department',
+                    position: 'Audit Director',
+                    employmentType: 'Permanent',
+                    email: 'sahr.williams@bcf-sl.org',
+                    username: 's.williams',
+                    role: 'Internal Risk & Audits Director',
+                    accessLevel: 'Executive / Audit View',
+                    permissionGroup: 'Internal Audit & Controls',
+                    status: 'ACTIVE',
+                    createdDate: '12/09/2026',
+                    lastLogin: '13/09/2026 16:10',
+                    lastActivity: '13/09/2026 16:45'
+                }
+            ];
+            saveAccounts();
+        }
+    }
+
+    function saveAccounts() {
+        localStorage.setItem('bcf_user_accounts', JSON.stringify(userAccounts));
+    }
+
+    // AUDIT LOGGING HELPER
+    function logAuditAction(action, targetUserId, employeeId, prevVal, newVal) {
+        let logs = JSON.parse(localStorage.getItem('bcf_audit_logs') || '[]');
+        const auditId = 'AUD-' + String(logs.length + 1).padStart(6, '0');
+        const now = new Date();
+        const dateStr = now.toLocaleDateString('en-GB') + ' ' + now.toLocaleTimeString('en-GB', {hour:'2-digit', minute:'2-digit'});
+        
+        logs.unshift({
+            auditId: auditId,
+            userId: targetUserId || 'SYSTEM',
+            employeeId: employeeId || '-',
+            action: action,
+            module: 'Super Admin / RBAC',
+            dateTime: dateStr,
+            ipSession: '192.168.1.' + Math.floor(Math.random()*150 + 10),
+            previousValue: prevVal || '-',
+            newValue: newVal || '-',
+            result: 'Successful'
+        });
+        localStorage.setItem('bcf_audit_logs', JSON.stringify(logs));
+    }
+
+    // AUTOMATIC HR EMPLOYEE SYNC
+    function syncHrEmployees() {
+        const staffRegistry = JSON.parse(localStorage.getItem('bcf_staff_registry') || '[]');
+        let newCount = 0;
+
+        staffRegistry.forEach(emp => {
+            const exists = userAccounts.some(acc => acc.employeeId === emp.employeeId || (acc.fullName && emp.fullName && acc.fullName.toLowerCase() === emp.fullName.toLowerCase()));
+            if(!exists && emp.fullName) {
+                // Deduce role from position or title or department
+                let role = 'Officer';
+                const pos = (emp.title || emp.position || '').toLowerCase();
+                if(pos.includes('ceo') || pos.includes('executive director')) role = 'Super Admin';
+                else if(pos.includes('board') || pos.includes('trustee')) role = 'Governing Board';
+                else if(pos.includes('hr director') || pos.includes('human resources director')) role = 'HRM Director';
+                else if(pos.includes('finance director')) role = 'Finance Director';
+                else if(pos.includes('programs director')) role = 'Programs Director';
+                else if(pos.includes('director')) role = 'Unit Manager';
+                else if(pos.includes('manager')) role = 'Unit Manager';
+                else if(pos.includes('assistant')) role = 'Assistant Manager';
+                else if((emp.classification||'').toLowerCase() === 'volunteer') role = 'Volunteer';
+                else if((emp.classification||'').toLowerCase() === 'intern') role = 'Intern';
+
+                const nameParts = emp.fullName.trim().split(' ');
+                const fInitial = nameParts[0].charAt(0).toLowerCase();
+                const lName = nameParts[nameParts.length - 1].toLowerCase().replace(/[^a-z]/g,'');
+                const username = `${fInitial}.${lName}`;
+                const email = emp.email || `${fInitial}.${lName}@bcf-sl.org`;
+
+                const nextIdNum = userAccounts.length + 1;
+                const newUserId = `USR-BCF-${String(nextIdNum).padStart(4, '0')}`;
+
+                const mapping = ROLE_ACCESS_MAP[role] || ROLE_ACCESS_MAP['Officer'];
+
+                const newAccount = {
+                    userId: newUserId,
+                    employeeId: emp.employeeId || `BCF-EMP-2026-${String(nextIdNum).padStart(4, '0')}`,
+                    fullName: emp.fullName,
+                    department: emp.department || 'Programs Department',
+                    position: emp.title || emp.position || 'Staff Member',
+                    employmentType: emp.classification || 'Permanent',
+                    email: email,
+                    username: username,
+                    role: role,
+                    accessLevel: mapping.level,
+                    permissionGroup: mapping.group,
+                    status: 'ACTIVE',
+                    createdDate: new Date().toLocaleDateString('en-GB'),
+                    lastLogin: 'Never',
+                    lastActivity: 'Auto-provisioned from HR'
+                };
+
+                userAccounts.push(newAccount);
+                logAuditAction('Auto-Provisioned Employee Account', newUserId, newAccount.employeeId, 'None', `Created ${role} account for ${emp.fullName}`);
+                newCount++;
+            }
+        });
+
+        saveAccounts();
+        filteredAccounts = userAccounts;
+        renderAccounts();
+        updateKpis();
+
+        const icon = document.getElementById('sync-icon');
+        if (icon) {
+            icon.classList.add('animate-spin');
+            setTimeout(() => icon.classList.remove('animate-spin'), 700);
+        }
+
+        if (newCount > 0) {
+            showAccountToast(`✅ Synced! ${newCount} new employee account(s) provisioned with RBAC.`);
+        } else {
+            showAccountToast('✅ All registered HR employees already have active user accounts.');
+        }
+    }
+
+    // UPDATE KPIS
+    function updateKpis() {
+        const total = userAccounts.length;
+        const active = userAccounts.filter(a => a.status === 'ACTIVE').length;
+        const pending = userAccounts.filter(a => a.status === 'PENDING').length;
+        const suspended = userAccounts.filter(a => a.status === 'SUSPENDED').length;
+        const deactivated = userAccounts.filter(a => a.status === 'DEACTIVATED').length;
+
+        document.getElementById('kpi-total').textContent = total;
+        document.getElementById('kpi-active').textContent = active;
+        document.getElementById('kpi-pending').textContent = pending;
+        document.getElementById('kpi-suspended').textContent = suspended;
+        document.getElementById('kpi-deactivated').textContent = deactivated;
+        updateKpiCardStyles();
+    }
+
+    // FILTER ACCOUNTS
+    function filterAccounts(skipCardUpdate) {
+        const q = (document.getElementById('acc-search').value || '').trim().toLowerCase();
+        const dept = document.getElementById('filter-dept').value;
+        const role = document.getElementById('filter-role').value;
+        const status = document.getElementById('filter-status').value;
+
+        activeStatusFilter = status ? status : 'ALL';
+        if (!skipCardUpdate) {
+            updateKpiCardStyles();
+        }
+
+        filteredAccounts = userAccounts.filter(acc => {
+            const matchQ = !q || (acc.fullName||'').toLowerCase().includes(q) ||
+                           (acc.userId||'').toLowerCase().includes(q) ||
+                           (acc.employeeId||'').toLowerCase().includes(q) ||
+                           (acc.email||'').toLowerCase().includes(q) ||
+                           (acc.username||'').toLowerCase().includes(q);
+            const matchDept = !dept || acc.department === dept;
+            const matchRole = !role || acc.role === role;
+            const matchStatus = !status || acc.status === status;
+            return matchQ && matchDept && matchRole && matchStatus;
+        });
+
+        renderAccounts();
+    }
+
+    // STATUS BADGE STYLES
+    const STATUS_BADGES = {
+        'ACTIVE': 'bg-emerald-100 text-emerald-800 border-emerald-200',
+        'PENDING': 'bg-amber-100 text-amber-800 border-amber-200',
+        'SUSPENDED': 'bg-rose-100 text-rose-800 border-rose-200',
+        'DEACTIVATED': 'bg-slate-200 text-slate-700 border-slate-300'
+    };
+
+    // RENDER TABLE
+    function renderAccounts() {
+        const tbody = document.getElementById('accounts-tbody');
+        const empty = document.getElementById('accounts-empty');
+        const badge = document.getElementById('account-results-badge');
+
+        const data = filteredAccounts;
+        const filterNotice = activeStatusFilter !== 'ALL' ? ` (Filtered by: ${activeStatusFilter})` : '';
+        badge.textContent = `Showing ${data.length} of ${userAccounts.length} User Accounts${filterNotice}`;
+
+        if(data.length === 0) {
+            tbody.innerHTML = '';
+            empty.classList.remove('hidden');
+            return;
+        }
+        empty.classList.add('hidden');
+
+        tbody.innerHTML = data.map(acc => {
+            const statusClass = STATUS_BADGES[acc.status] || 'bg-slate-100 text-slate-700';
+            const deptShort = (acc.department||'').replace(' Department','');
+
+            return `
+                <tr class="hover:bg-slate-50 transition-colors border-b border-outline">
+                    <!-- User ID -->
+                    <td class="px-4 py-3 font-mono font-bold text-secondary whitespace-nowrap">
+                        ${acc.userId}
+                    </td>
+
+                    <!-- Employee Name & ID -->
+                    <td class="px-4 py-3 whitespace-nowrap">
+                        <div class="flex items-center gap-2.5">
+                            <div class="w-8 h-8 rounded-full bg-primary/10 text-primary font-bold flex items-center justify-center text-xs shrink-0">
+                                ${(acc.fullName||'?').charAt(0).toUpperCase()}
+                            </div>
+                            <div>
+                                <span class="font-bold text-on-surface text-xs block">${acc.fullName}</span>
+                                <span class="font-mono text-[10px] text-slate-500">${acc.employeeId}</span>
+                            </div>
+                        </div>
+                    </td>
+
+                    <!-- Department -->
+                    <td class="px-4 py-3 whitespace-nowrap text-slate-700">
+                        <span class="font-semibold">${deptShort}</span>
+                        <span class="block text-[10px] text-slate-500">${acc.position}</span>
+                    </td>
+
+                    <!-- Email & Username -->
+                    <td class="px-4 py-3 whitespace-nowrap">
+                        <span class="font-medium text-slate-800 block">${acc.email}</span>
+                        <span class="font-mono text-[10px] text-primary">@${acc.username}</span>
+                    </td>
+
+                    <!-- Role & Access Level -->
+                    <td class="px-4 py-3 whitespace-nowrap">
+                        <span class="font-bold text-slate-900 block">${acc.role}</span>
+                        <span class="text-[10px] text-slate-500 block">${acc.accessLevel}</span>
+                    </td>
+
+                    <!-- Status -->
+                    <td class="px-4 py-3 whitespace-nowrap">
+                        <span class="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold border ${statusClass}">
+                            ${acc.status}
+                        </span>
+                    </td>
+
+                    <!-- Last Activity -->
+                    <td class="px-4 py-3 whitespace-nowrap text-[11px] text-slate-500">
+                        ${acc.lastActivity || acc.lastLogin || '-'}
+                    </td>
+
+                    <!-- Actions -->
+                    <td class="px-4 py-3 text-right whitespace-nowrap">
+                        <div class="flex items-center justify-end gap-1.5">
+                            <!-- View Button -->
+                            <button onclick="viewUserDetail('${acc.userId}')" title="View Full Details" class="p-1.5 rounded hover:bg-slate-200 text-slate-600 transition">
+                                <span class="material-symbols-outlined text-[17px]">visibility</span>
+                            </button>
+
+                            <!-- Edit Role / Access -->
+                            <button onclick="openEditModal('${acc.userId}')" title="Edit Role / Access" class="p-1.5 rounded hover:bg-blue-100 text-secondary transition">
+                                <span class="material-symbols-outlined text-[17px]">edit</span>
+                            </button>
+
+                            <!-- Approve Button (if pending) -->
+                            ${acc.status === 'PENDING' ? `
+                                <button onclick="approveUser('${acc.userId}')" title="Approve Account" class="p-1.5 rounded hover:bg-emerald-100 text-emerald-700 transition">
+                                    <span class="material-symbols-outlined text-[17px]">check_circle</span>
+                                </button>
+                            ` : ''}
+
+                            <!-- Reset Password -->
+                            <button onclick="openResetPassModal('${acc.userId}')" title="Reset Password" class="p-1.5 rounded hover:bg-amber-100 text-amber-700 transition">
+                                <span class="material-symbols-outlined text-[17px]">lock_reset</span>
+                            </button>
+
+                            <!-- Suspend / Reactivate -->
+                            ${acc.status === 'ACTIVE' ? `
+                                <button onclick="toggleSuspendUser('${acc.userId}')" title="Suspend Account" class="p-1.5 rounded hover:bg-rose-100 text-rose-700 transition">
+                                    <span class="material-symbols-outlined text-[17px]">pause_circle</span>
+                                </button>
+                            ` : acc.status === 'SUSPENDED' ? `
+                                <button onclick="toggleSuspendUser('${acc.userId}')" title="Reactivate Account" class="p-1.5 rounded hover:bg-emerald-100 text-emerald-700 transition">
+                                    <span class="material-symbols-outlined text-[17px]">play_circle</span>
+                                </button>
+                            ` : ''}
+
+                            <!-- Deactivate / Revoke Exit -->
+                            ${acc.status !== 'DEACTIVATED' ? `
+                                <button onclick="deactivateUser('${acc.userId}')" title="Exit Process: Deactivate & Revoke Access" class="p-1.5 rounded hover:bg-slate-200 text-slate-500 hover:text-red-700 transition">
+                                    <span class="material-symbols-outlined text-[17px]">person_off</span>
+                                </button>
+                            ` : ''}
+                        </div>
+                    </td>
+                </tr>
+            `;
+        }).join('');
+    }
+
+    // MODAL CONTROL
+    function closeModal(id) {
+        document.getElementById(id).classList.add('hidden');
+    }
+
+    // VIEW USER DETAILS
+    function viewUserDetail(userId) {
+        const acc = userAccounts.find(a => a.userId === userId);
+        if(!acc) return;
+
+        document.getElementById('uv-avatar').textContent = (acc.fullName||'?').charAt(0).toUpperCase();
+        document.getElementById('uv-name').textContent = acc.fullName;
+        document.getElementById('uv-ids').textContent = `${acc.userId} • ${acc.employeeId}`;
+        document.getElementById('uv-userid').textContent = acc.userId;
+        document.getElementById('uv-empid').textContent = acc.employeeId;
+        document.getElementById('uv-dept').textContent = acc.department;
+        document.getElementById('uv-position').textContent = acc.position;
+        document.getElementById('uv-email').textContent = acc.email;
+        document.getElementById('uv-username').textContent = '@' + acc.username;
+        document.getElementById('uv-role').textContent = acc.role;
+        document.getElementById('uv-access').textContent = acc.accessLevel;
+        
+        const statusEl = document.getElementById('uv-status');
+        statusEl.textContent = acc.status;
+        statusEl.className = `inline-block font-extrabold px-2.5 py-0.5 rounded-full text-[11px] border ${STATUS_BADGES[acc.status]||''}`;
+
+        document.getElementById('uv-created').textContent = acc.createdDate;
+        document.getElementById('uv-scope-desc').textContent = `${acc.role} operates under "${acc.accessLevel}" in permission group "${acc.permissionGroup}". Actions are authenticated and audited.`;
+
+        document.getElementById('view-user-modal').classList.remove('hidden');
+    }
+
+    // EDIT USER MODAL
+    function openEditModal(userId) {
+        const acc = userAccounts.find(a => a.userId === userId);
+        if(!acc) return;
+
+        document.getElementById('edit-user-id').value = acc.userId;
+        document.getElementById('edit-user-name').textContent = acc.fullName;
+        document.getElementById('edit-user-empid').textContent = `${acc.userId} • ${acc.employeeId} • ${acc.department}`;
+        document.getElementById('edit-role-select').value = acc.role;
+        document.getElementById('edit-status-select').value = acc.status;
+        document.getElementById('edit-access-level').value = acc.accessLevel;
+
+        document.getElementById('edit-user-modal').classList.remove('hidden');
+    }
+
+    function onEditRoleChange() {
+        const role = document.getElementById('edit-role-select').value;
+        const mapping = ROLE_ACCESS_MAP[role] || ROLE_ACCESS_MAP['Officer'];
+        document.getElementById('edit-access-level').value = mapping.level;
+    }
+
+    function saveUserEdit() {
+        const userId = document.getElementById('edit-user-id').value;
+        const acc = userAccounts.find(a => a.userId === userId);
+        if(!acc) return;
+
+        const prevRole = acc.role;
+        const prevStatus = acc.status;
+
+        acc.role = document.getElementById('edit-role-select').value;
+        const mapping = ROLE_ACCESS_MAP[acc.role] || ROLE_ACCESS_MAP['Officer'];
+        acc.accessLevel = mapping.level;
+        acc.permissionGroup = mapping.group;
+        acc.status = document.getElementById('edit-status-select').value;
+        acc.lastActivity = 'Role/Status modified by Admin';
+
+        saveAccounts();
+        logAuditAction('Modified User Role & Access', acc.userId, acc.employeeId, `${prevRole} (${prevStatus})`, `${acc.role} (${acc.status})`);
+        
+        closeModal('edit-user-modal');
+        filterAccounts();
+        updateKpis();
+    }
+
+    // APPROVE USER
+    function approveUser(userId) {
+        const acc = userAccounts.find(a => a.userId === userId);
+        if(!acc) return;
+        acc.status = 'ACTIVE';
+        acc.lastActivity = 'Account Approved & Activated';
+        saveAccounts();
+        logAuditAction('Approved User Account', acc.userId, acc.employeeId, 'PENDING', 'ACTIVE');
+        filterAccounts();
+        updateKpis();
+    }
+
+    // TOGGLE SUSPEND USER
+    function toggleSuspendUser(userId) {
+        const acc = userAccounts.find(a => a.userId === userId);
+        if(!acc) return;
+        const isSus = acc.status === 'SUSPENDED';
+        acc.status = isSus ? 'ACTIVE' : 'SUSPENDED';
+        acc.lastActivity = isSus ? 'Account Reactivated' : 'Account Suspended by Admin';
+        saveAccounts();
+        logAuditAction(isSus ? 'Reactivated Account' : 'Suspended Account', acc.userId, acc.employeeId, isSus ? 'SUSPENDED' : 'ACTIVE', acc.status);
+        filterAccounts();
+        updateKpis();
+    }
+
+    // DEACTIVATE USER (EXIT PROCESS)
+    function deactivateUser(userId) {
+        const acc = userAccounts.find(a => a.userId === userId);
+        if(!acc) return;
+        if(!confirm(`Are you sure you want to run the Exit Process for ${acc.fullName}?\n\nThis will immediately revoke all active system permissions and lock the account. Audit records will be permanently retained.`)) {
+            return;
+        }
+        acc.status = 'DEACTIVATED';
+        acc.lastActivity = 'Access Revoked (Employee Exit)';
+        saveAccounts();
+        logAuditAction('Revoked Access & Deactivated Account', acc.userId, acc.employeeId, 'ACTIVE', 'DEACTIVATED - EXIT PROCESS COMPLETED');
+        filterAccounts();
+        updateKpis();
+    }
+
+    // RESET PASSWORD
+    function openResetPassModal(userId) {
+        const acc = userAccounts.find(a => a.userId === userId);
+        if(!acc) return;
+        currentRpUserId = userId;
+        document.getElementById('rp-desc').textContent = `Generate temporary credentials for ${acc.fullName} (${acc.userId})`;
+        const tempPass = 'BCF@' + Math.floor(1000 + Math.random() * 9000);
+        document.getElementById('rp-pass').textContent = tempPass;
+        document.getElementById('reset-pass-modal').classList.remove('hidden');
+    }
+
+    function confirmResetPass() {
+        if(!currentRpUserId) return;
+        const acc = userAccounts.find(a => a.userId === currentRpUserId);
+        if(!acc) return;
+        const pass = document.getElementById('rp-pass').textContent;
+        acc.lastActivity = 'Password Reset by Super Admin';
+        saveAccounts();
+        logAuditAction('Reset User Password', acc.userId, acc.employeeId, 'Previous Password', 'Temporary Password Issued: ' + pass);
+        closeModal('reset-pass-modal');
+        alert(`Password for ${acc.fullName} has been reset to: ${pass}\n\nPlease share this temporary credential securely.`);
+        filterAccounts();
+    }
+
+    // CREATE USER MANUAL
+    function openCreateUserModal() {
+        document.getElementById('cu-name').value = '';
+        document.getElementById('cu-empid').value = '';
+        document.getElementById('cu-pos').value = '';
+        document.getElementById('cu-email').value = '';
+        document.getElementById('create-user-modal').classList.remove('hidden');
+    }
+
+    function submitCreateUser() {
+        const name = document.getElementById('cu-name').value.trim();
+        const empId = document.getElementById('cu-empid').value.trim() || `BCF-EMP-2026-${String(userAccounts.length + 1).padStart(4, '0')}`;
+        const dept = document.getElementById('cu-dept').value;
+        const pos = document.getElementById('cu-pos').value.trim();
+        const role = document.getElementById('cu-role').value;
+        const type = document.getElementById('cu-type').value;
+        
+        const nameParts = name.split(' ');
+        const fInitial = nameParts[0].charAt(0).toLowerCase();
+        const lName = nameParts[nameParts.length - 1].toLowerCase().replace(/[^a-z]/g,'');
+        const username = `${fInitial}.${lName}`;
+        const email = document.getElementById('cu-email').value.trim() || `${fInitial}.${lName}@bcf-sl.org`;
+
+        const newUserId = `USR-BCF-${String(userAccounts.length + 1).padStart(4, '0')}`;
+        const mapping = ROLE_ACCESS_MAP[role] || ROLE_ACCESS_MAP['Officer'];
+
+        const newAccount = {
+            userId: newUserId,
+            employeeId: empId,
+            fullName: name,
+            department: dept,
+            position: pos,
+            employmentType: type,
+            email: email,
+            username: username,
+            role: role,
+            accessLevel: mapping.level,
+            permissionGroup: mapping.group,
+            status: 'ACTIVE',
+            createdDate: new Date().toLocaleDateString('en-GB'),
+            lastLogin: 'Never',
+            lastActivity: 'Manually Created by Super Admin'
+        };
+
+        userAccounts.push(newAccount);
+        saveAccounts();
+        logAuditAction('Created New System Account', newUserId, empId, 'None', `Created account for ${name} as ${role}`);
+        
+        closeModal('create-user-modal');
+        filterAccounts();
+        updateKpis();
+        alert(`Account created successfully for ${name}!\nUser ID: ${newUserId}\nUsername: @${username}`);
+    }
+
+    window.onload = function() {
+        ensureInitialAccounts();
+        filteredAccounts = userAccounts;
+        renderAccounts();
+        updateKpis();
+    };
+</script>
+
+<!-- LIVE TOAST NOTIFICATION -->
+<div id="account-toast" class="fixed bottom-6 right-6 z-50 bg-slate-900 text-white px-4 py-3 rounded-xl shadow-xl border border-slate-700 text-xs font-semibold flex items-center gap-2.5 transform transition-all duration-300 translate-y-20 opacity-0 pointer-events-none">
+    <span class="material-symbols-outlined text-emerald-400 text-[20px]">check_circle</span>
+    <span id="account-toast-msg">Operation completed.</span>
+</div>
+
+</body>
+</html>

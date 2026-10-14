@@ -1,0 +1,2951 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" name="viewport"/>
+  <title>BCF-SL — Staff Payroll Schedule & Statutory Engine</title>
+  
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <script id="tailwind-config">
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            primary: '#0D5C3A',
+            'primary-dark': '#083B25',
+            'primary-light': '#E8F5EE',
+            'bcf-blue': '#2563EB',
+            'bcf-purple': '#9333EA',
+            'bcf-amber': '#D97706',
+            surface: '#F8FAFC',
+            'card-bg': '#FFFFFF',
+            outline: '#E2E8F0',
+            'on-surface': '#0F172A',
+            'on-surface-variant': '#64748B'
+          },
+          fontFamily: {
+            sans: ['Inter', 'Calibri', 'system-ui', 'sans-serif'],
+            mono: ['JetBrains Mono', 'monospace']
+          }
+        }
+      }
+    };
+  </script>
+
+  <style>
+    @layer base {
+      html, body {
+        width: 100%;
+        margin: 0;
+        padding: 0;
+        background-color: #f8fafc;
+        color: #0f172a;
+        font-family: 'Inter', Calibri, system-ui, sans-serif;
+      }
+      body {
+        overscroll-behavior-y: none;
+        -webkit-tap-highlight-color: transparent;
+      }
+    }
+    .custom-scrollbar::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-track {
+      background: #f1f5f9;
+      border-radius: 4px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-thumb {
+      background: #cbd5e1;
+      border-radius: 4px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+      background: #94a3b8;
+    }
+    .pulse-dot {
+      animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+    }
+    @keyframes pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: .4; transform: scale(1.15); }
+    }
+    @media print {
+      body * { visibility: hidden; }
+      #printable-schedule, #printable-schedule * { visibility: visible; }
+      #printable-schedule { position: absolute; left: 0; top: 0; width: 100%; }
+      .no-print { display: none !important; }
+    }
+  </style>
+</head>
+
+<body class="bg-surface text-on-surface min-h-screen flex flex-col antialiased">
+
+  <!-- TOP APP HEADER -->
+  <header class="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-outline shadow-xs">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="h-16 flex items-center justify-between gap-4">
+        
+        <!-- Brand / Identity -->
+        <div class="flex items-center gap-3 min-w-0">
+          <img src="../bandama_charity_foundation_logo/bcf_official_logo.png" alt="Bandama Charity Foundation" class="h-10 w-auto object-contain shrink-0" onerror="this.src='/bcf_official_logo.png'" />
+          <div class="flex flex-col min-w-0">
+            <div class="flex items-center gap-2">
+              <span class="text-xs font-black tracking-widest text-primary uppercase">BCF-SL</span>
+              <span class="px-1.5 py-0.5 rounded text-[10px] font-bold bg-emerald-100 text-emerald-800 border border-emerald-200">FINANCIAL OPS</span>
+              <span class="text-[10px] font-mono text-slate-500">ISO-4217: SLE</span>
+            </div>
+            <h1 class="text-base sm:text-lg font-bold text-on-surface truncate leading-tight">Staff Payroll & Statutory Schedule</h1>
+          </div>
+        </div>
+
+        <!-- Navigation & Quick Action Controls -->
+        <div class="flex items-center gap-2 shrink-0">
+          
+          <!-- Role Switcher (RBAC) -->
+          <div class="relative flex items-center">
+            <label for="role-select" class="sr-only">Role</label>
+            <div class="flex items-center gap-1.5 bg-slate-100 hover:bg-slate-200 transition px-2.5 py-1.5 rounded-lg border border-slate-200 cursor-pointer">
+              <span class="material-symbols-outlined text-[16px] text-primary" id="role-icon">admin_panel_settings</span>
+              <select id="role-select" onchange="changeRole(this.value)" class="bg-transparent text-xs font-bold text-slate-800 focus:outline-none cursor-pointer">
+                <option value="finance_director">Finance Director (Full)</option>
+                <option value="super_admin">Super Admin (Full)</option>
+                <option value="hr_director">HR Director (Verify)</option>
+                <option value="ceo">CEO / Trustee (Approve)</option>
+                <option value="audit_director">Audit & Risk (Audit)</option>
+                <option value="staff">Staff View (Self-Only)</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Settings Button -->
+          <button type="button" onclick="openPayrollSettings()" class="h-9 px-3 rounded-lg border border-outline bg-white hover:bg-slate-50 text-xs font-semibold text-slate-700 flex items-center gap-1.5 transition shadow-2xs" title="Configure NRA PAYE, NASSIT & Allowance Rates">
+            <span class="material-symbols-outlined text-[17px] text-primary">tune</span>
+            <span class="hidden md:inline">Payroll Settings</span>
+          </button>
+
+          <!-- Sync with Registry -->
+          <button type="button" onclick="syncWithRegistry()" class="h-9 px-3 rounded-lg border border-outline bg-white hover:bg-slate-50 text-xs font-semibold text-slate-700 flex items-center gap-1.5 transition shadow-2xs" title="Refresh from Employee Database">
+            <span class="material-symbols-outlined text-[17px] text-bcf-blue">sync</span>
+            <span class="hidden sm:inline">Sync Registry</span>
+          </button>
+
+          <!-- Payslip Self-Service Link -->
+          <button type="button" onclick="navToPayslips()" class="h-9 px-3.5 rounded-lg bg-primary hover:bg-primary-dark text-white text-xs font-bold flex items-center gap-1.5 transition shadow-sm">
+            <span class="material-symbols-outlined text-[17px]">description</span>
+            <span class="hidden xs:inline">Self-Service Portal</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- MAIN VIEW CONTAINER -->
+  <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
+
+    <!-- SUB-NAV BREADCRUMB & CYCLE SELECTOR (WITH TYPEABLE PERIOD, DATE & PREPARED BY) -->
+    <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-3.5 bg-white p-4 rounded-xl border border-outline shadow-2xs">
+      <div class="flex flex-wrap items-center gap-3.5">
+        <div class="w-9 h-9 rounded-lg bg-emerald-50 text-primary flex items-center justify-center font-bold shrink-0">
+          <span class="material-symbols-outlined text-[20px]">calendar_today</span>
+        </div>
+        
+        <!-- Standard Cycle Select -->
+        <div>
+          <div class="flex items-center gap-2">
+            <span class="text-[11px] font-bold text-primary uppercase tracking-wider">Payroll Cycle</span>
+            <span id="cycle-status-pill" class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-100 text-amber-900 border border-amber-300 flex items-center gap-1">
+              <span class="w-1.5 h-1.5 rounded-full bg-amber-600 pulse-dot"></span>
+              <span id="cycle-status-text">Draft Review</span>
+            </span>
+          </div>
+          <div class="flex items-center gap-2 mt-0.5">
+            <select id="select-pay-period" onchange="changePayPeriod(this.value)" class="text-xs font-bold text-slate-900 bg-slate-50 border border-slate-200 rounded px-2 py-1 focus:outline-none focus:ring-1 focus:ring-primary">
+              <option value="2026-03" selected>March 2026 (Active Run)</option>
+              <option value="2026-02">February 2026 (Certified)</option>
+              <option value="2026-01">January 2026 (Certified)</option>
+              <option value="2025-12">December 2025 (Certified)</option>
+              <option value="2025-11">November 2025 (Certified)</option>
+            </select>
+            <span class="text-[11px] text-slate-500 font-mono" id="period-ref-code">Ref: PAY-2026-03-BCF</span>
+          </div>
+        </div>
+
+        <div class="h-8 w-px bg-slate-200 hidden sm:block"></div>
+
+        <!-- Typeable Period Input -->
+        <div>
+          <label for="input-period-name" class="block text-[10px] font-bold uppercase text-slate-500 tracking-wider">Period (Type)</label>
+          <input type="text" id="input-period-name" value="March 2026" oninput="savePeriodAndSignOffMeta()" placeholder="e.g. March 2026" class="mt-0.5 text-xs font-bold text-slate-900 bg-emerald-50/50 border border-emerald-300 rounded px-2 py-1 w-32 focus:outline-none focus:ring-1 focus:ring-primary" title="Type Payroll Period name" />
+        </div>
+
+        <!-- Typeable Date: 03/2026 (Same as Period) -->
+        <div>
+          <label for="input-period-date" class="block text-[10px] font-bold uppercase text-slate-500 tracking-wider">Date (03/2026)</label>
+          <input type="text" id="input-period-date" value="03/2026" oninput="savePeriodAndSignOffMeta()" placeholder="03/2026" class="mt-0.5 text-xs font-bold font-mono text-slate-900 bg-emerald-50/50 border border-emerald-300 rounded px-2 py-1 w-24 text-center focus:outline-none focus:ring-1 focus:ring-primary" title="Date matching Period (e.g. 03/2026)" />
+        </div>
+
+        <!-- Typeable Prepared By -->
+        <div>
+          <label for="input-prepared-by" class="block text-[10px] font-bold uppercase text-slate-500 tracking-wider">Prepared By (Type)</label>
+          <input type="text" id="input-prepared-by" value="Accounts Officer" oninput="savePeriodAndSignOffMeta()" placeholder="e.g. Accounts Officer" class="mt-0.5 text-xs font-bold text-slate-900 bg-emerald-50/50 border border-emerald-300 rounded px-2 py-1 w-36 sm:w-40 focus:outline-none focus:ring-1 focus:ring-primary" title="Type Prepared By name or role" />
+        </div>
+      </div>
+
+      <!-- Quick Actions for Payroll Run -->
+      <div class="flex items-center gap-2 flex-wrap">
+        <!-- Certification Status Workflow Trigger -->
+        <button type="button" id="btn-workflow-action" onclick="advanceWorkflow()" class="h-9 px-3.5 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold flex items-center gap-1.5 transition shadow-sm">
+          <span class="material-symbols-outlined text-[17px]">verified</span>
+          <span id="workflow-action-label">Submit for Finance Review</span>
+        </button>
+        <button type="button" onclick="exportScheduleCSV()" class="h-9 px-3 rounded-lg border border-outline bg-white hover:bg-slate-50 text-xs font-semibold text-slate-700 flex items-center gap-1.5 transition shadow-2xs">
+          <span class="material-symbols-outlined text-[17px] text-slate-600">download</span>
+          <span>Export CSV</span>
+        </button>
+        <button type="button" onclick="window.print()" class="h-9 px-3 rounded-lg border border-outline bg-white hover:bg-slate-50 text-xs font-semibold text-slate-700 flex items-center gap-1.5 transition shadow-2xs">
+          <span class="material-symbols-outlined text-[17px] text-slate-600">print</span>
+          <span>Print Schedule</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- 1. EXECUTIVE PAYROLL DASHBOARD (BENTO KPI CARDS) -->
+    <section aria-labelledby="exec-dashboard-title" class="space-y-3">
+      <div class="flex items-center justify-between">
+        <h2 id="exec-dashboard-title" class="text-sm font-black text-slate-800 uppercase tracking-wider flex items-center gap-2">
+          <span class="material-symbols-outlined text-[18px] text-primary">monitoring</span>
+          <span>Executive Payroll Intelligence & Statutory Summary</span>
+        </h2>
+        <span class="text-xs text-slate-500 font-medium" id="stat-update-time">Auto-calculated live</span>
+      </div>
+
+      <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3.5">
+        
+        <!-- Total Employees -->
+        <div class="bg-white p-3.5 rounded-xl border border-outline shadow-2xs flex flex-col justify-between">
+          <div class="flex items-center justify-between text-slate-500 text-xs">
+            <span class="font-bold uppercase tracking-wider">Payroll Headcount</span>
+            <span class="material-symbols-outlined text-[18px] text-primary">group</span>
+          </div>
+          <div class="mt-2">
+            <span class="text-2xl font-black text-slate-900" id="kpi-headcount">0</span>
+            <span class="text-[11px] text-slate-500 block">Registered Staff</span>
+          </div>
+          <div class="mt-2 pt-2 border-t border-slate-100 flex items-center justify-between text-[11px] text-emerald-700 font-medium">
+            <span>● 100% Synced</span>
+            <span class="font-mono font-bold" id="kpi-active-count">0 Active</span>
+          </div>
+        </div>
+
+        <!-- Total Gross Payroll -->
+        <div class="bg-white p-3.5 rounded-xl border border-outline shadow-2xs flex flex-col justify-between">
+          <div class="flex items-center justify-between text-slate-500 text-xs">
+            <span class="font-bold uppercase tracking-wider">Total Gross Payroll</span>
+            <span class="material-symbols-outlined text-[18px] text-primary">account_balance_wallet</span>
+          </div>
+          <div class="mt-2">
+            <div class="flex items-baseline gap-1">
+              <span class="text-xs font-bold text-slate-500">NLe</span>
+              <span class="text-2xl font-black text-slate-900" id="kpi-gross-total">0.00</span>
+            </div>
+            <span class="text-[11px] text-slate-500 block">Basic + Increases</span>
+          </div>
+          <div class="mt-2 pt-2 border-t border-slate-100 flex items-center justify-between text-[11px] text-slate-600">
+            <span>Avg Gross:</span>
+            <span class="font-mono font-bold" id="kpi-avg-gross">NLe 0</span>
+          </div>
+        </div>
+
+        <!-- Total NRA PAYE (Statutory) -->
+        <div class="bg-white p-3.5 rounded-xl border border-outline shadow-2xs flex flex-col justify-between">
+          <div class="flex items-center justify-between text-slate-500 text-xs">
+            <span class="font-bold uppercase tracking-wider">NRA PAYE (30%)</span>
+            <span class="material-symbols-outlined text-[18px] text-amber-600">assured_workload</span>
+          </div>
+          <div class="mt-2">
+            <div class="flex items-baseline gap-1">
+              <span class="text-xs font-bold text-amber-700">NLe</span>
+              <span class="text-2xl font-black text-amber-900" id="kpi-paye-total">0.00</span>
+            </div>
+            <span class="text-[11px] text-slate-500 block">Statutory Withholding</span>
+          </div>
+          <div class="mt-2 pt-2 border-t border-slate-100 flex items-center justify-between text-[11px] text-amber-800">
+            <span>Config Rate:</span>
+            <span class="font-mono font-bold" id="kpi-paye-rate-tag">30.0%</span>
+          </div>
+        </div>
+
+        <!-- Total NASSIT (Employee & Employer) -->
+        <div class="bg-white p-3.5 rounded-xl border border-outline shadow-2xs flex flex-col justify-between">
+          <div class="flex items-center justify-between text-slate-500 text-xs">
+            <span class="font-bold uppercase tracking-wider">NASSIT Pension</span>
+            <span class="material-symbols-outlined text-[18px] text-bcf-blue">shield_person</span>
+          </div>
+          <div class="mt-2">
+            <div class="flex items-baseline gap-1">
+              <span class="text-xs font-bold text-bcf-blue">NLe</span>
+              <span class="text-2xl font-black text-slate-900" id="kpi-nassit-ee-total">0.00</span>
+            </div>
+            <span class="text-[11px] text-slate-500 block">Staff Deduct (5%)</span>
+          </div>
+          <div class="mt-2 pt-2 border-t border-slate-100 flex items-center justify-between text-[11px] text-slate-600">
+            <span>Employer 10%:</span>
+            <span class="font-mono font-bold text-primary" id="kpi-nassit-er-total">NLe 0</span>
+          </div>
+        </div>
+
+        <!-- Total Net Disbursement -->
+        <div class="bg-emerald-50/70 p-3.5 rounded-xl border border-emerald-200 shadow-2xs flex flex-col justify-between col-span-2 sm:col-span-1">
+          <div class="flex items-center justify-between text-emerald-800 text-xs">
+            <span class="font-bold uppercase tracking-wider">Total Net Pay</span>
+            <span class="material-symbols-outlined text-[18px] text-emerald-700">payments</span>
+          </div>
+          <div class="mt-2">
+            <div class="flex items-baseline gap-1">
+              <span class="text-xs font-bold text-emerald-700">NLe</span>
+              <span class="text-2xl font-black text-emerald-950" id="kpi-net-total">0.00</span>
+            </div>
+            <span class="text-[11px] text-emerald-800 block">Bank Wire Amount</span>
+          </div>
+          <div class="mt-2 pt-2 border-t border-emerald-200/60 flex items-center justify-between text-[11px] text-emerald-900">
+            <span>Recoveries:</span>
+            <span class="font-mono font-bold" id="kpi-recoveries-total">NLe 0</span>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- SECONDARY STATS BAR: Department Costs & Classification Distribution -->
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-3.5">
+        
+        <!-- Department Cost Breakdown -->
+        <div class="bg-white p-4 rounded-xl border border-outline shadow-2xs space-y-3 lg:col-span-2">
+          <div class="flex items-center justify-between border-b border-slate-100 pb-2">
+            <div class="flex items-center gap-2">
+              <span class="material-symbols-outlined text-[18px] text-primary">domain</span>
+              <h3 class="text-xs font-bold text-slate-800 uppercase tracking-wider">Department Payroll Allocation</h3>
+            </div>
+            <span class="text-[11px] text-slate-500 font-medium">All 9 Official BCF-SL Departments</span>
+          </div>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5" id="dept-payroll-bars">
+            <!-- Rendered dynamically -->
+          </div>
+        </div>
+
+        <!-- Statutory & Loan Ledger Box -->
+        <div class="bg-white p-4 rounded-xl border border-outline shadow-2xs space-y-3 flex flex-col justify-between">
+          <div class="flex items-center justify-between border-b border-slate-100 pb-2">
+            <div class="flex items-center gap-2">
+              <span class="material-symbols-outlined text-[18px] text-bcf-purple">account_tree</span>
+              <h3 class="text-xs font-bold text-slate-800 uppercase tracking-wider">Disbursement & Deductions</h3>
+            </div>
+            <span class="px-1.5 py-0.5 rounded text-[10px] font-bold bg-purple-50 text-purple-700">Live Breakdown</span>
+          </div>
+
+          <div class="space-y-2 text-xs">
+            <div class="flex items-center justify-between py-1 border-b border-slate-50">
+              <span class="text-slate-600 flex items-center gap-1.5">
+                <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+                <span>Total Allowances (Duty 2% + Other)</span>
+              </span>
+              <span class="font-mono font-bold text-emerald-800" id="stat-allowances-sum">+ NLe 0.00</span>
+            </div>
+            <div class="flex items-center justify-between py-1 border-b border-slate-50">
+              <span class="text-slate-600 flex items-center gap-1.5">
+                <span class="w-2 h-2 rounded-full bg-amber-500"></span>
+                <span>Total Mid-Month Advances (5-10%)</span>
+              </span>
+              <span class="font-mono font-bold text-amber-800" id="stat-advances-sum">- NLe 0.00</span>
+            </div>
+            <div class="flex items-center justify-between py-1 border-b border-slate-50">
+              <span class="text-slate-600 flex items-center gap-1.5">
+                <span class="w-2 h-2 rounded-full bg-bcf-purple"></span>
+                <span>Staff Loan Auto-Recoveries</span>
+              </span>
+              <span class="font-mono font-bold text-purple-800" id="stat-loans-sum">- NLe 0.00</span>
+            </div>
+            <div class="flex items-center justify-between py-1 border-b border-slate-50">
+              <span class="text-slate-600 flex items-center gap-1.5">
+                <span class="w-2 h-2 rounded-full bg-slate-400"></span>
+                <span>Active Loans Beneficiaries</span>
+              </span>
+              <span class="font-mono font-bold text-slate-800" id="stat-loan-beneficiaries">0 Staff</span>
+            </div>
+            <div class="flex items-center justify-between py-1.5 bg-slate-50 rounded px-2 font-bold">
+              <span class="text-slate-800">Total Employer Burden (Gross + 10% ER)</span>
+              <span class="font-mono text-primary" id="stat-employer-total">NLe 0.00</span>
+            </div>
+          </div>
+
+          <!-- Dual Sign-off status -->
+          <div class="bg-slate-50 p-2.5 rounded-lg border border-slate-200 flex items-center justify-between text-[11px]">
+            <div class="flex items-center gap-2">
+              <span class="material-symbols-outlined text-[16px] text-emerald-600">verified</span>
+              <span class="font-medium text-slate-700" id="cert-signoff-summary">Dual Sign-Off: Pending Approval</span>
+            </div>
+            <button type="button" onclick="viewAuditTrail()" class="text-primary hover:underline font-bold">Audit Trail</button>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- 2. SEARCH & FILTER CONTROLS -->
+    <section aria-labelledby="roster-filter-heading" class="bg-white p-4 rounded-xl border border-outline shadow-2xs space-y-3">
+      <div class="flex flex-col md:flex-row md:items-center justify-between gap-3">
+        
+        <!-- Search Input -->
+        <div class="relative flex-1 min-w-[240px]">
+          <span class="material-symbols-outlined absolute left-3 top-2.5 text-[18px] text-slate-400">search</span>
+          <input type="text" id="search-input" oninput="applyFilters()" placeholder="Search by Employee Name or ID (e.g. Albert Joseph Bandama, BCF-EMP-2026-0001)..." class="w-full pl-9 pr-4 py-2 text-xs rounded-lg border border-outline focus:outline-none focus:ring-1 focus:ring-primary text-slate-900"/>
+        </div>
+
+        <!-- Filter Dropdowns Grid -->
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 shrink-0">
+          
+          <!-- Department Filter -->
+          <select id="filter-dept" onchange="applyFilters()" class="text-xs bg-slate-50 border border-outline rounded-lg px-2.5 py-2 font-medium text-slate-700 focus:outline-none focus:ring-1 focus:ring-primary">
+            <option value="">All Departments</option>
+            <option value="Executive Management">Executive Management</option>
+            <option value="Finance Department">Finance Department</option>
+            <option value="Health & Safety Department">Health & Safety</option>
+            <option value="Human Resources Management Department">Human Resources</option>
+            <option value="Information Technology (IT) Department">IT Department</option>
+            <option value="Internal Risk & Audits Department">Internal Audit</option>
+            <option value="Legal & Communication Department">Legal & Comms</option>
+            <option value="Procurement Department">Procurement</option>
+            <option value="Programs Department">Programs</option>
+          </select>
+
+          <!-- Employment Type Filter -->
+          <select id="filter-type" onchange="applyFilters()" class="text-xs bg-slate-50 border border-outline rounded-lg px-2.5 py-2 font-medium text-slate-700 focus:outline-none focus:ring-1 focus:ring-primary">
+            <option value="">All Types</option>
+            <option value="Permanent">Permanent</option>
+            <option value="Fixed-Term Contract">Fixed-Term Contract</option>
+            <option value="Part-Time">Part-Time</option>
+            <option value="Casual">Casual</option>
+            <option value="Consultant">Consultant</option>
+            <option value="Volunteer">Volunteer</option>
+            <option value="Intern">Intern</option>
+          </select>
+
+          <!-- Job Level Filter -->
+          <select id="filter-level" onchange="applyFilters()" class="text-xs bg-slate-50 border border-outline rounded-lg px-2.5 py-2 font-medium text-slate-700 focus:outline-none focus:ring-1 focus:ring-primary">
+            <option value="">All Job Levels</option>
+            <option value="Executive">Executive</option>
+            <option value="Director">Director</option>
+            <option value="Manager">Manager</option>
+            <option value="Assistant Manager">Assistant Manager</option>
+            <option value="Officer">Officer</option>
+            <option value="Assistant">Assistant</option>
+            <option value="Support Staff">Support Staff</option>
+          </select>
+
+          <!-- Payroll Status Filter -->
+          <select id="filter-status" onchange="applyFilters()" class="text-xs bg-slate-50 border border-outline rounded-lg px-2.5 py-2 font-medium text-slate-700 focus:outline-none focus:ring-1 focus:ring-primary">
+            <option value="">All Statuses</option>
+            <option value="active" selected>● Payroll Active</option>
+            <option value="hold">On Hold</option>
+            <option value="all">Active & Inactive</option>
+          </select>
+        </div>
+
+        <!-- Reset Button -->
+        <button type="button" onclick="resetFilters()" class="h-8 px-2.5 rounded-lg border border-slate-200 text-slate-600 hover:bg-slate-100 text-xs font-semibold flex items-center justify-center gap-1 transition" title="Reset all filters">
+          <span class="material-symbols-outlined text-[16px]">restart_alt</span>
+          <span>Reset</span>
+        </button>
+
+      </div>
+      
+      <!-- Results counter -->
+      <div class="flex items-center justify-between text-xs text-slate-500 pt-1 border-t border-slate-100">
+        <span id="filter-counter">Showing 0 of 0 registered employees</span>
+        <span class="text-primary font-medium">Click any employee card to open and edit their Payroll Profile & Salary</span>
+      </div>
+    </section>
+
+    <!-- 3. STAFF PAYROLL SCHEDULE: SELECTABLE CARDS ROSTER -->
+    <section aria-labelledby="cards-roster-title" class="space-y-3">
+      <div class="flex items-center justify-between">
+        <h2 id="cards-roster-title" class="text-sm font-black text-slate-800 uppercase tracking-wider flex items-center gap-2">
+          <span class="material-symbols-outlined text-[18px] text-primary">badge</span>
+          <span>STAFF EMPLOYEE CARDS — SELECT EMPLOYEE FOR ENTRY SALARY</span>
+        </h2>
+        <div class="flex items-center gap-2 text-xs">
+          <span class="inline-flex items-center gap-1 font-semibold text-emerald-700">
+            <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+            <span>Zero Re-Entry Automated Flow</span>
+          </span>
+        </div>
+      </div>
+
+      <!-- CARDS CONTAINER (Grid of employee cards matching required layout) -->
+      <div id="employee-cards-grid" class="grid grid-cols-1 md:grid-cols-2 gap-3.5">
+        <!-- Rendered dynamically -->
+      </div>
+
+      <!-- Empty State -->
+      <div id="cards-empty-state" class="hidden bg-white p-12 rounded-xl border border-outline text-center space-y-3">
+        <div class="w-12 h-12 rounded-full bg-slate-100 text-slate-400 mx-auto flex items-center justify-center">
+          <span class="material-symbols-outlined text-[24px]">search_off</span>
+        </div>
+        <h3 class="text-sm font-bold text-slate-700">No Employees Found</h3>
+        <p class="text-xs text-slate-500 max-w-md mx-auto">No employees match your active search or filter criteria. Try resetting the filters or syncing with the Employee Database.</p>
+        <button type="button" onclick="resetFilters()" class="h-8 px-3 rounded-lg bg-primary text-white text-xs font-bold inline-flex items-center gap-1.5">
+          <span class="material-symbols-outlined text-[16px]">restart_alt</span>
+          <span>Reset Filters</span>
+        </button>
+      </div>
+    </section>
+
+    
+
+  </main>
+
+  <!-- MODAL 1: EMPLOYEE PAYROLL PROFILE & SALARY ENTRY (ZERO RE-ENTRY) -->
+  <div id="profile-salary-modal" class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-3 sm:p-4 hidden">
+    <div class="bg-white rounded-2xl shadow-2xl border border-slate-200 max-w-4xl w-full max-h-[92vh] flex flex-col overflow-hidden animate-in fade-in zoom-in-95 duration-150">
+      
+      <!-- Modal Header -->
+      <div class="px-6 py-4 bg-gradient-to-r from-emerald-900 to-primary text-white flex items-center justify-between shrink-0">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center font-bold text-white text-lg" id="modal-emp-avatar">
+            AJ
+          </div>
+          <div>
+            <div class="flex items-center gap-2">
+              <span class="text-xs font-mono font-bold bg-white/20 px-2 py-0.5 rounded text-white" id="modal-emp-id">BCF-EMP-2026-0001</span>
+              <span class="text-xs bg-emerald-400/30 text-emerald-100 px-2 py-0.5 rounded-full font-semibold" id="modal-emp-status-badge">● Payroll Active</span>
+            </div>
+            <h3 class="text-lg font-bold text-white tracking-tight" id="modal-emp-name">Albert Joseph Bandama</h3>
+          </div>
+        </div>
+        <div class="flex items-center gap-2">
+          <button type="button" onclick="closePayrollModal()" class="w-8 h-8 rounded-lg bg-white/10 hover:bg-white/20 text-white flex items-center justify-center transition" title="Close">
+            <span class="material-symbols-outlined text-[20px]">close</span>
+          </button>
+        </div>
+      </div>
+
+      
+
+      <!-- Modal Body (Scrollable) -->
+      <div class="p-6 overflow-y-auto custom-scrollbar space-y-6 flex-1 text-xs">
+
+        <!-- 3. EMPLOYEE INFORMATION (AUTO-POPULATED FROM REGISTRATION - ZERO RE-ENTRY) -->
+        <div class="space-y-2">
+          <div class="flex items-center justify-between border-b border-slate-200 pb-1.5">
+            <div class="flex items-center gap-1.5 font-bold text-slate-800 text-xs uppercase tracking-wider">
+              <span class="material-symbols-outlined text-[16px] text-primary">assignment_ind</span>
+              <span>1. Employee Information (Auto-Populated from Registration)</span>
+            </div>
+            <span class="text-[10px] text-emerald-700 font-semibold bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200 flex items-center gap-1">
+              <span class="material-symbols-outlined text-[12px]">lock</span>
+              <span>Synced from Registry (Read-Only)</span>
+            </span>
+          </div>
+
+          <!-- 9 Mandatory Auto-Populated Fields -->
+          <div class="grid grid-cols-2 sm:grid-cols-3 gap-3 bg-slate-50 p-3.5 rounded-xl border border-slate-200">
+            <div>
+              <span class="text-[10px] uppercase font-bold text-slate-400 block">Employee Name</span>
+              <span class="text-xs font-bold text-slate-900" id="info-name">-</span>
+            </div>
+            <div>
+              <span class="text-[10px] uppercase font-bold text-slate-400 block">Employee ID</span>
+              <span class="text-xs font-mono font-bold text-primary" id="info-id">-</span>
+            </div>
+            <div>
+              <span class="text-[10px] uppercase font-bold text-slate-400 block">Department</span>
+              <span class="text-xs font-semibold text-slate-800" id="info-dept">-</span>
+            </div>
+            <div>
+              <span class="text-[10px] uppercase font-bold text-slate-400 block">Unit</span>
+              <span class="text-xs font-semibold text-slate-800" id="info-unit">-</span>
+            </div>
+            <div>
+              <span class="text-[10px] uppercase font-bold text-slate-400 block">Position / Title</span>
+              <span class="text-xs font-semibold text-slate-800" id="info-title">-</span>
+            </div>
+            <div>
+              <span class="text-[10px] uppercase font-bold text-slate-400 block">Job Level</span>
+              <span class="text-xs font-semibold text-slate-800" id="info-level">-</span>
+            </div>
+            <div>
+              <span class="text-[10px] uppercase font-bold text-slate-400 block">Employment Type</span>
+              <span class="text-xs font-semibold text-slate-800" id="info-type">-</span>
+            </div>
+            <div>
+              <span class="text-[10px] uppercase font-bold text-slate-400 block">Bank Name</span>
+              <span class="text-xs font-semibold text-slate-800" id="info-bank">-</span>
+            </div>
+            <div>
+              <span class="text-[10px] uppercase font-bold text-slate-400 block">Account Number</span>
+              <span class="text-xs font-mono font-bold text-slate-800" id="info-acc">-</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- 4. SALARY & EARNINGS ENTRY -->
+        <div class="space-y-2">
+          <div class="flex items-center justify-between border-b border-slate-200 pb-1.5">
+            <div class="flex items-center gap-1.5 font-bold text-slate-800 text-xs uppercase tracking-wider">
+              <span class="material-symbols-outlined text-[16px] text-primary">add_card</span>
+              <span>2. Monthly Salary & Earnings Entry</span>
+            </div>
+            <span class="text-[10px] text-slate-500 font-mono">Currency: NLe (SLE)</span>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 bg-white p-3.5 rounded-xl border border-slate-200 shadow-2xs">
+            <div>
+              <label for="sal-basic" class="text-[11px] font-bold text-slate-700 block mb-1">Current Monthly Basic (NLe)</label>
+              <div class="relative">
+                <span class="absolute left-2.5 top-2 text-slate-400 font-bold text-xs">NLe</span>
+                <input type="number" id="sal-basic" oninput="recalcSalary()" step="0.01" min="0" value="8000" class="w-full pl-10 pr-3 py-1.5 rounded-lg border border-outline font-mono font-bold text-slate-900 focus:outline-none focus:ring-1 focus:ring-primary"/>
+              </div>
+              <span class="text-[10px] text-slate-400 mt-0.5 block">Base remuneration</span>
+            </div>
+
+            <div>
+              <label for="sal-increase-pct" class="text-[11px] font-bold text-slate-700 block mb-1">Salary Increase (%)</label>
+              <div class="flex items-center gap-1.5">
+                <input type="number" id="sal-increase-pct" oninput="recalcSalary()" step="1" min="0" max="200" value="50" class="w-20 px-2.5 py-1.5 rounded-lg border border-outline font-mono font-bold text-slate-900 focus:outline-none focus:ring-1 focus:ring-primary"/>
+                <span class="text-xs font-bold text-slate-500">%</span>
+                <span class="text-xs font-mono font-semibold text-emerald-700 pl-2" id="sal-increase-amt">= NLe 4,000.00</span>
+              </div>
+              <span class="text-[10px] text-slate-400 mt-0.5 block">Approved merit increase</span>
+            </div>
+
+            <div class="bg-emerald-50/60 p-2.5 rounded-lg border border-emerald-200 flex flex-col justify-center">
+              <span class="text-[10px] uppercase font-bold text-emerald-800">Gross Monthly Salary</span>
+              <div class="flex items-baseline gap-1 mt-0.5">
+                <span class="text-xs font-bold text-emerald-700">NLe</span>
+                <span class="text-lg font-black text-emerald-950 font-mono" id="sal-gross-display">12,000.00</span>
+              </div>
+              <span class="text-[10px] text-emerald-800">Basic + Increase</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- 5. STATUTORY DEDUCTIONS (CONFIGURABLE LIVE CALCULATOR) -->
+        <div class="space-y-2">
+          <div class="flex items-center justify-between border-b border-slate-200 pb-1.5">
+            <div class="flex items-center gap-1.5 font-bold text-slate-800 text-xs uppercase tracking-wider">
+              <span class="material-symbols-outlined text-[16px] text-amber-600">assured_workload</span>
+              <span>3. Statutory Deductions (Configurable Rates)</span>
+            </div>
+            <button type="button" onclick="openPayrollSettings()" class="text-[10px] text-primary hover:underline font-bold flex items-center gap-0.5">
+              <span class="material-symbols-outlined text-[12px]">settings</span>
+              <span>Edit Statutory Rates</span>
+            </button>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 bg-slate-50 p-3.5 rounded-xl border border-slate-200">
+            
+            <!-- NRA PAYE -->
+            <div class="bg-white p-3 rounded-lg border border-slate-200 shadow-2xs">
+              <div class="flex items-center justify-between">
+                <span class="font-bold text-slate-700">NRA PAYE Withholding</span>
+                <span class="text-[10px] font-bold px-1.5 py-0.5 rounded bg-amber-100 text-amber-800" id="badge-paye-rate">30.0%</span>
+              </div>
+              <div class="mt-2 flex items-baseline gap-1">
+                <span class="text-xs font-bold text-amber-700">NLe</span>
+                <span class="text-base font-black text-amber-900 font-mono" id="val-paye-amount">3,600.00</span>
+              </div>
+              <span class="text-[10px] text-slate-400 mt-1 block">Gross × <span id="text-paye-pct">30%</span></span>
+            </div>
+
+            <!-- Net After PAYE baseline -->
+            <div class="bg-white p-3 rounded-lg border border-slate-200 shadow-2xs">
+              <div class="flex items-center justify-between">
+                <span class="font-bold text-slate-700">Net-of-Tax Salary</span>
+                <span class="text-[10px] font-bold px-1.5 py-0.5 rounded bg-blue-100 text-blue-800">Baseline</span>
+              </div>
+              <div class="mt-2 flex items-baseline gap-1">
+                <span class="text-xs font-bold text-blue-700">NLe</span>
+                <span class="text-base font-black text-blue-900 font-mono" id="val-net-after-tax">8,400.00</span>
+              </div>
+              <span class="text-[10px] text-slate-400 mt-1 block">Gross − PAYE</span>
+            </div>
+
+            <!-- Employee NASSIT -->
+            <div class="bg-white p-3 rounded-lg border border-slate-200 shadow-2xs">
+              <div class="flex items-center justify-between">
+                <span class="font-bold text-slate-700">NASSIT Pension</span>
+                <span class="text-[10px] font-bold px-1.5 py-0.5 rounded bg-emerald-100 text-emerald-800" id="badge-nassit-rate">5.0% EE</span>
+              </div>
+              <div class="mt-2 flex items-baseline gap-1">
+                <span class="text-xs font-bold text-emerald-700">NLe</span>
+                <span class="text-base font-black text-emerald-950 font-mono" id="val-nassit-ee">420.00</span>
+              </div>
+              <span class="text-[10px] text-slate-400 mt-1 block">Employer 10%: <span class="font-mono font-bold" id="val-nassit-er">NLe 840.00</span></span>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- 6. MID-MONTH SALARY ADVANCE -->
+        <div class="space-y-2">
+          <div class="flex items-center justify-between border-b border-slate-200 pb-1.5">
+            <div class="flex items-center gap-1.5 font-bold text-slate-800 text-xs uppercase tracking-wider">
+              <span class="material-symbols-outlined text-[16px] text-bcf-blue">price_change</span>
+              <span>4. Mid-Month Salary Advance</span>
+            </div>
+            <span class="text-[10px] text-slate-500">Calculated on Net-of-Tax (<span id="advance-tax-baseline">NLe 8,400.00</span>)</span>
+          </div>
+
+          <div class="bg-white p-3.5 rounded-xl border border-slate-200 shadow-2xs grid grid-cols-1 sm:grid-cols-4 gap-3 items-center">
+            
+            <div class="sm:col-span-2">
+              <label class="text-[11px] font-bold text-slate-700 block mb-1">Select Advance Option</label>
+              <div class="flex items-center gap-2 flex-wrap">
+                <button type="button" onclick="selectAdvanceRate(0)" class="adv-btn px-2.5 py-1.5 rounded-lg border text-xs font-bold transition" id="adv-btn-0">No advance</button>
+                <button type="button" onclick="selectAdvanceRate(5)" class="adv-btn px-2.5 py-1.5 rounded-lg border text-xs font-bold transition" id="adv-btn-5">5% (NLe 420)</button>
+                <button type="button" onclick="selectAdvanceRate(10)" class="adv-btn px-2.5 py-1.5 rounded-lg border text-xs font-bold transition bg-primary text-white border-primary" id="adv-btn-10">10% (NLe 840)</button>
+                <button type="button" onclick="selectAdvanceRate(-1)" class="adv-btn px-2.5 py-1.5 rounded-lg border text-xs font-bold transition" id="adv-btn-custom">Custom</button>
+              </div>
+            </div>
+
+            <!-- Custom Advance Input -->
+            <div id="custom-advance-wrap" class="hidden">
+              <label for="input-custom-advance" class="text-[11px] font-bold text-slate-700 block mb-1">Custom Approved Amount</label>
+              <div class="relative">
+                <span class="absolute left-2.5 top-2 text-slate-400 font-bold text-xs">NLe</span>
+                <input type="number" id="input-custom-advance" oninput="recalcSalary()" step="1" min="0" value="0" class="w-full pl-10 pr-3 py-1.5 rounded-lg border border-outline font-mono font-bold text-slate-900 focus:outline-none focus:ring-1 focus:ring-primary"/>
+              </div>
+            </div>
+
+            <!-- Advance Applied Output -->
+            <div class="bg-blue-50/70 p-2.5 rounded-lg border border-blue-200 flex flex-col justify-center">
+              <span class="text-[10px] uppercase font-bold text-blue-800">Advance Applied</span>
+              <div class="flex items-baseline gap-1 mt-0.5">
+                <span class="text-xs font-bold text-blue-700">NLe</span>
+                <span class="text-base font-black text-blue-950 font-mono" id="val-advance-applied">840.00</span>
+              </div>
+              <span class="text-[10px] text-blue-800" id="text-advance-rate-label">Rate: 10% applied</span>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- 7. STAFF LOAN DEDUCTION (BCF LOAN TRACKER INTEGRATION) -->
+        <div class="space-y-2">
+          <div class="flex items-center justify-between border-b border-slate-200 pb-1.5">
+            <div class="flex items-center gap-1.5 font-bold text-slate-800 text-xs uppercase tracking-wider">
+              <span class="material-symbols-outlined text-[16px] text-bcf-purple">credit_score</span>
+              <span>5. Staff Loan Deduction (Integrated with BCF Staff Loan Tracker)</span>
+            </div>
+            <span class="text-[10px] text-purple-700 font-semibold bg-purple-50 px-2 py-0.5 rounded border border-purple-200" id="loan-status-tag">
+              Active Facility
+            </span>
+          </div>
+
+          <div class="bg-white p-3.5 rounded-xl border border-slate-200 shadow-2xs grid grid-cols-1 sm:grid-cols-4 gap-3 items-center">
+            
+            <div>
+              <span class="text-[10px] uppercase font-bold text-slate-400 block">Total Outstanding Loan</span>
+              <div class="flex items-baseline gap-1 mt-0.5">
+                <span class="text-xs font-bold text-slate-500">NLe</span>
+                <span class="text-base font-black text-slate-900 font-mono" id="loan-outstanding-display">4,200.00</span>
+              </div>
+              <span class="text-[10px] text-slate-400 block" id="loan-tenor-display">Installment Mo 4 of 10</span>
+            </div>
+
+            <div>
+              <label for="loan-monthly-deduct" class="text-[11px] font-bold text-slate-700 block mb-1">Monthly Repayment (NLe)</label>
+              <div class="relative">
+                <span class="absolute left-2.5 top-2 text-slate-400 font-bold text-xs">NLe</span>
+                <input type="number" id="loan-monthly-deduct" oninput="recalcSalary()" step="0.01" min="0" value="420" class="w-full pl-10 pr-3 py-1.5 rounded-lg border border-outline font-mono font-bold text-slate-900 focus:outline-none focus:ring-1 focus:ring-primary"/>
+              </div>
+              <span class="text-[10px] text-emerald-700 mt-0.5 block">Auto-transferred to payroll</span>
+            </div>
+
+            <div class="bg-purple-50 p-2.5 rounded-lg border border-purple-200 flex flex-col justify-center">
+              <span class="text-[10px] uppercase font-bold text-purple-800">Payroll Deduction</span>
+              <div class="flex items-baseline gap-1 mt-0.5">
+                <span class="text-xs font-bold text-purple-700">NLe</span>
+                <span class="text-base font-black text-purple-950 font-mono" id="val-loan-deduction">420.00</span>
+              </div>
+              <span class="text-[10px] text-purple-700" id="loan-rule-note">Zero balance auto-stops</span>
+            </div>
+
+            <div class="flex flex-col gap-1.5">
+              <button type="button" onclick="toggleLoanPaid()" class="h-8 px-2.5 rounded-lg border border-slate-200 text-slate-700 hover:bg-slate-50 font-bold text-xs flex items-center justify-center gap-1">
+                <span class="material-symbols-outlined text-[16px] text-emerald-600">done_all</span>
+                <span id="btn-toggle-loan-text">Mark Loan as PAID</span>
+              </button>
+              <span class="text-[10px] text-slate-400 text-center">Auto-updates loan ledger</span>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- 8. ALLOWANCES SECTION -->
+        <div class="space-y-2">
+          <div class="flex items-center justify-between border-b border-slate-200 pb-1.5">
+            <div class="flex items-center gap-1.5 font-bold text-slate-800 text-xs uppercase tracking-wider">
+              <span class="material-symbols-outlined text-[16px] text-emerald-600">payments</span>
+              <span>6. Approved Allowances (Auto-Calculated)</span>
+            </div>
+            <span class="text-[10px] text-slate-500">Duty Allowance @ 2% of Gross</span>
+          </div>
+
+          <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 bg-white p-3.5 rounded-xl border border-slate-200 shadow-2xs">
+            
+            <div>
+              <label for="allowance-duty" class="text-[11px] font-bold text-slate-700 block mb-1">Duty Allowance (2%)</label>
+              <div class="relative">
+                <span class="absolute left-2.5 top-2 text-slate-400 font-bold text-xs">NLe</span>
+                <input type="number" id="allowance-duty" oninput="recalcSalary()" step="0.01" min="0" value="240" class="w-full pl-10 pr-3 py-1.5 rounded-lg border border-outline font-mono font-bold text-slate-900 focus:outline-none focus:ring-1 focus:ring-primary"/>
+              </div>
+              <span class="text-[10px] text-slate-400 mt-0.5 block">2% of Gross (NLe 12k = 240)</span>
+            </div>
+
+            <div>
+              <label for="allowance-transport" class="text-[11px] font-bold text-slate-700 block mb-1">Transport Allowance</label>
+              <div class="relative">
+                <span class="absolute left-2.5 top-2 text-slate-400 font-bold text-xs">NLe</span>
+                <input type="number" id="allowance-transport" oninput="recalcSalary()" step="0.01" min="0" value="0" class="w-full pl-10 pr-3 py-1.5 rounded-lg border border-outline font-mono font-bold text-slate-900 focus:outline-none focus:ring-1 focus:ring-primary"/>
+              </div>
+            </div>
+
+            <div>
+              <label for="allowance-housing" class="text-[11px] font-bold text-slate-700 block mb-1">Housing Allowance</label>
+              <div class="relative">
+                <span class="absolute left-2.5 top-2 text-slate-400 font-bold text-xs">NLe</span>
+                <input type="number" id="allowance-housing" oninput="recalcSalary()" step="0.01" min="0" value="0" class="w-full pl-10 pr-3 py-1.5 rounded-lg border border-outline font-mono font-bold text-slate-900 focus:outline-none focus:ring-1 focus:ring-primary"/>
+              </div>
+            </div>
+
+            <div>
+              <label for="allowance-other" class="text-[11px] font-bold text-slate-700 block mb-1">Other Approved Allowances</label>
+              <div class="relative">
+                <span class="absolute left-2.5 top-2 text-slate-400 font-bold text-xs">NLe</span>
+                <input type="number" id="allowance-other" oninput="recalcSalary()" step="0.01" min="0" value="0" class="w-full pl-10 pr-3 py-1.5 rounded-lg border border-outline font-mono font-bold text-slate-900 focus:outline-none focus:ring-1 focus:ring-primary"/>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- 9. TOTAL NET PAY SUMMARY CARD -->
+        <div class="bg-gradient-to-br from-emerald-900 via-primary to-emerald-950 text-white p-4 rounded-xl shadow-md space-y-3">
+          <div class="flex items-center justify-between border-b border-white/20 pb-2">
+            <span class="text-xs font-bold uppercase tracking-wider text-emerald-200">Official BCF-SL Net Pay Computation Formula</span>
+            <span class="text-[10px] bg-white/20 px-2 py-0.5 rounded font-mono">Approved BCF Finance Standard</span>
+          </div>
+
+          <div class="grid grid-cols-2 sm:grid-cols-6 gap-2 text-center text-xs">
+            <div class="bg-white/10 p-2 rounded-lg">
+              <span class="text-[10px] text-emerald-200 block">Gross Salary</span>
+              <span class="font-bold font-mono text-white text-xs" id="sum-gross">NLe 12,000.00</span>
+            </div>
+            <div class="bg-white/10 p-2 rounded-lg">
+              <span class="text-[10px] text-emerald-200 block">+ Allowances</span>
+              <span class="font-bold font-mono text-emerald-300 text-xs" id="sum-allowance">+ NLe 240.00</span>
+            </div>
+            <div class="bg-white/10 p-2 rounded-lg">
+              <span class="text-[10px] text-emerald-200 block">- NRA PAYE</span>
+              <span class="font-bold font-mono text-amber-300 text-xs" id="sum-paye">- NLe 3,600.00</span>
+            </div>
+            <div class="bg-white/10 p-2 rounded-lg">
+              <span class="text-[10px] text-emerald-200 block">- EE NASSIT</span>
+              <span class="font-bold font-mono text-amber-300 text-xs" id="sum-nassit">- NLe 420.00</span>
+            </div>
+            <div class="bg-white/10 p-2 rounded-lg">
+              <span class="text-[10px] text-emerald-200 block">- Salary Advance</span>
+              <span class="font-bold font-mono text-amber-300 text-xs" id="sum-advance">- NLe 840.00</span>
+            </div>
+            <div class="bg-white/10 p-2 rounded-lg">
+              <span class="text-[10px] text-emerald-200 block">- Staff Loan</span>
+              <span class="font-bold font-mono text-amber-300 text-xs" id="sum-loan">- NLe 420.00</span>
+            </div>
+          </div>
+
+          <!-- Final Net Output -->
+          <div class="flex items-center justify-between pt-2 border-t border-white/20">
+            <div>
+              <span class="text-[11px] font-bold text-emerald-200 uppercase tracking-wider block">Total Net Remuneration (Take-Home)</span>
+              <span class="text-[10px] text-white/70">Wire direct deposit to <span id="sum-bank-name" class="font-semibold text-white">Sierra Leone Commercial Bank</span></span>
+            </div>
+            <div class="flex items-baseline gap-1.5 bg-white text-emerald-950 px-4 py-1.5 rounded-xl shadow-sm">
+              <span class="text-sm font-bold text-emerald-800">NLe</span>
+              <span class="text-2xl font-black font-mono tracking-tight" id="sum-net-pay">6,960.00</span>
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+
+      <!-- Modal Footer -->
+      <div class="px-6 py-3.5 bg-slate-50 border-t border-slate-200 flex items-center justify-between shrink-0">
+        <button type="button" onclick="closePayrollModal()" class="h-9 px-4 rounded-lg border border-slate-300 bg-white hover:bg-slate-100 text-xs font-bold text-slate-700 transition">
+          Cancel
+        </button>
+        <div class="flex items-center gap-2">
+          <button type="button" onclick="openIndividualPayslipPreview()" class="h-9 px-3.5 rounded-lg border border-primary text-primary hover:bg-emerald-50 text-xs font-bold inline-flex items-center gap-1.5 transition">
+            <span class="material-symbols-outlined text-[16px]">receipt_long</span>
+            <span>Preview Official Payslip</span>
+          </button>
+          <button type="button" onclick="saveEmployeePayroll()" class="h-9 px-5 rounded-lg bg-primary hover:bg-primary-dark text-white text-xs font-bold inline-flex items-center gap-1.5 transition shadow-sm">
+            <span class="material-symbols-outlined text-[16px]">save</span>
+            <span>Save Payroll Profile</span>
+          </button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- MODAL 2: CONFIGURABLE PAYROLL SETTINGS (LEGISLATION & STATUTORY RATES) -->
+  <div id="payroll-settings-modal" class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4 hidden">
+    <div class="bg-white rounded-2xl shadow-2xl border border-slate-200 max-w-lg w-full overflow-hidden animate-in fade-in zoom-in-95 duration-150">
+      
+      <div class="px-5 py-4 bg-slate-900 text-white flex items-center justify-between">
+        <div class="flex items-center gap-2.5">
+          <span class="material-symbols-outlined text-primary text-[22px]">tune</span>
+          <div>
+            <h3 class="text-sm font-bold text-white">Payroll & Statutory Rate Configuration</h3>
+            <p class="text-[11px] text-slate-400">Manage NRA PAYE, NASSIT & Standard Allowance Rates</p>
+          </div>
+        </div>
+        <button type="button" onclick="closePayrollSettings()" class="text-slate-400 hover:text-white">
+          <span class="material-symbols-outlined text-[20px]">close</span>
+        </button>
+      </div>
+
+      <div class="p-5 space-y-4 text-xs">
+        
+        <div class="bg-amber-50 border border-amber-200 rounded-lg p-3 text-amber-900 flex items-start gap-2">
+          <span class="material-symbols-outlined text-[18px] text-amber-600 shrink-0">info</span>
+          <p class="text-[11px] leading-snug">
+            <strong>Legislative Compliance:</strong> Statutory rates should be updated whenever the Sierra Leone National Revenue Authority (NRA) or NASSIT modifies official taxation bands. Changes immediately apply to all active payroll runs.
+          </p>
+        </div>
+
+        <div class="space-y-3">
+          <div>
+            <label for="cfg-paye" class="font-bold text-slate-700 block mb-1">NRA PAYE Standard Rate (%)</label>
+            <div class="flex items-center gap-2">
+              <input type="number" id="cfg-paye" step="0.5" min="0" max="50" value="30.0" class="w-24 px-3 py-1.5 rounded-lg border border-outline font-mono font-bold text-slate-900 focus:outline-none focus:ring-1 focus:ring-primary"/>
+              <span class="text-xs font-bold text-slate-600">% of Gross Salary (Default 30.0%)</span>
+            </div>
+          </div>
+
+          <div>
+            <label for="cfg-nassit-ee" class="font-bold text-slate-700 block mb-1">NASSIT Employee Contribution Rate (%)</label>
+            <div class="flex items-center gap-2">
+              <input type="number" id="cfg-nassit-ee" step="0.5" min="0" max="20" value="5.0" class="w-24 px-3 py-1.5 rounded-lg border border-outline font-mono font-bold text-slate-900 focus:outline-none focus:ring-1 focus:ring-primary"/>
+              <span class="text-xs font-bold text-slate-600">% deducted from staff (Default 5.0%)</span>
+            </div>
+          </div>
+
+          <div>
+            <label for="cfg-nassit-er" class="font-bold text-slate-700 block mb-1">NASSIT Employer Contribution Rate (%)</label>
+            <div class="flex items-center gap-2">
+              <input type="number" id="cfg-nassit-er" step="0.5" min="0" max="30" value="10.0" class="w-24 px-3 py-1.5 rounded-lg border border-outline font-mono font-bold text-slate-900 focus:outline-none focus:ring-1 focus:ring-primary"/>
+              <span class="text-xs font-bold text-slate-600">% institutional cost (Default 10.0%)</span>
+            </div>
+          </div>
+
+          <div>
+            <label for="cfg-duty" class="font-bold text-slate-700 block mb-1">Standard Duty Allowance Rate (%)</label>
+            <div class="flex items-center gap-2">
+              <input type="number" id="cfg-duty" step="0.5" min="0" max="20" value="2.0" class="w-24 px-3 py-1.5 rounded-lg border border-outline font-mono font-bold text-slate-900 focus:outline-none focus:ring-1 focus:ring-primary"/>
+              <span class="text-xs font-bold text-slate-600">% of Gross Salary (Default 2.0%)</span>
+            </div>
+          </div>
+
+          <div>
+            <label for="cfg-advance" class="font-bold text-slate-700 block mb-1">Default Salary Advance Rate (%)</label>
+            <div class="flex items-center gap-2">
+              <input type="number" id="cfg-advance" step="1" min="0" max="50" value="10" class="w-24 px-3 py-1.5 rounded-lg border border-outline font-mono font-bold text-slate-900 focus:outline-none focus:ring-1 focus:ring-primary"/>
+              <span class="text-xs font-bold text-slate-600">% of Net-of-tax salary (Default 10%)</span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <div class="px-5 py-3 bg-slate-50 border-t border-slate-200 flex items-center justify-between">
+        <button type="button" onclick="restoreDefaultSettings()" class="text-xs font-bold text-slate-600 hover:text-slate-900">
+          Restore Defaults
+        </button>
+        <div class="flex items-center gap-2">
+          <button type="button" onclick="closePayrollSettings()" class="h-8 px-3 rounded-lg border border-slate-300 bg-white text-xs font-bold text-slate-700">
+            Cancel
+          </button>
+          <button type="button" onclick="savePayrollSettings()" class="h-8 px-4 rounded-lg bg-primary hover:bg-primary-dark text-white text-xs font-bold">
+            Save Rates
+          </button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- MODAL 3: MULTI-STAGE CERTIFICATION WORKFLOW MODAL -->
+  <div id="workflow-modal" class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4 hidden">
+    <div class="bg-white rounded-2xl shadow-2xl border border-slate-200 max-w-xl w-full overflow-hidden animate-in fade-in zoom-in-95 duration-150">
+      
+      <div class="px-5 py-4 bg-gradient-to-r from-emerald-950 to-primary text-white flex items-center justify-between">
+        <div class="flex items-center gap-2.5">
+          <span class="material-symbols-outlined text-[22px]">verified</span>
+          <div>
+            <h3 class="text-sm font-bold text-white">Payroll Certification Workflow</h3>
+            <p class="text-[11px] text-emerald-200">Cycle: <span id="wf-cycle-label">March 2026</span> • Ref: <span id="wf-ref-label">PAY-2026-03-001</span></p>
+          </div>
+        </div>
+        <button type="button" onclick="closeWorkflowModal()" class="text-white/80 hover:text-white">
+          <span class="material-symbols-outlined text-[20px]">close</span>
+        </button>
+      </div>
+
+      <div class="p-5 space-y-4 text-xs">
+        
+        <!-- Workflow Steps Progress Bar -->
+        <div class="space-y-2">
+          <div class="flex items-center justify-between text-[11px] font-bold text-slate-600">
+            <span id="wf-step-title">Stage 2 of 4: Finance Review</span>
+            <span id="wf-progress-pct" class="text-primary">50% Complete</span>
+          </div>
+          <div class="w-full h-2 rounded-full bg-slate-100 overflow-hidden">
+            <div id="wf-progress-bar" class="h-full bg-primary transition-all duration-300" style="width: 50%;"></div>
+          </div>
+        </div>
+
+        <!-- 4 Workflow Milestones -->
+        <div class="space-y-2.5 bg-slate-50 p-3.5 rounded-xl border border-slate-200">
+          
+          <div class="flex items-start gap-3 p-2 rounded-lg bg-white border border-slate-200" id="step-row-1">
+            <div class="w-6 h-6 rounded-full bg-emerald-100 text-emerald-800 flex items-center justify-center font-bold text-xs shrink-0" id="step-icon-1">✓</div>
+            <div class="min-w-0 flex-1">
+              <div class="flex items-center justify-between">
+                <span class="font-bold text-slate-800">1. Draft Payroll Preparation</span>
+                <span class="text-[10px] text-emerald-700 font-semibold" id="step-date-1">Prepared</span>
+              </div>
+              <p class="text-[11px] text-slate-500">Compiled by Finance Officer / Accounts Officer from Employee Registry.</p>
+              <div class="text-[10px] font-mono text-slate-600 mt-0.5" id="step-user-1">By: Accounts Officer (Albert J. Bandama)</div>
+            </div>
+          </div>
+
+          <div class="flex items-start gap-3 p-2 rounded-lg bg-white border border-slate-200" id="step-row-2">
+            <div class="w-6 h-6 rounded-full bg-amber-100 text-amber-800 flex items-center justify-center font-bold text-xs shrink-0" id="step-icon-2">2</div>
+            <div class="min-w-0 flex-1">
+              <div class="flex items-center justify-between">
+                <span class="font-bold text-slate-800">2. Finance Review & Tax Reconciliations</span>
+                <span class="text-[10px] text-amber-700 font-semibold" id="step-date-2">Pending</span>
+              </div>
+              <p class="text-[11px] text-slate-500">Statutory deductions (NRA PAYE, NASSIT) and loan repayments validated.</p>
+              <div class="text-[10px] font-mono text-slate-600 mt-0.5" id="step-user-2">Sign-off: Finance Director</div>
+            </div>
+          </div>
+
+          <div class="flex items-start gap-3 p-2 rounded-lg bg-white border border-slate-200" id="step-row-3">
+            <div class="w-6 h-6 rounded-full bg-slate-100 text-slate-600 flex items-center justify-center font-bold text-xs shrink-0" id="step-icon-3">3</div>
+            <div class="min-w-0 flex-1">
+              <div class="flex items-center justify-between">
+                <span class="font-bold text-slate-800">3. HR Verification & Headcount Audit</span>
+                <span class="text-[10px] text-slate-500 font-semibold" id="step-date-3">Awaiting</span>
+              </div>
+              <p class="text-[11px] text-slate-500">Verification against active staff contracts, leave deductions & roster.</p>
+              <div class="text-[10px] font-mono text-slate-600 mt-0.5" id="step-user-3">Sign-off: HR Director (Joe Ansumana Conteh)</div>
+            </div>
+          </div>
+
+          <div class="flex items-start gap-3 p-2 rounded-lg bg-white border border-slate-200" id="step-row-4">
+            <div class="w-6 h-6 rounded-full bg-slate-100 text-slate-600 flex items-center justify-center font-bold text-xs shrink-0" id="step-icon-4">4</div>
+            <div class="min-w-0 flex-1">
+              <div class="flex items-center justify-between">
+                <span class="font-bold text-slate-800">4. Executive Approval & Certification</span>
+                <span class="text-[10px] text-slate-500 font-semibold" id="step-date-4">Final Stage</span>
+              </div>
+              <p class="text-[11px] text-slate-500">CEO authorization unlocks digital payslip vouchers for staff self-service.</p>
+              <div class="text-[10px] font-mono text-slate-600 mt-0.5" id="step-user-4">Executive Sign-off: Chief Executive Officer</div>
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+
+      <div class="px-5 py-3.5 bg-slate-50 border-t border-slate-200 flex items-center justify-between">
+        <button type="button" onclick="closeWorkflowModal()" class="h-9 px-4 rounded-lg border border-slate-300 bg-white text-xs font-bold text-slate-700">
+          Close
+        </button>
+        <button type="button" id="btn-advance-workflow-step" onclick="executeWorkflowStep()" class="h-9 px-4 rounded-lg bg-primary hover:bg-primary-dark text-white text-xs font-bold flex items-center gap-1.5 shadow-sm">
+          <span class="material-symbols-outlined text-[16px]">task_alt</span>
+          <span id="btn-advance-step-label">Approve Finance Review</span>
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- TOAST NOTIFICATION -->
+  <div id="toast" class="fixed bottom-6 right-6 z-50 bg-slate-900 text-white px-4 py-3 rounded-xl shadow-xl flex items-center gap-2.5 text-xs font-semibold transform translate-y-16 opacity-0 transition-all duration-300 pointer-events-none">
+    <span class="material-symbols-outlined text-emerald-400 text-[18px]" id="toast-icon">check_circle</span>
+    <span id="toast-message">Notification message</span>
+  </div>
+
+  <!-- JAVASCRIPT ENGINE -->
+  <script>
+    // GLOBAL STATE
+    let allStaff = [];
+    let filteredStaff = [];
+    let activeEmployee = null;
+    let currentPeriod = '2026-03';
+    let currentRole = 'finance_director';
+    let payrollSettings = {
+      payeRate: 30.0,
+      nassitEmployeeRate: 5.0,
+      nassitEmployerRate: 10.0,
+      dutyAllowanceRate: 2.0,
+      defaultAdvanceRate: 10.0
+    };
+    let payrollCycles = {};
+    let staffLoans = [];
+
+    // BULLETPROOF NUMBER PARSER & SANITIZER
+    function safeNum(val, fallback = 0) {
+      if (val === null || val === undefined) return fallback;
+      if (typeof val === 'number') return isNaN(val) ? fallback : val;
+      const str = String(val).trim().replace(/[^0-9.-]/g, '');
+      if (!str) return fallback;
+      const n = parseFloat(str);
+      return isNaN(n) ? fallback : n;
+    }
+
+    // DEFAULT SEED STAFF IF REGISTRY IS EMPTY
+    const SEED_STAFF = [
+      {
+        employeeId: "BCF-EMP-2026-0001",
+        fullName: "Albert Joseph Bandama",
+        gender: "Male",
+        dob: "1988-04-12",
+        department: "Finance Department",
+        title: "Accounts Officer",
+        unit: "Financial Reporting & Payroll",
+        jobLevel: "Officer",
+        classification: "Permanent",
+        mgmtLevel: "Employee",
+        status: "Active",
+        bankName: "Sierra Leone Commercial Bank",
+        accNo: "00300123456789",
+        payBasic: 8000,
+        payInc: 50,
+        payAdvType: 10,
+        payLoan: 420
+      },
+      {
+        employeeId: "BCF-EMP-2026-0002",
+        fullName: "Joe Ansumana Conteh",
+        gender: "Male",
+        dob: "1985-08-20",
+        department: "Human Resources Management Department",
+        title: "Human Resources Director",
+        unit: "Talent & Personnel Operations",
+        jobLevel: "Director",
+        classification: "Permanent",
+        mgmtLevel: "Top Management",
+        status: "Active",
+        bankName: "Rokel Commercial Bank",
+        accNo: "00200234567890",
+        payBasic: 18000,
+        payInc: 0,
+        payAdvType: 0,
+        payLoan: 0
+      },
+      {
+        employeeId: "BCF-EMP-2026-0003",
+        fullName: "Ibrahim Kargbo",
+        gender: "Male",
+        dob: "1987-11-05",
+        department: "Programs Department",
+        title: "Senior Program Coordinator",
+        unit: "Maternal Health Initiative",
+        jobLevel: "Manager",
+        classification: "Permanent",
+        mgmtLevel: "Middle Management",
+        status: "Active",
+        bankName: "Sierra Leone Commercial Bank",
+        accNo: "00300345678901",
+        payBasic: 12000,
+        payInc: 20,
+        payAdvType: 10,
+        payLoan: 2500
+      },
+      {
+        employeeId: "BCF-EMP-2026-0004",
+        fullName: "Aminata Kamara",
+        gender: "Female",
+        dob: "1992-03-14",
+        department: "Internal Risk & Audits Department",
+        title: "Chief M&E Specialist",
+        unit: "Impact & Compliance",
+        jobLevel: "Manager",
+        classification: "Permanent",
+        mgmtLevel: "Middle Management",
+        status: "Active",
+        bankName: "Rokel Commercial Bank",
+        accNo: "00200456789012",
+        payBasic: 11000,
+        payInc: 15,
+        payAdvType: 5,
+        payLoan: 1800
+      },
+      {
+        employeeId: "BCF-EMP-2026-0005",
+        fullName: "Sahr Bangura",
+        gender: "Male",
+        dob: "1994-09-18",
+        department: "Health & Safety Department",
+        title: "Lead Field Engineer",
+        unit: "WASH Engineering",
+        jobLevel: "Officer",
+        classification: "Fixed-Term Contract",
+        mgmtLevel: "Employee",
+        status: "Active",
+        bankName: "Sierra Leone Commercial Bank",
+        accNo: "00300567890123",
+        payBasic: 9500,
+        payInc: 0,
+        payAdvType: 10,
+        payLoan: 3000
+      },
+      {
+        employeeId: "BCF-EMP-2026-0006",
+        fullName: "Mariama Sesay",
+        gender: "Female",
+        dob: "1991-01-25",
+        department: "Information Technology (IT) Department",
+        title: "Systems Administrator",
+        unit: "Infrastructure & Cybersecurity",
+        jobLevel: "Officer",
+        classification: "Permanent",
+        mgmtLevel: "Employee",
+        status: "Active",
+        bankName: "Ecobank Sierra Leone",
+        accNo: "00400678901234",
+        payBasic: 9000,
+        payInc: 25,
+        payAdvType: 0,
+        payLoan: 0
+      },
+      {
+        employeeId: "BCF-EMP-2026-0007",
+        fullName: "Fatmata Turay",
+        gender: "Female",
+        dob: "1993-06-30",
+        department: "Procurement Department",
+        title: "Procurement Officer",
+        unit: "Vendor Management",
+        jobLevel: "Officer",
+        classification: "Permanent",
+        mgmtLevel: "Employee",
+        status: "Active",
+        bankName: "Standard Chartered Bank",
+        accNo: "00500789012345",
+        payBasic: 8500,
+        payInc: 10,
+        payAdvType: 5,
+        payLoan: 0
+      },
+      {
+        employeeId: "BCF-EMP-2026-0008",
+        fullName: "Mohamed Koroma",
+        gender: "Male",
+        dob: "1986-12-10",
+        department: "Legal & Communication Department",
+        title: "Legal Counsel",
+        unit: "Corporate Affairs",
+        jobLevel: "Manager",
+        classification: "Permanent",
+        mgmtLevel: "Middle Management",
+        status: "Active",
+        bankName: "Sierra Leone Commercial Bank",
+        accNo: "00300890123456",
+        payBasic: 14000,
+        payInc: 10,
+        payAdvType: 10,
+        payLoan: 0
+      }
+    ];
+
+    // DEFAULT LOANS SEED
+    const SEED_LOANS = [
+      {
+        loanId: "LOAN-BCF-2026-001",
+        employeeId: "BCF-EMP-2026-0001",
+        employeeName: "Albert Joseph Bandama",
+        totalPrincipal: 4200,
+        monthlyDeduction: 420,
+        balanceRemaining: 4200,
+        monthsPaid: 3,
+        totalMonths: 10,
+        status: "ACTIVE"
+      },
+      {
+        loanId: "LOAN-BCF-2026-002",
+        employeeId: "BCF-EMP-2026-0003",
+        employeeName: "Ibrahim Kargbo",
+        totalPrincipal: 30000,
+        monthlyDeduction: 2500,
+        balanceRemaining: 10000,
+        monthsPaid: 8,
+        totalMonths: 12,
+        status: "ACTIVE"
+      },
+      {
+        loanId: "LOAN-BCF-2026-003",
+        employeeId: "BCF-EMP-2026-0004",
+        employeeName: "Aminata Kamara",
+        totalPrincipal: 10800,
+        monthlyDeduction: 1800,
+        balanceRemaining: 7200,
+        monthsPaid: 2,
+        totalMonths: 6,
+        status: "ACTIVE"
+      },
+      {
+        loanId: "LOAN-BCF-2026-004",
+        employeeId: "BCF-EMP-2026-0005",
+        employeeName: "Sahr Bangura",
+        totalPrincipal: 30000,
+        monthlyDeduction: 3000,
+        balanceRemaining: 6000,
+        monthsPaid: 8,
+        totalMonths: 10,
+        status: "ACTIVE"
+      }
+    ];
+
+    // TYPEABLE PERIOD, DATE & PREPARED BY DIRECT SYNC ENGINE
+    function savePeriodAndSignOffMeta() {
+      const periodName = (document.getElementById('input-period-name')?.value || 'March 2026').trim();
+      const periodDate = (document.getElementById('input-period-date')?.value || '03/2026').trim();
+      const preparedBy = (document.getElementById('input-prepared-by')?.value || 'Accounts Officer').trim();
+
+      localStorage.setItem('bcf_payroll_period_name', periodName);
+      localStorage.setItem('bcf_payroll_period_date', periodDate);
+      localStorage.setItem('bcf_payroll_prepared_by', preparedBy);
+
+      if (payrollCycles[currentPeriod]) {
+        payrollCycles[currentPeriod].periodName = periodName;
+        payrollCycles[currentPeriod].periodDate = periodDate;
+        payrollCycles[currentPeriod].preparedBy = preparedBy;
+        localStorage.setItem('bcf_payroll_cycles', JSON.stringify(payrollCycles));
+      }
+
+      // Update receipts store
+      try {
+        let receipts = JSON.parse(localStorage.getItem('bcf_payroll_receipts') || '{}');
+        for (let k in receipts) {
+          if (k.endsWith(currentPeriod)) {
+            receipts[k].periodName = periodName;
+            receipts[k].receiptDate = periodDate;
+            receipts[k].preparedBy = preparedBy;
+          }
+        }
+        localStorage.setItem('bcf_payroll_receipts', JSON.stringify(receipts));
+      } catch(e) {}
+
+      // Always create/update month folder for this prepared cycle
+      try {
+        let folders = JSON.parse(localStorage.getItem('bcf_payroll_folders') || '{}');
+        folders[currentPeriod] = {
+          period: currentPeriod,
+          name: periodName,
+          date: periodDate,
+          status: 'Prepared Run',
+          receiptCount: allStaff.length
+        };
+        localStorage.setItem('bcf_payroll_folders', JSON.stringify(folders));
+      } catch(e) {}
+
+      // Trigger instant cross-tab sync
+      localStorage.setItem('bcf_last_payroll_sync', Date.now().toString());
+    }
+
+    function initPeriodAndSignOffMeta() {
+      const savedPeriod = localStorage.getItem('bcf_payroll_period_name') || 'March 2026';
+      const savedDate = localStorage.getItem('bcf_payroll_period_date') || '03/2026';
+      const savedPrep = localStorage.getItem('bcf_payroll_prepared_by') || 'Accounts Officer';
+
+      const pInput = document.getElementById('input-period-name');
+      const dInput = document.getElementById('input-period-date');
+      const bInput = document.getElementById('input-prepared-by');
+
+      if (pInput) pInput.value = savedPeriod;
+      if (dInput) dInput.value = savedDate;
+      if (bInput) bInput.value = savedPrep;
+    }
+
+    function quickPreviewPayslip(empId) {
+      openPayrollProfile(empId);
+      openIndividualPayslipPreview();
+    }
+
+    // RENDER EMPLOYEE CARDS STRIP INSIDE ENTRY SALARY MODAL
+    function renderModalEmployeeCardsStrip() {
+      const strip = document.getElementById('modal-employee-cards-strip');
+      const counter = document.getElementById('modal-staff-counter');
+      if (!strip) return;
+
+      if (counter) counter.textContent = `${allStaff.length} Staff Synced`;
+
+      strip.innerHTML = allStaff.map(emp => {
+        const isSelected = activeEmployee && (
+          (activeEmployee.employeeId === emp.employeeId && (activeEmployee.fullName || '').trim().toLowerCase() === (emp.fullName || '').trim().toLowerCase()) ||
+          activeEmployee === emp
+        );
+        const initials = (emp.fullName || 'E').split(' ').map(w => w[0]).slice(0, 2).join('').toUpperCase();
+        const p = computeStaffPayroll(emp);
+        const safeName = (emp.fullName || '').replace(/'/g, "\\'");
+
+        const cardStyle = isSelected
+          ? 'bg-emerald-50 border-2 border-primary ring-1 ring-primary shadow-xs'
+          : 'bg-white border border-slate-200 hover:border-primary/60 hover:bg-slate-50';
+
+        return `
+        <button type="button" onclick="openPayrollProfile('${emp.employeeId}', '${safeName}')" class="shrink-0 text-left px-3 py-1.5 rounded-lg transition-all flex items-center gap-2.5 ${cardStyle}">
+          <div class="w-7 h-7 rounded-full ${isSelected ? 'bg-primary text-white' : 'bg-slate-100 text-slate-700'} font-bold text-[11px] flex items-center justify-center shrink-0">
+            ${initials}
+          </div>
+          <div class="min-w-0">
+            <div class="text-[11px] font-bold text-slate-900 truncate max-w-[130px] leading-tight">${emp.fullName}</div>
+            <div class="text-[9px] font-mono text-slate-500 flex items-center gap-1">
+              <span>${emp.employeeId}</span>
+              <span class="text-emerald-700 font-bold">• NLe ${Math.round(p.netPay).toLocaleString()}</span>
+            </div>
+          </div>
+        </button>
+        `;
+      }).join('');
+    }
+
+    // OPEN OFFICIAL RECEIPT MODAL DIRECTLY IN PAYROLL SCHEDULE (ONLY ONE AT A TIME)
+    function openScheduleReceiptModal(empId, empName = '') {
+      let emp = null;
+      if (empName) {
+        emp = allStaff.find(e => e.employeeId === empId && (e.fullName || '').trim().toLowerCase() === empName.trim().toLowerCase());
+        if (!emp) emp = allStaff.find(e => (e.fullName || '').trim().toLowerCase() === empName.trim().toLowerCase());
+      }
+      if (!emp) {
+        emp = allStaff.find(e => e.employeeId === empId);
+      }
+      if (!emp) return;
+      activeEmployee = emp;
+
+      const p = computeStaffPayroll(emp);
+      const periodName = (document.getElementById('input-period-name')?.value || 'March 2026').trim();
+      const periodDate = (document.getElementById('input-period-date')?.value || '03/2026').trim();
+      const preparedBy = (document.getElementById('input-prepared-by')?.value || 'Accounts Officer').trim();
+
+      document.getElementById('sched-vouch-title').textContent = `INDIVIDUAL SALARY PAYROLL & REMITTANCE RECEIPT — ${(emp.jobLevel || 'OFFICER').toUpperCase()}`;
+      document.getElementById('sched-vouch-receipt-no').textContent = p.receiptNo || `BCF-REC-${currentPeriod.replace(/[^A-Za-z0-9]/g, '')}-${(emp.employeeId || '0001').split('-').pop()}`;
+      document.getElementById('sched-vouch-period').textContent = periodName;
+      document.getElementById('sched-vouch-date').textContent = periodDate;
+
+      // Employee info
+      document.getElementById('sched-vouch-name').textContent = emp.fullName;
+      document.getElementById('sched-vouch-id').textContent = emp.employeeId;
+      document.getElementById('sched-vouch-dept').textContent = emp.department || 'General Administration';
+      document.getElementById('sched-vouch-unit').textContent = emp.unit || 'Headquarters';
+      document.getElementById('sched-vouch-pos').textContent = emp.title || 'Staff Officer';
+      document.getElementById('sched-vouch-level').textContent = emp.jobLevel || 'Officer';
+      document.getElementById('sched-vouch-bank').textContent = emp.bankName || 'Sierra Leone Commercial Bank';
+      document.getElementById('sched-vouch-acc').textContent = emp.accNo || '-';
+
+      // Earnings
+      document.getElementById('sched-vouch-basic').textContent = p.basic.toLocaleString('en-US', { minimumFractionDigits: 2 });
+      document.getElementById('sched-vouch-basic-final').textContent = p.basic.toLocaleString('en-US', { minimumFractionDigits: 2 });
+      document.getElementById('sched-vouch-inc-pct').textContent = `${p.incPct}% Approved Merit Adjustment`;
+      document.getElementById('sched-vouch-inc-amt').textContent = (p.basic * (p.incPct / 100.0)).toLocaleString('en-US', { minimumFractionDigits: 2 });
+      document.getElementById('sched-vouch-inc-final').textContent = (p.basic * (p.incPct / 100.0)).toLocaleString('en-US', { minimumFractionDigits: 2 });
+      document.getElementById('sched-vouch-gross').textContent = p.gross.toLocaleString('en-US', { minimumFractionDigits: 2 });
+      document.getElementById('sched-vouch-gross-final').textContent = p.gross.toLocaleString('en-US', { minimumFractionDigits: 2 });
+
+      // Deductions
+      document.getElementById('sched-vouch-paye').textContent = p.payeAmt.toLocaleString('en-US', { minimumFractionDigits: 2 });
+      document.getElementById('sched-vouch-paye-final').textContent = p.payeAmt.toLocaleString('en-US', { minimumFractionDigits: 2 });
+      document.getElementById('sched-vouch-nassit').textContent = p.nassitEeAmt.toLocaleString('en-US', { minimumFractionDigits: 2 });
+      document.getElementById('sched-vouch-nassit-final').textContent = p.nassitEeAmt.toLocaleString('en-US', { minimumFractionDigits: 2 });
+      document.getElementById('sched-vouch-advance').textContent = p.advanceAmt.toLocaleString('en-US', { minimumFractionDigits: 2 });
+      document.getElementById('sched-vouch-advance-final').textContent = p.advanceAmt.toLocaleString('en-US', { minimumFractionDigits: 2 });
+      document.getElementById('sched-vouch-loan').textContent = p.loanDeduct.toLocaleString('en-US', { minimumFractionDigits: 2 });
+      document.getElementById('sched-vouch-loan-final').textContent = p.loanDeduct.toLocaleString('en-US', { minimumFractionDigits: 2 });
+      document.getElementById('sched-vouch-ded-total').textContent = p.totalDeductions.toLocaleString('en-US', { minimumFractionDigits: 2 });
+      document.getElementById('sched-vouch-ded-total-final').textContent = `- ${p.totalDeductions.toLocaleString('en-US', { minimumFractionDigits: 2 })}`;
+
+      // Allowances
+      document.getElementById('sched-vouch-allw').textContent = p.totalAllowances.toLocaleString('en-US', { minimumFractionDigits: 2 });
+      document.getElementById('sched-vouch-allw-final').textContent = `+ ${p.totalAllowances.toLocaleString('en-US', { minimumFractionDigits: 2 })}`;
+      document.getElementById('sched-vouch-allw-total').textContent = p.totalAllowances.toLocaleString('en-US', { minimumFractionDigits: 2 });
+      document.getElementById('sched-vouch-allw-total-final').textContent = `+ ${p.totalAllowances.toLocaleString('en-US', { minimumFractionDigits: 2 })}`;
+
+      // Net Pay
+      document.getElementById('sched-vouch-net').textContent = p.netPay.toLocaleString('en-US', { minimumFractionDigits: 2 });
+
+      // Signatures
+      document.getElementById('sched-vouch-prepared').textContent = preparedBy;
+      document.getElementById('sched-vouch-sign-date').textContent = `Date: ${periodDate}`;
+      document.getElementById('sched-vouch-stamp').textContent = `Ref: PAY-${currentPeriod}-BCF`;
+
+      document.getElementById('schedule-receipt-modal').classList.remove('hidden');
+    }
+
+    function closeScheduleReceiptModal() {
+      document.getElementById('schedule-receipt-modal').classList.add('hidden');
+    }
+
+    // INITIALIZATION
+    window.addEventListener('DOMContentLoaded', () => {
+      // Auto open salary modal if instructed
+      const targetEmp = localStorage.getItem('bcf_selected_payslip_emp');
+      if (localStorage.getItem('bcf_auto_open_salary_modal') === '1') {
+        localStorage.removeItem('bcf_auto_open_salary_modal');
+        if (targetEmp) {
+          setTimeout(() => { openPayrollProfile(targetEmp); }, 150);
+        }
+      }
+      initPeriodAndSignOffMeta();
+      loadSettings();
+      loadStaff();
+      loadLoans();
+      loadPayrollCycles();
+      applyFilters();
+      updateDashboardKPIs();
+      checkSavedRole();
+    });
+
+    // LOAD SAVED ROLE
+    function checkSavedRole() {
+      const saved = localStorage.getItem('bcf_user_role');
+      if (saved) {
+        currentRole = saved;
+        const sel = document.getElementById('role-select');
+        if (sel) sel.value = saved;
+        updateRoleUI();
+      }
+    }
+
+    function changeRole(role) {
+      currentRole = role;
+      localStorage.setItem('bcf_user_role', role);
+      updateRoleUI();
+      showToast(`Switched active view to: ${role.replace('_', ' ').toUpperCase()}`, 'admin_panel_settings');
+    }
+
+    function updateRoleUI() {
+      const icon = document.getElementById('role-icon');
+      if (icon) {
+        icon.textContent = currentRole === 'staff' ? 'person' : (currentRole === 'ceo' ? 'verified' : 'admin_panel_settings');
+      }
+      // If staff role, restrict actions
+      const btnSettings = document.querySelector('[onclick="openPayrollSettings()"]');
+      if (btnSettings) {
+        btnSettings.style.display = (currentRole === 'staff' || currentRole === 'audit_director') ? 'none' : 'inline-flex';
+      }
+    }
+
+    // SETTINGS ENGINE
+    function loadSettings() {
+      try {
+        const stored = localStorage.getItem('bcf_payroll_settings');
+        if (stored) {
+          payrollSettings = Object.assign({}, payrollSettings, JSON.parse(stored));
+        } else {
+          localStorage.setItem('bcf_payroll_settings', JSON.stringify(payrollSettings));
+        }
+      } catch(e) {
+        console.error("Error loading settings", e);
+      }
+      // Update UI tags
+      const payeTag = document.getElementById('kpi-paye-rate-tag');
+      if (payeTag) payeTag.textContent = `${payrollSettings.payeRate.toFixed(1)}%`;
+      const badgePaye = document.getElementById('badge-paye-rate');
+      if (badgePaye) badgePaye.textContent = `${payrollSettings.payeRate.toFixed(1)}%`;
+      const textPaye = document.getElementById('text-paye-pct');
+      if (textPaye) textPaye.textContent = `${payrollSettings.payeRate.toFixed(0)}%`;
+    }
+
+    function openPayrollSettings() {
+      if (currentRole === 'staff') {
+        showToast("Access Restricted: Staff cannot modify statutory rates", "lock");
+        return;
+      }
+      document.getElementById('cfg-paye').value = payrollSettings.payeRate;
+      document.getElementById('cfg-nassit-ee').value = payrollSettings.nassitEmployeeRate;
+      document.getElementById('cfg-nassit-er').value = payrollSettings.nassitEmployerRate;
+      document.getElementById('cfg-duty').value = payrollSettings.dutyAllowanceRate;
+      document.getElementById('cfg-advance').value = payrollSettings.defaultAdvanceRate;
+      document.getElementById('payroll-settings-modal').classList.remove('hidden');
+    }
+
+    function closePayrollSettings() {
+      document.getElementById('payroll-settings-modal').classList.add('hidden');
+    }
+
+    function savePayrollSettings() {
+      payrollSettings.payeRate = parseFloat(document.getElementById('cfg-paye').value) || 30.0;
+      payrollSettings.nassitEmployeeRate = parseFloat(document.getElementById('cfg-nassit-ee').value) || 5.0;
+      payrollSettings.nassitEmployerRate = parseFloat(document.getElementById('cfg-nassit-er').value) || 10.0;
+      payrollSettings.dutyAllowanceRate = parseFloat(document.getElementById('cfg-duty').value) || 2.0;
+      payrollSettings.defaultAdvanceRate = parseFloat(document.getElementById('cfg-advance').value) || 10.0;
+      
+      localStorage.setItem('bcf_payroll_settings', JSON.stringify(payrollSettings));
+      closePayrollSettings();
+      loadSettings();
+      updateDashboardKPIs();
+      renderCards();
+      showToast("Statutory rates updated successfully across all payroll schedules!", "done_all");
+    }
+
+    function restoreDefaultSettings() {
+      document.getElementById('cfg-paye').value = 30.0;
+      document.getElementById('cfg-nassit-ee').value = 5.0;
+      document.getElementById('cfg-nassit-er').value = 10.0;
+      document.getElementById('cfg-duty').value = 2.0;
+      document.getElementById('cfg-advance').value = 10.0;
+    }
+
+    // REGISTRY & LOANS DATA LOAD
+    function deduplicateStaffRegistry(staffList) {
+      if (!Array.isArray(staffList) || staffList.length === 0) return staffList;
+      
+      const seenIds = new Set();
+      let hasDuplicates = false;
+
+      let maxNum = 0;
+      staffList.forEach(s => {
+        if (s && s.employeeId) {
+          const match = String(s.employeeId).match(/(\d+)$/);
+          if (match) {
+            const n = parseInt(match[1], 10);
+            if (!isNaN(n) && n > maxNum) maxNum = n;
+          }
+        }
+      });
+
+      const deduplicated = staffList.map(emp => {
+        if (!emp || typeof emp !== 'object') return emp;
+        const currentId = (emp.employeeId || '').trim();
+
+        if (!currentId || seenIds.has(currentId)) {
+          hasDuplicates = true;
+          maxNum += 1;
+          const prefix = currentId ? currentId.replace(/\d+$/, '') : 'BCF-EMP-2026-';
+          const cleanPrefix = prefix.endsWith('-') ? prefix : `${prefix}-`;
+          const newId = `${cleanPrefix}${String(maxNum).padStart(4, '0')}`;
+          seenIds.add(newId);
+          console.warn(`[BCF-SL Schedule] Reassigning duplicate staff ID from "${currentId}" to "${newId}" for "${emp.fullName}".`);
+          return Object.assign({}, emp, { employeeId: newId });
+        } else {
+          seenIds.add(currentId);
+          return emp;
+        }
+      });
+
+      if (hasDuplicates) {
+        try {
+          localStorage.setItem('bcf_staff_registry', JSON.stringify(deduplicated));
+          const currentSeq = parseInt(localStorage.getItem('bcf_seq') || '0', 10);
+          if (maxNum > currentSeq) {
+            localStorage.setItem('bcf_seq', String(maxNum).padStart(4, '0'));
+          }
+        } catch(e) {}
+      }
+
+      return deduplicated;
+    }
+
+    function loadStaff() {
+      try {
+        let stored = JSON.parse(localStorage.getItem('bcf_staff_registry') || '[]');
+        if (!stored || stored.length === 0) {
+          stored = SEED_STAFF;
+          localStorage.setItem('bcf_staff_registry', JSON.stringify(stored));
+        } else {
+          // Verify Albert Joseph Bandama is present
+          const hasAlbert = stored.some(s => (s.fullName||'').toLowerCase().includes('albert'));
+          if (!hasAlbert) {
+            stored.unshift(SEED_STAFF[0]);
+            localStorage.setItem('bcf_staff_registry', JSON.stringify(stored));
+          }
+        }
+        allStaff = deduplicateStaffRegistry(stored);
+      } catch(e) {
+        allStaff = SEED_STAFF;
+      }
+    }
+
+    function loadLoans() {
+      try {
+        let stored = JSON.parse(localStorage.getItem('bcf_staff_loans') || '[]');
+        if (!stored || stored.length === 0) {
+          stored = SEED_LOANS;
+          localStorage.setItem('bcf_staff_loans', JSON.stringify(stored));
+        }
+        staffLoans = stored;
+      } catch(e) {
+        staffLoans = SEED_LOANS;
+      }
+    }
+
+    function syncWithRegistry() {
+      loadStaff();
+      loadLoans();
+      applyFilters();
+      updateDashboardKPIs();
+      showToast(`Synchronized ${allStaff.length} employees from BCF-SL Registry`, 'sync');
+    }
+
+    // PAYROLL CYCLES & COMPUTATIONS
+    function loadPayrollCycles() {
+      try {
+        let stored = JSON.parse(localStorage.getItem('bcf_payroll_cycles') || '{}');
+        if (!stored[currentPeriod]) {
+          stored[currentPeriod] = {
+            period: currentPeriod,
+            status: "Finance Review",
+            stage: 2,
+            preparedBy: "Albert Joseph Bandama (Accounts Officer)",
+            datePrepared: "17 April 2026",
+            reviewedBy: "Finance Director",
+            approvedBy: "Chief Executive Officer",
+            dateApproved: null,
+            refNumber: `PAY-${currentPeriod}-BCF`,
+            records: {}
+          };
+          localStorage.setItem('bcf_payroll_cycles', JSON.stringify(stored));
+        }
+        payrollCycles = stored;
+        updateCycleUI();
+      } catch(e) {
+        console.error("Cycles load error", e);
+      }
+    }
+
+    function changePayPeriod(period) {
+      currentPeriod = period;
+      
+      // Auto-update typed period and date (Date: MM/YYYY matching Period)
+      const periodNamesMap = {
+        '2026-03': { name: 'March 2026', date: '03/2026' },
+        '2026-02': { name: 'February 2026', date: '02/2026' },
+        '2026-01': { name: 'January 2026', date: '01/2026' },
+        '2025-12': { name: 'December 2025', date: '12/2025' },
+        '2025-11': { name: 'November 2025', date: '11/2025' }
+      };
+      if (periodNamesMap[period]) {
+        const pInput = document.getElementById('input-period-name');
+        const dInput = document.getElementById('input-period-date');
+        if (pInput) pInput.value = periodNamesMap[period].name;
+        if (dInput) dInput.value = periodNamesMap[period].date;
+        savePeriodAndSignOffMeta();
+      }
+      loadPayrollCycles();
+      updateDashboardKPIs();
+      renderCards();
+      showToast(`Loaded payroll cycle for ${period}`, 'calendar_today');
+    }
+
+    function updateCycleUI() {
+      const cycle = payrollCycles[currentPeriod];
+      if (!cycle) return;
+
+      const pill = document.getElementById('cycle-status-pill');
+      const text = document.getElementById('cycle-status-text');
+      const btnAction = document.getElementById('workflow-action-label');
+      const refCode = document.getElementById('period-ref-code');
+
+      if (refCode) refCode.textContent = `Ref: ${cycle.refNumber || `PAY-${currentPeriod}-BCF`}`;
+
+      if (text) text.textContent = cycle.status;
+
+      if (cycle.status === 'Certified / Published' || cycle.stage === 4) {
+        if (pill) {
+          pill.className = "px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-900 border border-emerald-300 flex items-center gap-1";
+          pill.innerHTML = '<span class="material-symbols-outlined text-[12px] text-emerald-700">verified</span><span>Certified & Published</span>';
+        }
+        if (btnAction) btnAction.textContent = "View Certification Certificate";
+      } else if (cycle.stage === 3) {
+        if (pill) {
+          pill.className = "px-2 py-0.5 rounded-full text-[10px] font-bold bg-blue-100 text-blue-900 border border-blue-300 flex items-center gap-1";
+          pill.innerHTML = '<span class="w-1.5 h-1.5 rounded-full bg-blue-600 pulse-dot"></span><span>Awaiting CEO Approval</span>';
+        }
+        if (btnAction) btnAction.textContent = "Authorize as CEO";
+      } else {
+        if (pill) {
+          pill.className = "px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-100 text-amber-900 border border-amber-300 flex items-center gap-1";
+          pill.innerHTML = '<span class="w-1.5 h-1.5 rounded-full bg-amber-600 pulse-dot"></span><span>Finance Review</span>';
+        }
+        if (btnAction) btnAction.textContent = "Submit for Finance Review";
+      }
+    }
+
+    // CALCULATE EMPLOYEE PAYROLL LINE ITEM
+    function computeStaffPayroll(emp) {
+      if (!emp) return null;
+      const cycle = payrollCycles[currentPeriod];
+      const customOverride = cycle && cycle.records && cycle.records[emp.employeeId];
+
+      // 1. Basic Salary
+      let basic = 0;
+      if (customOverride && customOverride.basic !== undefined) {
+        basic = safeNum(customOverride.basic, 0);
+      } else {
+        const rawBasic = emp.payBasic || emp.basicSalary || emp.basic || emp.salary;
+        basic = safeNum(rawBasic, 0);
+      }
+
+      // Default tier if basic is empty or 0
+      if (basic <= 0) {
+        const lvl = ((emp.jobLevel || '') + ' ' + (emp.title || '') + ' ' + (emp.mgmtLevel || '')).toLowerCase();
+        if (lvl.includes('ceo') || lvl.includes('executive') || lvl.includes('board')) basic = 24000;
+        else if (lvl.includes('director')) basic = 18000;
+        else if (lvl.includes('manager') || lvl.includes('lead') || lvl.includes('specialist') || lvl.includes('coordinator')) basic = 12000;
+        else basic = 8500;
+      }
+
+      // 2. Merit Increase %
+      let incPct = 0;
+      if (customOverride && customOverride.incPct !== undefined) {
+        incPct = safeNum(customOverride.incPct, 0);
+      } else if (emp.payInc !== undefined && emp.payInc !== null && String(emp.payInc).trim() !== '') {
+        incPct = safeNum(emp.payInc, 0);
+      } else {
+        incPct = 0;
+      }
+
+      const incAmt = basic * (incPct / 100.0);
+      const gross = basic + incAmt;
+
+      // 3. Statutory Deductions
+      const payeRate = safeNum(payrollSettings?.payeRate, 30.0);
+      const payeAmt = gross * (payeRate / 100.0);
+      const netAfterTax = Math.max(0, gross - payeAmt);
+
+      const nassitEeRate = safeNum(payrollSettings?.nassitEmployeeRate, 5.0);
+      const nassitEeAmt = gross * (nassitEeRate / 100.0);
+
+      const nassitErRate = safeNum(payrollSettings?.nassitEmployerRate, 10.0);
+      const nassitErAmt = gross * (nassitErRate / 100.0);
+
+      // 4. Mid-Month Salary Advance (Based on net-of-tax)
+      let advType = 10;
+      if (customOverride && customOverride.advType !== undefined) {
+        advType = customOverride.advType;
+      } else if (emp.payAdvType !== undefined && emp.payAdvType !== null && String(emp.payAdvType).trim() !== '') {
+        advType = emp.payAdvType;
+      }
+
+      let advanceAmt = 0;
+      if (advType === 5 || advType === '5') {
+        advanceAmt = netAfterTax * 0.05;
+      } else if (advType === 10 || advType === '10') {
+        advanceAmt = netAfterTax * 0.10;
+      } else if ((advType === -1 || advType === 'custom') && customOverride) {
+        advanceAmt = safeNum(customOverride.customAdvance, 0);
+      } else if (advType === 0 || advType === '0') {
+        advanceAmt = 0;
+      } else {
+        const parsedAdv = safeNum(advType, 0);
+        if (parsedAdv > 0 && parsedAdv <= 100) {
+          advanceAmt = netAfterTax * (parsedAdv / 100.0);
+        } else if (parsedAdv > 100) {
+          advanceAmt = parsedAdv;
+        }
+      }
+      advanceAmt = safeNum(advanceAmt, 0);
+
+      // 5. Staff Loan Deduction
+      const activeLoan = staffLoans.find(l => l.employeeId === emp.employeeId && l.status === 'ACTIVE' && safeNum(l.balanceRemaining, 0) > 0);
+      let loanDeduct = 0;
+      if (customOverride && customOverride.loanDeduct !== undefined) {
+        loanDeduct = safeNum(customOverride.loanDeduct, 0);
+      } else if (activeLoan) {
+        const monDed = safeNum(activeLoan.monthlyDeduction, 0);
+        const balRem = safeNum(activeLoan.balanceRemaining, 0);
+        loanDeduct = Math.min(monDed, balRem);
+      } else if (emp.payLoan !== undefined && emp.payLoan !== null) {
+        loanDeduct = safeNum(emp.payLoan, 0);
+      }
+      loanDeduct = safeNum(loanDeduct, 0);
+
+      // 6. Allowances
+      const dutyRate = safeNum(payrollSettings?.dutyAllowanceRate, 2.0);
+      const dutyAllowance = customOverride && customOverride.dutyAllowance !== undefined 
+        ? safeNum(customOverride.dutyAllowance, 0) 
+        : (gross * (dutyRate / 100.0));
+      const transportAllowance = customOverride ? safeNum(customOverride.transportAllowance, 0) : safeNum(emp.payTransport || emp.transportAllowance, 0);
+      const housingAllowance = customOverride ? safeNum(customOverride.housingAllowance, 0) : safeNum(emp.payHousing || emp.housingAllowance, 0);
+      const otherAllowance = customOverride ? safeNum(customOverride.otherAllowance, 0) : safeNum(emp.payOther || emp.otherAllowance, 0);
+      const totalAllowances = dutyAllowance + transportAllowance + housingAllowance + otherAllowance;
+
+      // 7. TOTAL NET PAY FORMULA
+      // Net = Gross + Allowances - PAYE - EE NASSIT - Advance - Loan - Other
+      const otherDeductions = customOverride ? safeNum(customOverride.otherDeductions, 0) : 0;
+      const totalDeductions = payeAmt + nassitEeAmt + advanceAmt + loanDeduct + otherDeductions;
+      const netPay = Math.max(0, (gross + totalAllowances) - totalDeductions);
+
+      return {
+        employeeId: emp.employeeId,
+        fullName: emp.fullName,
+        department: emp.department || 'General Administration',
+        title: emp.title || 'Officer',
+        jobLevel: emp.jobLevel || 'Officer',
+        classification: emp.classification || 'Permanent',
+        bankName: emp.bankName || 'Sierra Leone Commercial Bank',
+        accNo: emp.accNo || '00300123456789',
+        unit: emp.unit || 'Finance & Accounts',
+        basic,
+        incPct,
+        incAmt,
+        gross,
+        payeAmt,
+        netAfterTax,
+        nassitEeAmt,
+        nassitErAmt,
+        advType,
+        advanceAmt,
+        loanDeduct,
+        activeLoan,
+        dutyAllowance,
+        transportAllowance,
+        housingAllowance,
+        otherAllowance,
+        totalAllowances,
+        otherDeductions,
+        totalDeductions,
+        netPay
+      };
+    }
+
+    // FILTER & SEARCH LOGIC
+    function applyFilters() {
+      const q = (document.getElementById('search-input').value || '').trim().toLowerCase();
+      const fDept = document.getElementById('filter-dept').value;
+      const fType = document.getElementById('filter-type').value;
+      const fLevel = document.getElementById('filter-level').value;
+      const fStatus = document.getElementById('filter-status').value;
+
+      filteredStaff = allStaff.filter(emp => {
+        // Search query
+        if (q) {
+          const matchName = (emp.fullName || '').toLowerCase().includes(q);
+          const matchId = (emp.employeeId || '').toLowerCase().includes(q);
+          const matchTitle = (emp.title || '').toLowerCase().includes(q);
+          if (!matchName && !matchId && !matchTitle) return false;
+        }
+        // Dept filter
+        if (fDept && emp.department !== fDept) return false;
+        // Classification filter
+        if (fType && (emp.classification || '').toLowerCase() !== fType.toLowerCase()) return false;
+        // Level filter
+        if (fLevel && (emp.jobLevel || '').toLowerCase() !== fLevel.toLowerCase()) return false;
+        // Status filter
+        if (fStatus === 'active') {
+          if ((emp.status || 'active').toLowerCase() !== 'active') return false;
+        } else if (fStatus === 'hold') {
+          if ((emp.status || '').toLowerCase() !== 'on hold' && (emp.status || '').toLowerCase() !== 'hold') return false;
+        }
+        return true;
+      });
+
+      const counter = document.getElementById('filter-counter');
+      if (counter) counter.textContent = `Showing ${filteredStaff.length} of ${allStaff.length} registered employees`;
+
+      renderCards();
+    }
+
+    function resetFilters() {
+      document.getElementById('search-input').value = '';
+      document.getElementById('filter-dept').value = '';
+      document.getElementById('filter-type').value = '';
+      document.getElementById('filter-level').value = '';
+      document.getElementById('filter-status').value = 'active';
+      applyFilters();
+      showToast("Filters reset to default view", "refresh");
+    }
+
+    // 2. RENDER SELECTABLE EMPLOYEE CARDS
+    function renderCards() {
+      const container = document.getElementById('employee-cards-grid');
+      const empty = document.getElementById('cards-empty-state');
+      if (!container) return;
+
+      if (filteredStaff.length === 0) {
+        container.innerHTML = '';
+        if (empty) empty.classList.remove('hidden');
+        return;
+      }
+      if (empty) empty.classList.add('hidden');
+
+      container.innerHTML = filteredStaff.map(emp => {
+        const p = computeStaffPayroll(emp);
+        const initials = (emp.fullName || 'E').split(' ').map(w => w[0]).slice(0, 2).join('').toUpperCase();
+        const hasLoan = p.loanDeduct > 0;
+        const safeName = (emp.fullName || '').replace(/'/g, "\\'");
+
+        return `
+        <div onclick="openPayrollProfile('${emp.employeeId}', '${safeName}')" class="bg-white rounded-xl p-4 border border-outline hover:border-emerald-600 hover:shadow-md transition-all duration-200 cursor-pointer flex flex-col justify-between relative group">
+          
+          <!-- Top Row: Name & Top Right Arrow -->
+          <div class="flex items-start justify-between gap-3">
+            <div class="flex items-center gap-3 min-w-0">
+              <div class="w-11 h-11 rounded-full bg-emerald-100 text-primary font-bold text-sm flex items-center justify-center shrink-0 border border-emerald-200 group-hover:bg-primary group-hover:text-white transition">
+                ${initials}
+              </div>
+              <div class="min-w-0">
+                <h3 class="text-sm font-bold text-slate-900 group-hover:text-primary transition truncate">${emp.fullName}</h3>
+                <div class="flex items-center gap-1.5 mt-0.5 text-xs">
+                  <span class="font-mono text-primary font-bold">${emp.employeeId}</span>
+                  <span class="text-slate-300">•</span>
+                  <span class="text-slate-500 truncate">${emp.department || 'General Administration'}</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Top Right Corner Arrow (Click opens Entry Salary) -->
+            <button type="button" onclick="event.stopPropagation(); openPayrollProfile('${emp.employeeId}', '${safeName}')" title="Entry Salary for ${emp.fullName}" class="w-8 h-8 rounded-lg bg-slate-50 hover:bg-primary hover:text-white text-slate-400 flex items-center justify-center transition shrink-0 border border-slate-100">
+              <span class="material-symbols-outlined text-[18px]">arrow_forward</span>
+            </button>
+          </div>
+
+          <!-- Middle Meta: Position & Level Badges -->
+          <div class="mt-3 pt-3 border-t border-slate-100 flex items-center justify-between text-xs">
+            <span class="font-semibold text-slate-700 truncate max-w-[200px]">${emp.title || 'Staff Officer'}</span>
+            <div class="flex items-center gap-1.5 shrink-0">
+              <span class="px-2 py-0.5 rounded text-[10px] font-semibold bg-slate-100 text-slate-700 border border-slate-200">${emp.classification || 'Permanent'}</span>
+              ${hasLoan ? `<span class="px-1.5 py-0.5 rounded text-[10px] font-bold bg-purple-100 text-purple-800 border border-purple-200" title="Active Loan Deduction: NLe ${p.loanDeduct.toFixed(2)}">Loan Active</span>` : ''}
+            </div>
+          </div>
+
+          <!-- Bottom Row: Payroll Status & Net Pay Preview -->
+          <div class="mt-3 pt-2.5 border-t border-slate-50 flex items-center justify-between text-xs">
+            <div class="flex items-center gap-1.5">
+              <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+              <span class="font-bold text-emerald-800 text-[11px]">● Payroll Active</span>
+            </div>
+            <div class="flex items-baseline gap-1 text-right">
+              <span class="text-[10px] font-bold text-slate-400">Net:</span>
+              <span class="text-xs font-bold text-slate-500">NLe</span>
+              <span class="text-sm font-black font-mono text-primary">${p.netPay.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+            </div>
+          </div>
+
+          <!-- Action Buttons: Entry Salary & Receipt -->
+          <div class="mt-3 pt-2.5 border-t border-slate-100 flex items-center gap-2" onclick="event.stopPropagation()">
+            <button type="button" onclick="openPayrollProfile('${emp.employeeId}', '${safeName}')" class="flex-1 h-9 rounded-lg bg-[#0D5C3A] hover:bg-[#083B25] text-white text-xs font-bold inline-flex items-center justify-center gap-1.5 transition shadow-2xs">
+              <span class="material-symbols-outlined text-[16px]">payments</span>
+              <span>Entry Salary</span>
+            </button>
+            <button type="button" onclick="openScheduleReceiptModal('${emp.employeeId}', '${safeName}')" class="h-9 px-3.5 rounded-lg border border-[#0D5C3A] bg-white text-[#0D5C3A] hover:bg-emerald-50 text-xs font-bold inline-flex items-center justify-center gap-1.5 transition shadow-2xs">
+              <span class="material-symbols-outlined text-[16px]">receipt_long</span>
+              <span>Receipt</span>
+            </button>
+          </div>
+
+        </div>
+        `;
+      }).join('');
+    }
+
+    // 3. OPEN EMPLOYEE PAYROLL PROFILE MODAL (ZERO RE-ENTRY)
+    function openPayrollProfile(empId, empName = '') {
+      let emp = null;
+      if (empName) {
+        emp = allStaff.find(e => e.employeeId === empId && (e.fullName || '').trim().toLowerCase() === empName.trim().toLowerCase());
+        if (!emp) emp = allStaff.find(e => (e.fullName || '').trim().toLowerCase() === empName.trim().toLowerCase());
+      }
+      if (!emp) {
+        emp = allStaff.find(e => e.employeeId === empId);
+      }
+      if (!emp) return;
+      activeEmployee = emp;
+
+      // 1. Fill Read-only Employee Registration Info (ZERO RE-ENTRY)
+      document.getElementById('modal-emp-avatar').textContent = (emp.fullName || 'E').split(' ').map(w=>w[0]).slice(0,2).join('').toUpperCase();
+      document.getElementById('modal-emp-name').textContent = emp.fullName;
+      document.getElementById('modal-emp-id').textContent = emp.employeeId;
+
+      document.getElementById('info-name').textContent = emp.fullName || '-';
+      document.getElementById('info-id').textContent = emp.employeeId || '-';
+      document.getElementById('info-dept').textContent = emp.department || '-';
+      document.getElementById('info-unit').textContent = emp.unit || 'Headquarters';
+      document.getElementById('info-title').textContent = emp.title || '-';
+      document.getElementById('info-level').textContent = emp.jobLevel || 'Officer';
+      document.getElementById('info-type').textContent = emp.classification || 'Permanent';
+      document.getElementById('info-bank').textContent = emp.bankName || 'Sierra Leone Commercial Bank';
+      document.getElementById('info-acc').textContent = emp.accNo || '-';
+      document.getElementById('sum-bank-name').textContent = emp.bankName || 'Sierra Leone Commercial Bank';
+
+      // 2. Load existing or default salary values
+      const p = computeStaffPayroll(emp);
+      document.getElementById('sal-basic').value = p.basic;
+      document.getElementById('sal-increase-pct').value = p.incPct;
+
+      // 3. Mid-Month Advance
+      selectAdvanceRate(p.advType);
+      if (p.advType === -1) {
+        document.getElementById('input-custom-advance').value = p.advanceAmt;
+      }
+
+      // 4. Staff Loan
+      document.getElementById('loan-monthly-deduct').value = p.loanDeduct;
+      const loanTag = document.getElementById('loan-status-tag');
+      const loanOut = document.getElementById('loan-outstanding-display');
+      const loanTenor = document.getElementById('loan-tenor-display');
+      const btnToggle = document.getElementById('btn-toggle-loan-text');
+
+      if (p.activeLoan) {
+        loanTag.textContent = `Active Facility (${p.activeLoan.loanId})`;
+        loanTag.className = "text-[10px] text-purple-700 font-semibold bg-purple-50 px-2 py-0.5 rounded border border-purple-200";
+        loanOut.textContent = p.activeLoan.balanceRemaining.toLocaleString('en-US', { minimumFractionDigits: 2 });
+        loanTenor.textContent = `Installment Mo ${p.activeLoan.monthsPaid} of ${p.activeLoan.totalMonths}`;
+        btnToggle.textContent = "Mark Loan as PAID";
+      } else {
+        loanTag.textContent = "No Active Facility (PAID)";
+        loanTag.className = "text-[10px] text-slate-500 font-semibold bg-slate-100 px-2 py-0.5 rounded border border-slate-200";
+        loanOut.textContent = "0.00";
+        loanTenor.textContent = "Status: PAID / Complete";
+        btnToggle.textContent = "Attach New Staff Facility";
+      }
+
+      // 5. Allowances
+      document.getElementById('allowance-duty').value = p.dutyAllowance;
+      document.getElementById('allowance-transport').value = p.transportAllowance;
+      document.getElementById('allowance-housing').value = p.housingAllowance;
+      document.getElementById('allowance-other').value = p.otherAllowance;
+
+      recalcSalary();
+
+      // Open Modal
+      document.getElementById('profile-salary-modal').classList.remove('hidden');
+    }
+
+    function closePayrollModal() {
+      document.getElementById('profile-salary-modal').classList.add('hidden');
+      activeEmployee = null;
+    }
+
+    // LIVE RECALCULATE SALARY ENGINE
+    let currentAdvType = 10;
+
+    function selectAdvanceRate(rate) {
+      currentAdvType = rate;
+      ['0', '5', '10', 'custom'].forEach(k => {
+        const b = document.getElementById(`adv-btn-${k}`);
+        if (b) {
+          b.className = "adv-btn px-2.5 py-1.5 rounded-lg border text-xs font-bold transition text-slate-700 border-slate-200 hover:bg-slate-50";
+        }
+      });
+      const activeBtn = document.getElementById(`adv-btn-${rate === -1 ? 'custom' : rate}`);
+      if (activeBtn) {
+        activeBtn.className = "adv-btn px-2.5 py-1.5 rounded-lg border text-xs font-bold transition bg-primary text-white border-primary";
+      }
+      const customWrap = document.getElementById('custom-advance-wrap');
+      if (customWrap) {
+        customWrap.className = rate === -1 ? "block" : "hidden";
+      }
+      recalcSalary();
+    }
+
+    function recalcSalary() {
+      const basic = safeNum(document.getElementById('sal-basic')?.value, 0);
+      const incPct = safeNum(document.getElementById('sal-increase-pct')?.value, 0);
+      const incAmt = basic * (incPct / 100.0);
+      const gross = basic + incAmt;
+
+      const setTxt = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = val; };
+
+      setTxt('sal-increase-amt', `= NLe ${incAmt.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`);
+      setTxt('sal-gross-display', gross.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }));
+
+      // Statutory NRA PAYE
+      const payeRate = safeNum(payrollSettings?.payeRate, 30.0);
+      const payeAmt = gross * (payeRate / 100.0);
+      const netAfterTax = Math.max(0, gross - payeAmt);
+
+      setTxt('val-paye-amount', payeAmt.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }));
+      setTxt('val-net-after-tax', netAfterTax.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }));
+      setTxt('advance-tax-baseline', `NLe ${netAfterTax.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`);
+
+      // NASSIT
+      const nassitEeRate = safeNum(payrollSettings?.nassitEmployeeRate, 5.0);
+      const nassitEeAmt = gross * (nassitEeRate / 100.0);
+      const nassitErAmt = gross * (safeNum(payrollSettings?.nassitEmployerRate, 10.0) / 100.0);
+
+      setTxt('val-nassit-ee', nassitEeAmt.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }));
+      setTxt('val-nassit-er', `NLe ${nassitErAmt.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`);
+
+      // Advance
+      let advanceAmt = 0;
+      let advLabel = "No advance applied";
+      if (currentAdvType === 5 || currentAdvType === '5') {
+        advanceAmt = netAfterTax * 0.05;
+        advLabel = "Rate: 5% applied";
+      } else if (currentAdvType === 10 || currentAdvType === '10') {
+        advanceAmt = netAfterTax * 0.10;
+        advLabel = "Rate: 10% applied";
+      } else if (currentAdvType === -1 || currentAdvType === 'custom') {
+        advanceAmt = safeNum(document.getElementById('input-custom-advance')?.value, 0);
+        advLabel = "Custom amount applied";
+      }
+      setTxt('val-advance-applied', advanceAmt.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }));
+      setTxt('text-advance-rate-label', advLabel);
+
+      // Staff Loan
+      const loanDeduct = safeNum(document.getElementById('loan-monthly-deduct')?.value, 0);
+      setTxt('val-loan-deduction', loanDeduct.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }));
+
+      // Allowances
+      const duty = safeNum(document.getElementById('allowance-duty')?.value, (gross * (safeNum(payrollSettings?.dutyAllowanceRate, 2.0) / 100.0)));
+      const transport = safeNum(document.getElementById('allowance-transport')?.value, 0);
+      const housing = safeNum(document.getElementById('allowance-housing')?.value, 0);
+      const other = safeNum(document.getElementById('allowance-other')?.value, 0);
+      const totalAllowances = duty + transport + housing + other;
+
+      // Total Net Pay Formula:
+      // Gross + Allowances - PAYE - EE NASSIT - Advance - Loan - Other
+      const netPay = Math.max(0, (gross + totalAllowances) - payeAmt - nassitEeAmt - advanceAmt - loanDeduct);
+
+      // Update Formula Card
+      setTxt('sum-gross', `NLe ${gross.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`);
+      setTxt('sum-allowance', `+ NLe ${totalAllowances.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`);
+      setTxt('sum-paye', `- NLe ${payeAmt.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`);
+      setTxt('sum-nassit', `- NLe ${nassitEeAmt.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`);
+      setTxt('sum-advance', `- NLe ${advanceAmt.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`);
+      setTxt('sum-loan', `- NLe ${loanDeduct.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`);
+      setTxt('sum-net-pay', netPay.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }));
+    }
+
+    // TOGGLE LOAN STATUS (PAID vs ACTIVE)
+    function toggleLoanPaid() {
+      if (!activeEmployee) return;
+      const loan = staffLoans.find(l => l.employeeId === activeEmployee.employeeId);
+      if (loan) {
+        if (loan.status === 'ACTIVE') {
+          loan.status = 'PAID';
+          loan.balanceRemaining = 0;
+          document.getElementById('loan-monthly-deduct').value = 0;
+          showToast(`Loan ${loan.loanId} marked as PAID. Deduction stopped.`, 'done_all');
+        } else {
+          loan.status = 'ACTIVE';
+          loan.balanceRemaining = loan.totalPrincipal;
+          document.getElementById('loan-monthly-deduct').value = loan.monthlyDeduction;
+          showToast(`Loan ${loan.loanId} reactivated.`, 'refresh');
+        }
+        localStorage.setItem('bcf_staff_loans', JSON.stringify(staffLoans));
+        openPayrollProfile(activeEmployee.employeeId);
+      } else {
+        // Create new loan for this employee
+        const newLoan = {
+          loanId: `LOAN-BCF-2026-${String(staffLoans.length + 1).padStart(3, '0')}`,
+          employeeId: activeEmployee.employeeId,
+          employeeName: activeEmployee.fullName,
+          totalPrincipal: 4200,
+          monthlyDeduction: 420,
+          balanceRemaining: 4200,
+          monthsPaid: 1,
+          totalMonths: 10,
+          status: "ACTIVE"
+        };
+        staffLoans.push(newLoan);
+        localStorage.setItem('bcf_staff_loans', JSON.stringify(staffLoans));
+        showToast(`Created new active loan facility: ${newLoan.loanId}`, 'add_circle');
+        openPayrollProfile(activeEmployee.employeeId);
+      }
+      updateDashboardKPIs();
+      renderCards();
+    }
+
+    // SAVE PAYROLL RECORD FOR EMPLOYEE (DIRECT SYNC TO SELF-SERVICE)
+    function saveEmployeePayroll() {
+      if (!activeEmployee) return;
+      const empId = activeEmployee.employeeId;
+
+      const basic = safeNum(document.getElementById('sal-basic')?.value, 0);
+      const incPct = safeNum(document.getElementById('sal-increase-pct')?.value, 0);
+      const duty = safeNum(document.getElementById('allowance-duty')?.value, 0);
+      const transport = safeNum(document.getElementById('allowance-transport')?.value, 0);
+      const housing = safeNum(document.getElementById('allowance-housing')?.value, 0);
+      const other = safeNum(document.getElementById('allowance-other')?.value, 0);
+      const loanDeduct = safeNum(document.getElementById('loan-monthly-deduct')?.value, 0);
+      const customAdv = safeNum(document.getElementById('input-custom-advance')?.value, 0);
+
+      // Ensure active cycle exists
+      if (!payrollCycles[currentPeriod]) loadPayrollCycles();
+      if (!payrollCycles[currentPeriod].records) payrollCycles[currentPeriod].records = {};
+
+      // Full accurate statutory & financial computation
+      const incAmt = basic * (incPct / 100.0);
+      const gross = basic + incAmt;
+      const payeRate = safeNum(payrollSettings?.payeRate, 30.0);
+      const payeAmt = gross * (payeRate / 100.0);
+      const netAfterTax = Math.max(0, gross - payeAmt);
+      const nassitEeRate = safeNum(payrollSettings?.nassitEmployeeRate, 5.0);
+      const nassitEeAmt = gross * (nassitEeRate / 100.0);
+      const nassitErRate = safeNum(payrollSettings?.nassitEmployerRate, 10.0);
+      const nassitErAmt = gross * (nassitErRate / 100.0);
+
+      let advanceAmt = 0;
+      if (currentAdvType === 'custom') {
+        advanceAmt = customAdv;
+      } else {
+        const advRate = safeNum(currentAdvType, 0);
+        advanceAmt = advRate > 0 ? (netAfterTax * (advRate / 100.0)) : 0;
+      }
+
+      const totalAllowances = duty + transport + housing + other;
+      const totalDeductions = payeAmt + nassitEeAmt + advanceAmt + loanDeduct;
+      const netPay = Math.max(0, (gross + totalAllowances) - totalDeductions);
+      const receiptNo = `BCF-REC-${currentPeriod.replace(/[^A-Za-z0-9]/g, '')}-${(empId || '0001').split('-').pop()}`;
+      const receiptDate = new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' });
+
+      const periodName = (document.getElementById('input-period-name')?.value || 'March 2026').trim();
+      const periodDate = (document.getElementById('input-period-date')?.value || '03/2026').trim();
+      const preparedBy = (document.getElementById('input-prepared-by')?.value || 'Accounts Officer').trim();
+
+      // Save complete record for current period
+      const payrollRecord = {
+        periodName,
+        preparedBy,
+        basic,
+        incPct,
+        incAmt,
+        gross,
+        advType: currentAdvType,
+        customAdvance: customAdv,
+        advanceAmt,
+        loanDeduct,
+        dutyAllowance: duty,
+        transportAllowance: transport,
+        housingAllowance: housing,
+        otherAllowance: other,
+        totalAllowances,
+        payeRate,
+        payeAmt,
+        netAfterTax,
+        nassitEeRate,
+        nassitEeAmt,
+        nassitErRate,
+        nassitErAmt,
+        totalDeductions,
+        netPay,
+        receiptNo,
+        receiptDate: periodDate,
+        updatedAt: new Date().toISOString()
+      };
+
+      payrollCycles[currentPeriod].records[empId] = payrollRecord;
+      localStorage.setItem('bcf_payroll_cycles', JSON.stringify(payrollCycles));
+
+      // Direct save to dedicated receipts store for immediate self-service consumption
+      let receipts = {};
+      try {
+        receipts = JSON.parse(localStorage.getItem('bcf_payroll_receipts') || '{}');
+      } catch(e) { receipts = {}; }
+      receipts[`${empId}_${currentPeriod}`] = payrollRecord;
+      receipts[empId] = payrollRecord;
+      localStorage.setItem('bcf_payroll_receipts', JSON.stringify(receipts));
+
+      // Also update central staff registry compensation fields
+      const regIdx = allStaff.findIndex(e => e.employeeId === empId);
+      if (regIdx >= 0) {
+        allStaff[regIdx].payBasic = basic;
+        allStaff[regIdx].payInc = incPct;
+        allStaff[regIdx].payAdvType = currentAdvType;
+        allStaff[regIdx].payLoan = loanDeduct;
+        localStorage.setItem('bcf_staff_registry', JSON.stringify(allStaff));
+      }
+
+      // Always ensure month folder exists for this prepared receipt
+      try {
+        let folders = JSON.parse(localStorage.getItem('bcf_payroll_folders') || '{}');
+        folders[currentPeriod] = {
+          period: currentPeriod,
+          name: periodName,
+          date: periodDate,
+          status: 'Prepared Run',
+          receiptCount: allStaff.length
+        };
+        localStorage.setItem('bcf_payroll_folders', JSON.stringify(folders));
+      } catch(e) {}
+
+      // Signal instant cross-tab & self-service sync
+      localStorage.setItem('bcf_selected_payslip_emp', empId);
+      localStorage.setItem('bcf_last_payroll_sync', Date.now().toString());
+
+      closePayrollModal();
+      updateDashboardKPIs();
+      renderCards();
+      showToast(`Receipt saved & moved into folder '${periodName}' for ${activeEmployee.fullName}`, 'check_circle');
+    }
+
+    // 4. EXECUTIVE DASHBOARD KPI ENGINE
+    function updateDashboardKPIs() {
+      let totalHeadcount = allStaff.length;
+      let activeCount = 0;
+      let sumGross = 0;
+      let sumPaye = 0;
+      let sumNassitEe = 0;
+      let sumNassitEr = 0;
+      let sumNet = 0;
+      let sumAllowances = 0;
+      let sumAdvances = 0;
+      let sumLoans = 0;
+      let loanBeneficiaries = 0;
+
+      const deptTotals = {};
+
+      allStaff.forEach(emp => {
+        if ((emp.status || 'active').toLowerCase() === 'active') activeCount++;
+        const p = computeStaffPayroll(emp);
+        if (!p) return;
+
+        const g = safeNum(p.gross, 0);
+        const paye = safeNum(p.payeAmt, 0);
+        const nEe = safeNum(p.nassitEeAmt, 0);
+        const nEr = safeNum(p.nassitErAmt, 0);
+        const net = safeNum(p.netPay, 0);
+        const allw = safeNum(p.totalAllowances, 0);
+        const adv = safeNum(p.advanceAmt, 0);
+        const loan = safeNum(p.loanDeduct, 0);
+
+        sumGross += g;
+        sumPaye += paye;
+        sumNassitEe += nEe;
+        sumNassitEr += nEr;
+        sumNet += net;
+        sumAllowances += allw;
+        sumAdvances += adv;
+        sumLoans += loan;
+        if (loan > 0) loanBeneficiaries++;
+
+        const dept = emp.department || 'General Administration';
+        deptTotals[dept] = (deptTotals[dept] || 0) + g;
+      });
+
+      // Update KPI Elements
+      const setTxt = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = val; };
+      setTxt('kpi-headcount', totalHeadcount);
+      setTxt('kpi-active-count', `${activeCount} Active`);
+      setTxt('kpi-gross-total', sumGross.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }));
+      setTxt('kpi-avg-gross', `NLe ${totalHeadcount > 0 ? Math.round(sumGross / totalHeadcount).toLocaleString('en-US') : 0}`);
+      setTxt('kpi-paye-total', sumPaye.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }));
+      setTxt('kpi-nassit-ee-total', sumNassitEe.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }));
+      setTxt('kpi-nassit-er-total', `NLe ${sumNassitEr.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`);
+      setTxt('kpi-net-total', sumNet.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }));
+      setTxt('kpi-recoveries-total', `NLe ${sumLoans.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`);
+
+      setTxt('stat-allowances-sum', `+ NLe ${sumAllowances.toLocaleString('en-US', { minimumFractionDigits: 2 })}`);
+      setTxt('stat-advances-sum', `- NLe ${sumAdvances.toLocaleString('en-US', { minimumFractionDigits: 2 })}`);
+      setTxt('stat-loans-sum', `- NLe ${sumLoans.toLocaleString('en-US', { minimumFractionDigits: 2 })}`);
+      setTxt('stat-loan-beneficiaries', `${loanBeneficiaries} Staff`);
+      setTxt('stat-employer-total', `NLe ${(sumGross + sumNassitEr).toLocaleString('en-US', { minimumFractionDigits: 2 })}`);
+
+      // Render Department Cost Progress Bars
+      const deptContainer = document.getElementById('dept-payroll-bars');
+      if (deptContainer) {
+        const deptValues = Object.values(deptTotals).map(v => safeNum(v, 0));
+        const maxDept = Math.max(...deptValues, 1);
+        deptContainer.innerHTML = Object.entries(deptTotals).map(([dept, amt]) => {
+          const validAmt = safeNum(amt, 0);
+          const pct = Math.min(100, Math.max(0, Math.round((validAmt / maxDept) * 100)));
+          const shortDept = dept.replace(' Department', '');
+          return `
+          <div class="space-y-1">
+            <div class="flex items-center justify-between text-[11px]">
+              <span class="font-semibold text-slate-700 truncate max-w-[140px]">${shortDept}</span>
+              <span class="font-mono font-bold text-slate-900">NLe ${validAmt.toLocaleString('en-US')}</span>
+            </div>
+            <div class="w-full h-1.5 rounded-full bg-slate-100 overflow-hidden">
+              <div class="h-full bg-primary rounded-full" style="width: ${pct}%"></div>
+            </div>
+          </div>
+          `;
+        }).join('');
+      }
+
+      setTxt('stat-update-time', `Updated: ${new Date().toLocaleTimeString()}`);
+    }
+
+    // 5. MULTI-STAGE CERTIFICATION WORKFLOW
+    function advanceWorkflow() {
+      const cycle = payrollCycles[currentPeriod];
+      if (!cycle) return;
+
+      document.getElementById('wf-cycle-label').textContent = currentPeriod;
+      document.getElementById('wf-ref-label').textContent = cycle.refNumber || `PAY-${currentPeriod}-BCF`;
+
+      const stage = cycle.stage || 1;
+      updateWorkflowModalUI(stage);
+      document.getElementById('workflow-modal').classList.remove('hidden');
+    }
+
+    function closeWorkflowModal() {
+      document.getElementById('workflow-modal').classList.add('hidden');
+    }
+
+    function updateWorkflowModalUI(stage) {
+      const titles = [
+        "Stage 1: Draft Preparation",
+        "Stage 2: Finance Review & Statutory Reconciliations",
+        "Stage 3: HR Headcount Verification",
+        "Stage 4: Executive Approval & Self-Service Certification"
+      ];
+      const btnLabels = [
+        "Submit for Finance Review",
+        "Authorize Finance Review",
+        "Sign HR Verification",
+        "Authorize & Certify for Self-Service"
+      ];
+
+      const bar = document.getElementById('wf-progress-bar');
+      const title = document.getElementById('wf-step-title');
+      const pct = document.getElementById('wf-progress-pct');
+      const btnLabel = document.getElementById('btn-advance-step-label');
+
+      const p = stage * 25;
+      if (bar) bar.style.width = `${p}%`;
+      if (title) title.textContent = titles[stage - 1] || "Certification Complete";
+      if (pct) pct.textContent = `${p}% Complete`;
+      if (btnLabel) btnLabel.textContent = stage >= 4 ? "Cycle Certified & Published" : btnLabels[stage - 1];
+
+      // Highlight rows
+      for (let i = 1; i <= 4; i++) {
+        const row = document.getElementById(`step-row-${i}`);
+        const icon = document.getElementById(`step-icon-${i}`);
+        if (!row || !icon) continue;
+
+        if (i < stage) {
+          row.className = "flex items-start gap-3 p-2 rounded-lg bg-emerald-50/60 border border-emerald-200";
+          icon.className = "w-6 h-6 rounded-full bg-emerald-600 text-white flex items-center justify-center font-bold text-xs shrink-0";
+          icon.innerHTML = "✓";
+        } else if (i === stage) {
+          row.className = "flex items-start gap-3 p-2 rounded-lg bg-amber-50/70 border border-amber-300 ring-1 ring-amber-300";
+          icon.className = "w-6 h-6 rounded-full bg-amber-500 text-white flex items-center justify-center font-bold text-xs shrink-0 animate-pulse";
+          icon.innerHTML = `${i}`;
+        } else {
+          row.className = "flex items-start gap-3 p-2 rounded-lg bg-white border border-slate-200 opacity-60";
+          icon.className = "w-6 h-6 rounded-full bg-slate-100 text-slate-400 flex items-center justify-center font-bold text-xs shrink-0";
+          icon.innerHTML = `${i}`;
+        }
+      }
+    }
+
+    function executeWorkflowStep() {
+      const cycle = payrollCycles[currentPeriod];
+      if (!cycle) return;
+
+      let stage = cycle.stage || 1;
+      if (stage < 4) {
+        stage++;
+        cycle.stage = stage;
+        if (stage === 2) cycle.status = "Finance Review";
+        if (stage === 3) cycle.status = "HR Verification";
+        if (stage === 4) {
+          cycle.status = "Certified / Published";
+          cycle.dateApproved = new Date().toLocaleDateString('en-GB');
+          localStorage.setItem('bcf_certified_payroll_published', 'true');
+        }
+        localStorage.setItem('bcf_payroll_cycles', JSON.stringify(payrollCycles));
+        updateWorkflowModalUI(stage);
+        updateCycleUI();
+        showToast(`Workflow advanced to Stage ${stage}!`, 'verified');
+        if (stage === 4) {
+          setTimeout(() => {
+            closeWorkflowModal();
+            showToast("Payroll Certified! Published to Staff Payslip Self-Service Portal.", "celebration");
+          }, 1000);
+        }
+      } else {
+        closeWorkflowModal();
+        showToast("Payroll cycle is already fully certified and published to staff.", "info");
+      }
+    }
+
+    function viewAuditTrail() {
+      advanceWorkflow();
+    }
+
+    // 6. EXPORT SCHEDULE AS CSV
+    function exportScheduleCSV() {
+      const headers = [
+        "Employee ID",
+        "Employee Name",
+        "Department",
+        "Unit",
+        "Position",
+        "Job Level",
+        "Employment Type",
+        "Bank Name",
+        "Account Number",
+        "Basic Salary (NLe)",
+        "Salary Increase %",
+        "Gross Salary (NLe)",
+        "NRA PAYE (NLe)",
+        "EE NASSIT (NLe)",
+        "ER NASSIT (NLe)",
+        "Salary Advance (NLe)",
+        "Loan Deduction (NLe)",
+        "Duty Allowance (NLe)",
+        "Total Allowances (NLe)",
+        "Total Deductions (NLe)",
+        "TOTAL NET PAY (NLe)"
+      ];
+
+      const rows = allStaff.map(emp => {
+        const p = computeStaffPayroll(emp);
+        return [
+          `"${p.employeeId}"`,
+          `"${p.fullName}"`,
+          `"${p.department}"`,
+          `"${p.unit}"`,
+          `"${p.title}"`,
+          `"${p.jobLevel}"`,
+          `"${p.classification}"`,
+          `"${p.bankName}"`,
+          `"${p.accNo}"`,
+          p.basic.toFixed(2),
+          p.incPct.toFixed(1),
+          p.gross.toFixed(2),
+          p.payeAmt.toFixed(2),
+          p.nassitEeAmt.toFixed(2),
+          p.nassitErAmt.toFixed(2),
+          p.advanceAmt.toFixed(2),
+          p.loanDeduct.toFixed(2),
+          p.dutyAllowance.toFixed(2),
+          p.totalAllowances.toFixed(2),
+          p.totalDeductions.toFixed(2),
+          p.netPay.toFixed(2)
+        ];
+      });
+
+      const csvContent = "data:text/csv;charset=utf-8," + [headers.join(","), ...rows.map(r => r.join(","))].join("\n");
+      const encodedUri = encodeURI(csvContent);
+      const link = document.createElement("a");
+      link.setAttribute("href", encodedUri);
+      link.setAttribute("download", `BCF_SL_Payroll_Schedule_${currentPeriod}.csv`);
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      showToast("Payroll Schedule CSV exported successfully", "download");
+    }
+
+    // 7. PREVIEW INDIVIDUAL PAYSLIP DIRECTLY OR NAVIGATE TO SELF-SERVICE
+    function openIndividualPayslipPreview() {
+      if (activeEmployee) {
+        localStorage.setItem('bcf_selected_payslip_emp', activeEmployee.employeeId);
+        localStorage.setItem('bcf_auto_open_receipt', '1');
+      }
+      navToPayslips();
+    }
+
+    function navToPayslips() {
+      try {
+        if (window.top && window.top !== window && window.top.location) {
+          window.top.location.href = '/finance/payslip-self-service';
+          return;
+        }
+      } catch(e) {}
+      window.location.href = '../staff_monthly_payslip_self_service/code.html';
+    }
+
+    // TOAST SYSTEM
+    let toastTimer;
+    function showToast(msg, icon = 'check_circle') {
+      const t = document.getElementById('toast');
+      const txt = document.getElementById('toast-message');
+      const ic = document.getElementById('toast-icon');
+      if (!t || !txt) return;
+
+      txt.textContent = msg;
+      if (ic) ic.textContent = icon;
+      t.classList.remove('translate-y-16', 'opacity-0', 'pointer-events-none');
+      t.classList.add('translate-y-0', 'opacity-100');
+
+      clearTimeout(toastTimer);
+      toastTimer = setTimeout(() => {
+        t.classList.add('translate-y-16', 'opacity-0', 'pointer-events-none');
+        t.classList.remove('translate-y-0', 'opacity-100');
+      }, 3500);
+    }
+  </script>
+
+
+  <!-- MODAL 3: OFFICIAL PAYSLIP & REMITTANCE RECEIPT VOUCHER (CENTERED, 1-PAGE) -->
+  <div id="schedule-receipt-modal" class="fixed inset-0 z-50 bg-slate-900/70 backdrop-blur-xs flex items-center justify-center p-3 sm:p-4 hidden">
+    <div class="bg-white rounded-2xl shadow-2xl border border-slate-300 max-w-3xl w-full max-h-[96vh] flex flex-col overflow-hidden animate-in fade-in zoom-in-95 duration-150">
+      
+      <!-- Modal Action Bar -->
+      <div class="px-5 py-3 bg-slate-900 text-white flex items-center justify-between shrink-0 no-print">
+        <div class="flex items-center gap-2">
+          <span class="material-symbols-outlined text-primary text-[20px]">verified</span>
+          <span class="text-xs font-bold uppercase tracking-wider text-white">Official BCF-SL Payslip & Remittance Receipt</span>
+        </div>
+        <div class="flex items-center gap-2">
+          <button type="button" onclick="window.print()" class="h-8 px-3 rounded-lg bg-white/10 hover:bg-white/20 text-white text-xs font-bold flex items-center gap-1.5 transition">
+            <span class="material-symbols-outlined text-[15px]">print</span>
+            <span>Print Receipt</span>
+          </button>
+          <button type="button" onclick="closeScheduleReceiptModal()" class="w-8 h-8 rounded-lg bg-white/10 hover:bg-white/20 text-white flex items-center justify-center transition">
+            <span class="material-symbols-outlined text-[18px]">close</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Printable Payslip Voucher Body (Compact Single-Page Design) -->
+      <div class="p-3 sm:p-4 overflow-y-auto custom-scrollbar flex-1 bg-white text-slate-900 leading-tight" id="schedule-receipt-voucher">
+        
+        <!-- Centered Header with Official Logo -->
+        <div class="border-b-2 border-primary pb-2 mb-2 text-center">
+          <div class="flex flex-col items-center justify-center">
+            
+            <div class="mb-1 flex items-center justify-center">
+              <img src="../bandama_charity_foundation_logo/bcf_official_logo.png" alt="Bandama Charity Foundation" class="h-9 sm:h-10 w-auto object-contain mx-auto" onerror="this.src='/bcf_official_logo.png'" />
+            </div>
+
+            <span class="text-[11px] sm:text-xs font-black uppercase tracking-wider text-primary block leading-none">BANDAMA CHARITY FOUNDATION SIERRA LEONE</span>
+            <span class="text-[9px] text-slate-500 font-medium block mt-0.5 leading-tight">Headquarters: 14 Wilkinson Road, Freetown, Sierra Leone • Statutory Remittance & Certified Payroll Voucher</span>
+            <h2 class="text-xs sm:text-sm font-black text-slate-900 tracking-tight my-1 uppercase leading-none" id="sched-vouch-title">INDIVIDUAL SALARY PAYROLL & REMITTANCE RECEIPT — OFFICER</h2>
+            
+            <!-- Centered Meta Badges -->
+            <div class="flex flex-wrap items-center justify-center gap-1.5 text-[10px] font-semibold text-slate-600 mt-0.5">
+              <span class="bg-slate-100 px-2 py-0.5 rounded border border-slate-200">
+                Voucher: <strong class="font-mono text-primary font-bold" id="sched-vouch-receipt-no">BCF-REC-2026-03-001</strong>
+              </span>
+              <span class="bg-slate-100 px-2 py-0.5 rounded border border-slate-200">
+                Period: <strong class="font-bold text-slate-900" id="sched-vouch-period">March 2026</strong>
+              </span>
+              <span class="bg-slate-100 px-2 py-0.5 rounded border border-slate-200">
+                Date: <strong class="font-bold text-slate-900 font-mono" id="sched-vouch-date">03/2026</strong>
+              </span>
+              <span class="inline-flex items-center gap-0.5 bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded border border-emerald-200 font-bold text-[10px]">
+                <span class="material-symbols-outlined text-[12px]">verified</span> Direct Synced & Certified
+              </span>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- Employee Info -->
+        <div class="mb-2 bg-slate-50 p-2 rounded-lg border border-slate-200">
+          <div class="text-[9px] uppercase font-bold text-primary tracking-wider mb-1 flex items-center gap-1">
+            <span class="material-symbols-outlined text-[12px]">badge</span>
+            <span>Employee Identification & Remittance Particulars</span>
+          </div>
+
+          <div class="grid grid-cols-2 sm:grid-cols-4 gap-x-2 gap-y-1 text-[10px]">
+            <div>
+              <span class="text-[8px] text-slate-400 font-bold block uppercase leading-none">Employee Name</span>
+              <span class="font-bold text-slate-900 truncate block" id="sched-vouch-name">-</span>
+            </div>
+            <div>
+              <span class="text-[8px] text-slate-400 font-bold block uppercase leading-none">Employee ID</span>
+              <span class="font-mono font-bold text-primary truncate block" id="sched-vouch-id">-</span>
+            </div>
+            <div>
+              <span class="text-[8px] text-slate-400 font-bold block uppercase leading-none">Department</span>
+              <span class="font-semibold text-slate-800 truncate block" id="sched-vouch-dept">-</span>
+            </div>
+            <div>
+              <span class="text-[8px] text-slate-400 font-bold block uppercase leading-none">Unit</span>
+              <span class="font-semibold text-slate-800 truncate block" id="sched-vouch-unit">-</span>
+            </div>
+            <div>
+              <span class="text-[8px] text-slate-400 font-bold block uppercase leading-none">Position / Title</span>
+              <span class="font-semibold text-slate-800 truncate block" id="sched-vouch-pos">-</span>
+            </div>
+            <div>
+              <span class="text-[8px] text-slate-400 font-bold block uppercase leading-none">Job Level</span>
+              <span class="font-semibold text-slate-800 truncate block" id="sched-vouch-level">-</span>
+            </div>
+            <div>
+              <span class="text-[8px] text-slate-400 font-bold block uppercase leading-none">Bank Name</span>
+              <span class="font-semibold text-slate-800 truncate block" id="sched-vouch-bank">-</span>
+            </div>
+            <div>
+              <span class="text-[8px] text-slate-400 font-bold block uppercase leading-none">Account Number</span>
+              <span class="font-mono font-bold text-slate-800 truncate block" id="sched-vouch-acc">-</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Computation Tables -->
+        <div class="space-y-1.5 mb-2">
+
+          <!-- A. Earnings -->
+          <div class="border border-slate-200 rounded-lg overflow-hidden">
+            <div class="bg-slate-100 px-2 py-0.5 text-[9px] font-black text-slate-800 uppercase tracking-wider flex items-center justify-between">
+              <span>A. EARNINGS</span>
+              <span class="text-[8px] text-slate-500 font-mono">Gross Remuneration Base</span>
+            </div>
+            <table class="w-full text-[10px]">
+              <thead class="bg-slate-50 text-slate-500 text-[8px] uppercase font-bold border-b border-slate-200">
+                <tr>
+                  <th class="py-0.5 px-2 text-left">Description</th>
+                  <th class="py-0.5 px-2 text-left">Details</th>
+                  <th class="py-0.5 px-2 text-right">Amount (NLe)</th>
+                  <th class="py-0.5 px-2 text-right">Final (NLe)</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-slate-100">
+                <tr>
+                  <td class="py-0.5 px-2 font-semibold text-slate-800">Basic Salary</td>
+                  <td class="py-0.5 px-2 text-slate-500">Current Monthly Basic</td>
+                  <td class="py-0.5 px-2 text-right font-mono" id="sched-vouch-basic">0.00</td>
+                  <td class="py-0.5 px-2 text-right font-mono font-semibold" id="sched-vouch-basic-final">0.00</td>
+                </tr>
+                <tr>
+                  <td class="py-0.5 px-2 font-semibold text-slate-800">Salary Increase</td>
+                  <td class="py-0.5 px-2 text-slate-500" id="sched-vouch-inc-pct">50% Merit Adjustment</td>
+                  <td class="py-0.5 px-2 text-right font-mono" id="sched-vouch-inc-amt">0.00</td>
+                  <td class="py-0.5 px-2 text-right font-mono font-semibold" id="sched-vouch-inc-final">0.00</td>
+                </tr>
+                <tr class="bg-emerald-50/50 font-bold text-slate-900 border-t border-slate-200">
+                  <td class="py-0.5 px-2 text-emerald-900">Gross Monthly Salary</td>
+                  <td class="py-0.5 px-2 text-emerald-800 text-[9px]">Basic + Increase</td>
+                  <td class="py-0.5 px-2 text-right font-mono text-emerald-950" id="sched-vouch-gross">0.00</td>
+                  <td class="py-0.5 px-2 text-right font-mono text-emerald-950 font-black" id="sched-vouch-gross-final">0.00</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <!-- B. Deductions -->
+          <div class="border border-slate-200 rounded-lg overflow-hidden">
+            <div class="bg-slate-100 px-2 py-0.5 text-[9px] font-black text-slate-800 uppercase tracking-wider flex items-center justify-between">
+              <span>B. STATUTORY & WELFARE DEDUCTIONS</span>
+              <span class="text-[8px] text-amber-700 font-mono">Tax & Loan Offsets</span>
+            </div>
+            <table class="w-full text-[10px]">
+              <thead class="bg-slate-50 text-slate-500 text-[8px] uppercase font-bold border-b border-slate-200">
+                <tr>
+                  <th class="py-0.5 px-2 text-left">Description</th>
+                  <th class="py-0.5 px-2 text-left">Details</th>
+                  <th class="py-0.5 px-2 text-right">Amount (NLe)</th>
+                  <th class="py-0.5 px-2 text-right">Final (NLe)</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-slate-100">
+                <tr>
+                  <td class="py-0.5 px-2 font-semibold text-slate-800">NRA PAYE Statutory Tax</td>
+                  <td class="py-0.5 px-2 text-slate-500">Standard rate (30%)</td>
+                  <td class="py-0.5 px-2 text-right font-mono text-amber-900" id="sched-vouch-paye">0.00</td>
+                  <td class="py-0.5 px-2 text-right font-mono font-semibold text-amber-900" id="sched-vouch-paye-final">0.00</td>
+                </tr>
+                <tr>
+                  <td class="py-0.5 px-2 font-semibold text-slate-800">Employee NASSIT Pension</td>
+                  <td class="py-0.5 px-2 text-slate-500">Employee rate (5%)</td>
+                  <td class="py-0.5 px-2 text-right font-mono text-amber-900" id="sched-vouch-nassit">0.00</td>
+                  <td class="py-0.5 px-2 text-right font-mono font-semibold text-amber-900" id="sched-vouch-nassit-final">0.00</td>
+                </tr>
+                <tr>
+                  <td class="py-0.5 px-2 font-semibold text-slate-800">Mid-Month Salary Advance</td>
+                  <td class="py-0.5 px-2 text-slate-500">Net-of-Tax Advance</td>
+                  <td class="py-0.5 px-2 text-right font-mono text-purple-900" id="sched-vouch-advance">0.00</td>
+                  <td class="py-0.5 px-2 text-right font-mono font-semibold text-purple-900" id="sched-vouch-advance-final">0.00</td>
+                </tr>
+                <tr>
+                  <td class="py-0.5 px-2 font-semibold text-slate-800">Staff Loan Repayment</td>
+                  <td class="py-0.5 px-2 text-slate-500">Monthly auto-deduct</td>
+                  <td class="py-0.5 px-2 text-right font-mono text-purple-900" id="sched-vouch-loan">0.00</td>
+                  <td class="py-0.5 px-2 text-right font-mono font-semibold text-purple-900" id="sched-vouch-loan-final">0.00</td>
+                </tr>
+                <tr class="bg-amber-50/50 font-bold text-amber-950 border-t border-slate-200">
+                  <td class="py-0.5 px-2">Total Deductions</td>
+                  <td class="py-0.5 px-2 text-[9px] text-amber-800">Statutory + Loan + Advance</td>
+                  <td class="py-0.5 px-2 text-right font-mono" id="sched-vouch-ded-total">0.00</td>
+                  <td class="py-0.5 px-2 text-right font-mono font-black" id="sched-vouch-ded-total-final">- 0.00</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <!-- C. Allowances -->
+          <div class="border border-slate-200 rounded-lg overflow-hidden">
+            <div class="bg-slate-100 px-2 py-0.5 text-[9px] font-black text-slate-800 uppercase tracking-wider flex items-center justify-between">
+              <span>C. APPROVED ALLOWANCES</span>
+              <span class="text-[8px] text-emerald-700 font-mono">Merit & Duty Relief</span>
+            </div>
+            <table class="w-full text-[10px]">
+              <thead class="bg-slate-50 text-slate-500 text-[8px] uppercase font-bold border-b border-slate-200">
+                <tr>
+                  <th class="py-0.5 px-2 text-left">Description</th>
+                  <th class="py-0.5 px-2 text-left">Details</th>
+                  <th class="py-0.5 px-2 text-right">Amount (NLe)</th>
+                  <th class="py-0.5 px-2 text-right">Final (NLe)</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-slate-100">
+                <tr>
+                  <td class="py-0.5 px-2 font-semibold text-slate-800">Approved Allowances</td>
+                  <td class="py-0.5 px-2 text-slate-500">Duty, Transport & Housing</td>
+                  <td class="py-0.5 px-2 text-right font-mono text-emerald-800" id="sched-vouch-allw">0.00</td>
+                  <td class="py-0.5 px-2 text-right font-mono font-semibold text-emerald-800" id="sched-vouch-allw-final">+ 0.00</td>
+                </tr>
+                <tr class="bg-emerald-50/50 font-bold text-emerald-950 border-t border-slate-200">
+                  <td class="py-0.5 px-2">Total Allowances</td>
+                  <td class="py-0.5 px-2 text-[9px] text-emerald-800">Directly Credited to Net</td>
+                  <td class="py-0.5 px-2 text-right font-mono" id="sched-vouch-allw-total">0.00</td>
+                  <td class="py-0.5 px-2 text-right font-mono font-black text-emerald-900" id="sched-vouch-allw-total-final">+ 0.00</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+        </div>
+
+        <!-- Net Pay Banner -->
+        <div class="bg-gradient-to-r from-emerald-950 to-primary text-white px-3 py-1.5 rounded-lg flex items-center justify-between mb-2 shadow-xs">
+          <div>
+            <span class="text-[9px] font-bold uppercase tracking-wider text-emerald-200 block">TOTAL NET PAY (FINAL REMUNERATION)</span>
+            <span class="text-[8px] text-emerald-100/80">Approved Formula: Gross + Allowances − PAYE − EE NASSIT − Advance − Loan</span>
+          </div>
+          <div class="flex items-baseline gap-1 bg-white text-emerald-950 px-3 py-1 rounded-md shadow-2xs">
+            <span class="text-[10px] font-bold text-emerald-800">NLe</span>
+            <span class="text-base sm:text-lg font-black font-mono tracking-tight" id="sched-vouch-net">0.00</span>
+          </div>
+        </div>
+
+        <!-- Sign-Off Control Strip -->
+        <div class="grid grid-cols-3 gap-2 text-center border-t border-slate-200 pt-1.5 mb-1.5 text-[9px]">
+          <div class="space-y-0.5">
+            <span class="text-[8px] font-bold text-slate-400 uppercase block">Prepared By</span>
+            <span class="font-bold text-slate-800 block text-[9px]" id="sched-vouch-prepared">Accounts Officer</span>
+            <span class="text-[8px] text-slate-500 block font-mono" id="sched-vouch-sign-date">Date: 03/2026</span>
+          </div>
+          <div class="space-y-0.5 border-x border-slate-200">
+            <span class="text-[8px] font-bold text-slate-400 uppercase block">Reviewed By</span>
+            <span class="font-bold text-slate-800 block text-[9px]">Finance Director</span>
+            <span class="text-[8px] text-slate-500 block">Dual Signed & Verified</span>
+          </div>
+          <div class="space-y-0.5">
+            <span class="text-[8px] font-bold text-slate-400 uppercase block">Approved By</span>
+            <span class="font-bold text-primary block text-[9px]">Chief Executive Officer</span>
+            <span class="text-[8px] text-slate-500 block" id="sched-vouch-stamp">Ref: PAY-2026-03-BCF</span>
+          </div>
+        </div>
+
+        <!-- Confidentiality Footer -->
+        <div class="text-center pt-1 border-t border-slate-100 text-[9px] text-slate-400 font-medium">
+          Bandama Charity Foundation Sierra Leone — Confidential Payroll Document
+        </div>
+
+      </div>
+
+    </div>
+  </div>
+
+</body>
+</html>

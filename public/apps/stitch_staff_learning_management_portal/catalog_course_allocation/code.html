@@ -1,0 +1,655 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Course Catalogue & Learning Slots — BCF-SL Learning</title>
+<meta name="description" content="Select up to two approved professional-development courses per semester from Coursera, Udemy and Microsoft Learn."/>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin=""/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com"></script>
+<script>tailwind.config={theme:{extend:{fontFamily:{sans:['Inter','sans-serif'],display:['Plus Jakarta Sans','sans-serif']}}}}</script>
+<script src="../learning_db.js?v=20261010_smtp_live_v3"></script>
+<style>
+  body{background:radial-gradient(1200px 500px at 10% -10%,#dbe7ff 0,transparent 60%),radial-gradient(900px 400px at 110% 0,#e0f2fe 0,transparent 55%),#f5f7fb}
+  .hero{background:linear-gradient(135deg,#00164e 0%,#00236f 45%,#0b4fd6 100%)}
+  .slot{width:44px;height:44px;border-radius:9999px;display:flex;align-items:center;justify-content:center;transition:all .4s}
+  .slot.on{background:linear-gradient(135deg,#34d399,#059669);box-shadow:0 0 0 4px rgba(52,211,153,.25)}
+  .slot.off{background:rgba(255,255,255,.08);border:2px dashed rgba(255,255,255,.45)}
+  .card{transition:transform .2s,box-shadow .2s}
+  .card:hover{transform:translateY(-3px);box-shadow:0 18px 40px -18px rgba(0,35,111,.35)}
+  .chip{font-size:10.5px;font-weight:700;padding:2px 8px;border-radius:999px}
+  .fade-in{animation:f .35s ease both}@keyframes f{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+  select,input,textarea{outline:none}
+  ::-webkit-scrollbar{width:8px;height:8px}::-webkit-scrollbar-thumb{background:#cbd5e1;border-radius:8px}
+</style>
+</head>
+<body class="font-sans text-slate-800 min-h-screen">
+
+<!-- Top bar -->
+<header class="sticky top-0 z-40 bg-white/85 backdrop-blur-xl border-b border-slate-200/70">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between gap-3">
+    <div class="flex items-center gap-3 min-w-0">
+      <div class="w-10 h-10 rounded-xl hero text-white flex items-center justify-center shadow"><span class="material-symbols-outlined">school</span></div>
+      <div class="min-w-0">
+        <h1 class="font-display font-extrabold text-[15px] text-slate-900 leading-none truncate">BCF-SL Learning & Professional Development</h1>
+        <p class="text-[11px] text-slate-500 mt-1 truncate" id="hdr-sub">Course Catalogue</p>
+      </div>
+    </div>
+    <nav class="hidden md:flex items-center gap-1 text-xs font-semibold">
+      <a class="px-2.5 py-1.5 rounded-lg bg-blue-50 text-blue-700 font-bold" href="/learning/course-allocation" onclick="return false;">Catalogue</a>
+      <a target="_top" class="px-2.5 py-1.5 rounded-lg text-slate-600 hover:bg-slate-100 transition" href="/learning/learning-grades" onclick="navTo('/learning/learning-grades'); return false;">My Learning</a>
+      <a target="_top" class="px-2.5 py-1.5 rounded-lg text-slate-600 hover:bg-slate-100 transition" href="/learning/certificates" onclick="navTo('/learning/certificates'); return false;">Certificates</a>
+      <a target="_top" id="nav-acc-link" class="px-2.5 py-1.5 rounded-lg text-slate-600 hover:bg-slate-100 transition flex items-center gap-1" href="/learning/account-creation" onclick="navTo('/learning/account-creation'); return false;">
+        <span>Accounts</span> <span class="px-1.5 py-0.2 rounded text-[9px] bg-amber-100 text-amber-800 font-bold">Admin</span>
+      </a>
+      <a target="_top" id="nav-dash-link" class="px-2.5 py-1.5 rounded-lg text-slate-600 hover:bg-slate-100 transition flex items-center gap-1" href="/learning/learning-dashboard" onclick="navTo('/learning/learning-dashboard'); return false;">
+        <span>Dashboard</span> <span class="px-1.5 py-0.2 rounded text-[9px] bg-indigo-100 text-indigo-800 font-bold">Admin</span>
+      </a>
+    </nav>
+    <div class="flex items-center gap-2">
+      <button id="btn-notif" class="relative w-10 h-10 rounded-xl hover:bg-slate-100 flex items-center justify-center text-slate-600 transition" onclick="toggleNotif()" aria-label="Notifications">
+        <span class="material-symbols-outlined text-xl">notifications</span>
+        <span id="notif-dot" class="hidden absolute top-1.5 right-1.5 min-w-[16px] h-4 px-1 rounded-full bg-rose-500 text-white text-[9px] font-bold flex items-center justify-center"></span>
+      </button>
+
+      <!-- Staff Switcher Dropdown Trigger -->
+      <div class="relative">
+        <button onclick="toggleUserDropdown()" class="flex items-center gap-2 p-1.5 pr-2.5 rounded-xl hover:bg-slate-100 border border-transparent hover:border-slate-200 transition">
+          <div id="avatar" class="w-8 h-8 rounded-full bg-gradient-to-br from-blue-700 to-indigo-800 text-white text-xs font-bold flex items-center justify-center shadow-xs">--</div>
+          <div class="hidden sm:block text-left leading-tight">
+            <div id="emp-name" class="text-xs font-bold text-slate-900 truncate max-w-[130px]">—</div>
+            <div id="emp-pos" class="text-[10px] text-slate-500 truncate max-w-[130px]">—</div>
+          </div>
+          <span class="material-symbols-outlined text-slate-400 text-sm">expand_more</span>
+        </button>
+
+        <!-- Dropdown Menu -->
+        <div id="user-dropdown" class="hidden absolute right-0 top-12 w-64 bg-white rounded-2xl shadow-xl border border-slate-200 p-2 z-50 fade-in">
+          <div id="staff-switcher-hdr" class="px-3 py-2 border-b border-slate-100">
+            <div id="staff-switcher-title" class="text-[10px] uppercase font-bold text-slate-400">Switch Active Staff Profile</div>
+            <div id="staff-switcher-subtitle" class="text-xs text-slate-600 mt-0.5">Quickly test catalogue as another user:</div>
+          </div>
+          <div class="py-1 flex flex-col gap-0.5" id="staff-switcher-items"></div>
+          <div class="py-1 border-t border-slate-100">
+            <button onclick="openChangePasswordModal()" class="w-full text-left px-3 py-2 rounded-xl bg-blue-50/80 hover:bg-blue-100 text-blue-900 font-bold text-xs flex items-center gap-2 transition">
+              <span class="material-symbols-outlined text-base text-blue-700">key</span>
+              <span>Change / Edit Password</span>
+            </button>
+          </div>
+          <div class="pt-2 border-t border-slate-100 flex items-center justify-between px-2">
+            <a target="_top" href="/learning/login" onclick="navTo('/learning/login'); return false;" class="text-xs font-bold text-blue-700 hover:underline flex items-center gap-1">
+              <span class="material-symbols-outlined text-sm">login</span> Sign In
+            </a>
+            <button onclick="logout()" class="text-xs font-bold text-rose-600 hover:underline flex items-center gap-1">
+              <span class="material-symbols-outlined text-sm">logout</span> Logout
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- notifications panel -->
+  <div id="notif-panel" class="hidden absolute right-4 top-16 w-[360px] max-h-[420px] overflow-auto bg-white rounded-2xl shadow-2xl border border-slate-200 p-3 fade-in z-50"></div>
+</header>
+
+<main class="max-w-7xl mx-auto px-4 sm:px-6 py-6 flex flex-col gap-6">
+
+  <!-- Section 7: My Learning summary + slot meter -->
+  <section class="hero rounded-3xl text-white p-6 sm:p-8 relative overflow-hidden shadow-xl">
+    <div class="absolute -right-16 -top-16 w-72 h-72 rounded-full bg-sky-400/20 blur-3xl"></div>
+    <div class="absolute -left-10 -bottom-20 w-72 h-72 rounded-full bg-indigo-400/20 blur-3xl"></div>
+    <div class="relative grid lg:grid-cols-[1.4fr_1fr] gap-6 items-center">
+      <div>
+        <div class="flex flex-wrap items-center gap-2 mb-3">
+          <span class="chip bg-white/15 border border-white/20" id="sem-chip">—</span>
+          <span class="chip bg-emerald-400/20 text-emerald-200 border border-emerald-300/30" id="sem-status">Open</span>
+          <span class="chip bg-white/10 border border-white/15" id="sem-dates">—</span>
+        </div>
+        <h2 class="font-display font-extrabold text-2xl sm:text-3xl tracking-tight">My Learning — <span id="hero-name">Staff</span></h2>
+        <p class="text-blue-100/90 text-sm mt-2 max-w-xl">Choose <b>one or two</b> approved professional-development courses this semester. You are not required to use both slots. Mandatory BCF-SL training does not use your slots.</p>
+        <div class="grid grid-cols-3 gap-3 mt-5 max-w-md">
+          <div class="bg-white/10 rounded-2xl p-3 border border-white/10"><div class="text-[10px] uppercase tracking-wider text-blue-200 font-bold">Allocation</div><div class="font-display text-2xl font-extrabold" id="k-alloc">2</div></div>
+          <div class="bg-white/10 rounded-2xl p-3 border border-white/10"><div class="text-[10px] uppercase tracking-wider text-blue-200 font-bold">Selected</div><div class="font-display text-2xl font-extrabold" id="k-used">0</div></div>
+          <div class="bg-white/10 rounded-2xl p-3 border border-white/10"><div class="text-[10px] uppercase tracking-wider text-blue-200 font-bold">Remaining</div><div class="font-display text-2xl font-extrabold" id="k-rem">2</div></div>
+        </div>
+      </div>
+      <div class="bg-white/10 backdrop-blur rounded-3xl p-5 border border-white/15">
+        <div class="text-[11px] uppercase tracking-wider text-blue-200 font-bold mb-3">Learning Slot Progress</div>
+        <div class="flex items-center gap-3" id="slot-dots"></div>
+        <div class="mt-3 font-display font-bold text-lg" id="slot-text">0/2 Courses Selected</div>
+        <div class="text-sm text-blue-100" id="slot-sub">2 Slots Available</div>
+        <div id="slot-lock" class="hidden mt-4 rounded-2xl bg-amber-400/15 border border-amber-300/40 p-3 text-[12.5px] text-amber-100">
+          <div class="font-bold flex items-center gap-1.5 text-amber-200"><span class="material-symbols-outlined text-[18px]">lock</span>Course Selection Threshold Reached</div>
+          You have reached the maximum of two optional courses for this semester. You may select another optional course when the next semester begins. Your existing courses remain fully accessible.
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- My current-semester courses (compact) -->
+  <section>
+    <div class="flex items-center justify-between mb-3">
+      <h3 class="font-display font-extrabold text-lg text-slate-900">My Courses This Semester</h3>
+      <a href="/learning/learning-grades" target="_top" class="text-xs font-bold text-blue-700 hover:underline flex items-center gap-1">Open My Learning <span class="material-symbols-outlined text-[16px]">arrow_forward</span></a>
+    </div>
+    <div id="my-courses" class="grid md:grid-cols-2 xl:grid-cols-3 gap-3"></div>
+  </section>
+
+  <!-- Section 9: Recommendations -->
+  <section id="rec-wrap">
+    <div class="flex items-center gap-2 mb-3">
+      <span class="material-symbols-outlined text-amber-500">auto_awesome</span>
+      <h3 class="font-display font-extrabold text-lg text-slate-900">Recommended for You</h3>
+      <span class="text-xs text-slate-500" id="rec-basis"></span>
+    </div>
+    <div id="rec-list" class="grid sm:grid-cols-2 xl:grid-cols-4 gap-3"></div>
+  </section>
+
+  <!-- Section 8: Catalogue with filters -->
+  <section class="bg-white rounded-3xl border border-slate-200/80 shadow-sm p-4 sm:p-6">
+    <div class="flex flex-col lg:flex-row lg:items-end justify-between gap-3 mb-4">
+      <div>
+        <h3 class="font-display font-extrabold text-lg text-slate-900">Course Catalogue</h3>
+        <p class="text-xs text-slate-500">Approved courses from BCF-SL learning partners · <span id="count">0</span> shown</p>
+      </div>
+      <div class="relative w-full lg:w-80">
+        <span class="material-symbols-outlined absolute left-3 top-2.5 text-slate-400 text-[20px]">search</span>
+        <input id="f-q" oninput="renderCatalogue()" placeholder="Search title, skill, description…" class="w-full h-10 pl-10 pr-3 rounded-xl border border-slate-300 bg-slate-50 text-sm focus:bg-white focus:border-blue-600"/>
+      </div>
+    </div>
+    <div class="grid grid-cols-2 md:grid-cols-4 xl:grid-cols-8 gap-2 mb-5" id="filters">
+      <select id="f-vendor" class="h-9 rounded-lg border border-slate-300 text-xs px-2 bg-white"></select>
+      <select id="f-cat" class="h-9 rounded-lg border border-slate-300 text-xs px-2 bg-white"></select>
+      <select id="f-dept" class="h-9 rounded-lg border border-slate-300 text-xs px-2 bg-white"></select>
+      <select id="f-skill" class="h-9 rounded-lg border border-slate-300 text-xs px-2 bg-white"></select>
+      <select id="f-level" class="h-9 rounded-lg border border-slate-300 text-xs px-2 bg-white"></select>
+      <select id="f-dur" class="h-9 rounded-lg border border-slate-300 text-xs px-2 bg-white">
+        <option value="">Any duration</option><option value="s">Under 15 h</option><option value="m">15–30 h</option><option value="l">Over 30 h</option>
+      </select>
+      <select id="f-type" class="h-9 rounded-lg border border-slate-300 text-xs px-2 bg-white">
+        <option value="">Mandatory & optional</option><option value="opt">Optional (uses slot)</option><option value="mand">Mandatory (no slot)</option>
+      </select>
+      <select id="f-rec" class="h-9 rounded-lg border border-slate-300 text-xs px-2 bg-white">
+        <option value="">All courses</option><option value="rec">Recommended</option><option value="cert">Certificate available</option>
+      </select>
+    </div>
+    <div id="catalogue" class="grid sm:grid-cols-2 xl:grid-cols-3 gap-4"></div>
+  </section>
+</main>
+
+<!-- Course details + Section 10 request modal -->
+<div id="modal" class="hidden fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm flex items-end sm:items-center justify-center p-3">
+  <div class="bg-white w-full max-w-2xl rounded-3xl shadow-2xl overflow-hidden fade-in max-h-[92vh] flex flex-col">
+    <div class="relative h-32 shrink-0"><img id="m-img" class="w-full h-full object-cover" alt=""/><div class="absolute inset-0 bg-gradient-to-t from-slate-900/85 to-slate-900/10"></div>
+      <button onclick="closeModal()" class="absolute top-3 right-3 w-9 h-9 rounded-full bg-white/90 flex items-center justify-center"><span class="material-symbols-outlined">close</span></button>
+      <div class="absolute bottom-3 left-5 right-5 text-white"><div id="m-vendor" class="text-[11px] font-bold uppercase tracking-wider text-sky-200"></div><div id="m-title" class="font-display font-extrabold text-xl leading-tight"></div></div>
+    </div>
+    <div class="p-5 overflow-auto flex flex-col gap-4">
+      <div id="m-meta" class="flex flex-wrap gap-2"></div>
+      <p id="m-desc" class="text-sm text-slate-600"></p>
+      <div class="grid sm:grid-cols-2 gap-3 text-xs">
+        <div class="bg-slate-50 rounded-2xl p-3"><div class="font-bold text-slate-700 mb-1">Learning objectives</div><ul id="m-obj" class="list-disc pl-4 text-slate-600 space-y-0.5"></ul></div>
+        <div class="bg-slate-50 rounded-2xl p-3 space-y-1.5">
+          <div><span class="font-bold text-slate-700">Skills gained:</span> <span id="m-skills" class="text-slate-600"></span></div>
+          <div><span class="font-bold text-slate-700">Recommended for:</span> <span id="m-depts" class="text-slate-600"></span></div>
+          <div><span class="font-bold text-slate-700">Prerequisites:</span> <span id="m-pre" class="text-slate-600"></span></div>
+          <div><span class="font-bold text-slate-700">Course link:</span> <a id="m-link" target="_blank" rel="noopener" class="text-blue-700 underline break-all"></a></div>
+        </div>
+      </div>
+
+      <form id="req-form" onsubmit="submitRequest(event)" class="border-t border-slate-200 pt-4 flex flex-col gap-3">
+        <div class="flex items-center justify-between">
+          <h4 class="font-display font-extrabold text-base text-slate-900">Course Request</h4>
+          <span id="m-slot" class="chip bg-blue-100 text-blue-800"></span>
+        </div>
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 text-[11.5px]">
+          <div class="bg-slate-50 rounded-xl p-2"><div class="text-slate-400 font-bold uppercase text-[9.5px]">Employee</div><div id="r-emp" class="font-semibold"></div></div>
+          <div class="bg-slate-50 rounded-xl p-2"><div class="text-slate-400 font-bold uppercase text-[9.5px]">Department</div><div id="r-dept" class="font-semibold"></div></div>
+          <div class="bg-slate-50 rounded-xl p-2"><div class="text-slate-400 font-bold uppercase text-[9.5px]">Semester</div><div id="r-sem" class="font-semibold"></div></div>
+          <div class="bg-slate-50 rounded-xl p-2"><div class="text-slate-400 font-bold uppercase text-[9.5px]">Approval route</div><div id="r-route" class="font-semibold"></div></div>
+        </div>
+        <label class="text-xs font-bold text-slate-700" id="reason-label">Reason for selection <span class="text-rose-500">*</span>
+          <textarea id="r-reason" rows="3" class="mt-1 w-full rounded-xl border border-slate-300 p-3 text-sm font-normal focus:border-blue-600" placeholder="Explain how this course will improve your work or professional development."></textarea>
+        </label>
+        <div class="grid sm:grid-cols-2 gap-3">
+          <label class="text-xs font-bold text-slate-700">Expected skills
+            <input id="r-skills" class="mt-1 w-full h-10 rounded-xl border border-slate-300 px-3 text-sm font-normal focus:border-blue-600"/>
+          </label>
+          <label class="text-xs font-bold text-slate-700">Estimated completion date <span class="text-rose-500">*</span>
+            <input id="r-date" type="date" required class="mt-1 w-full h-10 rounded-xl border border-slate-300 px-3 text-sm font-normal focus:border-blue-600"/>
+          </label>
+        </div>
+        <div id="r-error" class="hidden text-xs font-semibold text-rose-700 bg-rose-50 border border-rose-200 rounded-xl p-3"></div>
+        <button id="r-submit" class="h-11 rounded-xl bg-gradient-to-r from-blue-700 to-indigo-700 text-white font-bold text-sm flex items-center justify-center gap-2 shadow-md hover:opacity-95 disabled:opacity-50 disabled:cursor-not-allowed">
+          <span class="material-symbols-outlined text-[18px]">send</span><span id="r-submit-text">Submit Course Request</span>
+        </button>
+      </form>
+    </div>
+  </div>
+</div>
+
+<div id="toast" class="fixed bottom-6 left-1/2 -translate-x-1/2 z-[60] hidden bg-slate-900 text-white text-sm font-semibold px-5 py-3 rounded-2xl shadow-2xl items-center gap-2"></div>
+
+<!-- Modal for Staff Self-Service Password Change -->
+<div id="password-modal" class="hidden fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4">
+  <div class="bg-white rounded-3xl max-w-md w-full shadow-2xl border border-slate-200 overflow-hidden fade-in">
+    <div class="hero p-5 text-white flex items-center justify-between">
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-xl bg-white/15 flex items-center justify-center text-white ring-1 ring-white/20">
+          <span class="material-symbols-outlined text-xl">key</span>
+        </div>
+        <div>
+          <h3 class="font-display font-extrabold text-base">Change Account Password</h3>
+          <p class="text-xs text-blue-100">Update your BCF-SL Learning Portal credentials</p>
+        </div>
+      </div>
+      <button onclick="closeChangePasswordModal()" class="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 text-white flex items-center justify-center transition">
+        <span class="material-symbols-outlined text-base">close</span>
+      </button>
+    </div>
+
+    <form id="change-pass-form" onsubmit="handleStaffPasswordChange(event)" class="p-6 flex flex-col gap-4">
+      <div class="bg-slate-50 rounded-2xl p-3.5 border border-slate-200/80 text-xs">
+        <div class="flex items-center justify-between text-slate-500 mb-1">
+          <span>Active Staff Account:</span>
+          <span class="font-bold text-slate-800" id="pwd-staff-name">—</span>
+        </div>
+        <div class="flex items-center justify-between text-slate-500">
+          <span>Staff Login Username:</span>
+          <span class="font-mono font-bold text-blue-700 bg-blue-50 px-2 py-0.5 rounded border border-blue-100" id="pwd-staff-user">—</span>
+        </div>
+        <div class="flex items-center justify-between text-slate-500 mt-1">
+          <span>Work Email Address:</span>
+          <span class="font-semibold text-slate-700 truncate max-w-[200px]" id="pwd-staff-email">—</span>
+        </div>
+      </div>
+
+      <div class="flex flex-col gap-1.5">
+        <label class="text-xs font-bold text-slate-700" for="curr-pass">Current Password <span class="text-red-500">*</span></label>
+        <div class="relative">
+          <input type="password" id="curr-pass" required placeholder="Enter current password" class="w-full h-11 pl-3.5 pr-10 rounded-xl border border-slate-300 bg-slate-50 text-xs font-mono font-bold text-slate-900 focus:bg-white focus:border-blue-600 focus:outline-none"/>
+          <button type="button" onclick="togglePassField('curr-pass', 'eye-curr')" class="absolute right-3 top-3 text-slate-400 hover:text-slate-600">
+            <span class="material-symbols-outlined text-lg" id="eye-curr">visibility</span>
+          </button>
+        </div>
+      </div>
+
+      <div class="flex flex-col gap-1.5">
+        <label class="text-xs font-bold text-slate-700" for="new-pass">New Password <span class="text-red-500">*</span></label>
+        <div class="relative">
+          <input type="password" id="new-pass" required minlength="6" placeholder="At least 6 characters" class="w-full h-11 pl-3.5 pr-10 rounded-xl border border-slate-300 bg-slate-50 text-xs font-mono font-bold text-slate-900 focus:bg-white focus:border-blue-600 focus:outline-none"/>
+          <button type="button" onclick="togglePassField('new-pass', 'eye-new')" class="absolute right-3 top-3 text-slate-400 hover:text-slate-600">
+            <span class="material-symbols-outlined text-lg" id="eye-new">visibility</span>
+          </button>
+        </div>
+      </div>
+
+      <div class="flex flex-col gap-1.5">
+        <label class="text-xs font-bold text-slate-700" for="conf-pass">Confirm New Password <span class="text-red-500">*</span></label>
+        <div class="relative">
+          <input type="password" id="conf-pass" required minlength="6" placeholder="Re-enter new password" class="w-full h-11 pl-3.5 pr-10 rounded-xl border border-slate-300 bg-slate-50 text-xs font-mono font-bold text-slate-900 focus:bg-white focus:border-blue-600 focus:outline-none"/>
+          <button type="button" onclick="togglePassField('conf-pass', 'eye-conf')" class="absolute right-3 top-3 text-slate-400 hover:text-slate-600">
+            <span class="material-symbols-outlined text-lg" id="eye-conf">visibility</span>
+          </button>
+        </div>
+      </div>
+
+      <div class="text-[11px] text-slate-500 flex items-start gap-1.5 bg-blue-50/60 p-2.5 rounded-xl border border-blue-100">
+        <span class="material-symbols-outlined text-sm text-blue-600 shrink-0 mt-0.5">info</span>
+        <span>A security confirmation email will automatically be dispatched to your official BCF-SL work email upon password update.</span>
+      </div>
+
+      <div class="flex items-center gap-3 pt-2">
+        <button type="button" onclick="closeChangePasswordModal()" class="flex-1 h-11 rounded-xl border border-slate-300 bg-white hover:bg-slate-50 font-bold text-xs text-slate-700 transition">
+          Cancel
+        </button>
+        <button type="submit" id="btn-save-pwd" class="flex-1 h-11 rounded-xl bg-blue-700 hover:bg-blue-800 text-white font-bold text-xs flex items-center justify-center gap-1.5 shadow transition">
+          <span class="material-symbols-outlined text-base">check</span>
+          <span>Update Password</span>
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script>
+const SLOT_STATUSES_DONE = ['Completed','Certificate Submitted','Certificate Verified','Closed'];
+const STATUS_STYLE = {
+  'Requested':'bg-amber-100 text-amber-800','Under Review':'bg-orange-100 text-orange-800','Approved':'bg-sky-100 text-sky-800',
+  'Enrolled':'bg-blue-100 text-blue-800','Not Started':'bg-slate-100 text-slate-700','In Progress':'bg-indigo-100 text-indigo-800',
+  'Completed':'bg-emerald-100 text-emerald-800','Certificate Submitted':'bg-teal-100 text-teal-800','Certificate Verified':'bg-emerald-600 text-white',
+  'Closed':'bg-slate-700 text-white','Rejected':'bg-rose-100 text-rose-700','Cancelled':'bg-slate-100 text-slate-500'
+};
+let emp, slots, sem, current = null;
+
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const initials = n => (n||'?').split(' ').map(x=>x[0]).join('').slice(0,2).toUpperCase();
+const fmtDate = d => d ? new Date(d).toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'}) : '—';
+function toast(msg, ok=true){const t=document.getElementById('toast');t.innerHTML=`<span class="material-symbols-outlined text-[18px] ${ok?'text-emerald-400':'text-rose-400'}">${ok?'check_circle':'error'}</span>${esc(msg)}`;t.classList.remove('hidden');t.classList.add('flex');clearTimeout(t._h);t._h=setTimeout(()=>{t.classList.add('hidden');t.classList.remove('flex')},4200)}
+
+function navTo(url) {
+  try {
+    if (window.top && window.top !== window && window.top.location) {
+      window.top.location.href = url;
+      return;
+    }
+  } catch(e) {}
+  if (url.includes('course-allocation')) window.location.href = '../catalog_course_allocation/code.html';
+  else if (url.includes('learning-grades')) window.location.href = '../my_learning_grades/code.html';
+  else if (url.includes('certificates')) window.location.href = '../assessment_certificate/code.html';
+  else if (url.includes('account-creation')) window.location.href = '../admin_staff_provisioning/code.html?tab=accounts';
+  else if (url.includes('learning-dashboard')) window.location.href = '../admin_staff_provisioning/code.html?tab=analytics';
+  else if (url.includes('admin-provisioning')) window.location.href = '../admin_staff_provisioning/code.html';
+  else if (url.includes('login')) window.location.href = '../login/code.html';
+}
+
+function requireLogin(){
+  try{ const s = JSON.parse(sessionStorage.getItem('bcf_learning_session')||'null'); return !!s; }catch(e){ return false; }
+}
+function logout(){
+  sessionStorage.removeItem('bcf_learning_session');
+  localStorage.removeItem('bcf_selected_profile');
+  sessionStorage.removeItem('bcf_staff_only_session');
+  navTo('/learning/login');
+}
+
+function toggleUserDropdown() {
+  const el = document.getElementById('user-dropdown');
+  el.classList.toggle('hidden');
+}
+
+function selectStaff(empId) {
+  if (!isHRAdmin()) {
+    toast('Profile switching is restricted to HR Administrators.');
+    return;
+  }
+  setCurrentEmployee(empId);
+  document.getElementById('user-dropdown').classList.add('hidden');
+  const e = getCurrentEmployee();
+  toast(`Switched profile to ${e.fullName} (${e.department})`);
+  renderAll();
+}
+
+function renderStaffSwitcher() {
+  const current = getCurrentEmployee();
+  const list = document.getElementById('staff-switcher-items');
+  const title = document.getElementById('staff-switcher-title');
+  const subtitle = document.getElementById('staff-switcher-subtitle');
+  if (!list) return;
+
+  if (!isHRAdmin(current)) {
+    if (title) title.textContent = 'Active Staff Profile';
+    if (subtitle) subtitle.textContent = 'Your verified learning account:';
+    list.innerHTML = `
+      <div class="p-2.5 rounded-xl bg-blue-50/70 border border-blue-100 flex flex-col gap-1 text-left">
+        <div class="text-xs font-bold text-blue-950 truncate">${esc(current.fullName)}</div>
+        <div class="text-[11px] font-mono text-blue-700 font-semibold">${esc(current.employeeId)}</div>
+        <div class="text-[10.5px] text-slate-600 truncate">${esc(current.position || 'Staff')} · ${esc(current.department)}</div>
+        ${current.email ? `<div class="text-[10px] text-slate-500 truncate">${esc(current.email)}</div>` : ''}
+        <div class="mt-1 flex items-center gap-1 text-[10px] text-emerald-700 font-bold">
+          <span class="material-symbols-outlined text-[13px]">verified_user</span>
+          <span>Verified Staff Session</span>
+        </div>
+      </div>
+    `;
+    return;
+  }
+
+  if (title) title.textContent = 'Switch Active Staff Profile';
+  if (subtitle) subtitle.textContent = 'Quickly test catalogue as another user:';
+  const accounts = getLearningAccounts();
+  list.innerHTML = accounts.map(a => `
+    <button onclick="selectStaff('${a.employeeId}')" class="w-full px-3 py-2 text-left rounded-xl hover:bg-blue-50 transition flex items-center justify-between ${a.employeeId === current.employeeId ? 'bg-blue-50/80 font-bold text-blue-900' : 'text-slate-700'}">
+      <div class="min-w-0 pr-2">
+        <div class="text-xs truncate">${esc(a.employeeName)}</div>
+        <div class="text-[10px] text-slate-400 truncate">${esc(a.position)} · ${esc(a.department)}</div>
+      </div>
+      ${a.employeeId === current.employeeId ? '<span class="material-symbols-outlined text-sm text-blue-700">check</span>' : ''}
+    </button>
+  `).join('');
+}
+
+function renderHeader(){
+  emp = getCurrentEmployee(); sem = getActiveSemester(); slots = getSlotSummary(emp.employeeId);
+  document.getElementById('emp-name').textContent = emp.fullName;
+  document.getElementById('emp-pos').textContent = `${emp.position} · ${emp.department}`;
+  document.getElementById('avatar').textContent = initials(emp.fullName);
+  document.getElementById('hero-name').textContent = emp.fullName.split(' ')[0];
+  document.getElementById('hdr-sub').textContent = `${sem.name} · ${slots.used}/${slots.max} slots used`;
+
+  const govLink = document.getElementById('nav-gov-link');
+  if (govLink) {
+    govLink.style.display = isHRAdmin(emp) ? '' : 'none';
+  }
+
+  document.getElementById('sem-chip').textContent = sem.name;
+  document.getElementById('sem-dates').textContent = `${fmtDate(sem.startDate)} – ${fmtDate(sem.endDate)}`;
+  document.getElementById('sem-status').textContent = sem.status === 'Open' ? 'Selection Open' : 'Closed';
+  document.getElementById('k-alloc').textContent = slots.max;
+  document.getElementById('k-used').textContent = slots.used;
+  document.getElementById('k-rem').textContent = slots.remaining;
+  document.getElementById('slot-dots').innerHTML = Array.from({length:slots.max},(_,i)=>`<div class="slot ${i<slots.used?'on':'off'}"><span class="material-symbols-outlined text-[22px] ${i<slots.used?'text-white':'text-white/50'}">${i<slots.used?'check':'add'}</span></div>`).join('') +
+    `<div class="text-xs text-blue-100 ml-1">${slots.used} of ${slots.max} slots used</div>`;
+  document.getElementById('slot-text').textContent = `${slots.used}/${slots.max} Courses Selected`;
+  document.getElementById('slot-sub').textContent = `${slots.remaining} Slot${slots.remaining===1?'':'s'} Available`;
+  document.getElementById('slot-lock').classList.toggle('hidden', !slots.locked);
+
+  const notes = getNotifications(emp.employeeId); const unread = notes.filter(n=>!n.read).length;
+  const dot = document.getElementById('notif-dot'); dot.textContent = unread; dot.classList.toggle('hidden', !unread);
+}
+
+function toggleNotif(){
+  const p = document.getElementById('notif-panel'); const open = p.classList.toggle('hidden') === false;
+  if (!open) return;
+  const notes = getNotifications(emp.employeeId).slice(0, 25);
+  const icon = {semester:'event_available',approved:'task_alt',enrolled:'how_to_reg',reminder:'schedule',completed:'celebration',certificate:'upload_file',threshold:'lock',closing:'hourglass_bottom',rejected:'cancel',review:'rate_review',verified:'verified'};
+  p.innerHTML = `<div class="flex items-center justify-between px-1 pb-2"><b class="text-sm">Learning notifications</b><span class="text-[11px] text-slate-400">${notes.length}</span></div>` +
+    (notes.length ? notes.map(n=>`<div class="flex gap-2 p-2 rounded-xl ${n.read?'':'bg-blue-50/70'}"><span class="material-symbols-outlined text-[18px] text-blue-600">${icon[n.type]||'notifications'}</span><div><div class="text-[12.5px] text-slate-700">${esc(n.message)}</div><div class="text-[10.5px] text-slate-400 mt-0.5">${fmtDate(n.at)}</div></div></div>`).join('') : '<div class="text-xs text-slate-500 p-3">No notifications.</div>');
+  markNotificationsRead(emp.employeeId); setTimeout(renderHeader, 300);
+}
+
+function renderMyCourses(){
+  const list = getEmployeeEnrollments(emp.employeeId, sem.id).filter(e=>e.status!=='Cancelled');
+  const wrap = document.getElementById('my-courses');
+  if (!list.length){ wrap.innerHTML = `<div class="md:col-span-2 xl:col-span-3 bg-white rounded-2xl border border-dashed border-slate-300 p-6 text-center text-sm text-slate-500"><span class="material-symbols-outlined text-3xl text-slate-300 block">library_add</span>You have not selected a course this semester. Browse the catalogue below.</div>`; return; }
+  wrap.innerHTML = list.map(e=>`
+    <div class="bg-white rounded-2xl border border-slate-200 p-4 shadow-sm fade-in">
+      <div class="flex items-start justify-between gap-2">
+        <div class="min-w-0"><div class="text-[10.5px] font-bold uppercase tracking-wider text-slate-400">${e.isMandatory?'Mandatory · no slot':'Slot '+(e.slotNumber||'—')+' of '+slots.max} · ${esc(e.vendor)}</div>
+        <div class="font-bold text-slate-900 text-sm leading-snug mt-0.5">${esc(e.courseTitle)}</div></div>
+        <span class="chip whitespace-nowrap ${STATUS_STYLE[e.status]||'bg-slate-100'}">${esc(e.status)}</span>
+      </div>
+      <div class="mt-3 h-2 rounded-full bg-slate-100 overflow-hidden"><div class="h-full rounded-full ${e.progress===100?'bg-emerald-500':'bg-gradient-to-r from-blue-600 to-indigo-600'}" style="width:${e.progress||0}%"></div></div>
+      <div class="flex justify-between text-[11px] text-slate-500 mt-1.5"><span>${e.progress||0}% completed</span><span>Due ${fmtDate(e.expectedCompletionDate)}</span></div>
+    </div>`).join('');
+}
+
+function courseState(c){
+  const mine = getEmployeeEnrollments(emp.employeeId, sem.id).find(e=>e.courseId===c.id && !BCF_LEARNING.INACTIVE_STATUSES.includes(e.status));
+  if (mine) return {kind:'mine', e:mine};
+  if (!emp.isActive) return {kind:'inactive'};
+  if (sem.status!=='Open') return {kind:'closed'};
+  if (!c.isMandatory && slots.locked) return {kind:'locked'};
+  return {kind:'open'};
+}
+function actionButton(c){
+  const s = courseState(c);
+  if (s.kind==='mine') return `<span class="chip ${STATUS_STYLE[s.e.status]}">${esc(s.e.status)}</span>`;
+  if (s.kind==='locked') return `<button disabled class="h-9 px-3 rounded-xl bg-slate-100 text-slate-400 text-xs font-bold flex items-center gap-1 cursor-not-allowed"><span class="material-symbols-outlined text-[16px]">lock</span>Select New Course</button>`;
+  if (s.kind!=='open') return `<button disabled class="h-9 px-3 rounded-xl bg-slate-100 text-slate-400 text-xs font-bold">Unavailable</button>`;
+  return `<button onclick="openModal('${c.id}')" class="h-9 px-3 rounded-xl ${c.isMandatory?'bg-emerald-600 hover:bg-emerald-700':'bg-blue-700 hover:bg-blue-800'} text-white text-xs font-bold flex items-center gap-1 shadow-sm active:scale-95"><span class="material-symbols-outlined text-[16px]">${c.isMandatory?'how_to_reg':'add_circle'}</span>${c.isMandatory?'Start Training':'Select Course'}</button>`;
+}
+function courseCard(c, rec){
+  return `<article class="card bg-white rounded-2xl border border-slate-200 overflow-hidden flex flex-col fade-in">
+    <div class="relative h-32 cursor-pointer" onclick="openModal('${c.id}')"><img src="${c.image}" alt="${esc(c.title)}" class="w-full h-full object-cover" loading="lazy"/><div class="absolute inset-0 bg-gradient-to-t from-slate-900/75 to-transparent"></div>
+      <div class="absolute top-2 left-2 flex gap-1.5 flex-wrap">
+        <span class="chip bg-white/95 text-slate-800">${esc(c.vendor)}</span>
+        ${c.isMandatory?'<span class="chip bg-emerald-500 text-white">Mandatory · No slot</span>':'<span class="chip bg-blue-600 text-white">Uses 1 slot</span>'}
+        ${c.recommended&&!c.isMandatory?'<span class="chip bg-amber-400 text-amber-950">Recommended</span>':''}
+      </div>
+      <div class="absolute bottom-2 left-3 right-3 flex justify-between text-[11px] text-white/95 font-semibold"><span>${c.hours} h · ${esc(c.level)}</span><span>${c.certificate?'Certificate ✓':'No certificate'}</span></div>
+    </div>
+    <div class="p-4 flex flex-col gap-2 flex-1">
+      <div class="text-[10.5px] font-bold uppercase tracking-wider text-blue-700">${esc(c.category)}</div>
+      <h4 class="font-display font-bold text-[15px] text-slate-900 leading-snug cursor-pointer hover:text-blue-700" onclick="openModal('${c.id}')">${esc(c.title)}</h4>
+      <p class="text-xs text-slate-500 line-clamp-2">${esc(c.description)}</p>
+      ${rec && c.why ? `<div class="text-[11px] text-amber-700 bg-amber-50 rounded-lg px-2 py-1">Why: ${esc(c.why.join(' · '))}</div>`:''}
+      <div class="flex flex-wrap gap-1 mt-auto pt-1">${c.skills.slice(0,3).map(s=>`<span class="chip bg-slate-100 text-slate-600">${esc(s)}</span>`).join('')}</div>
+      <div class="flex items-center justify-between pt-2 border-t border-slate-100 mt-1">
+        <button onclick="openModal('${c.id}')" class="text-xs font-bold text-slate-600 hover:text-blue-700">Details</button>${actionButton(c)}
+      </div>
+    </div></article>`;
+}
+
+function renderRecommendations(){
+  const recs = getRecommendedCourses(emp);
+  document.getElementById('rec-basis').textContent = `based on your role (${emp.position}), department and skills profile`;
+  document.getElementById('rec-wrap').classList.toggle('hidden', !recs.length);
+  document.getElementById('rec-list').innerHTML = recs.map(c=>courseCard(c,true)).join('');
+}
+
+function fillFilters(){
+  const cs = getCourses(); const uniq = a => [...new Set(a)].sort();
+  const opt = (id, label, vals) => document.getElementById(id).innerHTML = `<option value="">${label}</option>` + vals.map(v=>`<option>${esc(v)}</option>`).join('');
+  opt('f-vendor','All partners', getVendors().map(v=>v.name));
+  opt('f-cat','All categories', uniq(cs.map(c=>c.category)));
+  opt('f-dept','All departments', uniq(cs.flatMap(c=>c.departments).filter(d=>d!=='All')));
+  opt('f-skill','All skills', uniq(cs.flatMap(c=>c.skills)));
+  opt('f-level','Any difficulty', uniq(cs.map(c=>c.level)));
+  document.querySelectorAll('#filters select').forEach(s=>s.addEventListener('change', renderCatalogue));
+}
+function renderCatalogue(){
+  const v = id => document.getElementById(id).value;
+  const q = v('f-q').toLowerCase();
+  const list = getCourses().filter(c =>
+    (!q || [c.title,c.description,c.skills.join(' '),c.vendor].join(' ').toLowerCase().includes(q)) &&
+    (!v('f-vendor') || c.vendor===v('f-vendor')) && (!v('f-cat') || c.category===v('f-cat')) &&
+    (!v('f-dept') || c.departments.includes(v('f-dept')) || c.departments.includes('All')) &&
+    (!v('f-skill') || c.skills.includes(v('f-skill'))) && (!v('f-level') || c.level===v('f-level')) &&
+    (!v('f-dur') || (v('f-dur')==='s'?c.hours<15:v('f-dur')==='m'?c.hours>=15&&c.hours<=30:c.hours>30)) &&
+    (!v('f-type') || (v('f-type')==='mand')===!!c.isMandatory) &&
+    (!v('f-rec') || (v('f-rec')==='rec'?c.recommended:c.certificate))
+  ).sort((a,b)=>(b.isMandatory-a.isMandatory));
+  document.getElementById('count').textContent = list.length;
+  document.getElementById('catalogue').innerHTML = list.length ? list.map(c=>courseCard(c)).join('') : '<div class="col-span-full text-center text-sm text-slate-500 py-10">No courses match your filters.</div>';
+}
+
+function openModal(id){
+  const c = getCourse(id); current = c; const st = courseState(c);
+  document.getElementById('m-img').src = c.image;
+  document.getElementById('m-vendor').textContent = `${c.vendor} · ${c.category}`;
+  document.getElementById('m-title').textContent = c.title;
+  document.getElementById('m-meta').innerHTML = [`${c.hours} hours`, c.level, c.certificate?'Certificate available':'No certificate', c.isMandatory?'Mandatory – no slot used':'Optional – uses 1 slot', c.cost?`Cost: NLe ${c.cost.toLocaleString()}`:'Covered by subscription']
+    .map(t=>`<span class="chip bg-slate-100 text-slate-700">${esc(t)}</span>`).join('');
+  document.getElementById('m-desc').textContent = c.description;
+  document.getElementById('m-obj').innerHTML = c.objectives.map(o=>`<li>${esc(o)}</li>`).join('');
+  document.getElementById('m-skills').textContent = c.skills.join(', ');
+  document.getElementById('m-depts').textContent = c.departments.join(', ');
+  document.getElementById('m-pre').textContent = c.prerequisites;
+  const l = document.getElementById('m-link'); l.textContent = c.link; l.href = c.link;
+
+  const form = document.getElementById('req-form');
+  form.classList.toggle('hidden', st.kind !== 'open');
+  document.getElementById('r-error').classList.add('hidden');
+  if (st.kind === 'open'){
+    document.getElementById('m-slot').textContent = c.isMandatory ? 'Mandatory · no slot' : `Slot ${slots.used+1} of ${slots.max}`;
+    document.getElementById('r-emp').textContent = emp.fullName;
+    document.getElementById('r-dept').textContent = emp.department;
+    document.getElementById('r-sem').textContent = sem.name;
+    document.getElementById('r-route').textContent = c.isMandatory ? 'Pre-authorised by HR' : `${emp.supervisor} → HR`;
+    document.getElementById('reason-label').style.display = c.isMandatory ? 'none' : '';
+    document.getElementById('r-reason').value = '';
+    document.getElementById('r-skills').value = c.skills.join(', ');
+    const d = new Date(); d.setDate(d.getDate() + Math.max(14, Math.ceil(c.hours/3)*7));
+    const end = new Date(sem.endDate); document.getElementById('r-date').value = (d > end ? end : d).toISOString().slice(0,10);
+    document.getElementById('r-date').max = sem.endDate;
+    document.getElementById('r-submit-text').textContent = c.isMandatory ? 'Enrol in Mandatory Training' : 'Submit Course Request';
+  }
+  document.getElementById('modal').classList.remove('hidden');
+}
+function closeModal(){ document.getElementById('modal').classList.add('hidden'); current = null; }
+
+function submitRequest(ev){
+  ev.preventDefault(); if (!current) return;
+  const r = submitCourseRequest({ courseId: current.id, reason: document.getElementById('r-reason').value, expectedSkills: document.getElementById('r-skills').value, expectedCompletionDate: document.getElementById('r-date').value });
+  if (!r.success){ const e = document.getElementById('r-error'); e.textContent = r.message; e.classList.remove('hidden'); return; }
+  closeModal();
+  toast(current?.isMandatory || r.enrollment.isMandatory ? 'Enrolled in mandatory training.' : `Request submitted — awaiting ${emp.supervisor}'s endorsement.`);
+  renderAll();
+}
+
+// ── Staff Self-Service Password Management ──
+function openChangePasswordModal() {
+  const current = getCurrentEmployee();
+  const accounts = getLearningAccounts();
+  const acc = accounts.find(a => a.employeeId === current.employeeId) || current;
+  document.getElementById('pwd-staff-name').textContent = acc.employeeName || current.fullName;
+  document.getElementById('pwd-staff-user').textContent = acc.username || current.username;
+  document.getElementById('pwd-staff-email').textContent = acc.employeeEmail || current.email || 'staff@bcf-sl.org';
+  document.getElementById('change-pass-form').reset();
+  document.getElementById('user-dropdown').classList.add('hidden');
+  document.getElementById('password-modal').classList.remove('hidden');
+  document.getElementById('password-modal').classList.add('flex');
+}
+
+function closeChangePasswordModal() {
+  const m = document.getElementById('password-modal');
+  if (m) {
+    m.classList.add('hidden');
+    m.classList.remove('flex');
+  }
+}
+
+function togglePassField(fieldId, iconId) {
+  const inp = document.getElementById(fieldId);
+  const ico = document.getElementById(iconId);
+  if (!inp || !ico) return;
+  if (inp.type === 'password') {
+    inp.type = 'text';
+    ico.textContent = 'visibility_off';
+  } else {
+    inp.type = 'password';
+    ico.textContent = 'visibility';
+  }
+}
+
+function handleStaffPasswordChange(e) {
+  e.preventDefault();
+  const curr = document.getElementById('curr-pass').value;
+  const newP = document.getElementById('new-pass').value;
+  const confP = document.getElementById('conf-pass').value;
+
+  if (newP !== confP) {
+    toast('New passwords do not match. Please re-enter.', false);
+    return;
+  }
+
+  const current = getCurrentEmployee();
+  const res = updateStaffPassword(current.employeeId, curr, newP, current.fullName);
+
+  if (res.success) {
+    closeChangePasswordModal();
+    toast(`Password updated successfully! Official confirmation email dispatched to your work address.`);
+  } else {
+    toast(res.message || 'Failed to update password.', false);
+  }
+}
+
+function renderAll(){ renderHeader(); renderStaffSwitcher(); renderMyCourses(); renderRecommendations(); renderCatalogue(); }
+document.addEventListener('keydown', e => { if (e.key==='Escape') closeModal(); });
+document.addEventListener('click', e => {
+  const p=document.getElementById('notif-panel');
+  if (p && !p.classList.contains('hidden') && !p.contains(e.target) && !document.getElementById('btn-notif').contains(e.target)) p.classList.add('hidden');
+  const userDrop = document.getElementById('user-dropdown');
+  if (userDrop && !userDrop.contains(e.target) && !e.target.closest('button[onclick*="toggleUserDropdown"]')) {
+    userDrop.classList.add('hidden');
+  }
+});
+window.addEventListener('bcf_employee_changed', () => renderAll());
+fillFilters(); renderAll();
+</script>
+</body>
+</html>

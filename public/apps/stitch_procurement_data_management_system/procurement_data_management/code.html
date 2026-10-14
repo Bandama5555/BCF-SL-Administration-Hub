@@ -1,0 +1,540 @@
+<!DOCTYPE html>
+
+<html lang="en"><head><meta charset="utf-8"/><meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" name="viewport"/><link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/><link href="https://fonts.googleapis.com" rel="preconnect"/><link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=Plus+Jakarta+Sans:wght@600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/><style>@layer base{html,body{width:100vw;margin:0;padding:0;}body{overscroll-behavior:none;}.pb-safe{padding-bottom:env(safe-area-inset-bottom,0px);}.pt-safe{padding-top:env(safe-area-inset-top,0px);}main>:first-child{margin-top:0!important;}main>:last-child{margin-bottom:0!important;}}::-webkit-scrollbar{display:none;}</style><script src="https://cdn.tailwindcss.com"></script><script id="tailwind-config">tailwind.config = { darkMode: "class", theme: { extend: { "colors": { "inverse-surface": "#213145", "on-primary-container": "#cad3ff", "surface-dim": "#cbdbf5", "on-secondary": "#ffffff", "on-tertiary-fixed": "#002114", "primary": "#0037b0", "inverse-primary": "#b7c4ff", "on-surface-variant": "#434655", "tertiary-fixed": "#85f8c4", "outline": "#747686", "surface-container-lowest": "#ffffff", "secondary-container": "#dae2fd", "on-secondary-fixed": "#131b2e", "on-surface": "#0b1c30", "background": "#f8f9ff", "on-background": "#0b1c30", "surface-container-highest": "#d3e4fe", "on-primary-fixed": "#001551", "surface-container": "#e5eeff", "on-tertiary": "#ffffff", "on-secondary-fixed-variant": "#3f465c", "surface-tint": "#2151da", "on-primary": "#ffffff", "surface-container-low": "#eff4ff", "primary-fixed-dim": "#b7c4ff", "on-error-container": "#93000a", "on-secondary-container": "#5c647a", "on-primary-fixed-variant": "#0039b5", "on-error": "#ffffff", "surface": "#f8f9ff", "secondary": "#565e74", "surface-variant": "#d3e4fe", "primary-fixed": "#dce1ff", "secondary-fixed-dim": "#bec6e0", "surface-container-high": "#dce9ff", "error-container": "#ffdad6", "tertiary-fixed-dim": "#68dba9", "outline-variant": "#c4c5d7", "primary-container": "#1d4ed8", "surface-bright": "#f8f9ff", "tertiary": "#004f35", "secondary-fixed": "#dae2fd", "on-tertiary-fixed-variant": "#005137", "on-tertiary-container": "#76eab6", "inverse-on-surface": "#eaf1ff", "tertiary-container": "#006948", "error": "#ba1a1a" }, "borderRadius": { "DEFAULT": "0.125rem", "lg": "0.25rem", "xl": "0.5rem", "full": "0.75rem" }, "spacing": { "space-md": "0.75rem", "space-xs": "0.25rem", "space-xl": "1.5rem", "space-2xl": "2rem", "gutter-mobile": "1rem", "space-2xs": "0.125rem", "space-lg": "1.25rem", "gutter-desktop": "2rem", "space-base": "1rem", "gutter-tablet": "1.5rem", "space-sm": "0.5rem" }, "fontFamily": { "body-sm": ["Inter"], "headline-lg": ["Plus Jakarta Sans"], "body-md": ["Inter"], "display-lg-mobile": ["Plus Jakarta Sans"], "label-md": ["Inter"], "data-mono": ["Inter"], "title-md": ["Inter"], "headline-sm": ["Plus Jakarta Sans"], "display-lg": ["Plus Jakarta Sans"], "label-xs": ["Inter"] }, "fontSize": { "body-sm": ["13px", { "lineHeight": "18px", "fontWeight": "400" }], "headline-lg": ["24px", { "lineHeight": "32px", "letterSpacing": "-0.015em", "fontWeight": "600" }], "body-md": ["14px", { "lineHeight": "20px", "fontWeight": "400" }], "display-lg-mobile": ["28px", { "lineHeight": "34px", "letterSpacing": "-0.02em", "fontWeight": "700" }], "label-md": ["12px", { "lineHeight": "16px", "letterSpacing": "0.01em", "fontWeight": "500" }], "data-mono": ["14px", { "lineHeight": "20px", "letterSpacing": "-0.01em", "fontWeight": "600" }], "title-md": ["16px", { "lineHeight": "22px", "letterSpacing": "-0.005em", "fontWeight": "600" }], "headline-sm": ["18px", { "lineHeight": "24px", "letterSpacing": "-0.01em", "fontWeight": "600" }], "display-lg": ["36px", { "lineHeight": "44px", "letterSpacing": "-0.02em", "fontWeight": "700" }], "label-xs": ["11px", { "lineHeight": "14px", "letterSpacing": "0.03em", "fontWeight": "600" }] } } } }</script></head><body class="bg-surface font-body-md text-body-md text-on-surface flex flex-col min-h-screen"><header class="fixed top-0 inset-x-0 z-50 bg-surface/85 backdrop-blur-xl pt-safe shadow-[0_1px_8px_rgba(0,0,0,0.04)]"><div class="h-16 px-gutter-mobile flex items-center justify-between gap-space-sm"><div class="flex items-center gap-space-sm min-w-0"><img alt="ProcurePulse Logo" class="h-8 w-auto object-contain flex-shrink-0" src="https://lh3.googleusercontent.com/aida/AEtjO1WYT7uUCz3aunZYfhkmo8wDPMv-YuHBW-ZGQees3uyOjAmTFy-Gf63AXdlnvojGHRzAyJ9MJxCbdFkTMffYbNKx1BIrmi38uFewAvWt79a4uxX0V9y7ik8tOobSlmNoR3geTNEaY_aurdlVDiSBMd2r-5yhpIakUrfoijPetNPIdhc2INODKLL-CVuKJHWBVa5nUbdyFTBCuLd90KHtydUp1oz0uvtZnGwlk22WVJ4oBethDxYWgBkDlg"/><div class="flex flex-col min-w-0"><span class="font-headline-sm text-headline-sm text-on-surface tracking-tight truncate">ProcurePulse DataHub</span><span class="font-label-xs text-label-xs text-on-surface-variant uppercase tracking-wider truncate">Data Hub</span></div></div><div class="flex items-center gap-space-xs flex-shrink-0"><button aria-label="Search Catalogs and POs" class="w-11 h-11 flex items-center justify-center rounded-xl text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition-colors"><span class="material-symbols-outlined text-[22px]">search</span></button><button aria-label="Notifications" class="w-11 h-11 relative flex items-center justify-center rounded-xl text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition-colors"><span class="material-symbols-outlined text-[22px]">notifications</span><span class="absolute top-2.5 right-2.5 w-2 h-2 rounded-full bg-error ring-2 ring-surface"></span></button><div class="pl-space-2xs flex items-center"><img alt="Profile" class="w-8 h-8 rounded-full object-cover ring-2 ring-primary-fixed" src="https://lh3.googleusercontent.com/aida-public/AB6AXuApZxe_72qC7j7j6i2ozD6wWQyQzI-5XvjqHuTPa-WdB70f765a7vnsMV0ZE4RqPUdLOr2WMDoc1uB4P1qziqSvSvPoEYaL_0EjoHZW0pAhw47hrYoitO3y1scgpMYVccQpHBKV0C69hvgy7Hthx1MJFGdBijdznM2w-6-Yxpi1db1Ip_gteDNxwwl5BUWNJnxHqn0G7a8KbCo3Bmt1760UzmdFT3tdHLSYLyPpz-Ja0aUVLF9xBaVT"/></div></div></div></header><main class="flex flex-col relative w-full pt-16 pb-24 bg-surface min-h-screen"><div class="flex flex-col w-full">
+<section class="px-gutter-mobile pt-space-md pb-space-sm">
+<div class="flex items-center justify-between gap-space-xs mb-space-xs">
+<div class="flex items-center gap-space-xs">
+<span class="inline-flex items-center justify-center w-2 h-2 rounded-full bg-tertiary-fixed-dim animate-pulse"></span>
+<span class="font-label-xs text-label-xs text-on-surface-variant tracking-wider uppercase font-semibold">Live Enterprise Ledger</span>
+</div>
+<div class="relative">
+<button aria-label="Select Fiscal Period" class="flex items-center gap-space-2xs px-space-sm py-1 rounded-full bg-surface-container text-on-surface text-label-xs font-label-xs font-semibold shadow-sm active:scale-95 transition-transform" id="fiscalPeriodBtn">
+<span class="material-symbols-outlined text-[14px] text-primary">calendar_month</span>
+<span id="activeQuarter">Q3 FY24</span>
+<span class="material-symbols-outlined text-[14px] text-on-surface-variant">expand_more</span>
+</button>
+<div class="hidden absolute right-0 mt-1 w-36 py-1 bg-surface-container-lowest rounded-xl shadow-xl z-30" id="periodDropdown">
+<button class="w-full text-left px-3 py-1.5 text-label-xs font-label-xs hover:bg-surface-container text-primary font-semibold period-opt" data-val="Q3 FY24">Q3 FY24 (Active)</button>
+<button class="w-full text-left px-3 py-1.5 text-label-xs font-label-xs hover:bg-surface-container text-on-surface period-opt" data-val="Q2 FY24">Q2 FY24</button>
+<button class="w-full text-left px-3 py-1.5 text-label-xs font-label-xs hover:bg-surface-container text-on-surface period-opt" data-val="Q1 FY24">Q1 FY24</button>
+<button class="w-full text-left px-3 py-1.5 text-label-xs font-label-xs hover:bg-surface-container text-on-surface period-opt" data-val="Full FY23">Full FY23</button>
+</div>
+</div>
+</div>
+<div class="flex items-start justify-between gap-space-sm mb-space-sm">
+<div class="flex flex-col">
+<h1 class="font-headline-lg text-headline-lg text-on-surface tracking-tight">Procurement Data</h1>
+<p class="font-body-sm text-body-sm text-on-surface-variant line-clamp-1">Master spend records, feeds &amp; ERP sync</p>
+</div>
+<button class="flex-shrink-0 flex items-center gap-space-2xs px-space-md py-2 rounded-xl bg-primary-container text-on-primary font-label-md text-label-md shadow-sm active:bg-primary transition-all" id="syncAllTrigger">
+<span class="material-symbols-outlined text-[18px]" id="syncIcon">sync</span>
+<span id="syncLabel">Sync All</span>
+</button>
+</div>
+<div class="hidden mb-space-xs p-space-sm rounded-xl bg-tertiary-container text-on-tertiary-container text-label-xs font-label-xs flex items-center justify-between" id="syncToast">
+<span class="flex items-center gap-1.5">
+<span class="material-symbols-outlined text-[16px]">check_circle</span>
+        Delta sync initiated across SAP, Coupa &amp; D&amp;B feeds
+      </span>
+<button class="opacity-80 hover:opacity-100" onclick="document.getElementById('syncToast').classList.add('hidden')">
+<span class="material-symbols-outlined text-[14px]">close</span>
+</button>
+</div>
+</section>
+<section class="pb-space-md">
+<div class="flex items-center justify-between px-gutter-mobile mb-space-xs">
+<span class="font-label-xs text-label-xs text-on-surface-variant uppercase font-semibold">Ledger Key Health</span>
+<span class="font-label-xs text-label-xs text-primary font-semibold">Telemetry Realtime</span>
+</div>
+<div class="flex overflow-x-auto snap-x snap-mandatory no-scrollbar px-gutter-mobile gap-space-sm pb-1">
+<div class="snap-center min-w-[210px] flex-1 p-space-md rounded-xl bg-surface-container-lowest shadow-sm flex flex-col justify-between">
+<div class="flex items-center justify-between mb-space-xs">
+<span class="font-label-xs text-label-xs text-on-surface-variant font-medium">Managed Spend</span>
+<span class="material-symbols-outlined text-primary text-[18px]">payments</span>
+</div>
+<div>
+<span class="font-display-lg-mobile text-display-lg-mobile text-on-surface tabular-nums tracking-tight">$42.8M</span>
+<div class="flex items-center gap-1 mt-1">
+<span class="inline-flex items-center text-[10px] font-semibold px-1.5 py-0.5 rounded-full bg-surface-container text-tertiary">
+<span class="material-symbols-outlined text-[12px] mr-0.5">trending_up</span>+6.4%
+            </span>
+<span class="font-label-xs text-label-xs text-on-surface-variant">vs budget</span>
+</div>
+</div>
+</div>
+<div class="snap-center min-w-[210px] flex-1 p-space-md rounded-xl bg-surface-container-lowest shadow-sm flex flex-col justify-between">
+<div class="flex items-center justify-between mb-space-xs">
+<span class="font-label-xs text-label-xs text-on-surface-variant font-medium">Active Datasets</span>
+<span class="material-symbols-outlined text-tertiary text-[18px]">dataset</span>
+</div>
+<div>
+<span class="font-display-lg-mobile text-display-lg-mobile text-on-surface tabular-nums tracking-tight">1,248</span>
+<div class="flex items-center gap-1 mt-1">
+<span class="inline-flex items-center text-[10px] font-semibold px-1.5 py-0.5 rounded-full bg-surface-container text-primary">
+<span class="material-symbols-outlined text-[12px] mr-0.5">verified</span>99.4%
+            </span>
+<span class="font-label-xs text-label-xs text-on-surface-variant">health score</span>
+</div>
+</div>
+</div>
+<div class="snap-center min-w-[210px] flex-1 p-space-md rounded-xl bg-surface-container-lowest shadow-sm flex flex-col justify-between">
+<div class="flex items-center justify-between mb-space-xs">
+<span class="font-label-xs text-label-xs text-on-surface-variant font-medium">Pending Reconcile</span>
+<span class="material-symbols-outlined text-error text-[18px]">difference</span>
+</div>
+<div>
+<span class="font-display-lg-mobile text-display-lg-mobile text-error tabular-nums tracking-tight">18</span>
+<div class="flex items-center gap-1 mt-1">
+<span class="inline-flex items-center text-[10px] font-semibold px-1.5 py-0.5 rounded-full bg-error-container text-on-error-container">
+              PO Mismatches
+            </span>
+<span class="font-label-xs text-label-xs text-on-surface-variant">needs signoff</span>
+</div>
+</div>
+</div>
+<div class="snap-center min-w-[210px] flex-1 p-space-md rounded-xl bg-surface-container-lowest shadow-sm flex flex-col justify-between">
+<div class="flex items-center justify-between mb-space-xs">
+<span class="font-label-xs text-label-xs text-on-surface-variant font-medium">Contract Compliance</span>
+<span class="material-symbols-outlined text-secondary text-[18px]">rule</span>
+</div>
+<div>
+<span class="font-display-lg-mobile text-display-lg-mobile text-on-surface tabular-nums tracking-tight">94.2%</span>
+<div class="flex items-center gap-1 mt-1">
+<span class="inline-flex items-center text-[10px] font-semibold px-1.5 py-0.5 rounded-full bg-surface-container text-tertiary">
+              +1.8% QoQ
+            </span>
+<span class="font-label-xs text-label-xs text-on-surface-variant">catalog adherence</span>
+</div>
+</div>
+</div>
+</div>
+</section>
+<section class="px-gutter-mobile pb-space-lg">
+<div class="p-space-md rounded-xl bg-surface-container-lowest shadow-sm">
+<div class="flex items-center justify-between mb-space-sm">
+<div class="flex items-center gap-space-xs">
+<div class="w-8 h-8 rounded-lg bg-surface-container flex items-center justify-center text-primary">
+<span class="material-symbols-outlined text-[20px]">hub</span>
+</div>
+<div>
+<h2 class="font-title-md text-title-md text-on-surface">Data Pipelines &amp; ERP</h2>
+<p class="font-label-xs text-label-xs text-on-surface-variant">3 Feeds streaming concurrently</p>
+</div>
+</div>
+<span class="inline-flex items-center px-2 py-0.5 rounded-full bg-surface-container text-tertiary font-label-xs text-label-xs font-semibold">
+<span class="w-1.5 h-1.5 rounded-full bg-tertiary-container mr-1"></span>Operational
+        </span>
+</div>
+<div class="space-y-space-xs">
+<div class="p-space-sm rounded-lg bg-surface-container-low flex items-center justify-between">
+<div class="flex items-center gap-space-sm min-w-0">
+<div class="w-7 h-7 rounded-md bg-surface-container-lowest flex items-center justify-center text-on-surface-variant shadow-sm flex-shrink-0">
+<span class="material-symbols-outlined text-[16px]">account_balance</span>
+</div>
+<div class="min-w-0">
+<div class="flex items-center gap-1.5">
+<span class="font-label-md text-label-md text-on-surface font-semibold truncate">SAP S/4HANA ERP</span>
+<span class="px-1.5 py-0.2 rounded text-[10px] font-semibold bg-surface-container text-primary">Real-time</span>
+</div>
+<p class="font-label-xs text-label-xs text-on-surface-variant">Sync cycle: 3m ago • Ingestion OK</p>
+</div>
+</div>
+<div class="flex items-center gap-1 text-tertiary font-label-xs text-label-xs font-semibold flex-shrink-0">
+<span class="material-symbols-outlined text-[16px]">check_circle</span>
+<span>Connected</span>
+</div>
+</div>
+<div class="p-space-sm rounded-lg bg-surface-container-low flex items-center justify-between">
+<div class="flex items-center gap-space-sm min-w-0">
+<div class="w-7 h-7 rounded-md bg-surface-container-lowest flex items-center justify-center text-on-surface-variant shadow-sm flex-shrink-0">
+<span class="material-symbols-outlined text-[16px]">receipt</span>
+</div>
+<div class="min-w-0">
+<div class="flex items-center gap-1.5">
+<span class="font-label-md text-label-md text-on-surface font-semibold truncate">Coupa Spend Ingestion</span>
+<span class="px-1.5 py-0.2 rounded text-[10px] font-semibold bg-surface-container text-secondary">Hourly</span>
+</div>
+<p class="font-label-xs text-label-xs text-on-surface-variant">Batch synced 12m ago • 4,204 delta lines</p>
+</div>
+</div>
+<div class="flex items-center gap-1 text-tertiary font-label-xs text-label-xs font-semibold flex-shrink-0">
+<span class="material-symbols-outlined text-[16px]">check_circle</span>
+<span>Synced</span>
+</div>
+</div>
+<div class="p-space-sm rounded-lg bg-surface-container-low flex items-center justify-between">
+<div class="flex items-center gap-space-sm min-w-0">
+<div class="w-7 h-7 rounded-md bg-surface-container-lowest flex items-center justify-center text-on-surface-variant shadow-sm flex-shrink-0">
+<span class="material-symbols-outlined text-[16px]">shield</span>
+</div>
+<div class="min-w-0">
+<div class="flex items-center gap-1.5">
+<span class="font-label-md text-label-md text-on-surface font-semibold truncate">D&amp;B Risk &amp; Compliance</span>
+<span class="px-1.5 py-0.2 rounded text-[10px] font-semibold bg-surface-container text-secondary">Daily</span>
+</div>
+<p class="font-label-xs text-label-xs text-on-surface-variant">Sanctions &amp; Financial stability stream</p>
+</div>
+</div>
+<div class="flex items-center gap-1 text-tertiary font-label-xs text-label-xs font-semibold flex-shrink-0">
+<span class="material-symbols-outlined text-[16px]">done_all</span>
+<span>Complete</span>
+</div>
+</div>
+</div>
+<div class="mt-space-sm pt-space-xs flex items-center justify-between gap-space-xs">
+<button class="w-full py-2.5 px-space-md rounded-lg bg-surface-container text-primary hover:bg-surface-container-high active:bg-secondary-container transition-colors flex items-center justify-center gap-space-2xs font-label-md text-label-md font-semibold" id="runAuditBtn">
+<span class="material-symbols-outlined text-[18px]">health_and_safety</span>
+<span id="auditBtnLabel">Run Data Quality Audit</span>
+</button>
+</div>
+</div>
+</section>
+<section class="px-gutter-mobile pb-space-lg">
+<div class="flex items-center justify-between mb-space-xs">
+<div>
+<h2 class="font-title-md text-title-md text-on-surface">Master Data Domains</h2>
+<p class="font-label-xs text-label-xs text-on-surface-variant">Partitioned catalogs and transaction registries</p>
+</div>
+<span class="font-label-xs text-label-xs px-2 py-0.5 rounded bg-surface-container text-primary font-semibold">4 Catalogs</span>
+</div>
+<div class="relative mb-space-xs">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant text-[20px]">search</span>
+<input class="w-full h-11 pl-10 pr-4 rounded-xl bg-surface-container-lowest text-on-surface placeholder:text-on-surface-variant text-body-sm font-body-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-primary-container" id="domainSearch" placeholder="Search catalogs, tables, or fields..." type="text"/>
+</div>
+<div class="flex overflow-x-auto no-scrollbar gap-space-2xs pb-space-xs mb-space-xs" id="filterChips">
+<button class="domain-filter-chip px-3 py-1.5 rounded-full text-label-xs font-label-xs font-semibold bg-primary text-on-primary whitespace-nowrap active:scale-95 transition-all" data-domain="all">All Domains</button>
+<button class="domain-filter-chip px-3 py-1.5 rounded-full text-label-xs font-label-xs font-medium bg-surface-container-lowest text-on-surface-variant hover:text-on-surface whitespace-nowrap active:scale-95 transition-all" data-domain="vendor">Vendor Masters</button>
+<button class="domain-filter-chip px-3 py-1.5 rounded-full text-label-xs font-label-xs font-medium bg-surface-container-lowest text-on-surface-variant hover:text-on-surface whitespace-nowrap active:scale-95 transition-all" data-domain="sku">Material SKUs</button>
+<button class="domain-filter-chip px-3 py-1.5 rounded-full text-label-xs font-label-xs font-medium bg-surface-container-lowest text-on-surface-variant hover:text-on-surface whitespace-nowrap active:scale-95 transition-all" data-domain="spend">Spend Logs</button>
+<button class="domain-filter-chip px-3 py-1.5 rounded-full text-label-xs font-label-xs font-medium bg-surface-container-lowest text-on-surface-variant hover:text-on-surface whitespace-nowrap active:scale-95 transition-all" data-domain="contract">MSAs &amp; Contracts</button>
+</div>
+<div class="space-y-space-sm" id="catalogCardsContainer">
+<div class="catalog-card p-space-md rounded-xl bg-surface-container-lowest shadow-sm flex flex-col gap-space-xs" data-category="vendor" data-keywords="vendor master supplier records tax ids 3420">
+<div class="flex items-start justify-between">
+<div class="flex items-center gap-space-xs">
+<div class="w-10 h-10 rounded-lg bg-surface-container flex items-center justify-center text-primary flex-shrink-0">
+<span class="material-symbols-outlined text-[22px]">corporate_fare</span>
+</div>
+<div>
+<h3 class="font-title-md text-title-md text-on-surface font-semibold">Vendor Master Records</h3>
+<p class="font-label-xs text-label-xs text-on-surface-variant">Entity verification, bank details, 1099 compliance</p>
+</div>
+</div>
+<span class="px-2 py-0.5 rounded-full bg-surface-container text-tertiary font-label-xs text-label-xs font-semibold">98% Fresh</span>
+</div>
+<div class="grid grid-cols-2 gap-space-xs pt-space-2xs">
+<div class="p-2 rounded-lg bg-surface-container-low">
+<span class="font-label-xs text-label-xs text-on-surface-variant block">Total Profiled</span>
+<span class="font-data-mono text-data-mono text-on-surface font-bold">3,420 Vendors</span>
+</div>
+<div class="p-2 rounded-lg bg-surface-container-low">
+<span class="font-label-xs text-label-xs text-on-surface-variant block">Action Required</span>
+<span class="font-data-mono text-data-mono text-error font-bold flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px]">warning</span>14 Unverified Tax
+            </span>
+</div>
+</div>
+</div>
+<div class="catalog-card p-space-md rounded-xl bg-surface-container-lowest shadow-sm flex flex-col gap-space-xs" data-category="sku" data-keywords="global sku item catalog line items material taxonomy 88410">
+<div class="flex items-start justify-between">
+<div class="flex items-center gap-space-xs">
+<div class="w-10 h-10 rounded-lg bg-surface-container flex items-center justify-center text-secondary flex-shrink-0">
+<span class="material-symbols-outlined text-[22px]">category</span>
+</div>
+<div>
+<h3 class="font-title-md text-title-md text-on-surface font-semibold">Global SKU &amp; Item Catalog</h3>
+<p class="font-label-xs text-label-xs text-on-surface-variant">Automated taxonomy mapping with UNSPSC codes</p>
+</div>
+</div>
+<span class="px-2 py-0.5 rounded-full bg-secondary-container text-on-secondary-fixed font-label-xs text-label-xs font-semibold">AI Tagged</span>
+</div>
+<div class="grid grid-cols-2 gap-space-xs pt-space-2xs">
+<div class="p-2 rounded-lg bg-surface-container-low">
+<span class="font-label-xs text-label-xs text-on-surface-variant block">Mapped SKU Items</span>
+<span class="font-data-mono text-data-mono text-on-surface font-bold">88,410 Line Items</span>
+</div>
+<div class="p-2 rounded-lg bg-surface-container-low">
+<span class="font-label-xs text-label-xs text-on-surface-variant block">Classification Confidence</span>
+<span class="font-data-mono text-data-mono text-tertiary font-bold">99.1% Confidence</span>
+</div>
+</div>
+</div>
+<div class="catalog-card p-space-md rounded-xl bg-surface-container-lowest shadow-sm flex flex-col gap-space-xs" data-category="spend" data-keywords="purchase order spend logs month pos 1840">
+<div class="flex items-start justify-between">
+<div class="flex items-center gap-space-xs">
+<div class="w-10 h-10 rounded-lg bg-surface-container flex items-center justify-center text-tertiary flex-shrink-0">
+<span class="material-symbols-outlined text-[22px]">receipt_long</span>
+</div>
+<div>
+<h3 class="font-title-md text-title-md text-on-surface font-semibold">Purchase Order &amp; Spend Logs</h3>
+<p class="font-label-xs text-label-xs text-on-surface-variant">Real-time commitments, 3-way match journals</p>
+</div>
+</div>
+<span class="px-2 py-0.5 rounded-full bg-surface-container text-primary font-label-xs text-label-xs font-semibold">Live Feed</span>
+</div>
+<div class="grid grid-cols-2 gap-space-xs pt-space-2xs">
+<div class="p-2 rounded-lg bg-surface-container-low">
+<span class="font-label-xs text-label-xs text-on-surface-variant block">Month-to-Date Value</span>
+<span class="font-data-mono text-data-mono text-on-surface font-bold">$14.2M Cleared</span>
+</div>
+<div class="p-2 rounded-lg bg-surface-container-low">
+<span class="font-label-xs text-label-xs text-on-surface-variant block">Processed Requisitions</span>
+<span class="font-data-mono text-data-mono text-on-surface font-bold">1,840 PO Trans</span>
+</div>
+</div>
+</div>
+<div class="catalog-card p-space-md rounded-xl bg-surface-container-lowest shadow-sm flex flex-col gap-space-xs" data-category="contract" data-keywords="master service agreements msa active contracts legal expiring 412">
+<div class="flex items-start justify-between">
+<div class="flex items-center gap-space-xs">
+<div class="w-10 h-10 rounded-lg bg-surface-container flex items-center justify-center text-on-surface flex-shrink-0">
+<span class="material-symbols-outlined text-[22px]">description</span>
+</div>
+<div>
+<h3 class="font-title-md text-title-md text-on-surface font-semibold">Master Service Agreements</h3>
+<p class="font-label-xs text-label-xs text-on-surface-variant">Tier-1 commercial terms, SLAs &amp; rate schedules</p>
+</div>
+</div>
+<span class="px-2 py-0.5 rounded-full bg-error-container text-on-error-container font-label-xs text-label-xs font-semibold">8 Expiring</span>
+</div>
+<div class="grid grid-cols-2 gap-space-xs pt-space-2xs">
+<div class="p-2 rounded-lg bg-surface-container-low">
+<span class="font-label-xs text-label-xs text-on-surface-variant block">Active Instruments</span>
+<span class="font-data-mono text-data-mono text-on-surface font-bold">412 Contracts</span>
+</div>
+<div class="p-2 rounded-lg bg-surface-container-low">
+<span class="font-label-xs text-label-xs text-on-surface-variant block">Renegotiation Window</span>
+<span class="font-data-mono text-data-mono text-on-surface font-bold">&lt; 30 Days</span>
+</div>
+</div>
+</div>
+</div>
+</section>
+<section class="px-gutter-mobile pb-space-2xl">
+<div class="flex items-center justify-between mb-space-xs">
+<div>
+<h2 class="font-title-md text-title-md text-on-surface">Governance &amp; Audit Log</h2>
+<p class="font-label-xs text-label-xs text-on-surface-variant">Immutable data integrity changes &amp; edge validations</p>
+</div>
+<button class="font-label-xs text-label-xs text-primary font-semibold hover:underline">View All (64)</button>
+</div>
+<div class="rounded-xl bg-surface-container-lowest shadow-sm overflow-hidden">
+<div class="p-space-sm flex items-start gap-space-sm hover:bg-surface-container-low transition-colors">
+<div class="w-8 h-8 rounded-lg bg-error-container text-on-error-container flex items-center justify-center flex-shrink-0">
+<span class="material-symbols-outlined text-[18px]">report_problem</span>
+</div>
+<div class="min-w-0 flex-1">
+<div class="flex items-center justify-between gap-1">
+<span class="px-1.5 py-0.2 rounded text-[10px] font-semibold bg-error-container text-on-error-container">Critical Anomaly</span>
+<span class="font-label-xs text-label-xs text-on-surface-variant">14m ago</span>
+</div>
+<p class="font-title-md text-[13px] text-on-surface font-medium mt-0.5 line-clamp-1">Duplicate Tax ID flagged for Global Tech Logistics</p>
+<p class="font-label-xs text-label-xs text-on-surface-variant">EIN matches internal entity #4489. Hold placed on auto-disbursement.</p>
+</div>
+</div>
+<div class="p-space-sm flex items-start gap-space-sm hover:bg-surface-container-low transition-colors">
+<div class="w-8 h-8 rounded-lg bg-surface-container text-tertiary flex items-center justify-center flex-shrink-0">
+<span class="material-symbols-outlined text-[18px]">currency_exchange</span>
+</div>
+<div class="min-w-0 flex-1">
+<div class="flex items-center justify-between gap-1">
+<span class="px-1.5 py-0.2 rounded text-[10px] font-semibold bg-surface-container text-tertiary">Resolved Auto-Fix</span>
+<span class="font-label-xs text-label-xs text-on-surface-variant">1h ago</span>
+</div>
+<p class="font-title-md text-[13px] text-on-surface font-medium mt-0.5 line-clamp-1">Currency mismatch resolved in EMEA IT PO #8892</p>
+<p class="font-label-xs text-label-xs text-on-surface-variant">Converted EUR/USD spot parity at 1.084 via Bloomberg live fix.</p>
+</div>
+</div>
+<div class="p-space-sm flex items-start gap-space-sm hover:bg-surface-container-low transition-colors">
+<div class="w-8 h-8 rounded-lg bg-surface-container text-primary flex items-center justify-center flex-shrink-0">
+<span class="material-symbols-outlined text-[18px]">verified</span>
+</div>
+<div class="min-w-0 flex-1">
+<div class="flex items-center justify-between gap-1">
+<span class="px-1.5 py-0.2 rounded text-[10px] font-semibold bg-surface-container text-primary">Onboarding Pass</span>
+<span class="font-label-xs text-label-xs text-on-surface-variant">4h ago</span>
+</div>
+<p class="font-title-md text-[13px] text-on-surface font-medium mt-0.5 line-clamp-1">New vendor onboarded: Vertex Cloud Services</p>
+<p class="font-label-xs text-label-xs text-on-surface-variant">SOC2 Type II verification validated. Automated spend ceiling: $250k.</p>
+</div>
+</div>
+</div>
+</section>
+<div class="sticky bottom-20 inset-x-0 px-gutter-mobile pb-space-xs pt-space-xs bg-gradient-to-t from-surface via-surface/95 to-transparent z-40">
+<div class="flex items-center gap-space-xs">
+<button class="flex-1 h-12 rounded-xl bg-primary-container text-on-primary font-title-md text-title-md font-semibold flex items-center justify-center gap-space-2xs shadow-lg active:bg-primary transition-all" id="openIngestModal">
+<span class="material-symbols-outlined text-[20px]">add_circle</span>
+<span>Ingest New Dataset</span>
+</button>
+<button aria-label="Export Master Spend Report" class="h-12 w-12 rounded-xl bg-surface-container-lowest text-on-surface flex items-center justify-center shadow-md active:bg-surface-container transition-colors flex-shrink-0" id="exportReportBtn" title="Export Master Spend Report">
+<span class="material-symbols-outlined text-[22px] text-primary">download</span>
+</button>
+</div>
+</div>
+<div class="hidden fixed inset-0 z-50 flex items-end sm:items-center justify-center p-gutter-mobile bg-inverse-surface/40 backdrop-blur-sm transition-opacity" id="ingestModal">
+<div class="w-full max-w-md bg-surface-container-lowest rounded-2xl p-space-lg shadow-2xl space-y-space-md transform transition-transform">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-space-2xs">
+<div class="w-8 h-8 rounded-lg bg-surface-container flex items-center justify-center text-primary">
+<span class="material-symbols-outlined text-[20px]">upload_file</span>
+</div>
+<h3 class="font-headline-sm text-headline-sm text-on-surface">Ingest Data Stream</h3>
+</div>
+<button class="w-8 h-8 rounded-full bg-surface-container flex items-center justify-center text-on-surface-variant hover:text-on-surface" id="closeIngestModal">
+<span class="material-symbols-outlined text-[18px]">close</span>
+</button>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant">
+        Upload flat CSV/JSON ledger exports or establish a direct API connector to sync master spend catalogs into the ProcurePulse vault.
+      </p>
+<div class="p-space-lg rounded-xl bg-surface-container-low flex flex-col items-center justify-center text-center cursor-pointer hover:bg-surface-container transition-colors">
+<span class="material-symbols-outlined text-primary text-[32px] mb-1">cloud_upload</span>
+<span class="font-title-md text-[14px] text-on-surface font-semibold">Drop spend manifest here</span>
+<span class="font-label-xs text-label-xs text-on-surface-variant mt-0.5">Supports .csv, .parquet, .json (Up to 150MB)</span>
+</div>
+<div class="space-y-space-xs">
+<label class="font-label-xs text-label-xs text-on-surface-variant uppercase font-semibold">Target Domain Mapping</label>
+<select class="w-full h-11 px-space-sm rounded-lg bg-surface-container-low text-on-surface font-body-sm text-body-sm focus:outline-none">
+<option>Vendor Master Records (Accounts Payable)</option>
+<option>Global SKU &amp; Material Item Catalog</option>
+<option>PO Commitments &amp; Goods Receipt Notes</option>
+<option>MSA &amp; Contract Adherence Schedules</option>
+</select>
+</div>
+<div class="flex gap-space-xs pt-space-xs">
+<button class="flex-1 py-2.5 rounded-xl bg-surface-container text-on-surface font-label-md text-label-md font-semibold" id="cancelIngest">Cancel</button>
+<button class="flex-1 py-2.5 rounded-xl bg-primary-container text-on-primary font-label-md text-label-md font-semibold" id="confirmIngest">Initiate Pipeline</button>
+</div>
+</div>
+</div>
+</div>
+<script>
+  (() => {
+    const fiscalBtn = document.getElementById('fiscalPeriodBtn');
+    const periodDropdown = document.getElementById('periodDropdown');
+    const activeQuarter = document.getElementById('activeQuarter');
+    const periodOpts = document.querySelectorAll('.period-opt');
+
+    fiscalBtn?.addEventListener('click', (e) => {
+      e.stopPropagation();
+      periodDropdown?.classList.toggle('hidden');
+    });
+
+    periodOpts.forEach(opt => {
+      opt.addEventListener('click', () => {
+        const val = opt.getAttribute('data-val');
+        if (activeQuarter && val) activeQuarter.textContent = val;
+        periodDropdown?.classList.add('hidden');
+      });
+    });
+
+    document.addEventListener('click', (e) => {
+      if (!fiscalBtn?.contains(e.target) && !periodDropdown?.contains(e.target)) {
+        periodDropdown?.classList.add('hidden');
+      }
+    });
+
+    const syncTrigger = document.getElementById('syncAllTrigger');
+    const syncIcon = document.getElementById('syncIcon');
+    const syncLabel = document.getElementById('syncLabel');
+    const syncToast = document.getElementById('syncToast');
+
+    syncTrigger?.addEventListener('click', () => {
+      if (syncIcon) syncIcon.classList.add('animate-spin');
+      if (syncLabel) syncLabel.textContent = 'Syncing...';
+
+      setTimeout(() => {
+        if (syncIcon) syncIcon.classList.remove('animate-spin');
+        if (syncLabel) syncLabel.textContent = 'Synced';
+        if (syncToast) syncToast.classList.remove('hidden');
+
+        setTimeout(() => {
+          if (syncLabel) syncLabel.textContent = 'Sync All';
+        }, 2400);
+      }, 1000);
+    });
+
+    const auditBtn = document.getElementById('runAuditBtn');
+    const auditBtnLabel = document.getElementById('auditBtnLabel');
+    auditBtn?.addEventListener('click', () => {
+      if (auditBtnLabel) auditBtnLabel.textContent = 'Scanning 92,242 records...';
+      setTimeout(() => {
+        if (auditBtnLabel) auditBtnLabel.textContent = 'Audit Passed (99.4% Verified)';
+        setTimeout(() => {
+          if (auditBtnLabel) auditBtnLabel.textContent = 'Run Data Quality Audit';
+        }, 2200);
+      }, 900);
+    });
+
+    const searchInput = document.getElementById('domainSearch');
+    const catalogCards = document.querySelectorAll('.catalog-card');
+    const filterChips = document.querySelectorAll('.domain-filter-chip');
+    let activeFilter = 'all';
+
+    const filterCards = () => {
+      const q = (searchInput?.value || '').toLowerCase().trim();
+      catalogCards.forEach(card => {
+        const category = card.getAttribute('data-category');
+        const keywords = card.getAttribute('data-keywords') || '';
+        const matchesCategory = (activeFilter === 'all') || (category === activeFilter);
+        const matchesSearch = !q || keywords.toLowerCase().includes(q) || card.textContent.toLowerCase().includes(q);
+        
+        if (matchesCategory && matchesSearch) {
+          card.classList.remove('hidden');
+        } else {
+          card.classList.add('hidden');
+        }
+      });
+    };
+
+    searchInput?.addEventListener('input', filterCards);
+
+    filterChips.forEach(chip => {
+      chip.addEventListener('click', () => {
+        filterChips.forEach(c => {
+          c.classList.remove('bg-primary', 'text-on-primary', 'font-semibold');
+          c.classList.add('bg-surface-container-lowest', 'text-on-surface-variant', 'font-medium');
+        });
+        chip.classList.remove('bg-surface-container-lowest', 'text-on-surface-variant', 'font-medium');
+        chip.classList.add('bg-primary', 'text-on-primary', 'font-semibold');
+        activeFilter = chip.getAttribute('data-domain') || 'all';
+        filterCards();
+      });
+    });
+
+    const openIngest = document.getElementById('openIngestModal');
+    const closeIngest = document.getElementById('closeIngestModal');
+    const cancelIngest = document.getElementById('cancelIngest');
+    const confirmIngest = document.getElementById('confirmIngest');
+    const ingestModal = document.getElementById('ingestModal');
+
+    const toggleModal = (show) => {
+      if (!ingestModal) return;
+      if (show) {
+        ingestModal.classList.remove('hidden');
+      } else {
+        ingestModal.classList.add('hidden');
+      }
+    };
+
+    openIngest?.addEventListener('click', () => toggleModal(true));
+    closeIngest?.addEventListener('click', () => toggleModal(false));
+    cancelIngest?.addEventListener('click', () => toggleModal(false));
+    confirmIngest?.addEventListener('click', () => {
+      toggleModal(false);
+      if (syncToast) {
+        syncToast.classList.remove('hidden');
+        syncToast.querySelector('span').innerHTML = '<span class="material-symbols-outlined text-[16px]">hourglass_top</span> Data manifest queued for validation & ingestion';
+      }
+    });
+
+    const exportBtn = document.getElementById('exportReportBtn');
+    exportBtn?.addEventListener('click', () => {
+      const original = exportBtn.innerHTML;
+      exportBtn.innerHTML = '<span class="material-symbols-outlined text-[20px] text-tertiary">check</span>';
+      setTimeout(() => {
+        exportBtn.innerHTML = original;
+      }, 1500);
+    });
+  })();
+</script></main><nav class="fixed bottom-0 inset-x-0 z-50 pb-safe bg-surface/90 backdrop-blur-xl shadow-[0_-2px_12px_rgba(0,0,0,0.05)]" data-active-classes="text-primary font-semibold"><div class="flex items-center justify-around h-16 px-gutter-mobile"><a aria-current="page" class="flex flex-col items-center justify-center gap-space-2xs min-w-[64px] h-12 transition-colors text-primary font-semibold" data-path="data-hub"  onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="window.top.location.href='/procurement/procurement-data'; return false;" style="cursor:pointer"><span class="material-symbols-outlined text-[22px]">dashboard</span><span class="font-label-xs text-label-xs">Data Hub</span></a><a class="flex flex-col items-center justify-center gap-space-2xs min-w-[64px] h-12 text-on-surface-variant hover:text-on-surface transition-colors" data-path="catalogs-and-pos"  onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="window.top.location.href='/procurement/purchase-order'; return false;" style="cursor:pointer"><span class="material-symbols-outlined text-[22px]">receipt_long</span><span class="font-label-xs text-label-xs">Catalogs &amp; POs</span></a><a class="flex flex-col items-center justify-center gap-space-2xs min-w-[64px] h-12 text-on-surface-variant hover:text-on-surface transition-colors" data-path="suppliers"  onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="window.top.location.href='/procurement/supplier-management'; return false;" style="cursor:pointer"><span class="material-symbols-outlined text-[22px]">domain</span><span class="font-label-xs text-label-xs">Suppliers</span></a><a class="flex flex-col items-center justify-center gap-space-2xs min-w-[64px] h-12 text-on-surface-variant hover:text-on-surface transition-colors" data-path="audit-and-compliance"  onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="return false;" onclick="window.top.location.href='/procurement/transaction-audit-trail'; return false;" style="cursor:pointer"><span class="material-symbols-outlined text-[22px]">verified_user</span><span class="font-label-xs text-label-xs">Audit</span></a></div></nav></body></html>

@@ -1,0 +1,640 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>BCF-SL Organisational Chart</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: Arial, sans-serif; background: #f0f2f5; color: #111; }
+
+  .page-header {
+    background: linear-gradient(135deg, #0D1B2A 0%, #1F4E79 100%);
+    color: #fff; padding: 22px 30px; text-align: center;
+  }
+  .page-header h1 { font-size: 20px; letter-spacing: 1px; text-transform: uppercase; }
+  .page-header p { font-size: 12px; color: #C9A84C; margin-top: 4px; }
+
+  .nav-tabs {
+    display: flex; flex-wrap: wrap; gap: 6px;
+    padding: 14px 20px; background: #fff;
+    border-bottom: 2px solid #ddd; position: sticky; top: 0; z-index: 100;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  }
+  .nav-tab {
+    padding: 6px 13px; border-radius: 20px; font-size: 11.5px; font-weight: 600;
+    cursor: pointer; border: 2px solid transparent; transition: all 0.2s;
+    white-space: nowrap;
+  }
+  .nav-tab:hover { opacity: 0.85; transform: translateY(-1px); }
+  .nav-tab.active { color: #fff !important; }
+
+  .dept-section { display: none; padding: 28px 24px; }
+  .dept-section.active { display: block; }
+
+  .dept-title {
+    font-size: 17px; font-weight: 700; text-transform: uppercase;
+    letter-spacing: 0.8px; margin-bottom: 22px; padding: 10px 18px;
+    border-radius: 8px; color: #fff; display: inline-block;
+  }
+
+  /* Org tree */
+  .org-tree { overflow-x: auto; padding-bottom: 10px; }
+  .level { display: flex; justify-content: center; gap: 12px; flex-wrap: nowrap; margin-bottom: 0; }
+
+  .node-wrap { display: flex; flex-direction: column; align-items: center; position: relative; }
+
+  /* connector lines */
+  .node-wrap::before {
+    content: ''; display: block; width: 2px; height: 20px;
+    background: #ccc; margin: 0 auto;
+  }
+  .node-wrap:first-child:last-child::before { display: none; }
+
+  /* horizontal line above siblings */
+  .siblings { display: flex; gap: 12px; position: relative; justify-content: center; }
+  .siblings::before {
+    content: ''; position: absolute; top: 0; left: calc(50% - 50%);
+    height: 2px; background: #ccc;
+    left: 0; right: 0;
+  }
+
+  .card {
+    border-radius: 8px; padding: 8px 12px; text-align: center;
+    font-size: 11px; line-height: 1.35; min-width: 130px; max-width: 165px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.12); position: relative; z-index: 1;
+    border: 2px solid transparent;
+  }
+  .card .role { font-size: 10px; font-weight: 500; margin-bottom: 2px; }
+  .card .name { font-size: 11.5px; font-weight: 700; line-height: 1.3; }
+  .card .badge {
+    display: inline-block; font-size: 9px; font-weight: 700;
+    padding: 1px 6px; border-radius: 10px; margin-top: 4px;
+    text-transform: uppercase; letter-spacing: 0.4px;
+  }
+
+  /* level colours per tier */
+  .tier-director { background: #0D1B2A; color: #C9A84C; border-color: #C9A84C; }
+  .tier-director .badge { background: #C9A84C; color: #0D1B2A; }
+
+  .tier-manager { color: #fff; }
+  .tier-manager .badge { background: rgba(255,255,255,0.25); color: #fff; }
+
+  .tier-assistant { background: #fff; border-width: 2px; }
+  .tier-assistant .badge { color: #fff; }
+
+  .tier-officer { background: #f8f9fc; border-width: 1.5px; }
+  .tier-officer .badge { color: #fff; }
+
+  /* connector from parent down */
+  .connector-down { width: 2px; height: 22px; background: #ccc; margin: 0 auto; }
+  .connector-h-wrap { display: flex; align-items: flex-start; justify-content: center; position: relative; }
+  .connector-h { height: 2px; background: #ccc; position: absolute; top: 0; }
+
+  /* unit block */
+  .unit-block { margin-bottom: 32px; }
+  .unit-label {
+    font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.6px;
+    padding: 4px 14px; border-radius: 20px; color: #fff;
+    display: inline-block; margin-bottom: 14px;
+  }
+
+  .tree-container { display: flex; flex-direction: column; align-items: center; }
+  .children-row { display: flex; gap: 14px; justify-content: center; align-items: flex-start; margin-top: 0; }
+  .child-col { display: flex; flex-direction: column; align-items: center; }
+  .vline { width: 2px; height: 20px; background: #ccc; }
+  .hline-wrap { position: relative; display: flex; justify-content: center; }
+
+  /* grid layout for units */
+  .units-grid { display: flex; flex-direction: column; gap: 24px; }
+
+  .summary-bar {
+    display: flex; flex-wrap: wrap; gap: 10px;
+    margin-bottom: 22px;
+  }
+  .summary-pill {
+    padding: 5px 14px; border-radius: 20px; font-size: 11px; font-weight: 600;
+    background: #fff; box-shadow: 0 1px 4px rgba(0,0,0,0.1);
+  }
+  .summary-pill span { font-weight: 700; }
+</style>
+</head>
+<body>
+
+
+<!-- SEQUENTIAL WORKFLOW NAVIGATION BAR -->
+<div style="background:#fff; border-bottom:1px solid #ddd; padding:8px 20px; font-size:12px; font-weight:bold; display:flex; justify-content:space-between; align-items:center;">
+    <a href="./staff_analysis_reporting/code.html" onclick="navToApp('/employees/staff-analytics', './staff_analysis_reporting/code.html', event)" style="color:#333; text-decoration:none; padding:5px 12px; border:1px solid #ccc; border-radius:6px; background:#f9f9f9;">
+        ← Back to Staff Analytics
+    </a>
+    <span style="color:#ccc; font-weight:bold;">|</span>
+    <a href="./staff_directory/code.html" onclick="navToApp('/employees/staff-directory', './staff_directory/code.html', event)" style="color:#fff; text-decoration:none; padding:5px 14px; background:#15803d; border-radius:6px;">
+        Next →
+    </a>
+</div>
+
+<div class="page-header">
+  <h1>Bandama Charity Foundation Sierra Leone</h1>
+  <p>Organisational Hierarchy Chart — All Departments</p>
+</div>
+
+<div class="nav-tabs" id="navTabs"></div>
+<div id="deptContainers"></div>
+
+<script>
+const DEPTS = [
+  {
+    id: "finance", label: "Finance", color: "#1F4E79", unitColor: "#2E75B6",
+    title: "Finance Department",
+    director: "Finance Department Director",
+    units: [
+      { name: "Budgeting & Planning Unit", staff: [
+        { title: "Budgeting & Planning Unit Manager", level: "manager" },
+        { title: "Budget Monitoring Assistant", level: "assistant" },
+        { title: "Budget Planning Officer", level: "officer" },
+        { title: "Financial Forecasting Analyst Officer", level: "officer" },
+      ]},
+      { name: "Accounts & Record-Keeping Unit", staff: [
+        { title: "Accounts & Record-Keeping Manager", level: "manager" },
+        { title: "Bookkeeping Assistant", level: "assistant" },
+        { title: "Accounts Officer", level: "officer" },
+        { title: "Financial Records Administrator Officer", level: "officer" },
+      ]},
+      { name: "Donor Funds & Grants Management Unit", staff: [
+        { title: "Donor Funds & Grants Management Manager", level: "manager" },
+        { title: "Grant Reporting Assistant", level: "assistant" },
+        { title: "Grants & Donor Funds Officer", level: "officer" },
+        { title: "Donor Compliance Coordinator Officer", level: "officer" },
+      ]},
+    ]
+  },
+  {
+    id: "health", label: "Health & Safety", color: "#1A7A4A", unitColor: "#27AE60",
+    title: "Health & Safety Department",
+    director: "Health & Safety Department Director",
+    units: [
+      { name: "Workplace Safety & Emergency Response Unit", staff: [
+        { title: "Workplace Safety & Emergency Response Manager", level: "manager" },
+        { title: "First Aid & Incident Response Assistant", level: "assistant" },
+        { title: "Emergency Response Officer", level: "officer" },
+        { title: "Safety Protocol Supervisor Officer", level: "officer" },
+      ]},
+      { name: "Health Awareness & Training Unit", staff: [
+        { title: "Health Awareness & Training Manager", level: "manager" },
+        { title: "Public Health Outreach Assistant", level: "assistant" },
+        { title: "Health Education Officer", level: "officer" },
+        { title: "Awareness Campaign Coordinator Officer", level: "officer" },
+      ]},
+      { name: "Incident Reporting & Prevention Unit", staff: [
+        { title: "Incident Reporting & Prevention Manager", level: "manager" },
+        { title: "Prevention & Safety Compliance Assistant", level: "assistant" },
+        { title: "Incident Monitoring Officer", level: "officer" },
+        { title: "Safety Investigation Analyst Officer", level: "officer" },
+      ]},
+      { name: "Evacuation & Safety Unit", staff: [
+        { title: "Evacuation and Emergency Manager", level: "manager" },
+        { title: "Evacuation and Emergency Assistant", level: "assistant" },
+        { title: "Evacuation and Assembly Point Coordinator Officer", level: "officer" },
+        { title: "Safety and Rescue Officer", level: "officer" },
+      ]},
+      { name: "Resilience & Disaster Management Unit", staff: [
+        { title: "Disaster Management Manager", level: "manager" },
+        { title: "Disaster Management Assistant", level: "assistant" },
+        { title: "Disaster Response Officer", level: "officer" },
+        { title: "Risk Reduction & Preparedness Officer", level: "officer" },
+      ]},
+    ]
+  },
+  {
+    id: "hr", label: "Human Resources", color: "#7B2FBE", unitColor: "#9B59B6",
+    title: "Human Resources Management Department",
+    director: "Human Resources Management Department Director",
+    units: [
+      { name: "Recruitment & Onboarding Unit", staff: [
+        { title: "Recruitment & Onboarding Manager", level: "manager" },
+        { title: "Talent Acquisition Assistant", level: "assistant" },
+        { title: "Recruitment & Onboarding Officer", level: "officer" },
+        { title: "Volunteer & Intern Placement Coordinator Officer", level: "officer" },
+      ]},
+      { name: "Staff Welfare & Benefits Unit", staff: [
+        { title: "Staff Welfare & Benefits Manager", level: "manager" },
+        { title: "Compensation & Benefits Assistant", level: "assistant" },
+        { title: "Staff Welfare Officer", level: "officer" },
+        { title: "Employee Relations Coordinator Officer", level: "officer" },
+      ]},
+      { name: "Training & Capacity Building Unit", staff: [
+        { title: "Training & Capacity Building Manager", level: "manager" },
+        { title: "Staff Skills Enhancement Assistant", level: "assistant" },
+        { title: "Training & Development Officer", level: "officer" },
+        { title: "Capacity Building Coordinator Officer", level: "officer" },
+      ]},
+    ]
+  },
+  {
+    id: "it", label: "Information Technology", color: "#0A3D62", unitColor: "#1A6FA8",
+    title: "Information Technology (IT) Department",
+    director: "Information Technology (IT) Department Director",
+    units: [
+      { name: "Systems & Database Management Unit", staff: [
+        { title: "Systems & Database Management Manager", level: "manager" },
+        { title: "IT Records Management Assistant", level: "assistant" },
+        { title: "Database Administrator Officer", level: "officer" },
+        { title: "Systems Integration Officer", level: "officer" },
+      ]},
+      { name: "Cybersecurity & Data Protection Unit", staff: [
+        { title: "Cybersecurity & Data Protection Manager", level: "manager" },
+        { title: "Information Security Assistant", level: "assistant" },
+        { title: "Cybersecurity Officer", level: "officer" },
+        { title: "Data Protection Analyst Officer", level: "officer" },
+      ]},
+      { name: "Technical Support & Maintenance Unit", staff: [
+        { title: "Technical Support & Maintenance Manager", level: "manager" },
+        { title: "Helpdesk Support Assistant", level: "assistant" },
+        { title: "IT Support Technician Officer", level: "officer" },
+        { title: "Systems Maintenance Officer", level: "officer" },
+      ]},
+      { name: "Innovation & Human Capacity Unit", staff: [
+        { title: "Innovation & Human Capacity Manager", level: "manager" },
+        { title: "Technology Adoption Support Assistant", level: "assistant" },
+        { title: "Innovation & Digital Transformation Officer", level: "officer" },
+        { title: "ICT Training & Capacity Building Coordinator Officer", level: "officer" },
+      ]},
+    ]
+  },
+  {
+    id: "audit", label: "Internal Risk & Audits", color: "#7B3F00", unitColor: "#B85C00",
+    title: "Internal Risk & Audits Department",
+    director: "Internal Risk & Audits Department Director",
+    units: [
+      { name: "Compliance & Internal Control Unit", staff: [
+        { title: "Compliance & Internal Control Manager", level: "manager" },
+        { title: "Compliance Support Assistant", level: "assistant" },
+        { title: "Internal Control Officer", level: "officer" },
+        { title: "Policy Compliance Analyst", level: "officer" },
+      ]},
+      { name: "Fraud Detection & Reporting Unit", staff: [
+        { title: "Fraud Detection & Reporting Manager", level: "manager" },
+        { title: "Incident Reporting Assistant", level: "assistant" },
+        { title: "Fraud & Investigation Officer", level: "officer" },
+        { title: "Risk Intelligence Analyst", level: "officer" },
+      ]},
+      { name: "Risk Assessment & Mitigation Unit", staff: [
+        { title: "Risk Assessment & Mitigation Manager", level: "manager" },
+        { title: "Risk Mitigation Support Assistant", level: "assistant" },
+        { title: "Risk Assessment Officer", level: "officer" },
+        { title: "Operational Risk Analyst", level: "officer" },
+      ]},
+      { name: "Internal Audit & Risk Unit", staff: [
+        { title: "Internal Audit & Risk Manager", level: "manager" },
+        { title: "Assistant Internal Audit Manager", level: "assistant" },
+        { title: "Financial Auditor", level: "officer" },
+        { title: "Operational Auditor", level: "officer" },
+        { title: "Compliance & Regulatory Auditor", level: "officer" },
+        { title: "IT & Systems Auditor", level: "officer" },
+        { title: "Risk Management & Assurance Auditor", level: "officer" },
+      ]},
+    ]
+  },
+  {
+    id: "legal", label: "Legal & Communication", color: "#4A1278", unitColor: "#7B2FBE",
+    title: "Legal & Communication Department",
+    director: "Legal & Communication Department Director",
+    units: [
+      { name: "Legal Compliance & Policy Review Unit", staff: [
+        { title: "Legal Compliance & Policy Review Manager", level: "manager" },
+        { title: "Legal Compliance Assistant", level: "assistant" },
+        { title: "Legal Affairs Officer", level: "officer" },
+        { title: "Policy & Governance Analyst Officer", level: "officer" },
+      ]},
+      { name: "Public Relations & Media Communication Unit", staff: [
+        { title: "Public Relations & Media Communication Manager", level: "manager" },
+        { title: "Social Media & Outreach Assistant", level: "assistant" },
+        { title: "Public Relations Officer", level: "officer" },
+        { title: "Media & Communications Strategist Officer", level: "officer" },
+      ]},
+      { name: "Documentation & Contracts Unit", staff: [
+        { title: "Documentation & Contracts Manager", level: "manager" },
+        { title: "Legal Documentation Support Assistant", level: "assistant" },
+        { title: "Documentation & Records Officer", level: "officer" },
+        { title: "Contracts & Agreements Analyst Officer", level: "officer" },
+      ]},
+    ]
+  },
+  {
+    id: "procurement", label: "Procurement", color: "#B7410E", unitColor: "#E74C3C",
+    title: "Procurement Department",
+    director: "Procurement Department Director",
+    units: [
+      { name: "Procurement Planning & Budgeting Unit", staff: [
+        { title: "Procurement Planning & Budgeting Manager", level: "manager" },
+        { title: "Assistant Procurement Planning Officer", level: "assistant" },
+        { title: "Budget Forecasting & Analysis Officer", level: "officer" },
+        { title: "Procurement Documentation & Reporting Officer", level: "officer" },
+      ]},
+      { name: "Vendor Sourcing & Contracting Unit", staff: [
+        { title: "Vendor Sourcing & Contracting Manager", level: "manager" },
+        { title: "Assistant Vendor Management Officer", level: "assistant" },
+        { title: "Contract Evaluation & Negotiation Officer", level: "officer" },
+        { title: "Supplier Performance & Compliance Officer", level: "officer" },
+      ]},
+      { name: "Procurement Operations & Compliance Unit", staff: [
+        { title: "Procurement Operations & Compliance Manager", level: "manager" },
+        { title: "Assistant Procurement Compliance Officer", level: "assistant" },
+        { title: "Purchase Order & Records Management Officer", level: "officer" },
+        { title: "Policy Compliance & Audit Support Officer", level: "officer" },
+      ]},
+      { name: "Logistics, Delivery & Asset Verification Unit", staff: [
+        { title: "Logistics & Asset Verification Manager", level: "manager" },
+        { title: "Assistant Logistics & Inventory Officer", level: "assistant" },
+        { title: "Delivery Inspection & Quality Assurance Officer", level: "officer" },
+        { title: "Asset Tagging & Warehouse Records Officer", level: "officer" },
+      ]},
+    ]
+  },
+  {
+    id: "programs", label: "Programs", color: "#1A5276", unitColor: "#2980B9",
+    title: "Programs Department",
+    director: "Programs Department Director",
+    units: [
+      { name: "Project Planning & Implementation Unit", staff: [
+        { title: "Project Planning & Implementation Manager", level: "manager" },
+        { title: "Project Logistics Assistant", level: "assistant" },
+        { title: "Project Implementation Officer", level: "officer" },
+        { title: "Field Operations Coordinator Officer", level: "officer" },
+      ]},
+      { name: "Monitoring & Evaluation (M&E) Unit", staff: [
+        { title: "Monitoring & Evaluation Manager", level: "manager" },
+        { title: "Field Evaluation Assistant", level: "assistant" },
+        { title: "M&E Officer", level: "officer" },
+        { title: "Data & Impact Tracking Analyst Officer", level: "officer" },
+      ]},
+      { name: "Community Engagement & Outreach Unit", staff: [
+        { title: "Community Engagement & Outreach Manager", level: "manager" },
+        { title: "Community Liaison Assistant", level: "assistant" },
+        { title: "Community Outreach Coordinator Officer", level: "officer" },
+        { title: "Beneficiary Relations Officer", level: "officer" },
+      ]},
+      { name: "Management Quality Unit", staff: [
+        { title: "Management Quality Manager", level: "manager" },
+        { title: "Performance Review Assistant", level: "assistant" },
+        { title: "Quality Assurance Officer", level: "officer" },
+        { title: "Program Standards Compliance Analyst Officer", level: "officer" },
+      ]},
+      { name: "Community Empowerment Unit", staff: [
+        { title: "Community Empowerment Manager", level: "manager" },
+        { title: "Social Impact Support Assistant", level: "assistant" },
+        { title: "Community Empowerment Officer", level: "officer" },
+        { title: "Livelihood & Skills Development Coordinator Officer", level: "officer" },
+      ]},
+      { name: "Youth Engagement and Gender Affairs Unit", staff: [
+        { title: "Youth Engagement and Gender Affairs Manager", level: "manager" },
+        { title: "Youth and Gender Affairs Officer Assistant", level: "assistant" },
+        { title: "Youth Engagement & Development Officer", level: "officer" },
+        { title: "Gender Affairs & Counseling Officer", level: "officer" },
+      ]},
+      { name: "Disability Inclusion and Support Unit (DISU)", staff: [
+        { title: "Disability Inclusion Manager", level: "manager" },
+        { title: "Disability Support Assistant", level: "assistant" },
+        { title: "Disability Support Officer", level: "officer" },
+        { title: "Rehabilitation and Inclusion Officer", level: "officer" },
+        { title: "Disability Focal Person Officer", level: "officer" },
+      ]},
+      { name: "Sustainable Agriculture & Climate Action Unit", staff: [
+        { title: "Sustainable Agriculture & Climate Action Manager", level: "manager" },
+        { title: "Sustainable Agriculture & Climate Action Assistant", level: "assistant" },
+        { title: "Climate Change Advocacy Officer", level: "officer" },
+        { title: "Agricultural Development Officer", level: "officer" },
+      ]},
+    ]
+  },
+];
+
+const levelLabels = { manager: "Unit Manager", assistant: "Assistant Officer", officer: "Officer" };
+const levelBadge = { manager: "Manager", assistant: "Assistant", officer: "Officer" };
+
+function makeCard(title, level, color, unitColor) {
+  let bg, border, textColor, badgeBg, badgeText;
+  if (level === "director") {
+    bg = "#0D1B2A"; border = "#C9A84C"; textColor = "#C9A84C"; badgeBg = "#C9A84C"; badgeText = "#0D1B2A";
+  } else if (level === "manager") {
+    bg = color; border = color; textColor = "#fff"; badgeBg = "rgba(255,255,255,0.25)"; badgeText = "#fff";
+  } else if (level === "assistant") {
+    bg = "#fff"; border = unitColor; textColor = "#111"; badgeBg = unitColor; badgeText = "#fff";
+  } else {
+    bg = "#f4f6f9"; border = "#ccc"; textColor = "#333"; badgeBg = "#999"; badgeText = "#fff";
+  }
+  const roleLabel = level === "director" ? "Department Director" : levelLabels[level] || "";
+  const badge = level === "director" ? "Director" : levelBadge[level] || "Officer";
+  return `<div class="card" style="background:${bg};border-color:${border};color:${textColor}">
+    <div class="role" style="color:${level==='director'?'#C9A84C':textColor==='#fff'?'rgba(255,255,255,0.75)':'#666'}">${roleLabel}</div>
+    <div class="name">${title}</div>
+    <span class="badge" style="background:${badgeBg};color:${badgeText}">${badge}</span>
+  </div>`;
+}
+
+function buildDept(dept) {
+  const totalStaff = dept.units.reduce((a, u) => a + u.staff.length, 0) + 1;
+  const totalUnits = dept.units.length;
+
+  let html = `<div class="dept-section" id="dept-${dept.id}">
+    <div class="dept-title" style="background:${dept.color}">${dept.title}</div>
+    <div class="summary-bar">
+      <div class="summary-pill" style="border-left:4px solid ${dept.color}">Total Staff: <span>${totalStaff}</span></div>
+      <div class="summary-pill" style="border-left:4px solid ${dept.unitColor}">Units: <span>${totalUnits}</span></div>
+      <div class="summary-pill" style="border-left:4px solid #888">Hierarchy Levels: <span>4</span></div>
+    </div>`;
+
+  // Director at top
+  html += `<div class="tree-container">
+    ${makeCard(dept.director, "director", dept.color, dept.unitColor)}
+    <div class="vline"></div>`;
+
+  // Units row
+  html += `<div class="children-row">`;
+  dept.units.forEach((unit, ui) => {
+    html += `<div class="child-col">
+      <div class="unit-label" style="background:${dept.unitColor}">${unit.name}</div>`;
+
+    // Manager
+    const mgr = unit.staff.find(s => s.level === "manager");
+    if (mgr) {
+      html += makeCard(mgr.title, "manager", dept.color, dept.unitColor);
+      html += `<div class="vline"></div>`;
+    }
+
+    // Assistant
+    const asst = unit.staff.find(s => s.level === "assistant");
+    if (asst) {
+      html += makeCard(asst.title, "assistant", dept.color, dept.unitColor);
+      html += `<div class="vline"></div>`;
+    }
+
+    // Officers
+    const officers = unit.staff.filter(s => s.level === "officer");
+    if (officers.length) {
+      html += `<div style="display:flex;gap:8px;flex-wrap:wrap;justify-content:center">`;
+      officers.forEach(o => {
+        html += `<div>${makeCard(o.title, "officer", dept.color, dept.unitColor)}</div>`;
+      });
+      html += `</div>`;
+    }
+
+    html += `</div>`;
+  });
+
+  html += `</div></div>`;
+  html += `</div>`;
+  return html;
+}
+
+// Render nav tabs
+const navTabs = document.getElementById("navTabs");
+const containers = document.getElementById("deptContainers");
+
+DEPTS.forEach((dept, i) => {
+  const tab = document.createElement("div");
+  tab.className = "nav-tab" + (i === 0 ? " active" : "");
+  tab.textContent = dept.label;
+  tab.style.background = i === 0 ? dept.color : "#eee";
+  tab.style.color = i === 0 ? "#fff" : "#333";
+  tab.style.borderColor = dept.color;
+  tab.dataset.target = dept.id;
+  tab.dataset.color = dept.color;
+  tab.addEventListener("click", () => {
+    document.querySelectorAll(".nav-tab").forEach(t => {
+      t.classList.remove("active");
+      t.style.background = "#eee";
+      t.style.color = "#333";
+    });
+    document.querySelectorAll(".dept-section").forEach(s => s.classList.remove("active"));
+    tab.classList.add("active");
+    tab.style.background = dept.color;
+    tab.style.color = "#fff";
+    document.getElementById("dept-" + dept.id).classList.add("active");
+  });
+  navTabs.appendChild(tab);
+
+  containers.innerHTML += buildDept(dept);
+});
+
+// Activate first
+document.querySelector(".dept-section").classList.add("active");
+</script>
+
+<script>
+// â”€â”€â”€ Dynamic: Inject registered staff from localStorage into the Organogram â”€â”€
+(function loadOrganogramData() {
+  var registry = [];
+  try { registry = JSON.parse(localStorage.getItem('bcf_staff_registry') || '[]'); } catch(_) {}
+  // Filter for APPROVED or ACTIVE
+  registry = registry.filter(function(r) {
+    return r.workflowStatus === 'APPROVED' || r.recordStatus === 'ACTIVE' || (!r.workflowStatus && !r.recordStatus);
+  });
+  
+  if (!registry.length) return;
+
+  // Map from register dept keys to organogram dept section IDs
+  var DEPT_MAP = {
+    'finance':     'finance',     'Finance':     'finance',
+    'health':      'health',      'Health & Safety': 'health',
+    'hr':          'hr',          'Human Resources Management': 'hr',
+    'it':          'it',          'Information Technology (IT)': 'it',
+    'audit':       'audit',       'Internal Risk & Audits': 'audit',
+    'legal':       'legal',       'Legal & Communication': 'legal',
+    'procurement': 'procurement', 'Procurement': 'procurement',
+    'programs':    'programs',    'Programs':    'programs',
+    'ceo':         'ceo',         'CEO':         'ceo',
+  };
+
+  // Build a banner container for new staff per department
+  function getOrCreateNewStaffSection(deptId) {
+    var deptSection = document.getElementById('dept-' + deptId);
+    if (!deptSection) return null;
+    var existingBanner = deptSection.querySelector('.new-staff-banner');
+    if (existingBanner) return existingBanner;
+
+    var banner = document.createElement('div');
+    banner.className = 'new-staff-banner';
+    banner.style.cssText = 'margin-top:24px; padding:16px; background:#fff; border-radius:10px; border:2px dashed #4CAF50; box-shadow:0 2px 8px rgba(76,175,80,0.12);';
+    banner.innerHTML = '<div style="display:flex;align-items:center;gap:8px;margin-bottom:12px;"><span style="background:#4CAF50;color:#fff;padding:2px 10px;border-radius:12px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;">New Staff</span><span style="font-size:12px;color:#666;">Registered via HR Portal</span></div><div class="new-staff-cards" style="display:flex;flex-wrap:wrap;gap:10px;"></div>';
+    deptSection.appendChild(banner);
+    return banner;
+  }
+
+  var newStaffCount = 0;
+
+  registry.forEach(function(emp) {
+    var deptKey = DEPT_MAP[emp.dept] || DEPT_MAP[emp.deptLabel] || DEPT_MAP[emp.department] || null;
+    if (!deptKey) return;
+    
+    var level = (emp.managementLevel || emp.jobLevel || '').toLowerCase();
+    var jobLevel = (emp.jobLevel || '').toLowerCase();
+    
+    // Check if Director
+    if (level.includes('director') || jobLevel.includes('director') || level.includes('top management')) {
+      var deptSection = document.getElementById('dept-' + deptKey);
+      if (deptSection) {
+        // The first card in tree-container is the Director
+        var directorCard = deptSection.querySelector('.tree-container > .card');
+        if (directorCard) {
+          var nameEl = directorCard.querySelector('.name');
+          var roleEl = directorCard.querySelector('.role');
+          if (nameEl) nameEl.textContent = (emp.fullName || emp.displayName || emp.name || '');
+          if (roleEl) roleEl.textContent = (emp.jobTitle || 'Department Director');
+          return; // Done injecting director, don't add to banner
+        }
+      }
+    }
+
+    var banner = getOrCreateNewStaffSection(deptKey);
+    if (!banner) return;
+
+    var cardsContainer = banner.querySelector('.new-staff-cards');
+    if (!cardsContainer) return;
+
+    // Determine card tier colour based on job level / management level
+    var tierBg = '#4059aa', tierColor = '#fff';
+    if (level.includes('director')) { tierBg = '#0D1B2A'; tierColor = '#C9A84C'; }
+    else if (level.includes('top') || level.includes('manager')) { tierBg = '#1F4E79'; tierColor = '#fff'; }
+    else if (level.includes('middle') || level.includes('assistant')) { tierBg = '#2E75B6'; tierColor = '#fff'; }
+
+    var startDate = emp.tenureStart || emp.startDate || '';
+
+    var card = document.createElement('div');
+    card.style.cssText = 'min-width:140px;max-width:175px;padding:10px 12px;border-radius:8px;text-align:center;font-size:11px;line-height:1.4;box-shadow:0 2px 6px rgba(0,0,0,0.12);border:2px solid #4CAF50;position:relative;background:' + tierBg + ';color:' + tierColor + ';';
+    card.innerHTML =
+      '<div style="font-size:10px;font-weight:500;opacity:0.8;margin-bottom:2px;">' + (emp.jobTitle || emp.role || 'Staff') + '</div>' +
+      '<div style="font-size:12px;font-weight:700;line-height:1.3;">' + (emp.fullName || emp.displayName || emp.name || '') + '</div>' +
+      '<div style="display:inline-block;font-size:9px;font-weight:700;padding:1px 7px;border-radius:10px;margin-top:5px;background:rgba(76,175,80,0.9);color:#fff;text-transform:uppercase;letter-spacing:0.4px;">LIVE</div>' +
+      '<div style="font-size:9px;opacity:0.7;margin-top:3px;">' + (emp.employeeId || emp.id || '') + '</div>' +
+      (startDate ? '<div style="font-size:9px;opacity:0.6;margin-top:1px;">Started: ' + startDate + '</div>' : '');
+
+    cardsContainer.appendChild(card);
+    newStaffCount++;
+  });
+
+  // Update new staff count in nav tabs
+  if (newStaffCount > 0) {
+    var newBadge = document.createElement('span');
+    newBadge.style.cssText = 'margin-left:6px;background:#4CAF50;color:#fff;font-size:10px;font-weight:700;padding:1px 7px;border-radius:10px;';
+    newBadge.textContent = '+' + newStaffCount + ' LIVE';
+    var header = document.querySelector('.page-header p');
+    if (header) header.appendChild(newBadge);
+  }
+})();
+</script>
+<script>
+    function navToApp(nextRoute, fallbackPath, e) {
+        if (e) e.preventDefault();
+        try {
+            if (window.top && window.top !== window && window.top.location) {
+                window.top.location.href = nextRoute;
+                return;
+            }
+        } catch(err) {}
+        window.location.href = fallbackPath;
+    }
+</script>
+
+</body>
+</html>
+

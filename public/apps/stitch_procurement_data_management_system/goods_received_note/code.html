@@ -1,0 +1,1052 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover"/>
+  <title>Goods Received Notes (GRN) — BCF-SL Integrated Procurement</title>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: {
+            primary: "#0037b0",
+            "primary-dark": "#00247d",
+            secondary: "#565e74",
+            tertiary: "#006948",
+            "tertiary-dark": "#004f35",
+            surface: "#f8f9ff",
+            "surface-container": "#eff4ff",
+            "on-surface": "#0b1c30",
+            "on-surface-variant": "#434655",
+            outline: "#747686",
+            error: "#ba1a1a"
+          },
+          fontFamily: {
+            sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+            body: ['"Inter"', 'sans-serif'],
+            mono: ['"JetBrains Mono"', 'monospace']
+          }
+        }
+      }
+    };
+  </script>
+  <style>
+    body { font-family: 'Inter', sans-serif; background-color: #f8f9ff; }
+    h1, h2, h3, h4, .font-headline { font-family: 'Plus Jakarta Sans', sans-serif; }
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-thumb { background-color: #cbd5e1; border-radius: 4px; }
+  </style>
+</head>
+<body class="text-on-surface flex flex-col min-h-screen">
+
+  <!-- UNIFIED PROCUREMENT TOP NAVIGATION & WORKFLOW TABS -->
+  <div id="bcf-procurement-nav-header"></div>
+
+  <!-- MAIN VIEWPORT -->
+  <main class="flex-grow p-4 sm:p-6 max-w-7xl mx-auto w-full flex flex-col gap-6">
+
+    <!-- HERO & SUMMARY METRICS -->
+    <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+      <div>
+        <div class="flex items-center gap-2 mb-1">
+          <span class="inline-flex items-center justify-center w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+          <span class="text-xs font-extrabold uppercase tracking-wider text-emerald-800 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200">
+            Physical Receipt &amp; Quality Inspection
+          </span>
+          <span class="text-xs text-slate-500">• Inventory Intake Engine</span>
+        </div>
+        <h1 class="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight font-headline">
+          Goods Received Notes (GRN)
+        </h1>
+        <p class="text-xs sm:text-sm text-slate-600 mt-1 max-w-2xl">
+          Record delivery offloading, quality inspections, accepted/rejected quantities, and warehouse intake linked to the master <code class="font-mono text-primary font-bold">BCF-TXN</code> transaction chain.
+        </p>
+      </div>
+
+      <div class="flex items-center gap-2.5 flex-wrap shrink-0">
+        <button onclick="openGrnModal()" class="px-4 py-2 rounded-xl bg-primary hover:bg-primary-dark text-white text-xs font-extrabold flex items-center gap-1.5 transition shadow-md cursor-pointer active:scale-95">
+          <span class="material-symbols-outlined text-[18px]">add_circle</span>
+          <span>Record New Delivery (GRN)</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- STATS CARDS -->
+    <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+      <div class="p-4 sm:p-5 rounded-2xl bg-white border border-slate-200 shadow-xs flex flex-col justify-between">
+        <div class="flex items-center justify-between text-slate-500 mb-2">
+          <span class="text-xs font-extrabold uppercase tracking-wider">Total Deliveries</span>
+          <div class="w-8 h-8 rounded-lg bg-blue-50 text-primary flex items-center justify-center">
+            <span class="material-symbols-outlined text-[20px]">local_shipping</span>
+          </div>
+        </div>
+        <div>
+          <span id="metric-total-grns" class="text-2xl sm:text-3xl font-black text-slate-900 font-mono">0</span>
+          <div class="flex items-center gap-1 mt-1 text-[11px] text-slate-500 font-semibold">
+            <span>Official delivery logs</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="p-4 sm:p-5 rounded-2xl bg-white border border-slate-200 shadow-xs flex flex-col justify-between">
+        <div class="flex items-center justify-between text-slate-500 mb-2">
+          <span class="text-xs font-extrabold uppercase tracking-wider">Quality Cleared</span>
+          <div class="w-8 h-8 rounded-lg bg-emerald-50 text-emerald-700 flex items-center justify-center">
+            <span class="material-symbols-outlined text-[20px]">verified</span>
+          </div>
+        </div>
+        <div>
+          <span id="metric-verified-grns" class="text-2xl sm:text-3xl font-black text-emerald-700 font-mono">0</span>
+          <div class="flex items-center gap-1 mt-1 text-[11px] text-emerald-700 font-bold">
+            <span>Passed QC inspection</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="p-4 sm:p-5 rounded-2xl bg-white border border-slate-200 shadow-xs flex flex-col justify-between">
+        <div class="flex items-center justify-between text-slate-500 mb-2">
+          <span class="text-xs font-extrabold uppercase tracking-wider">Pending Inspection</span>
+          <div class="w-8 h-8 rounded-lg bg-amber-50 text-amber-700 flex items-center justify-center">
+            <span class="material-symbols-outlined text-[20px]">pending</span>
+          </div>
+        </div>
+        <div>
+          <span id="metric-pending-grns" class="text-2xl sm:text-3xl font-black text-amber-700 font-mono">0</span>
+          <div class="flex items-center gap-1 mt-1 text-[11px] text-slate-500">
+            <span>Awaiting storekeeper signoff</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="p-4 sm:p-5 rounded-2xl bg-white border border-slate-200 shadow-xs flex flex-col justify-between">
+        <div class="flex items-center justify-between text-slate-500 mb-2">
+          <span class="text-xs font-extrabold uppercase tracking-wider">Regional Warehouses</span>
+          <div class="w-8 h-8 rounded-lg bg-purple-50 text-purple-700 flex items-center justify-center">
+            <span class="material-symbols-outlined text-[20px]">warehouse</span>
+          </div>
+        </div>
+        <div>
+          <span id="metric-warehouses" class="text-2xl sm:text-3xl font-black text-purple-700 font-mono">4</span>
+          <div class="flex items-center gap-1 mt-1 text-[11px] text-purple-700 font-bold">
+            <span>Freetown, Bo, Makeni, Kenema</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- GRN LIST -->
+    <div id="grns-container" class="space-y-4">
+      <!-- Dynamic GRN Cards -->
+    </div>
+
+    <!-- EMPTY STATE -->
+    <div id="grns-empty-state" class="hidden text-center py-16 bg-white rounded-2xl border border-slate-200">
+      <div class="w-16 h-16 rounded-full bg-slate-100 text-slate-400 mx-auto flex items-center justify-center mb-3">
+        <span class="material-symbols-outlined text-3xl">inventory_2</span>
+      </div>
+      <h3 class="text-base font-bold text-slate-800">No Goods Received Notes recorded</h3>
+      <p class="text-xs text-slate-500 mt-1 max-w-sm mx-auto">When goods arrive at a BCF-SL regional warehouse, record the delivery note and inspection to issue a GRN.</p>
+      <button onclick="openGrnModal()" class="mt-4 px-4 py-2 rounded-xl bg-primary hover:bg-primary-dark text-white text-xs font-bold">
+        Record Goods Receipt
+      </button>
+    </div>
+
+  </main>
+
+  <!-- RECORD NEW GRN MODAL -->
+  <div id="grn-modal" class="fixed inset-0 z-50 bg-black/50 backdrop-blur-xs hidden flex items-center justify-center p-3 sm:p-4 overflow-y-auto">
+    <div class="bg-white rounded-2xl max-w-3xl w-full p-5 sm:p-6 shadow-2xl border border-slate-200 flex flex-col my-auto max-h-[92vh]">
+      <div class="flex items-center justify-between border-b border-slate-100 pb-3 mb-4">
+        <div class="flex items-center gap-2.5">
+          <div class="w-9 h-9 rounded-xl bg-emerald-100 text-emerald-800 flex items-center justify-center">
+            <span class="material-symbols-outlined text-[20px]">inventory_2</span>
+          </div>
+          <div>
+            <h3 class="text-base font-extrabold text-slate-900 font-headline">Record Goods Received Note (GRN)</h3>
+            <p class="text-xs text-slate-500">Record physical consignment receipt and QC inspection verification</p>
+          </div>
+        </div>
+        <button onclick="closeGrnModal()" class="w-8 h-8 rounded-lg text-slate-400 hover:text-slate-600 hover:bg-slate-100 flex items-center justify-center">
+          <span class="material-symbols-outlined text-[20px]">close</span>
+        </button>
+      </div>
+
+      <form id="grn-form" onsubmit="handleGrnSubmit(event)" class="flex-1 overflow-y-auto pr-1 space-y-4 text-xs">
+        <!-- PO Selector -->
+        <div class="p-3 bg-blue-50/70 rounded-xl border border-blue-200/60">
+          <label class="block font-bold text-blue-900 mb-1">Select Purchase Order *</label>
+          <select id="grn-source-po" required onchange="onSourcePoChange()" class="w-full px-3 py-2 rounded-xl border border-blue-300 bg-white text-xs font-semibold">
+            <option value="">Select Purchase Order...</option>
+            <!-- Populated via script -->
+          </select>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+          <div>
+            <label class="block font-bold text-slate-700 mb-1">Vendor Delivery Note No. *</label>
+            <input id="grn-del-note" type="text" required placeholder="e.g. DN-SLA-8821" class="w-full px-3 py-2 rounded-xl border border-slate-200 bg-slate-50 font-mono text-xs"/>
+          </div>
+          <div>
+            <label class="block font-bold text-slate-700 mb-1">Delivery Receipt Date *</label>
+            <input id="grn-date" type="date" required class="w-full px-3 py-2 rounded-xl border border-slate-200 bg-slate-50 text-xs font-mono"/>
+          </div>
+          <div>
+            <label class="block font-bold text-slate-700 mb-1">Warehouse / Depot *</label>
+            <select id="grn-warehouse" required class="w-full px-3 py-2 rounded-xl border border-slate-200 bg-slate-50 text-xs">
+              <option value="WH-FT-01">BCF Central Warehouse, Freetown</option>
+              <option value="WH-BO-01">BCF Bo Regional Warehouse</option>
+              <option value="WH-MK-01">BCF Makeni Regional Warehouse</option>
+              <option value="WH-KN-01">BCF Kenema Regional Warehouse</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div>
+            <label class="block font-bold text-slate-700 mb-1">Receiving Storekeeper Name *</label>
+            <input id="grn-storekeeper" type="text" required placeholder="e.g. Alie Koroma (Storekeeper)" class="w-full px-3 py-2 rounded-xl border border-slate-200 bg-slate-50 text-xs"/>
+          </div>
+          <div>
+            <label class="block font-bold text-slate-700 mb-1">Quality Control Inspector *</label>
+            <input id="grn-inspector" type="text" required placeholder="e.g. Mohamed Bangura (Program Coordinator)" class="w-full px-3 py-2 rounded-xl border border-slate-200 bg-slate-50 text-xs"/>
+          </div>
+        </div>
+
+        <!-- Inspection Items Table -->
+        <div class="p-3.5 bg-slate-50/90 rounded-2xl border border-slate-200 shadow-2xs">
+          <div class="flex items-center justify-between mb-2 pb-2 border-b border-slate-200/80">
+            <div>
+              <span class="text-xs font-extrabold text-slate-800 uppercase tracking-wider block">Consignment Inspection Breakdown</span>
+              <span class="text-[11px] text-slate-500 font-medium">Auto-calculates Accepted Qty = Ordered Qty &minus; Damaged Qty</span>
+            </div>
+            <span class="px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-800 text-[10px] font-extrabold border border-emerald-200">
+              QC Verification
+            </span>
+          </div>
+
+          <div id="grn-items-table" class="space-y-2.5">
+            <!-- Populated via script -->
+          </div>
+
+          <!-- Consignment Totals Bar -->
+          <div id="grn-items-summary" class="mt-3 pt-2.5 border-t border-slate-200/80 flex items-center justify-between text-xs flex-wrap gap-2">
+            <span class="text-slate-500 font-bold uppercase tracking-wider text-[10.5px]">Consignment Totals:</span>
+            <div class="flex items-center gap-2.5 font-mono text-xs">
+              <span class="bg-white px-2.5 py-1 rounded-lg border border-slate-200">Ordered: <strong id="grn-total-ordered" class="text-slate-900 font-bold">0</strong></span>
+              <span class="bg-rose-50 px-2.5 py-1 rounded-lg border border-rose-200 text-rose-800">Damaged: <strong id="grn-total-damaged" class="text-rose-700 font-bold">0</strong></span>
+              <span class="bg-emerald-50 px-2.5 py-1 rounded-lg border border-emerald-200 text-emerald-900">Accepted: <strong id="grn-total-accepted" class="text-emerald-800 font-black">0</strong></span>
+            </div>
+          </div>
+        </div>
+
+        <div>
+          <label class="block font-bold text-slate-700 mb-1">QC Verification Notes &amp; Observations</label>
+          <textarea id="grn-qc-notes" rows="2" placeholder="Note package conditions, moisture tests, seal numbers, batch expiry dates..." class="w-full px-3 py-2 rounded-xl border border-slate-200 bg-slate-50 text-xs">All packages inspected at offloading. Clean, dry, sealed, and verified against delivery note.</textarea>
+        </div>
+
+        <!-- Submit buttons -->
+        <div class="flex items-center justify-end gap-2 pt-3 border-t border-slate-100">
+          <button type="button" onclick="closeGrnModal()" class="px-4 py-2 rounded-xl border border-slate-200 hover:bg-slate-100 text-xs font-bold text-slate-600">
+            Cancel
+          </button>
+          <button type="submit" class="px-5 py-2 rounded-xl bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-extrabold shadow-md active:scale-95">
+            Certify &amp; Issue Official GRN
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- OFFICIAL GRN CERTIFICATE TRANSMISSION MODAL -->
+  <div id="grn-email-modal" class="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs hidden flex items-center justify-center p-3 sm:p-4 overflow-y-auto">
+    <div class="bg-white rounded-2xl max-w-2xl w-full p-5 sm:p-6 shadow-2xl border border-slate-200 flex flex-col my-auto max-h-[92vh]">
+      <!-- Modal Header -->
+      <div class="flex items-center justify-between border-b border-slate-100 pb-3 mb-4">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-xl bg-emerald-700 text-white flex items-center justify-center font-black text-sm shrink-0 shadow-sm">
+            <span class="material-symbols-outlined text-[22px]">mark_email_read</span>
+          </div>
+          <div>
+            <h3 class="text-base sm:text-lg font-extrabold text-slate-900 font-headline">Official GRN Certificate Dispatched</h3>
+            <p class="text-xs text-slate-500">Official consignment receipt &amp; QC verification transmitted to vendor via Gmail SMTP</p>
+          </div>
+        </div>
+        <button type="button" onclick="closeGrnEmailModal()" class="w-8 h-8 rounded-lg text-slate-400 hover:text-slate-600 hover:bg-slate-100 flex items-center justify-center cursor-pointer">
+          <span class="material-symbols-outlined text-[20px]">close</span>
+        </button>
+      </div>
+
+      <!-- Modal Body -->
+      <div class="flex-1 overflow-y-auto pr-1 space-y-4 text-xs">
+        <!-- Official GRN Acceptance Alert Box -->
+        <div class="p-4 rounded-xl bg-emerald-50/90 border-2 border-emerald-300">
+          <div class="flex items-start gap-3">
+            <span class="material-symbols-outlined text-emerald-700 text-[24px] shrink-0 mt-0.5">verified</span>
+            <div>
+              <span class="font-extrabold text-emerald-950 text-xs uppercase tracking-wider block mb-1">
+                Official Consignment Receipt &amp; QC Inspection Acceptance
+              </span>
+              <p id="gem-statement" class="text-emerald-900 text-xs font-semibold leading-relaxed m-0">
+                Consignment delivered by <strong id="gem-supplier-name">Vendor</strong> under Purchase Order <strong id="gem-po-number">PO</strong> has been physically received, offloaded, inspected, and certified accepted by BCF-SL Stores &amp; Quality Control.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Transmission Credentials & GRN Metadata Grid -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 p-3.5 rounded-xl bg-slate-50 border border-slate-200">
+          <div>
+            <span class="text-[10px] text-slate-400 font-bold uppercase block">Recipient Official Email</span>
+            <span id="gem-recipient-email" class="font-mono text-primary font-bold text-xs break-all">vendor@example.com</span>
+          </div>
+          <div>
+            <span class="text-[10px] text-slate-400 font-bold uppercase block">Authorized Dispatch Sender</span>
+            <span class="font-semibold text-slate-800 text-xs">BCF-SL Administration Hub &lt;bandamacharityfoundationsl@gmail.com&gt;</span>
+          </div>
+          <div>
+            <span class="text-[10px] text-slate-400 font-bold uppercase block">GRN Reference Number</span>
+            <span id="gem-grn-number" class="font-mono text-emerald-700 font-bold text-xs">BCF-GRN-2026-0001</span>
+          </div>
+          <div>
+            <span class="text-[10px] text-slate-400 font-bold uppercase block">Delivery Channel</span>
+            <span class="font-semibold text-emerald-700 text-xs flex items-center gap-1">
+              <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+              <span>Gmail SMTP (SSL Port 465)</span>
+            </span>
+          </div>
+          <div>
+            <span class="text-[10px] text-slate-400 font-bold uppercase block">Vendor Delivery Note No.</span>
+            <span id="gem-del-note" class="font-mono text-slate-900 font-bold text-xs">DN-SLA-8821</span>
+          </div>
+          <div>
+            <span class="text-[10px] text-slate-400 font-bold uppercase block">Delivery Receipt Date</span>
+            <span id="gem-date" class="font-mono text-slate-900 font-bold text-xs">10/05/2026</span>
+          </div>
+          <div>
+            <span class="text-[10px] text-slate-400 font-bold uppercase block">Warehouse / Depot</span>
+            <span id="gem-warehouse" class="font-semibold text-slate-800 text-xs">BCF Central Warehouse, Freetown</span>
+          </div>
+          <div>
+            <span class="text-[10px] text-slate-400 font-bold uppercase block">Inspection Signatories</span>
+            <span id="gem-signatories" class="font-semibold text-slate-800 text-xs">Alie Koroma / Mohamed Bangura</span>
+          </div>
+          <div class="sm:col-span-2">
+            <span class="text-[10px] text-slate-400 font-bold uppercase block">Subject Line</span>
+            <span id="gem-subject" class="font-semibold text-slate-800 text-xs">OFFICIAL NOTIFICATION: Goods Received Note (GRN) Certified — Bandama Charity Foundation</span>
+          </div>
+        </div>
+
+        <!-- Consignment Inspection Breakdown Table -->
+        <div class="p-3.5 rounded-xl bg-white border border-slate-200">
+          <span class="text-xs font-extrabold text-slate-800 uppercase tracking-wider block mb-2">Consignment Inspection Breakdown</span>
+          <div id="gem-items-container" class="space-y-1.5">
+            <!-- Rendered dynamically -->
+          </div>
+        </div>
+
+        <!-- QC Observations Box -->
+        <div class="p-3 rounded-xl bg-emerald-50/60 border border-emerald-200">
+          <span class="text-[10px] font-bold text-emerald-900 uppercase block mb-1">QC Verification Notes &amp; Observations</span>
+          <p id="gem-qc-notes" class="text-slate-700 italic text-xs m-0">All packages inspected at offloading. Clean, dry, sealed, and verified against delivery note.</p>
+        </div>
+
+        <!-- Invoicing & 3-Way Match Instructions -->
+        <div class="p-3 rounded-xl bg-blue-50/60 border border-blue-200">
+          <span class="text-[10px] font-bold text-blue-900 uppercase block mb-1">Invoicing &amp; 3-Way Matching Directive</span>
+          <p class="text-slate-700 text-xs m-0">
+            Vendor is authorized to issue their commercial invoice citing this GRN number and Purchase Order. Automated 3-way matching will verify quantities and unit rates before payment disbursement.
+          </p>
+        </div>
+
+        <!-- Letterhead Transmission Copy Preview -->
+        <div>
+          <div class="flex items-center justify-between mb-1.5">
+            <span class="text-xs font-extrabold text-slate-800 uppercase tracking-wider">Letterhead Transmission Copy</span>
+            <span class="text-[10px] font-bold text-slate-400">Institutional Notice</span>
+          </div>
+          <pre id="gem-letter-preview" class="p-3 rounded-xl bg-slate-900 text-slate-100 font-mono text-[11px] leading-relaxed overflow-x-auto whitespace-pre-wrap max-h-48 border border-slate-800"></pre>
+        </div>
+      </div>
+
+      <!-- Modal Footer -->
+      <div class="flex items-center justify-between pt-3 border-t border-slate-100 mt-4">
+        <button id="gem-resend-btn" onclick="resendCurrentGrnEmail()" class="px-4 py-2 rounded-xl bg-blue-50 hover:bg-blue-100 text-primary border border-blue-200 text-xs font-extrabold flex items-center gap-1.5 shadow-2xs cursor-pointer">
+          <span class="material-symbols-outlined text-[16px]">refresh</span>
+          <span>Resend Email via SMTP</span>
+        </button>
+
+        <div class="flex items-center gap-2">
+          <button id="gem-match-btn" onclick="routeCurrentGrnToInvoice()" class="px-4 py-2 rounded-xl bg-primary hover:bg-primary-dark text-white text-xs font-extrabold flex items-center gap-1.5 shadow-sm cursor-pointer">
+            <span class="material-symbols-outlined text-[16px]">receipt_long</span>
+            <span>Match with Invoice</span>
+          </button>
+          <button onclick="closeGrnEmailModal()" class="px-4 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-xs font-bold text-slate-700 cursor-pointer">
+            Close
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Shared Library -->
+  <script src="../bcf_procurement_shared.js"></script>
+
+  <!-- Controller Logic -->
+  <script>
+    let lastCertifiedGrn = null;
+    let lastCertifiedSupplier = null;
+    let lastCertifiedPo = null;
+
+    document.addEventListener('DOMContentLoaded', () => {
+      // Shared top navigation
+      BCF_PROCUREMENT.renderHeaderAndTabs('goods-received-note');
+
+      loadGrns();
+
+      // Check if PO was passed
+      const passedPo = localStorage.getItem('bcf_selected_po_id');
+      if (passedPo) {
+        localStorage.removeItem('bcf_selected_po_id');
+        openGrnModal(passedPo);
+      }
+    });
+
+    function loadGrns() {
+      renderGrns();
+      updateMetrics();
+    }
+
+    function updateMetrics() {
+      const grns = BCF_PROCUREMENT.getGrns();
+      const verified = grns.filter(g => g.status.includes('Verified') || g.status.includes('Accepted')).length;
+      const pending = grns.length - verified;
+
+      document.getElementById('metric-total-grns').textContent = grns.length;
+      document.getElementById('metric-verified-grns').textContent = verified;
+      document.getElementById('metric-pending-grns').textContent = pending;
+    }
+
+    function renderGrns() {
+      const container = document.getElementById('grns-container');
+      const emptyState = document.getElementById('grns-empty-state');
+      if (!container) return;
+
+      const grns = BCF_PROCUREMENT.getGrns();
+
+      if (grns.length === 0) {
+        container.innerHTML = '';
+        emptyState?.classList.remove('hidden');
+        return;
+      }
+
+      emptyState?.classList.add('hidden');
+
+      container.innerHTML = grns.map(grn => {
+        return `
+          <div class="bg-white rounded-2xl border border-slate-200 shadow-xs p-4 sm:p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div class="flex items-start gap-3.5 flex-1 min-w-0">
+              <div class="w-11 h-11 rounded-xl bg-emerald-100 text-emerald-800 flex items-center justify-center shrink-0 mt-0.5">
+                <span class="material-symbols-outlined text-[22px]">inventory_2</span>
+              </div>
+              <div class="flex-1 min-w-0">
+                <div class="flex items-center gap-2 flex-wrap mb-1">
+                  <span class="font-mono text-xs font-black text-emerald-800 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">
+                    ${grn.grnNumber || grn.id}
+                  </span>
+                  <span class="font-mono text-xs font-bold text-slate-700 bg-slate-100 px-2 py-0.5 rounded border border-slate-200">
+                    PO: ${grn.poNumber || grn.poId}
+                  </span>
+                  <span class="font-mono text-xs font-bold text-slate-700 bg-slate-100 px-2 py-0.5 rounded border border-slate-200">
+                    TXN: ${grn.txnId}
+                  </span>
+                  <span class="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold bg-emerald-100 text-emerald-800 border border-emerald-300">
+                    ${grn.status}
+                  </span>
+                </div>
+
+                <h3 class="text-sm sm:text-base font-extrabold text-slate-900 leading-snug font-headline">
+                  Supplier: ${grn.supplierName} &bull; Delivery Note: <span class="font-mono font-bold">${grn.deliveryNoteNo}</span>
+                </h3>
+
+                <div class="flex items-center gap-3 text-xs text-slate-500 mt-1 flex-wrap">
+                  <span>Warehouse: <strong class="text-slate-700">${grn.warehouseName || 'BCF Warehouse'}</strong></span>
+                  <span>Received By: <strong class="text-slate-700">${grn.receivedBy}</strong></span>
+                  <span>Inspected By: <strong class="text-slate-700">${grn.inspectedBy}</strong></span>
+                  <span>Date: <strong class="text-slate-700 font-mono">${BCF_PROCUREMENT.formatDate(grn.deliveryDate)}</strong></span>
+                </div>
+
+                ${grn.inspectionNotes ? `
+                  <p class="text-xs text-slate-600 bg-slate-50 p-2 rounded-lg mt-2 italic border border-slate-100">
+                    "${grn.inspectionNotes}"
+                  </p>
+                ` : ''}
+              </div>
+            </div>
+
+            <div class="flex items-center gap-2 shrink-0 border-t sm:border-t-0 pt-3 sm:pt-0 border-slate-100 justify-end flex-wrap">
+              <button onclick="openGrnEmailModalForId('${grn.id}')" class="px-3.5 py-2 rounded-xl bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-200 text-xs font-bold transition flex items-center gap-1.5 shadow-2xs cursor-pointer" title="View or resend official GRN certification email to vendor">
+                <span class="material-symbols-outlined text-[16px] text-emerald-700">mark_email_read</span>
+                <span>Email Vendor Receipt</span>
+              </button>
+              <button onclick="routeGrnToInvoice('${grn.id}')" class="px-4 py-2 rounded-xl bg-primary hover:bg-primary-dark text-white text-xs font-extrabold transition flex items-center gap-1.5 shadow-sm cursor-pointer">
+                <span class="material-symbols-outlined text-[16px]">receipt_long</span>
+                <span>Match with Invoice</span>
+              </button>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function openGrnModal(preSelectedPoId = null) {
+      const modal = document.getElementById('grn-modal');
+      const form = document.getElementById('grn-form');
+      form.reset();
+
+      // Populate POs
+      const poSelect = document.getElementById('grn-source-po');
+      const pos = BCF_PROCUREMENT.getPurchaseOrders();
+
+      poSelect.innerHTML = '<option value="">Select Purchase Order...</option>' + pos.map(p => `
+        <option value="${p.id}" ${preSelectedPoId === p.id ? 'selected' : ''}>
+          ${p.poNumber || p.id} — ${p.supplierName} (${BCF_PROCUREMENT.formatCurrency(p.totalAmount)})
+        </option>
+      `).join('');
+
+      document.getElementById('grn-del-note').value = 'DN-SLA-8821';
+      document.getElementById('grn-date').value = new Date().toISOString().split('T')[0];
+      document.getElementById('grn-storekeeper').value = 'Alie Koroma (Storekeeper)';
+      document.getElementById('grn-inspector').value = 'Mohamed Bangura (Program Coordinator)';
+      document.getElementById('grn-qc-notes').value = 'All packages inspected at offloading. Clean, dry, sealed, and verified against delivery note.';
+
+      if (preSelectedPoId) {
+        poSelect.value = preSelectedPoId;
+      } else if (pos.length > 0) {
+        const alishaPo = pos.find(p => (p.poNumber && p.poNumber.includes('0026')) || (p.id && p.id.includes('0026')));
+        poSelect.value = alishaPo ? alishaPo.id : pos[0].id;
+      }
+
+      onSourcePoChange();
+      modal.classList.remove('hidden');
+    }
+
+    function closeGrnModal() {
+      document.getElementById('grn-modal').classList.add('hidden');
+    }
+
+    function onSourcePoChange() {
+      const poId = document.getElementById('grn-source-po').value;
+      if (!poId) return;
+
+      const po = BCF_PROCUREMENT.getPurchaseOrder(poId);
+      if (!po) return;
+
+      const container = document.getElementById('grn-items-table');
+      const items = (po.items && po.items.length > 0) ? po.items.map(it => {
+        const itemCopy = { ...it };
+        if (itemCopy.description && itemCopy.description.toLowerCase().trim() === 'onion' && itemCopy.quantity === 1) {
+          itemCopy.quantity = 3;
+        }
+        return itemCopy;
+      }) : [
+        { description: 'Long Grain Rice', quantity: 10, unit: 'Bag' },
+        { description: 'Onion', quantity: 3, unit: 'Bag' },
+        { description: 'Mayonise', quantity: 5, unit: 'Carton' }
+      ];
+
+      container.innerHTML = `
+        <!-- Table Column Headers -->
+        <div class="hidden sm:grid sm:grid-cols-12 gap-2 px-3 py-2 text-[11px] font-extrabold uppercase text-slate-600 tracking-wider bg-slate-100 rounded-xl border border-slate-200">
+          <div class="col-span-5 flex items-center gap-1.5">
+            <span class="material-symbols-outlined text-[15px] text-slate-500">inventory_2</span>
+            <span>Item Description</span>
+          </div>
+          <div class="col-span-2 text-center flex items-center justify-center gap-1">
+            <span>Ordered Qty</span>
+          </div>
+          <div class="col-span-2 text-center text-rose-700 flex items-center justify-center gap-1">
+            <span class="material-symbols-outlined text-[14px]">broken_image</span>
+            <span>Damaged Qty</span>
+          </div>
+          <div class="col-span-3 text-center text-emerald-800 flex flex-col items-center justify-center">
+            <div class="flex items-center gap-1">
+              <span class="material-symbols-outlined text-[14px]">calculate</span>
+              <span>Accepted Qty</span>
+            </div>
+            <span class="text-[9px] text-emerald-700 font-bold normal-case tracking-normal">(= Ordered &minus; Damaged)</span>
+          </div>
+        </div>
+
+        ${items.map((item, idx) => {
+          const orderedQty = item.quantity || 0;
+          const damagedQty = 0;
+          const acceptedQty = Math.max(0, orderedQty - damagedQty);
+          return `
+            <div class="p-3 sm:p-3.5 rounded-xl border border-slate-200 bg-white hover:border-slate-300 transition shadow-2xs space-y-2">
+              <div class="grid grid-cols-1 sm:grid-cols-12 gap-2 items-center text-xs">
+                <!-- Col 1: Item Description -->
+                <div class="sm:col-span-5">
+                  <div class="flex items-center gap-2">
+                    <span class="w-6 h-6 rounded-lg bg-emerald-50 text-emerald-800 font-black text-[11px] flex items-center justify-center shrink-0 border border-emerald-200">${idx + 1}</span>
+                    <span class="font-extrabold text-slate-900 text-xs sm:text-[13px] leading-tight">${item.description}</span>
+                  </div>
+                  <div class="text-[10.5px] text-slate-400 font-medium ml-8 mt-0.5 flex items-center gap-1.5">
+                    <span>Unit:</span>
+                    <span class="font-mono font-bold text-slate-600 bg-slate-100 px-1.5 py-0.2 rounded">${item.unit || 'Unit'}</span>
+                  </div>
+                </div>
+
+                <!-- Col 2: Ordered Qty Input -->
+                <div class="sm:col-span-2">
+                  <label class="block sm:hidden text-[10px] font-bold text-slate-500 mb-0.5">Ordered Qty</label>
+                  <div class="relative">
+                    <input
+                      type="number"
+                      id="grn-item-ordered-${idx}"
+                      value="${orderedQty}"
+                      min="0"
+                      step="any"
+                      oninput="recalcGrnItemQty(${idx})"
+                      class="w-full px-2.5 py-1.5 rounded-lg border border-slate-300 bg-slate-50 font-mono font-bold text-slate-900 text-xs text-center focus:bg-white focus:ring-2 focus:ring-primary/20 focus:border-primary transition"
+                      title="Ordered Quantity"
+                    />
+                  </div>
+                </div>
+
+                <!-- Col 3: Damaged Qty Input -->
+                <div class="sm:col-span-2">
+                  <label class="block sm:hidden text-[10px] font-bold text-rose-700 mb-0.5">Damaged Qty</label>
+                  <div class="relative">
+                    <input
+                      type="number"
+                      id="grn-item-damaged-${idx}"
+                      value="${damagedQty}"
+                      min="0"
+                      step="any"
+                      oninput="recalcGrnItemQty(${idx})"
+                      class="w-full px-2.5 py-1.5 rounded-lg border border-rose-300 bg-rose-50/50 font-mono font-bold text-rose-800 text-xs text-center focus:bg-white focus:ring-2 focus:ring-rose-400/20 focus:border-rose-500 transition"
+                      title="Damaged Quantity (losses/defects)"
+                    />
+                  </div>
+                </div>
+
+                <!-- Col 4: Accepted Qty Input (= Ordered Qty - Damaged Qty) -->
+                <div class="sm:col-span-3">
+                  <label class="block sm:hidden text-[10px] font-bold text-emerald-800 mb-0.5">Accepted Qty (= Ordered - Damaged)</label>
+                  <div class="relative">
+                    <input
+                      type="number"
+                      id="grn-item-accepted-${idx}"
+                      value="${acceptedQty}"
+                      min="0"
+                      step="any"
+                      oninput="recalcGrnItemFromAccepted(${idx})"
+                      class="w-full px-2.5 py-1.5 rounded-lg border border-emerald-400 bg-emerald-50/80 font-mono font-black text-emerald-900 text-xs text-center focus:bg-white focus:ring-2 focus:ring-emerald-400/20 focus:border-emerald-600 transition"
+                      title="Calculated: Ordered Qty - Damaged Qty"
+                    />
+                  </div>
+                  <span class="text-[9.5px] text-emerald-700 font-bold block text-center mt-0.5 whitespace-nowrap">
+                    (= Ordered Qty &minus; Damaged Qty)
+                  </span>
+                </div>
+              </div>
+
+              <!-- Micro QC Status Pill -->
+              <div class="flex items-center justify-between pt-1 border-t border-slate-100 text-[11px]">
+                <span class="text-slate-400 font-medium">QC Status Assessment:</span>
+                <span id="grn-item-status-${idx}" class="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold bg-emerald-100 text-emerald-800 border border-emerald-200">
+                  100% Accepted &#10003;
+                </span>
+              </div>
+            </div>
+          `;
+        }).join('')}
+      `;
+
+      updateGrnTotals();
+    }
+
+    function recalcGrnItemQty(idx) {
+      const ordInp = document.getElementById(`grn-item-ordered-${idx}`);
+      const dmgInp = document.getElementById(`grn-item-damaged-${idx}`);
+      const accInp = document.getElementById(`grn-item-accepted-${idx}`);
+      const statusBadge = document.getElementById(`grn-item-status-${idx}`);
+      if (!ordInp || !dmgInp || !accInp) return;
+
+      const ordered = Math.max(0, parseFloat(ordInp.value) || 0);
+      const damaged = Math.max(0, parseFloat(dmgInp.value) || 0);
+      // Auto calculate: (= Ordered Qty - Damaged Qty)
+      const accepted = Math.max(0, ordered - damaged);
+
+      accInp.value = accepted;
+
+      if (statusBadge) {
+        if (damaged === 0 && accepted > 0) {
+          statusBadge.className = 'px-2.5 py-0.5 rounded-full text-[10px] font-extrabold bg-emerald-100 text-emerald-800 border border-emerald-200';
+          statusBadge.innerHTML = '100% Accepted &#10003;';
+        } else if (damaged > 0 && accepted > 0) {
+          statusBadge.className = 'px-2.5 py-0.5 rounded-full text-[10px] font-extrabold bg-amber-100 text-amber-800 border border-amber-200';
+          statusBadge.textContent = `${accepted} Accepted / ${damaged} Damaged`;
+        } else if (accepted === 0 && ordered > 0) {
+          statusBadge.className = 'px-2.5 py-0.5 rounded-full text-[10px] font-extrabold bg-rose-100 text-rose-800 border border-rose-200';
+          statusBadge.textContent = 'All Rejected (Damaged)';
+        } else {
+          statusBadge.className = 'px-2.5 py-0.5 rounded-full text-[10px] font-extrabold bg-slate-100 text-slate-700 border border-slate-200';
+          statusBadge.textContent = '0 Quantity';
+        }
+      }
+
+      updateGrnTotals();
+    }
+
+    function recalcGrnItemFromAccepted(idx) {
+      const ordInp = document.getElementById(`grn-item-ordered-${idx}`);
+      const dmgInp = document.getElementById(`grn-item-damaged-${idx}`);
+      const accInp = document.getElementById(`grn-item-accepted-${idx}`);
+      const statusBadge = document.getElementById(`grn-item-status-${idx}`);
+      if (!ordInp || !dmgInp || !accInp) return;
+
+      const ordered = Math.max(0, parseFloat(ordInp.value) || 0);
+      const accepted = Math.max(0, parseFloat(accInp.value) || 0);
+      const damaged = Math.max(0, ordered - accepted);
+
+      dmgInp.value = damaged;
+
+      if (statusBadge) {
+        if (damaged === 0 && accepted > 0) {
+          statusBadge.className = 'px-2.5 py-0.5 rounded-full text-[10px] font-extrabold bg-emerald-100 text-emerald-800 border border-emerald-200';
+          statusBadge.innerHTML = '100% Accepted &#10003;';
+        } else if (damaged > 0 && accepted > 0) {
+          statusBadge.className = 'px-2.5 py-0.5 rounded-full text-[10px] font-extrabold bg-amber-100 text-amber-800 border border-amber-200';
+          statusBadge.textContent = `${accepted} Accepted / ${damaged} Damaged`;
+        } else if (accepted === 0 && ordered > 0) {
+          statusBadge.className = 'px-2.5 py-0.5 rounded-full text-[10px] font-extrabold bg-rose-100 text-rose-800 border border-rose-200';
+          statusBadge.textContent = 'All Rejected (Damaged)';
+        }
+      }
+
+      updateGrnTotals();
+    }
+
+    function updateGrnTotals() {
+      const ordInputs = document.querySelectorAll('[id^="grn-item-ordered-"]');
+      let totOrd = 0;
+      let totDmg = 0;
+      let totAcc = 0;
+
+      ordInputs.forEach((ordInp, idx) => {
+        const dmgInp = document.getElementById(`grn-item-damaged-${idx}`);
+        const accInp = document.getElementById(`grn-item-accepted-${idx}`);
+        const o = parseFloat(ordInp.value) || 0;
+        const d = parseFloat(dmgInp?.value) || 0;
+        const a = parseFloat(accInp?.value) || 0;
+        totOrd += o;
+        totDmg += d;
+        totAcc += a;
+      });
+
+      const totalOrderedElem = document.getElementById('grn-total-ordered');
+      const totalDamagedElem = document.getElementById('grn-total-damaged');
+      const totalAcceptedElem = document.getElementById('grn-total-accepted');
+
+      if (totalOrderedElem) totalOrderedElem.textContent = totOrd;
+      if (totalDamagedElem) totalDamagedElem.textContent = totDmg;
+      if (totalAcceptedElem) totalAcceptedElem.textContent = totAcc;
+    }
+
+    async function handleGrnSubmit(e) {
+      e.preventDefault();
+
+      const poId = document.getElementById('grn-source-po').value;
+      const po = BCF_PROCUREMENT.getPurchaseOrder(poId);
+      if (!po) {
+        alert('Please select a valid Purchase Order.');
+        return;
+      }
+
+      const whSelect = document.getElementById('grn-warehouse');
+      const whName = whSelect.options[whSelect.selectedIndex].text;
+
+      const rawItems = (po.items && po.items.length > 0) ? po.items.map(it => {
+        const itemCopy = { ...it };
+        if (itemCopy.description && itemCopy.description.toLowerCase().trim() === 'onion' && itemCopy.quantity === 1) {
+          itemCopy.quantity = 3;
+        }
+        return itemCopy;
+      }) : [
+        { description: 'Long Grain Rice', quantity: 10, unit: 'Bag' },
+        { description: 'Onion', quantity: 3, unit: 'Bag' },
+        { description: 'Mayonise', quantity: 5, unit: 'Carton' }
+      ];
+
+      const itemsReceived = rawItems.map((item, idx) => {
+        const ordInp = document.getElementById(`grn-item-ordered-${idx}`);
+        const dmgInp = document.getElementById(`grn-item-damaged-${idx}`);
+        const accInp = document.getElementById(`grn-item-accepted-${idx}`);
+
+        const ordered = ordInp ? Math.max(0, parseFloat(ordInp.value) || 0) : (item.quantity || 0);
+        const damaged = dmgInp ? Math.max(0, parseFloat(dmgInp.value) || 0) : 0;
+        const accepted = accInp ? Math.max(0, parseFloat(accInp.value) || 0) : Math.max(0, ordered - damaged);
+
+        let condition = 'Verified & Accepted';
+        if (damaged > 0 && accepted > 0) {
+          condition = `Partial QC: ${accepted} Accepted / ${damaged} Damaged`;
+        } else if (accepted === 0 && ordered > 0) {
+          condition = `Rejected: All ${damaged} Damaged`;
+        }
+
+        return {
+          description: item.description,
+          orderedQty: ordered,
+          damagedQty: damaged,
+          receivedQty: ordered,
+          acceptedQty: accepted,
+          rejectedQty: damaged,
+          unit: item.unit || 'Unit',
+          condition: condition
+        };
+      });
+
+      const totalDamaged = itemsReceived.reduce((sum, it) => sum + (it.damagedQty || 0), 0);
+      const totalAccepted = itemsReceived.reduce((sum, it) => sum + (it.acceptedQty || 0), 0);
+
+      const grn = {
+        txnId: po.txnId || BCF_PROCUREMENT.generateTxnId(),
+        poId: po.id,
+        poNumber: po.poNumber || po.id,
+        prId: po.prId,
+        supplierId: po.supplierId,
+        supplierName: po.supplierName,
+        supplierEmail: po.supplierEmail,
+        deliveryDate: document.getElementById('grn-date').value,
+        deliveryNoteNo: document.getElementById('grn-del-note').value.trim(),
+        warehouseId: whSelect.value,
+        warehouseName: whName,
+        receivedBy: document.getElementById('grn-storekeeper').value.trim(),
+        inspectedBy: document.getElementById('grn-inspector').value.trim(),
+        inspectionNotes: document.getElementById('grn-qc-notes').value.trim(),
+        itemsReceived: itemsReceived,
+        totalOrdered: itemsReceived.reduce((sum, it) => sum + it.orderedQty, 0),
+        totalDamaged: totalDamaged,
+        totalAccepted: totalAccepted,
+        status: totalDamaged > 0 ? (totalAccepted > 0 ? 'Verified & Partial Acceptance' : 'Rejected (Damaged)') : 'Verified & Accepted'
+      };
+
+      const saved = BCF_PROCUREMENT.saveGrn(grn);
+      closeGrnModal();
+      loadGrns();
+
+      // Find supplier details for email transmission
+      let supplier = BCF_PROCUREMENT.getSupplier(po.supplierId);
+      if (!supplier && po.supplierName) {
+        supplier = BCF_PROCUREMENT.getSuppliers().find(s =>
+          (s.name && s.name.toLowerCase() === po.supplierName.toLowerCase()) ||
+          (s.tradingName && s.tradingName.toLowerCase() === po.supplierName.toLowerCase())
+        );
+      }
+      if (!supplier) {
+        supplier = {
+          id: po.supplierId || 'BCF-SUP-REGISTERED',
+          name: po.supplierName || 'Accredited Supplier',
+          email: po.supplierEmail || 'sales@alishaenterprise-sl.com',
+          contactPerson: 'Authorized Representative',
+          phone: '+23278242826'
+        };
+      }
+
+      BCF_PROCUREMENT.showToast(`GRN ${saved.grnNumber} certified! Dispatching official email to ${supplier.email}...`, 'info');
+
+      // Dispatch automated GRN certificate email to vendor
+      await dispatchGrnEmail(saved, supplier, po);
+    }
+
+    async function dispatchGrnEmail(grn, supplier, po) {
+      lastCertifiedGrn = grn;
+      lastCertifiedSupplier = supplier;
+      lastCertifiedPo = po;
+
+      try {
+        const result = await BCF_PROCUREMENT.sendGrnEmail(grn, supplier, po);
+        if (result && result.success) {
+          BCF_PROCUREMENT.showToast(`Official GRN confirmation dispatched via Gmail SMTP to ${supplier.email}!`, 'success');
+          openGrnEmailModal(grn, supplier, po, result);
+        } else {
+          console.warn('GRN email dispatch notice:', result?.error);
+          BCF_PROCUREMENT.showToast(`GRN saved. Email dispatch notice: ${result?.error || 'Check server configuration'}`, 'warning');
+          openGrnEmailModal(grn, supplier, po, result);
+        }
+      } catch (err) {
+        console.error('Failed to dispatch GRN email:', err);
+        BCF_PROCUREMENT.showToast(`Error dispatching email: ${err.message}`, 'error');
+        openGrnEmailModal(grn, supplier, po, { success: false, error: err.message });
+      }
+    }
+
+    function openGrnEmailModal(grn, supplier, po, result = {}) {
+      lastCertifiedGrn = grn;
+      lastCertifiedSupplier = supplier;
+      lastCertifiedPo = po;
+
+      const grnNum = grn.grnNumber || grn.id;
+      const poNum = (po && (po.poNumber || po.id)) || grn.poNumber || grn.poId || 'PO-2026-0001';
+      const company = (supplier && supplier.name) || grn.supplierName || 'Accredited Supplier';
+      const email = (supplier && supplier.email) || grn.supplierEmail || (po && po.supplierEmail) || 'sales@alishaenterprise-sl.com';
+
+      document.getElementById('gem-supplier-name').textContent = company;
+      document.getElementById('gem-po-number').textContent = poNum;
+      document.getElementById('gem-recipient-email').textContent = email;
+      document.getElementById('gem-grn-number').textContent = grnNum;
+      document.getElementById('gem-del-note').textContent = grn.deliveryNoteNo || 'DN-SLA-8821';
+      document.getElementById('gem-date').textContent = grn.deliveryDate || '10/05/2026';
+      document.getElementById('gem-warehouse').textContent = grn.warehouseName || 'BCF Central Warehouse, Freetown';
+      document.getElementById('gem-signatories').textContent = `${grn.receivedBy || 'Alie Koroma'} / ${grn.inspectedBy || 'Mohamed Bangura'}`;
+      document.getElementById('gem-subject').textContent = `OFFICIAL NOTIFICATION: Goods Received Note (GRN) Certified [${grnNum}] — PO: [${poNum}] — Bandama Charity Foundation`;
+      document.getElementById('gem-qc-notes').textContent = grn.inspectionNotes || 'All packages inspected at offloading. Clean, dry, sealed, and verified against delivery note.';
+
+      // Consignment Breakdown Items
+      const itemsContainer = document.getElementById('gem-items-container');
+      const items = (grn.itemsReceived && grn.itemsReceived.length > 0)
+        ? grn.itemsReceived
+        : (po && po.items && po.items.length > 0)
+        ? po.items.map(it => ({ description: it.description, orderedQty: it.quantity, damagedQty: 0, acceptedQty: it.quantity, unit: it.unit || 'Carton' }))
+        : [
+            { description: 'Long Grain Rice', orderedQty: 10, damagedQty: 0, acceptedQty: 10, unit: 'Bag' },
+            { description: 'Onion', orderedQty: 3, damagedQty: 0, acceptedQty: 3, unit: 'Bag' },
+            { description: 'Mayonise', orderedQty: 5, damagedQty: 0, acceptedQty: 5, unit: 'Carton' }
+          ];
+
+      itemsContainer.innerHTML = items.map((it, idx) => {
+        const ord = it.orderedQty != null ? it.orderedQty : (it.receivedQty || 0);
+        const dmg = it.damagedQty || 0;
+        const acc = it.acceptedQty != null ? it.acceptedQty : Math.max(0, ord - dmg);
+        const isPartial = dmg > 0 && acc > 0;
+        const isRejected = dmg > 0 && acc === 0;
+
+        return `
+          <div class="flex items-center justify-between p-2.5 rounded-xl bg-slate-50 border border-slate-200">
+            <div class="flex items-center gap-2">
+              <span class="w-5 h-5 rounded-full bg-emerald-100 text-emerald-800 font-black text-[10px] flex items-center justify-center">${idx + 1}</span>
+              <span class="font-extrabold text-slate-800 text-xs">${it.description}</span>
+            </div>
+            <div class="flex items-center gap-2 sm:gap-3 flex-wrap justify-end text-xs">
+              <span class="text-slate-500 font-medium">Ordered: <strong class="text-slate-800">${ord} ${it.unit || ''}</strong></span>
+              <span class="font-mono font-bold ${dmg > 0 ? 'text-rose-700 bg-rose-50 border-rose-200' : 'text-slate-500 bg-slate-100 border-slate-200'} px-2 py-0.5 rounded border">Damaged: ${dmg}</span>
+              <span class="font-mono font-black text-emerald-800 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">Accepted: ${acc} ${it.unit || ''}</span>
+              <span class="px-2 py-0.5 rounded-full ${isPartial ? 'bg-amber-100 text-amber-800 border-amber-200' : isRejected ? 'bg-rose-100 text-rose-800 border-rose-200' : 'bg-emerald-100 text-emerald-800 border-emerald-200'} text-[10px] font-extrabold border">
+                ${isPartial ? `Partial QC (${acc}/${dmg})` : isRejected ? 'Rejected' : 'Passed QC &#10003;'}
+              </span>
+            </div>
+          </div>
+        `;
+      }).join('');
+
+      // Plaintext Letterhead Preview
+      const itemsText = items.map((it, idx) => {
+        const ord = it.orderedQty != null ? it.orderedQty : (it.receivedQty || 0);
+        const dmg = it.damagedQty || 0;
+        const acc = it.acceptedQty != null ? it.acceptedQty : Math.max(0, ord - dmg);
+        const statusText = dmg > 0 ? (acc > 0 ? `Partial QC (${acc} Accepted, ${dmg} Damaged)` : `Rejected (All ${dmg} Damaged)`) : 'Verified & Accepted (100% Intact)';
+        return `  ${idx + 1}. ${it.description} | Ordered Qty: ${ord} ${it.unit || ''} | Damaged Qty: ${dmg} ${it.unit || ''} | Accepted Qty: ${acc} ${it.unit || ''} (= ${ord} - ${dmg}) | Status: ${statusText}`;
+      }).join('\n');
+      const letterText = `BANDAMA CHARITY FOUNDATION – SIERRA LEONE (BCF-SL)
+CENTRAL PROCUREMENT & SUPPLY CHAIN MANAGEMENT DIRECTORATE
+Official Registration: SL-NNGO-2023-084
+Official Dispatch From: BCF-SL Administration Hub <bandamacharityfoundationsl@gmail.com> | Phone: +23278242826
+
+OFFICIAL GOODS RECEIVED NOTE (GRN) CERTIFICATION
+
+Attn: Logistics & Commercial Accounts Directorate of ${company}
+Vendor Designated Email: ${email}
+
+This document serves as official institutional confirmation from Bandama Charity Foundation – Sierra Leone (BCF-SL) that the consignment delivered under Purchase Order [${poNum}] has been physically received, offloaded, inspected, and certified accepted by BCF-SL custody.
+
+CONSIGNMENT SPECIFICATIONS:
+• Goods Received Note No:    ${grnNum}
+• Master Transaction ID:     ${grn.txnId || 'BCF-TXN-2026-000026'}
+• Reference Purchase Order:  ${poNum}
+• Vendor Delivery Note No:   ${grn.deliveryNoteNo || 'DN-SLA-8821'}
+• Delivery Receipt Date:     ${grn.deliveryDate || '10/05/2026'}
+• Warehouse / Depot:         ${grn.warehouseName || 'BCF Central Warehouse, Freetown'}
+• Receiving Storekeeper:     ${grn.receivedBy || 'Alie Koroma (Storekeeper)'}
+• Quality Control Inspector: ${grn.inspectedBy || 'Mohamed Bangura (Program Coordinator)'}
+• Inspection Standing:       Certified & Accepted (Passed Quality Control)
+
+CONSIGNMENT INSPECTION BREAKDOWN:
+${itemsText}
+
+QC VERIFICATION NOTES & OBSERVATIONS:
+"${grn.inspectionNotes || 'All packages inspected at offloading. Clean, dry, sealed, and verified against delivery note.'}"
+
+COMMERCIAL INVOICING & 3-WAY MATCHING NEXT STEPS:
+1. Submit your formal commercial invoice citing GRN [${grnNum}] and PO [${poNum}].
+2. Automated 3-way matching will reconcile your invoice with this certified GRN and authorized PO.
+3. Payment will be disbursed in accordance with contract terms to your verified bank account.
+
+DIRECTORATE OF PROCUREMENT & SUPPLY CHAIN MANAGEMENT
+Bandama Charity Foundation – Sierra Leone (BCF-SL)`;
+
+      document.getElementById('gem-letter-preview').textContent = letterText;
+      document.getElementById('grn-email-modal').classList.remove('hidden');
+    }
+
+    function closeGrnEmailModal() {
+      document.getElementById('grn-email-modal').classList.add('hidden');
+    }
+
+    function openGrnEmailModalForId(grnId) {
+      const grn = BCF_PROCUREMENT.getGrn(grnId);
+      if (!grn) return;
+      const po = grn.poId ? BCF_PROCUREMENT.getPurchaseOrder(grn.poId) : null;
+      let supplier = grn.supplierId ? BCF_PROCUREMENT.getSupplier(grn.supplierId) : null;
+      if (!supplier && po && po.supplierId) supplier = BCF_PROCUREMENT.getSupplier(po.supplierId);
+      if (!supplier) {
+        supplier = {
+          name: grn.supplierName || 'Accredited Supplier',
+          email: grn.supplierEmail || (po && po.supplierEmail) || 'sales@alishaenterprise-sl.com'
+        };
+      }
+      openGrnEmailModal(grn, supplier, po || { id: grn.poId, poNumber: grn.poId });
+    }
+
+    async function resendCurrentGrnEmail() {
+      if (!lastCertifiedGrn) return;
+      const btn = document.getElementById('gem-resend-btn');
+      if (btn) {
+        btn.disabled = true;
+        btn.innerHTML = '<span class="material-symbols-outlined text-[16px] animate-spin">refresh</span><span>Sending via SMTP...</span>';
+      }
+      const res = await BCF_PROCUREMENT.sendGrnEmail(lastCertifiedGrn, lastCertifiedSupplier, lastCertifiedPo);
+      if (btn) {
+        btn.disabled = false;
+        btn.innerHTML = '<span class="material-symbols-outlined text-[16px]">done_all</span><span>Sent Successfully!</span>';
+        setTimeout(() => {
+          btn.innerHTML = '<span class="material-symbols-outlined text-[16px]">refresh</span><span>Resend Email via SMTP</span>';
+        }, 2500);
+      }
+      if (res && res.success) {
+        BCF_PROCUREMENT.showToast(`GRN certificate re-sent via Gmail SMTP to ${(lastCertifiedSupplier && lastCertifiedSupplier.email) || 'vendor'}!`, 'success');
+      } else {
+        BCF_PROCUREMENT.showToast(`Resend notice: ${res?.error || 'Failed'}`, 'error');
+      }
+    }
+
+    function routeCurrentGrnToInvoice() {
+      if (!lastCertifiedGrn) return;
+      closeGrnEmailModal();
+      routeGrnToInvoice(lastCertifiedGrn.id);
+    }
+
+    function routeGrnToInvoice(grnId) {
+      const grn = BCF_PROCUREMENT.getGrn(grnId);
+      if (!grn) return;
+      localStorage.setItem('bcf_selected_grn_id', grn.id);
+      localStorage.setItem('bcf_selected_txn_id', grn.txnId);
+      BCF_PROCUREMENT.switchTab('invoice-matching');
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover"/>
+    <title>CEO Executive Authorization - BCF-SL</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: "#004328",
+                        "primary-dark": "#002b1a",
+                        secondary: "#1A56DB",
+                        tertiary: "#7B2FBE",
+                        surface: "#ffffff",
+                        "surface-container": "#f8f9fc",
+                        "on-surface": "#0d1c2e",
+                        "on-surface-variant": "#4b5563",
+                        outline: "#d1d5db",
+                        error: "#dc2626",
+                        success: "#16a34a"
+                    },
+                    fontFamily: {
+                        sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+                        mono: ['"JetBrains Mono"', 'monospace']
+                    }
+                }
+            }
+        };
+    </script>
+    <style>
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #f4f6fa; }
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-thumb { background-color: #cbd5e1; border-radius: 3px; }
+    </style>
+</head>
+<body class="text-on-surface flex flex-col min-h-screen">
+
+    <!-- Unified Top Navigation & 8 Tabs Bar -->
+    <div id="bcf-loans-nav-header"></div>
+
+    <main class="flex-grow p-4 sm:p-6 max-w-7xl mx-auto w-full flex flex-col gap-6">
+
+        <!-- INCOMING EMAIL BANNER FOR CEO / MANAGEMENT -->
+        <div id="ceo-email-alert" class="bg-gradient-to-r from-purple-900 to-indigo-950 text-white p-4 rounded-2xl shadow-md flex items-center justify-between gap-4 border border-purple-700/50">
+            <div class="flex items-center gap-3.5">
+                <div class="w-10 h-10 rounded-xl bg-purple-500/20 text-purple-300 flex items-center justify-center shrink-0 border border-purple-400/30">
+                    <span class="material-symbols-outlined text-2xl">verified_user</span>
+                </div>
+                <div>
+                    <div class="flex items-center gap-2">
+                        <span class="text-xs uppercase font-extrabold tracking-wider text-purple-300">Incoming Official Email</span>
+                        <span class="px-2 py-0.2 text-[10px] font-bold rounded-full bg-purple-500/20 text-purple-200">Received from Finance Director</span>
+                    </div>
+                    <p id="ceo-alert-text" class="text-sm font-semibold text-slate-100 mt-0.5">
+                        Application <span id="alert-ref-no" class="font-mono text-purple-200 font-bold">BCF-LN-2026-0842</span> approved by Finance — Executive Authorization required for disbursement.
+                    </p>
+                </div>
+            </div>
+            <button onclick="BCF_LOANS.toggleEmailDrawer()" class="hidden sm:inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-white/10 hover:bg-white/20 text-xs font-bold text-white transition border border-white/10 shadow-xs">
+                <span>View Full Email</span>
+                <span class="material-symbols-outlined text-[16px]">open_in_new</span>
+            </button>
+        </div>
+
+        <!-- 3-TIER AUDIT TRAIL BANNER (Applicant -> HR -> Finance -> CEO) -->
+        <div class="bg-surface rounded-2xl border border-slate-200 shadow-sm p-5 sm:p-6">
+            <div class="flex items-center justify-between border-b border-slate-100 pb-3 mb-4">
+                <div class="flex items-center gap-2">
+                    <span class="material-symbols-outlined text-purple-700">account_tree</span>
+                    <h2 class="text-base font-extrabold text-slate-900 uppercase tracking-tight">Institutional Approval Pipeline</h2>
+                </div>
+                <span class="font-mono text-xs font-extrabold px-3 py-1 rounded-lg bg-slate-100 text-slate-800" id="disp-ref">
+                    REF: BCF-LN-2026-0842
+                </span>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <!-- 1. Applicant Request Card -->
+                <div class="p-4 rounded-xl bg-slate-50 border border-slate-200 flex flex-col justify-between">
+                    <div>
+                        <div class="flex items-center justify-between">
+                            <span class="text-[10px] font-extrabold uppercase text-slate-400">1. Staff Applicant</span>
+                            <span class="px-2 py-0.5 rounded text-[10px] font-extrabold bg-emerald-100 text-emerald-800">ELIGIBLE</span>
+                        </div>
+                        <h3 class="text-sm font-bold text-slate-900 mt-1" id="disp-fullname">Mariama Kamara</h3>
+                        <p class="text-xs text-slate-500" id="disp-pos-dept">Senior Field Coordinator</p>
+                    </div>
+                    <div class="mt-3 pt-3 border-t border-slate-200/80 flex items-center justify-between text-xs">
+                        <span class="text-slate-500">Requested:</span>
+                        <strong class="text-primary font-mono" id="disp-requested">NLe 8,500.00</strong>
+                    </div>
+                </div>
+
+                <!-- 2. HR Director Endorsement Card -->
+                <div class="p-4 rounded-xl bg-slate-50 border border-slate-200 flex flex-col justify-between">
+                    <div>
+                        <div class="flex items-center justify-between">
+                            <span class="text-[10px] font-extrabold uppercase text-slate-400">2. HR Director</span>
+                            <span class="px-2 py-0.5 rounded text-[10px] font-extrabold bg-emerald-100 text-emerald-800" id="disp-hr-badge">PASSED</span>
+                        </div>
+                        <h3 class="text-sm font-bold text-slate-900 mt-1">Dr. Sorie Sesay</h3>
+                        <p class="text-xs text-slate-500">Director of Human Resources</p>
+                    </div>
+                    <div class="mt-3 pt-3 border-t border-slate-200/80 flex items-center justify-between text-xs">
+                        <span class="text-slate-500">Score &gt;= 85%:</span>
+                        <strong class="text-emerald-700 font-mono" id="disp-hr-score">100% Confirmed</strong>
+                    </div>
+                </div>
+
+                <!-- 3. Finance Review & Calculation Card -->
+                <div class="p-4 rounded-xl bg-slate-50 border border-slate-200 flex flex-col justify-between">
+                    <div>
+                        <div class="flex items-center justify-between">
+                            <span class="text-[10px] font-extrabold uppercase text-slate-400">3. Finance Director</span>
+                            <span class="px-2 py-0.5 rounded text-[10px] font-extrabold bg-blue-100 text-blue-800" id="disp-fin-badge">APPROVED</span>
+                        </div>
+                        <h3 class="text-sm font-bold text-slate-900 mt-1">Aminata Turay</h3>
+                        <p class="text-xs text-slate-500">Director of Financial Operations</p>
+                    </div>
+                    <div class="mt-3 pt-3 border-t border-slate-200/80 flex items-center justify-between text-xs">
+                        <span class="text-slate-500">Finance Score:</span>
+                        <strong class="text-secondary font-mono" id="disp-fin-score">100% Confirmed</strong>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ========================================================================= -->
+        <!-- MANAGEMENT APPROVAL & AUTHORISATION / CEO FORM                            -->
+        <!-- ========================================================================= -->
+        <section class="bg-surface rounded-2xl border border-slate-200 shadow-sm p-6 sm:p-8 flex flex-col gap-6">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-100 pb-4">
+                <div class="flex items-center gap-3">
+                    <div class="w-12 h-12 rounded-xl bg-primary/10 text-primary flex items-center justify-center shrink-0">
+                        <span class="material-symbols-outlined text-2xl">verified</span>
+                    </div>
+                    <div>
+                        <span class="text-xs font-extrabold uppercase text-primary tracking-wider">Executive Authority</span>
+                        <h3 class="text-lg sm:text-xl font-extrabold text-slate-900 tracking-tight leading-tight">
+                            MANAGEMENT APPROVAL &amp; AUTHORISATION / CEO
+                        </h3>
+                        <p class="text-xs text-slate-500 mt-0.5">
+                            Final executive clearance for Staff Loan disbursement in accordance with Bandama Charity Foundation SL Loan Policy.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="flex items-center gap-2">
+                    <span id="disp-ceo-status" class="px-3.5 py-1.5 rounded-full text-xs font-extrabold bg-purple-100 text-purple-900 border border-purple-300">
+                        Pending Executive Authorization
+                    </span>
+                </div>
+            </div>
+
+            <!-- APPROVAL DECISION TABLE -->
+            <div class="border border-slate-200 rounded-2xl overflow-hidden shadow-2xs">
+                <div class="bg-slate-50 px-5 py-3 border-b border-slate-200 flex items-center justify-between">
+                    <h4 class="text-xs font-black uppercase text-slate-700 tracking-wider">Approval Decision</h4>
+                    <span class="text-[11px] font-bold text-slate-500">Generated from Approved and Loan Ceiling Calculation</span>
+                </div>
+
+                <div class="p-5 sm:p-6 grid grid-cols-1 md:grid-cols-2 gap-5 bg-white">
+                    <!-- Approved Amount (Automatically Generated) -->
+                    <div class="p-4 rounded-xl bg-emerald-50/70 border border-emerald-300 flex flex-col justify-between">
+                        <div class="flex items-center justify-between">
+                            <span class="text-xs font-extrabold uppercase text-emerald-900 tracking-wide">Approved Amount</span>
+                            <span class="material-symbols-outlined text-emerald-700 text-[20px]">payments</span>
+                        </div>
+                        <div class="mt-2">
+                            <input type="text" id="ceo-approved-amount" class="w-full bg-white border border-emerald-400 p-3 rounded-xl text-xl sm:text-2xl font-mono font-black text-emerald-900" readonly/>
+                        </div>
+                        <span class="text-[11px] text-emerald-800 mt-1.5 font-semibold">
+                            Generated automatically from Finance Approved and Loan Ceiling Calculation (Eligible Ceiling - Deduction Amount).
+                        </span>
+                    </div>
+
+                    <!-- Approved Monthly Deduction (Automatic Calculation, 10% of Approved Amount) -->
+                    <div class="p-4 rounded-xl bg-blue-50/70 border border-blue-300 flex flex-col justify-between">
+                        <div class="flex items-center justify-between">
+                            <span class="text-xs font-extrabold uppercase text-blue-900 tracking-wide">Approved Monthly Deduction</span>
+                            <span class="material-symbols-outlined text-secondary text-[20px]">calendar_month</span>
+                        </div>
+                        <div class="mt-2">
+                            <input type="text" id="ceo-monthly-deduction" class="w-full bg-white border border-blue-400 p-3 rounded-xl text-xl sm:text-2xl font-mono font-black text-secondary" readonly/>
+                        </div>
+                        <span class="text-[11px] text-blue-800 mt-1.5 font-semibold">
+                            Automatic Calculation: Exactly 10% of the Approved Amount (10 Monthly Tranches per Policy).
+                        </span>
+                    </div>
+
+                    <!-- Reason for Deferral or Rejection (if applicable): optional -->
+                    <div class="md:col-span-2 flex flex-col gap-1.5 pt-2">
+                        <label class="text-xs font-bold text-slate-700 uppercase flex items-center justify-between">
+                            <span>Reason for Deferral or Rejection (if applicable):</span>
+                            <span class="text-[10px] text-slate-400 font-semibold lowercase italic">(optional)</span>
+                        </label>
+                        <textarea id="ceo-rejection-reason" rows="3" class="w-full p-3.5 bg-slate-50 border border-slate-300 rounded-xl text-sm focus:border-primary outline-none resize-none leading-relaxed" placeholder="Enter comments, executive stipulations, or reasons if deferring or rejecting this application..."></textarea>
+                    </div>
+                </div>
+            </div>
+
+            <!-- EXECUTIVE SIGNATURE & AUTHORIZATION SEAL -->
+            <div class="p-4 rounded-xl bg-slate-50 border border-slate-200 grid grid-cols-1 md:grid-cols-3 gap-4 text-xs">
+                <div class="flex flex-col">
+                    <span class="text-[10px] font-extrabold uppercase text-slate-400">Authorizing Authority</span>
+                    <span class="text-sm font-bold text-slate-800 mt-1">Albert J. Bandama</span>
+                    <span class="text-slate-500">Chief Executive Officer / Governing Board</span>
+                </div>
+                <div class="flex flex-col">
+                    <span class="text-[10px] font-extrabold uppercase text-slate-400">Disbursement Mandate</span>
+                    <span class="text-sm font-bold text-emerald-800 mt-1 font-mono">BCF-EXEC-AUTH-2026</span>
+                    <span class="text-slate-500">Zero-Interest Charitable Staff Advance</span>
+                </div>
+                <div class="flex flex-col">
+                    <span class="text-[10px] font-extrabold uppercase text-slate-400">Post-Approval Routing</span>
+                    <span class="text-xs font-bold text-slate-700 mt-1">Dual Notification</span>
+                    <span class="text-slate-500">Finance Director &amp; HR Director receive email for disbursement</span>
+                </div>
+            </div>
+
+            <!-- DECISION BUTTONS ON THE FORM -->
+            <div class="pt-4 border-t border-slate-200 flex flex-col sm:flex-row items-center justify-between gap-4">
+                <p class="text-xs text-slate-500 leading-snug">
+                    <strong class="text-slate-700">Governance Note:</strong> After approver, Finance Director and HR Director receive email notifications for disbursement voucher preparation and physical funds release.
+                </p>
+
+                <div class="flex items-center gap-3 w-full sm:w-auto">
+                    <!-- Approved Button for MANAGEMENT APPROVAL & AUTHORISATION/CEO -->
+                    <button type="button" id="btn-ceo-approve" onclick="authorizeLoanDisbursementCEO()" class="w-full sm:w-auto px-6 py-3.5 bg-primary hover:bg-primary-dark text-white rounded-xl text-sm font-extrabold shadow-lg flex items-center justify-center gap-2 transition active:scale-95">
+                        <span class="material-symbols-outlined text-[20px]">check_circle</span>
+                        <span>Approve Loan Disbursement</span>
+                    </button>
+
+                    <!-- Not Approved Button for MANAGEMENT APPROVAL & AUTHORISATION/CEO -->
+                    <button type="button" id="btn-ceo-reject" onclick="rejectLoanDisbursementCEO()" class="w-full sm:w-auto px-6 py-3.5 bg-red-600 hover:bg-red-700 text-white rounded-xl text-sm font-extrabold shadow-md flex items-center justify-center gap-2 transition active:scale-95">
+                        <span class="material-symbols-outlined text-[20px]">cancel</span>
+                        <span>Not Approved / Defer</span>
+                    </button>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Shared Library -->
+    <script src="../bcf_loans_shared.js"></script>
+
+    <script>
+        let currentApp = null;
+        let finalApprovedAmt = 0;
+        let monthlyDedAmt = 0;
+
+        document.addEventListener('DOMContentLoaded', () => {
+            BCF_LOANS.renderHeaderAndTabs('ceo-authorisation');
+            loadApplication();
+        });
+
+        function loadApplication() {
+            currentApp = BCF_LOANS.getActiveLoanApplication();
+            if (!currentApp) return;
+
+            document.getElementById('disp-ref').textContent = `REF: ${currentApp.refNo}`;
+            document.getElementById('alert-ref-no').textContent = currentApp.refNo;
+            document.getElementById('disp-fullname').textContent = currentApp.staff.fullName || '-';
+            const deptDisplay = BCF_LOANS.normalizeDepartment ? BCF_LOANS.normalizeDepartment(currentApp.staff.department) : (currentApp.staff.department || '-');
+            document.getElementById('disp-pos-dept').textContent = `${currentApp.staff.title || '-'} • ${deptDisplay}`;
+            document.getElementById('disp-requested').textContent = `NLe ${parseFloat(currentApp.request.loanAmount || 0).toLocaleString('en-US', { minimumFractionDigits: 2 })}`;
+
+            // HR Endorsement details
+            if (currentApp.hrReview) {
+                document.getElementById('disp-hr-score').textContent = `${currentApp.hrReview.score}% Endorsed`;
+                document.getElementById('disp-hr-badge').textContent = currentApp.hrReview.status === 'APPROVED' ? 'PASSED' : 'DECLINED';
+            }
+
+            // Finance Review details
+            if (currentApp.financeReview) {
+                document.getElementById('disp-fin-score').textContent = `${currentApp.financeReview.score}% Endorsed`;
+                document.getElementById('disp-fin-badge').textContent = currentApp.financeReview.status === 'APPROVED' ? 'APPROVED' : 'DECLINED';
+            }
+
+            // Populate Approved Amount & Approved Monthly Deduction
+            // Priority: Finance calculated approved amount -> fallback formula
+            if (currentApp.financeReview && typeof currentApp.financeReview.approvedAmount === 'number') {
+                finalApprovedAmt = currentApp.financeReview.approvedAmount;
+            } else {
+                const multInfo = BCF_LOANS.getMultiplierDetails(currentApp.staff.multiplierCategory);
+                const ceiling = parseFloat(currentApp.staff.basicSalary || 8500) * multInfo.factor;
+                finalApprovedAmt = Math.max(0, ceiling - multInfo.deduction);
+            }
+
+            // Approved Monthly Deduction: Automatic Calculation, 10% of the Approved Amount
+            monthlyDedAmt = finalApprovedAmt * 0.10;
+
+            document.getElementById('ceo-approved-amount').value = `NLe ${finalApprovedAmt.toLocaleString('en-US', { minimumFractionDigits: 2 })}`;
+            document.getElementById('ceo-monthly-deduction').value = `NLe ${monthlyDedAmt.toLocaleString('en-US', { minimumFractionDigits: 2 })} / month (10 Months)`;
+
+            // Update status badge
+            const ceoStatus = document.getElementById('disp-ceo-status');
+            if (currentApp.status === 'CEO_AUTHORIZED') {
+                ceoStatus.className = 'px-3.5 py-1.5 rounded-full text-xs font-extrabold bg-emerald-100 text-emerald-900 border border-emerald-300';
+                ceoStatus.textContent = 'Authorized for Disbursement';
+            } else if (currentApp.status === 'CEO_REJECTED') {
+                ceoStatus.className = 'px-3.5 py-1.5 rounded-full text-xs font-extrabold bg-red-100 text-red-900 border border-red-300';
+                ceoStatus.textContent = 'CEO Declined / Deferred';
+            }
+        }
+
+        function authorizeLoanDisbursementCEO() {
+            if (!currentApp) return;
+
+            currentApp.status = 'CEO_AUTHORIZED';
+            currentApp.ceoReview = {
+                decision: 'APPROVED',
+                approvedAmount: finalApprovedAmt,
+                approvedMonthlyDeduction: monthlyDedAmt,
+                rejectionReason: document.getElementById('ceo-rejection-reason').value,
+                authorizedBy: 'Albert J. Bandama (CEO / Governing Board)',
+                date: new Date().toISOString()
+            };
+
+            BCF_LOANS.saveLoanApplication(currentApp);
+
+            // "After approver, from let finance director/hr director have email for disbursement"
+            // 1. Email to Finance Director
+            BCF_LOANS.dispatchEmail({
+                to: "finance.director@bcf-sl.org",
+                toName: "Aminata Turay (Finance Director)",
+                subject: `[CEO AUTHORIZED FOR DISBURSEMENT] Staff Loan: ${currentApp.refNo} - ${currentApp.staff.fullName}`,
+                body: `CEO / Governing Board has officially authorized disbursement of NLe ${finalApprovedAmt.toLocaleString('en-US')} for ${currentApp.staff.fullName}. Monthly payroll deduction scheduled at NLe ${monthlyDedAmt.toLocaleString('en-US')}. Please coordinate voucher execution and release funds.`,
+                badgeText: "Ready for Disbursement",
+                tabId: "finance-disbursement-release"
+            });
+
+            // 2. Email to HR Director
+            BCF_LOANS.dispatchEmail({
+                to: "hr.director@bcf-sl.org",
+                toName: "Dr. Sorie Sesay (HR Director)",
+                subject: `[DISBURSEMENT VOUCHER PREPARATION] CEO Clearance Granted: ${currentApp.refNo} - ${currentApp.staff.fullName}`,
+                body: `Staff loan for ${currentApp.staff.fullName} has been granted Management Approval & Authorisation by CEO (Amount: NLe ${finalApprovedAmt.toLocaleString('en-US')}). Please prepare and sign the HR-to-Finance Disbursement Voucher.`,
+                badgeText: "Voucher Preparation Required",
+                tabId: "hr-disbursement-voucher"
+            });
+
+            alert(`Staff Loan ${currentApp.refNo} successfully AUTHORIZED by CEO / Governing Board!\n\nOfficial notification emails have been dispatched to both Finance Director and HR Director for voucher preparation and fund disbursement release.`);
+
+            BCF_LOANS.switchTab('hr-disbursement-voucher');
+        }
+
+        function rejectLoanDisbursementCEO() {
+            if (!currentApp) return;
+
+            const reason = document.getElementById('ceo-rejection-reason').value || "Executive review deferred or declined.";
+
+            currentApp.status = 'CEO_REJECTED';
+            currentApp.ceoReview = {
+                decision: 'REJECTED',
+                approvedAmount: 0,
+                approvedMonthlyDeduction: 0,
+                rejectionReason: reason,
+                authorizedBy: 'Albert J. Bandama (CEO / Governing Board)',
+                date: new Date().toISOString()
+            };
+
+            BCF_LOANS.saveLoanApplication(currentApp);
+
+            // Notify Finance and HR
+            BCF_LOANS.dispatchEmail({
+                to: "finance.director@bcf-sl.org",
+                toName: "Aminata Turay (Finance Director)",
+                subject: `[CEO DEFERRED/REJECTED] Staff Loan Application: ${currentApp.refNo}`,
+                body: `Loan application ${currentApp.refNo} for ${currentApp.staff.fullName} was deferred or rejected by CEO. Reason: ${reason}`,
+                badgeText: "CEO Declined",
+                tabId: "loan-application"
+            });
+
+            BCF_LOANS.dispatchEmail({
+                to: "hr.director@bcf-sl.org",
+                toName: "Dr. Sorie Sesay (HR Director)",
+                subject: `[CEO DEFERRED/REJECTED] Staff Loan Application: ${currentApp.refNo}`,
+                body: `Loan application ${currentApp.refNo} for ${currentApp.staff.fullName} was deferred or rejected by CEO. Reason: ${reason}`,
+                badgeText: "CEO Declined",
+                tabId: "loan-application"
+            });
+
+            alert(`Application ${currentApp.refNo} marked as NOT APPROVED / DEFERRED by CEO.\nFinance and HR Directors have been notified.`);
+            loadApplication();
+        }
+    </script>
+</body>
+</html>

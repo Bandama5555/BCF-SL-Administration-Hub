@@ -1,0 +1,2058 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover"/>
+  <title>Supplier Master Data — BCF-SL Integrated Procurement</title>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: {
+            primary: "#0037b0",
+            "primary-dark": "#00247d",
+            secondary: "#565e74",
+            tertiary: "#006948",
+            "tertiary-dark": "#004f35",
+            surface: "#f8f9ff",
+            "surface-container": "#eff4ff",
+            "surface-container-high": "#e5eeff",
+            "on-surface": "#0b1c30",
+            "on-surface-variant": "#434655",
+            outline: "#747686",
+            error: "#ba1a1a"
+          },
+          fontFamily: {
+            sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+            body: ['"Inter"', 'sans-serif'],
+            mono: ['"JetBrains Mono"', 'monospace']
+          }
+        }
+      }
+    };
+  </script>
+  <style>
+    body { font-family: 'Inter', sans-serif; background-color: #f8f9ff; }
+    h1, h2, h3, h4, .font-headline { font-family: 'Plus Jakarta Sans', sans-serif; }
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-thumb { background-color: #cbd5e1; border-radius: 4px; }
+  </style>
+</head>
+<body class="text-on-surface flex flex-col min-h-screen">
+
+  <!-- UNIFIED PROCUREMENT TOP NAVIGATION & WORKFLOW TABS -->
+  <div id="bcf-procurement-nav-header"></div>
+
+  <!-- MAIN VIEWPORT -->
+  <main class="flex-grow p-4 sm:p-6 max-w-7xl mx-auto w-full flex flex-col gap-6">
+
+    <!-- HERO & SUMMARY METRICS -->
+    <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+      <div>
+        <div class="flex items-center gap-2 mb-1">
+          <span class="inline-flex items-center justify-center w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+          <span class="text-xs font-extrabold uppercase tracking-wider text-emerald-800 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200">
+            Official Vendor Database
+          </span>
+          <span class="text-xs text-slate-500">• BCF-SL Vendor Governance Standard</span>
+        </div>
+        <h1 class="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight font-headline">
+          Supplier &amp; Vendor Master Data
+        </h1>
+        <p class="text-xs sm:text-sm text-slate-600 mt-1 max-w-2xl">
+          Centralised registry of verified vendors, NRA tax clearance, NASSIT compliance, bank details, and historic procurement transactions.
+        </p>
+      </div>
+
+      <div class="flex items-center gap-2.5 flex-wrap shrink-0">
+        <button onclick="exportSuppliersCsv()" class="px-3.5 py-2 rounded-xl border border-slate-300 bg-white hover:bg-slate-50 text-xs font-bold text-slate-700 flex items-center gap-1.5 transition shadow-2xs cursor-pointer active:scale-95">
+          <span class="material-symbols-outlined text-[18px]">download</span>
+          <span>Export Master CSV</span>
+        </button>
+        <button onclick="openSupplierModal()" class="px-4 py-2 rounded-xl bg-primary hover:bg-primary-dark text-white text-xs font-extrabold flex items-center gap-1.5 transition shadow-md cursor-pointer active:scale-95">
+          <span class="material-symbols-outlined text-[18px]">add_circle</span>
+          <span>Register New Vendor</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- STATS CARDS -->
+    <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+      <div class="p-4 sm:p-5 rounded-2xl bg-white border border-slate-200 shadow-xs flex flex-col justify-between">
+        <div class="flex items-center justify-between text-slate-500 mb-2">
+          <span class="text-xs font-extrabold uppercase tracking-wider">Registered Vendors</span>
+          <div class="w-8 h-8 rounded-lg bg-blue-50 text-primary flex items-center justify-center">
+            <span class="material-symbols-outlined text-[20px]">storefront</span>
+          </div>
+        </div>
+        <div>
+          <span id="metric-total-vendors" class="text-2xl sm:text-3xl font-black text-slate-900 font-mono">0</span>
+          <div class="flex items-center gap-1 mt-1 text-[11px] text-emerald-700 font-bold">
+            <span class="material-symbols-outlined text-[14px]">verified</span>
+            <span>All verified entities</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="p-4 sm:p-5 rounded-2xl bg-white border border-slate-200 shadow-xs flex flex-col justify-between">
+        <div class="flex items-center justify-between text-slate-500 mb-2">
+          <span class="text-xs font-extrabold uppercase tracking-wider">NRA / NASSIT Compliant</span>
+          <div class="w-8 h-8 rounded-lg bg-emerald-50 text-emerald-700 flex items-center justify-center">
+            <span class="material-symbols-outlined text-[20px]">verified_user</span>
+          </div>
+        </div>
+        <div>
+          <span id="metric-compliant-vendors" class="text-2xl sm:text-3xl font-black text-emerald-700 font-mono">0</span>
+          <div class="flex items-center gap-1 mt-1 text-[11px] text-slate-500">
+            <span id="metric-compliance-pct" class="font-bold text-slate-800">0%</span>
+            <span>clearance pass rate</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="p-4 sm:p-5 rounded-2xl bg-white border border-slate-200 shadow-xs flex flex-col justify-between">
+        <div class="flex items-center justify-between text-slate-500 mb-2">
+          <span class="text-xs font-extrabold uppercase tracking-wider">Total Purchase Orders</span>
+          <div class="w-8 h-8 rounded-lg bg-amber-50 text-amber-700 flex items-center justify-center">
+            <span class="material-symbols-outlined text-[20px]">receipt_long</span>
+          </div>
+        </div>
+        <div>
+          <span id="metric-total-orders" class="text-2xl sm:text-3xl font-black text-slate-900 font-mono">0</span>
+          <div class="flex items-center gap-1 mt-1 text-[11px] text-slate-500">
+            <span>Fulfilled to BCF-SL</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="p-4 sm:p-5 rounded-2xl bg-white border border-slate-200 shadow-xs flex flex-col justify-between">
+        <div class="flex items-center justify-between text-slate-500 mb-2">
+          <span class="text-xs font-extrabold uppercase tracking-wider">Cumulative Spend</span>
+          <div class="w-8 h-8 rounded-lg bg-purple-50 text-purple-700 flex items-center justify-center">
+            <span class="material-symbols-outlined text-[20px]">payments</span>
+          </div>
+        </div>
+        <div>
+          <span id="metric-total-spend" class="text-xl sm:text-2xl font-black text-slate-900 font-mono">NLe 0.00</span>
+          <div class="flex items-center gap-1 mt-1 text-[11px] text-purple-700 font-bold">
+            <span>Direct &amp; tender contracts</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- FILTER BAR & CONTROLS -->
+    <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-xs flex flex-col gap-3">
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+        <!-- Search -->
+        <div class="relative flex-1">
+          <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-[20px]">search</span>
+          <input
+            id="supplier-search-input"
+            type="text"
+            placeholder="Search suppliers by name, contact, TIN, category, or district..."
+            class="w-full pl-9 pr-4 py-2.5 rounded-xl border border-slate-200 bg-slate-50 text-xs text-slate-900 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition"
+          />
+        </div>
+
+        <!-- Compliance Filter Dropdown -->
+        <div class="flex items-center gap-2">
+          <select id="filter-compliance-select" class="px-3 py-2.5 rounded-xl border border-slate-200 bg-slate-50 text-xs font-semibold text-slate-700 focus:outline-none focus:ring-2 focus:ring-primary/20">
+            <option value="all">All Compliance Statuses</option>
+            <option value="Compliant">Compliant Only</option>
+            <option value="Under Review">Under Review</option>
+            <option value="Pending">Pending Clearance</option>
+            <option value="Suspended">Suspended / Flagged</option>
+            <option value="Terminated">Agreement Terminated</option>
+          </select>
+
+          <!-- District Filter -->
+          <select id="filter-district-select" class="px-3 py-2.5 rounded-xl border border-slate-200 bg-slate-50 text-xs font-semibold text-slate-700 focus:outline-none focus:ring-2 focus:ring-primary/20">
+            <option value="all">All Districts</option>
+            <option value="Western Area Urban">Western Area Urban (Freetown)</option>
+            <option value="Bo">Bo District</option>
+            <option value="Kenema">Kenema District</option>
+            <option value="Bombali">Bombali District (Makeni)</option>
+            <option value="Moyamba">Moyamba District</option>
+            <option value="Port Loko">Port Loko District</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Categories Filter Chips -->
+      <div class="flex items-center gap-1.5 overflow-x-auto no-scrollbar pb-1 text-xs pt-1 border-t border-slate-100" id="category-chips-container">
+        <!-- Rendered dynamically -->
+      </div>
+    </div>
+
+    <!-- SUPPLIERS GRID / LIST -->
+    <div id="suppliers-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+      <!-- Dynamic supplier cards -->
+    </div>
+
+    <!-- EMPTY STATE -->
+    <div id="suppliers-empty-state" class="hidden text-center py-16 bg-white rounded-2xl border border-slate-200">
+      <div class="w-16 h-16 rounded-full bg-slate-100 text-slate-400 mx-auto flex items-center justify-center mb-3">
+        <span class="material-symbols-outlined text-3xl">store</span>
+      </div>
+      <h3 class="text-base font-bold text-slate-800">No matching suppliers found</h3>
+      <p class="text-xs text-slate-500 mt-1 max-w-sm mx-auto">Try clearing search terms or registering a new vendor to build the BCF-SL procurement ledger.</p>
+      <button onclick="resetFilters()" class="mt-4 px-4 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-xs font-bold text-slate-700">
+        Reset Search Filters
+      </button>
+    </div>
+
+  </main>
+
+  <!-- ADD / EDIT SUPPLIER MODAL -->
+  <div id="supplier-modal" class="fixed inset-0 z-50 bg-black/50 backdrop-blur-xs hidden flex items-center justify-center p-3 sm:p-4 overflow-y-auto">
+    <div class="bg-white rounded-2xl max-w-2xl w-full p-5 sm:p-6 shadow-2xl border border-slate-200 flex flex-col my-auto max-h-[92vh]">
+      <div class="flex items-center justify-between border-b border-slate-100 pb-3 mb-4">
+        <div class="flex items-center gap-2.5">
+          <div class="w-9 h-9 rounded-xl bg-primary/10 text-primary flex items-center justify-center">
+            <span class="material-symbols-outlined text-[20px]">storefront</span>
+          </div>
+          <div>
+            <h3 id="modal-title" class="text-base font-extrabold text-slate-900 font-headline">Register Verified Vendor</h3>
+            <p class="text-xs text-slate-500">Record institutional vendor details and compliance credentials</p>
+          </div>
+        </div>
+        <button onclick="closeSupplierModal()" class="w-8 h-8 rounded-lg text-slate-400 hover:text-slate-600 hover:bg-slate-100 flex items-center justify-center">
+          <span class="material-symbols-outlined text-[20px]">close</span>
+        </button>
+      </div>
+
+      <form id="supplier-form" onsubmit="handleSupplierSubmit(event)" class="flex-1 overflow-y-auto pr-1 space-y-4 text-xs">
+        <input type="hidden" id="sup-id" value=""/>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div>
+            <label class="block font-bold text-slate-700 mb-1">Company / Legal Name *</label>
+            <input id="sup-name" type="text" required placeholder="e.g. Sierra Leone Agro-Commodities Ltd" class="w-full px-3 py-2 rounded-xl border border-slate-200 bg-slate-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-primary/20 text-xs"/>
+          </div>
+          <div>
+            <label class="block font-bold text-slate-700 mb-1">Trading Name (if different)</label>
+            <input id="sup-trading-name" type="text" placeholder="e.g. SLA Agro" class="w-full px-3 py-2 rounded-xl border border-slate-200 bg-slate-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-primary/20 text-xs"/>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+          <div>
+            <label class="block font-bold text-slate-700 mb-1">Business Registration No. *</label>
+            <input id="sup-reg-no" type="text" required placeholder="e.g. SL-BUS-2020-01923" class="w-full px-3 py-2 rounded-xl border border-slate-200 bg-slate-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-primary/20 text-xs font-mono"/>
+          </div>
+          <div>
+            <label class="block font-bold text-slate-700 mb-1">NRA Tax Identification (TIN) *</label>
+            <input id="sup-tax-id" type="text" required placeholder="e.g. NRA-TIN-001928374" class="w-full px-3 py-2 rounded-xl border border-slate-200 bg-slate-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-primary/20 text-xs font-mono"/>
+          </div>
+          <div>
+            <label class="block font-bold text-slate-700 mb-1">Compliance Status</label>
+            <select id="sup-compliance-status" class="w-full px-3 py-2 rounded-xl border border-slate-200 bg-slate-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-primary/20 text-xs font-semibold">
+              <option value="Compliant">Compliant (NRA &amp; NASSIT Cleared)</option>
+              <option value="Under Review">Under Review</option>
+              <option value="Pending">Pending Documents</option>
+              <option value="Suspended">Suspended</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+          <div>
+            <label class="block font-bold text-slate-700 mb-1">Primary Contact Person *</label>
+            <input id="sup-contact-person" type="text" required placeholder="e.g. Amadu Bah" class="w-full px-3 py-2 rounded-xl border border-slate-200 bg-slate-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-primary/20 text-xs"/>
+          </div>
+          <div>
+            <label class="block font-bold text-slate-700 mb-1">Contact Phone *</label>
+            <input id="sup-phone" type="text" required placeholder="e.g. +232 76 123 456" class="w-full px-3 py-2 rounded-xl border border-slate-200 bg-slate-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-primary/20 text-xs"/>
+          </div>
+          <div>
+            <label class="block font-bold text-slate-700 mb-1">Official Email Address *</label>
+            <input id="sup-email" type="email" required placeholder="e.g. sales@sla-commodities.sl" class="w-full px-3 py-2 rounded-xl border border-slate-200 bg-slate-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-primary/20 text-xs"/>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div>
+            <label class="block font-bold text-slate-700 mb-1">Physical Business Address *</label>
+            <input id="sup-address" type="text" required placeholder="e.g. 14 Bai Bureh Road, Freetown" class="w-full px-3 py-2 rounded-xl border border-slate-200 bg-slate-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-primary/20 text-xs"/>
+          </div>
+          <div>
+            <label class="block font-bold text-slate-700 mb-1">District / Region *</label>
+            <select id="sup-district" class="w-full px-3 py-2 rounded-xl border border-slate-200 bg-slate-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-primary/20 text-xs">
+              <option value="Western Area Urban">Western Area Urban (Freetown)</option>
+              <option value="Western Area Rural">Western Area Rural</option>
+              <option value="Bo">Bo District</option>
+              <option value="Kenema">Kenema District</option>
+              <option value="Bombali">Bombali District (Makeni)</option>
+              <option value="Moyamba">Moyamba District</option>
+              <option value="Port Loko">Port Loko District</option>
+              <option value="Kono">Kono District</option>
+              <option value="Tonkolili">Tonkolili District</option>
+              <option value="Kailahun">Kailahun District</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Procurement Categories -->
+        <div>
+          <label class="block font-bold text-slate-700 mb-1">Supply Categories (Select all that apply) *</label>
+          <div id="sup-categories-checkboxes" class="grid grid-cols-2 sm:grid-cols-3 gap-2 p-3 bg-slate-50 rounded-xl border border-slate-200 max-h-36 overflow-y-auto">
+            <!-- Populated via script -->
+          </div>
+        </div>
+
+        <!-- Banking Information -->
+        <div class="p-3 bg-blue-50/60 rounded-xl border border-blue-200/60 space-y-2.5">
+          <span class="text-xs font-extrabold text-blue-900 block flex items-center gap-1.5">
+            <span class="material-symbols-outlined text-[16px] text-primary">account_balance</span>
+            <span>Bank &amp; Payment Settlement Details</span>
+          </span>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div>
+              <label class="block font-semibold text-slate-600 mb-0.5">Commercial Bank Name *</label>
+              <input id="sup-bank-name" type="text" required placeholder="e.g. Sierra Leone Commercial Bank" class="w-full px-3 py-1.5 rounded-lg border border-slate-200 bg-white text-xs"/>
+            </div>
+            <div>
+              <label class="block font-semibold text-slate-600 mb-0.5">Bank Account / BBAN Number *</label>
+              <input id="sup-bank-account" type="text" required placeholder="e.g. 003001847192" class="w-full px-3 py-1.5 rounded-lg border border-slate-200 bg-white text-xs font-mono"/>
+            </div>
+          </div>
+        </div>
+
+        <!-- Submit buttons -->
+        <div class="flex items-center justify-end gap-2 pt-3 border-t border-slate-100">
+          <button type="button" onclick="closeSupplierModal()" class="px-4 py-2 rounded-xl border border-slate-200 hover:bg-slate-100 text-xs font-bold text-slate-600 cursor-pointer">
+            Cancel
+          </button>
+          <button type="submit" class="px-5 py-2 rounded-xl bg-primary hover:bg-primary-dark text-white text-xs font-extrabold shadow-md cursor-pointer active:scale-95">
+            Save Vendor Record
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- SUPPLIER DOSSIER MODAL -->
+  <div id="dossier-modal" class="fixed inset-0 z-50 bg-black/50 backdrop-blur-xs hidden flex items-center justify-center p-3 sm:p-4 overflow-y-auto">
+    <div class="bg-white rounded-2xl max-w-3xl w-full p-5 sm:p-6 shadow-2xl border border-slate-200 flex flex-col my-auto max-h-[92vh]">
+      <div class="flex items-center justify-between border-b border-slate-100 pb-3 mb-4">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-xl bg-primary text-white flex items-center justify-center font-black text-sm" id="dossier-avatar">
+            SL
+          </div>
+          <div>
+            <div class="flex items-center gap-2">
+              <h3 id="dossier-name" class="text-base sm:text-lg font-extrabold text-slate-900 font-headline">Vendor Name</h3>
+              <span id="dossier-badge" class="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold bg-emerald-100 text-emerald-800 border border-emerald-200">
+                Compliant
+              </span>
+            </div>
+            <p id="dossier-subtitle" class="text-xs text-slate-500 font-mono">BCF-SUP-2026-0001 • Western Area Urban</p>
+          </div>
+        </div>
+        <button onclick="closeDossierModal()" class="w-8 h-8 rounded-lg text-slate-400 hover:text-slate-600 hover:bg-slate-100 flex items-center justify-center">
+          <span class="material-symbols-outlined text-[20px]">close</span>
+        </button>
+      </div>
+
+      <div class="flex-1 overflow-y-auto pr-1 space-y-4 text-xs" id="dossier-content">
+        <!-- Rendered dynamically -->
+      </div>
+
+      <div class="flex items-center justify-between pt-3 border-t border-slate-100 mt-4">
+        <div class="flex items-center gap-2">
+          <button id="dossier-create-pr-btn" class="px-4 py-2 rounded-xl bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-extrabold flex items-center gap-1.5 shadow-sm cursor-pointer">
+            <span class="material-symbols-outlined text-[16px]">add_shopping_cart</span>
+            <span>Raise Requisition for this Vendor</span>
+          </button>
+          <button id="dossier-send-email-btn" onclick="sendEnlistmentNoticeForCurrentVendor()" class="px-3.5 py-2 rounded-xl bg-blue-50 hover:bg-blue-100 text-blue-800 border border-blue-200 text-xs font-bold flex items-center gap-1.5 shadow-xs cursor-pointer" title="Send official enlistment confirmation email to vendor official email address">
+            <span class="material-symbols-outlined text-[16px] text-blue-700">mark_email_read</span>
+            <span>Send Enlistment Email</span>
+          </button>
+          <button id="dossier-terminate-btn" onclick="openTerminateModalForCurrentVendor()" class="px-3.5 py-2 rounded-xl bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 text-xs font-bold flex items-center gap-1.5 shadow-2xs cursor-pointer" title="Terminate procurement agreement with this vendor">
+            <span class="material-symbols-outlined text-[16px] text-rose-600">person_cancel</span>
+            <span>Terminate Agreement</span>
+          </button>
+          <button id="dossier-reinstate-btn" onclick="openReinstateModalForCurrentVendor()" class="hidden px-3.5 py-2 rounded-xl bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-200 text-xs font-bold flex items-center gap-1.5 shadow-2xs cursor-pointer" title="Reinstate and renew procurement agreement with this vendor">
+            <span class="material-symbols-outlined text-[16px] text-emerald-600">restart_alt</span>
+            <span>Reinstate Agreement</span>
+          </button>
+        </div>
+        <button onclick="closeDossierModal()" class="px-4 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-xs font-bold text-slate-700 cursor-pointer">
+          Close Dossier
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- OFFICIAL VENDOR ENLISTMENT EMAIL CONFIRMATION MODAL -->
+  <div id="vendor-email-modal" class="fixed inset-0 z-50 bg-black/55 backdrop-blur-xs hidden flex items-center justify-center p-3 sm:p-4 overflow-y-auto">
+    <div class="bg-white rounded-2xl max-w-2xl w-full p-5 sm:p-6 shadow-2xl border border-slate-200 flex flex-col my-auto max-h-[92vh]">
+      <!-- Modal Header -->
+      <div class="flex items-center justify-between border-b border-slate-100 pb-3 mb-4">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-xl bg-emerald-700 text-white flex items-center justify-center font-black text-sm shrink-0">
+            <span class="material-symbols-outlined text-[22px]">mark_email_read</span>
+          </div>
+          <div>
+            <h3 class="text-base sm:text-lg font-extrabold text-slate-900 font-headline">Vendor Enlistment Notice Sent</h3>
+            <p class="text-xs text-slate-500">Official notification dispatched via BCF-SL Administration Hub SMTP</p>
+          </div>
+        </div>
+        <button type="button" onclick="closeVendorEmailModal()" class="w-8 h-8 rounded-lg text-slate-400 hover:text-slate-600 hover:bg-slate-100 flex items-center justify-center cursor-pointer">
+          <span class="material-symbols-outlined text-[20px]">close</span>
+        </button>
+      </div>
+
+      <!-- Modal Content Body -->
+      <div class="flex-1 overflow-y-auto pr-1 space-y-4 text-xs">
+        <!-- Official Enlistment Statement Highlight Box -->
+        <div class="p-4 rounded-xl bg-emerald-50/90 border-2 border-emerald-300">
+          <div class="flex items-start gap-3">
+            <span class="material-symbols-outlined text-emerald-700 text-[24px] shrink-0 mt-0.5">verified</span>
+            <div>
+              <span class="font-extrabold text-emerald-950 text-xs uppercase tracking-wider block mb-1">
+                Official Statement of Enlistment
+              </span>
+              <p id="vem-statement" class="text-emerald-900 text-xs font-semibold leading-relaxed m-0">
+                This confirms that <strong id="vem-vendor-name">The Vendor</strong> has been successfully verified, accredited, and officially enrolled into the <strong>Bandama Charity Foundation – Sierra Leone (BCF-SL) Approved Vendor &amp; Supplier Master List</strong>.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Delivery Credentials Grid -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 p-3.5 rounded-xl bg-slate-50 border border-slate-200">
+          <div>
+            <span class="text-[10px] text-slate-400 font-bold uppercase block">Recipient Official Email</span>
+            <span id="vem-recipient-email" class="font-mono text-primary font-bold text-xs break-all">vendor@example.com</span>
+          </div>
+          <div>
+            <span class="text-[10px] text-slate-400 font-bold uppercase block">Authorized Sender</span>
+            <span class="font-semibold text-slate-800 text-xs">BCF-SL Administration Hub &lt;bandamacharityfoundationsl@gmail.com&gt;</span>
+          </div>
+          <div>
+            <span class="text-[10px] text-slate-400 font-bold uppercase block">Vendor Reference ID</span>
+            <span id="vem-vendor-id" class="font-mono text-slate-900 font-bold text-xs">BCF-SUP-2026-0001</span>
+          </div>
+          <div>
+            <span class="text-[10px] text-slate-400 font-bold uppercase block">Delivery Channel</span>
+            <span class="font-semibold text-emerald-700 text-xs flex items-center gap-1">
+              <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+              <span>Gmail SMTP Server (Port 465 SSL/TLS)</span>
+            </span>
+          </div>
+          <div class="sm:col-span-2">
+            <span class="text-[10px] text-slate-400 font-bold uppercase block">Subject Line</span>
+            <span id="vem-subject" class="font-semibold text-slate-800 text-xs">OFFICIAL NOTIFICATION: Enlistment in BCF-SL Approved Vendor &amp; Supplier Registry</span>
+          </div>
+        </div>
+
+        <!-- Letterhead Preview Box -->
+        <div>
+          <div class="flex items-center justify-between mb-1.5">
+            <span class="text-xs font-extrabold text-slate-800 uppercase tracking-wider">Letterhead Transmission Copy</span>
+            <span class="text-[10px] font-bold text-slate-400">Institutional Notice</span>
+          </div>
+          <div class="p-3.5 rounded-xl bg-white border border-slate-200 font-mono text-[11px] text-slate-600 max-h-48 overflow-y-auto whitespace-pre-wrap leading-relaxed" id="vem-letter-preview">
+            <!-- Text preview inserted dynamically -->
+          </div>
+        </div>
+      </div>
+
+      <!-- Modal Footer -->
+      <div class="flex items-center justify-between pt-3 border-t border-slate-100 mt-4 gap-2">
+        <button type="button" id="vem-resend-btn" onclick="resendCurrentVendorEmail()" class="px-4 py-2 rounded-xl bg-blue-50 hover:bg-blue-100 text-blue-800 border border-blue-200 text-xs font-bold flex items-center gap-1.5 cursor-pointer">
+          <span class="material-symbols-outlined text-[16px]">refresh</span>
+          <span>Resend Email via SMTP</span>
+        </button>
+        <button type="button" onclick="closeVendorEmailModal()" class="px-5 py-2 rounded-xl bg-primary hover:bg-primary-dark text-white text-xs font-bold shadow-md cursor-pointer">
+          Done &bull; Close Notice
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- TERMINATE VENDOR AGREEMENT MODAL -->
+  <div id="terminate-vendor-modal" class="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs hidden flex items-center justify-center p-3 sm:p-4 overflow-y-auto">
+    <div class="bg-white rounded-2xl max-w-xl w-full p-5 sm:p-6 shadow-2xl border border-slate-200 flex flex-col my-auto max-h-[92vh]">
+      <!-- Header -->
+      <div class="flex items-center justify-between border-b border-slate-100 pb-3 mb-4">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-xl bg-rose-700 text-white flex items-center justify-center font-black text-sm shrink-0 shadow-sm">
+            <span class="material-symbols-outlined text-[22px]">person_cancel</span>
+          </div>
+          <div>
+            <h3 class="text-base sm:text-lg font-extrabold text-slate-900 font-headline">Terminate Vendor Agreement</h3>
+            <p class="text-xs text-slate-500">Revoke active procurement standing &amp; notify vendor official contact</p>
+          </div>
+        </div>
+        <button type="button" onclick="closeTerminateModal()" class="w-8 h-8 rounded-lg text-slate-400 hover:text-slate-600 hover:bg-slate-100 flex items-center justify-center cursor-pointer">
+          <span class="material-symbols-outlined text-[20px]">close</span>
+        </button>
+      </div>
+
+      <!-- Form Body -->
+      <form id="terminate-vendor-form" onsubmit="handleTerminateFormSubmit(event)" class="flex-1 overflow-y-auto pr-1 space-y-4 text-xs">
+        <input type="hidden" id="term-vendor-id-input" value=""/>
+
+        <!-- Vendor Summary Card -->
+        <div class="p-3.5 rounded-xl bg-slate-50 border border-slate-200 space-y-2">
+          <div class="flex items-center justify-between">
+            <span class="text-[10px] text-slate-400 font-bold uppercase">Vendor Name</span>
+            <span id="term-vendor-name" class="font-bold text-slate-900 text-xs">Vendor Name</span>
+          </div>
+          <div class="flex items-center justify-between">
+            <span class="text-[10px] text-slate-400 font-bold uppercase">Vendor ID</span>
+            <span id="term-vendor-id-display" class="font-mono text-slate-700 font-bold text-xs">BCF-SUP-2026-0001</span>
+          </div>
+          <div class="flex items-center justify-between">
+            <span class="text-[10px] text-slate-400 font-bold uppercase">Designated Official Email</span>
+            <span id="term-vendor-email-display" class="font-mono text-primary font-bold text-xs">vendor@example.com</span>
+          </div>
+          <div class="flex items-center justify-between pt-2 border-t border-slate-200/80">
+            <span class="text-[10px] text-slate-400 font-bold uppercase">Historical Commitment Ledger</span>
+            <span id="term-vendor-history-display" class="font-semibold text-slate-800 text-xs">0 Orders &bull; NLe 0.00 Total Spend</span>
+          </div>
+        </div>
+
+        <!-- Warning Callout -->
+        <div class="p-3.5 rounded-xl bg-rose-50 border border-rose-200 flex items-start gap-2.5">
+          <span class="material-symbols-outlined text-rose-700 text-[20px] shrink-0 mt-0.5">warning</span>
+          <div class="text-[11.5px] text-rose-900 leading-relaxed font-medium">
+            <strong>Important Governance Policy:</strong> Terminating this agreement revokes vendor accreditation. The vendor will be <strong>strictly excluded from future RFQs and bidding awards</strong>. All historical purchase orders and spend records will remain retained in the Master Register for statutory financial audit.
+          </div>
+        </div>
+
+        <!-- Termination Reason Input -->
+        <div>
+          <label class="block font-bold text-slate-800 mb-1 text-xs">
+            Reason for Agreement Termination *
+          </label>
+          <textarea
+            id="term-reason-input"
+            required
+            rows="3"
+            placeholder="State official justification for contract termination, e.g.: Material breach of contract terms, persistent failure to fulfill Purchase Orders within delivery deadlines, non-compliance with quality standards, or formal cessation of operations..."
+            class="w-full px-3 py-2.5 rounded-xl border border-slate-300 bg-white text-xs text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-rose-500/20 focus:border-rose-600 transition"
+          ></textarea>
+        </div>
+
+        <!-- Recipient Email Address Input (Editable) -->
+        <div>
+          <label class="block font-bold text-slate-800 mb-1 text-xs">
+            Official Notification Email Address (Recipient) *
+          </label>
+          <div class="relative">
+            <span class="material-symbols-outlined absolute left-3 top-2.5 text-slate-400 text-[18px]">mail</span>
+            <input
+              type="email"
+              id="term-recipient-email-input"
+              required
+              placeholder="e.g. vendor@example.com or your test email"
+              class="w-full pl-9 pr-3 py-2 rounded-xl border border-slate-300 bg-white text-xs text-slate-900 font-mono focus:outline-none focus:ring-2 focus:ring-rose-500/20 focus:border-rose-600 transition"
+            />
+          </div>
+          <p class="text-[11px] text-slate-500 mt-1">
+            Official BCF-SL termination dispatch notice will be transmitted directly to this email address via Gmail SMTP.
+          </p>
+        </div>
+
+        <!-- Send Email Checkbox -->
+        <div class="p-3 rounded-xl bg-blue-50/70 border border-blue-200/70 flex items-start gap-2.5">
+          <input
+            type="checkbox"
+            id="term-send-email-check"
+            checked
+            class="rounded text-primary focus:ring-primary/20 mt-0.5 shrink-0"
+          />
+          <label for="term-send-email-check" class="text-[11.5px] text-blue-950 font-semibold cursor-pointer">
+            Dispatch official Termination Notice email to vendor designated official email (<span id="term-vendor-email-target" class="font-mono font-bold text-primary">vendor@example.com</span>) via Gmail SMTP
+          </label>
+        </div>
+
+        <!-- Footer Buttons -->
+        <div class="flex items-center justify-end gap-2 pt-3 border-t border-slate-100">
+          <button
+            type="button"
+            onclick="closeTerminateModal()"
+            class="px-4 py-2 rounded-xl border border-slate-200 hover:bg-slate-100 text-xs font-bold text-slate-600 cursor-pointer"
+          >
+            Cancel
+          </button>
+          <button
+            type="submit"
+            id="term-submit-btn"
+            class="px-5 py-2 rounded-xl bg-rose-700 hover:bg-rose-800 text-white text-xs font-extrabold shadow-md active:scale-95 flex items-center gap-1.5 cursor-pointer"
+          >
+            <span class="material-symbols-outlined text-[16px]">person_cancel</span>
+            <span>Confirm &amp; Terminate Agreement</span>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- OFFICIAL TERMINATION NOTICE CONFIRMATION MODAL -->
+  <div id="termination-notice-modal" class="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs hidden flex items-center justify-center p-3 sm:p-4 overflow-y-auto">
+    <div class="bg-white rounded-2xl max-w-2xl w-full p-5 sm:p-6 shadow-2xl border border-slate-200 flex flex-col my-auto max-h-[92vh]">
+      <!-- Header -->
+      <div class="flex items-center justify-between border-b border-slate-100 pb-3 mb-4">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-xl bg-rose-700 text-white flex items-center justify-center font-black text-sm shrink-0 shadow-sm">
+            <span class="material-symbols-outlined text-[22px]">mark_email_read</span>
+          </div>
+          <div>
+            <h3 class="text-base sm:text-lg font-extrabold text-slate-900 font-headline">Vendor Agreement Terminated</h3>
+            <p class="text-xs text-slate-500">Official notification dispatched via BCF-SL Administration Hub SMTP</p>
+          </div>
+        </div>
+        <button type="button" onclick="closeTerminationNoticeModal()" class="w-8 h-8 rounded-lg text-slate-400 hover:text-slate-600 hover:bg-slate-100 flex items-center justify-center cursor-pointer">
+          <span class="material-symbols-outlined text-[20px]">close</span>
+        </button>
+      </div>
+
+      <!-- Body -->
+      <div class="flex-1 overflow-y-auto pr-1 space-y-4 text-xs">
+        <!-- Live Transmission Status Banner -->
+        <div id="tnm-status-box" class="p-3 rounded-xl bg-slate-50 border border-slate-200"></div>
+
+        <!-- Statement Highlight -->
+        <div class="p-4 rounded-xl bg-rose-50/90 border-2 border-rose-300">
+          <div class="flex items-start gap-3">
+            <span class="material-symbols-outlined text-rose-700 text-[24px] shrink-0 mt-0.5">block</span>
+            <div>
+              <span class="font-extrabold text-rose-950 text-xs uppercase tracking-wider block mb-1">
+                Official Statement of Agreement Termination
+              </span>
+              <p class="text-rose-900 text-xs font-semibold leading-relaxed m-0">
+                The Master Vendor Agreement between <strong>Bandama Charity Foundation – Sierra Leone (BCF-SL)</strong> and <strong id="tnm-vendor-name">The Vendor</strong> has been officially terminated. Historical purchase orders remain preserved in the master register.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Transmission Metadata Grid -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 p-3.5 rounded-xl bg-slate-50 border border-slate-200">
+          <div>
+            <span class="text-[10px] text-slate-400 font-bold uppercase block">Recipient Official Email</span>
+            <span id="tnm-recipient-email" class="font-mono text-primary font-bold text-xs break-all">vendor@example.com</span>
+          </div>
+          <div>
+            <span class="text-[10px] text-slate-400 font-bold uppercase block">Authorized Sender</span>
+            <span class="font-semibold text-slate-800 text-xs">BCF-SL Administration Hub &lt;bandamacharityfoundationsl@gmail.com&gt;</span>
+          </div>
+          <div>
+            <span class="text-[10px] text-slate-400 font-bold uppercase block">Vendor Reference ID</span>
+            <span id="tnm-vendor-id" class="font-mono text-slate-900 font-bold text-xs">BCF-SUP-2026-0001</span>
+          </div>
+          <div>
+            <span class="text-[10px] text-slate-400 font-bold uppercase block">Delivery Channel</span>
+            <span class="font-semibold text-emerald-700 text-xs flex items-center gap-1">
+              <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+              <span>Gmail SMTP (SSL Port 465)</span>
+            </span>
+          </div>
+          <div>
+            <span class="text-[10px] text-slate-400 font-bold uppercase block">Effective Date</span>
+            <span id="tnm-effective-date" class="font-mono text-slate-900 font-bold text-xs">2026-10-05</span>
+          </div>
+          <div>
+            <span class="text-[10px] text-slate-400 font-bold uppercase block">Procurement Standing</span>
+            <span class="font-bold text-rose-700 text-xs">Excluded from all RFQs &amp; PO Awards</span>
+          </div>
+          <div class="sm:col-span-2">
+            <span class="text-[10px] text-slate-400 font-bold uppercase block">Subject Line</span>
+            <span id="tnm-subject" class="font-semibold text-slate-800 text-xs">OFFICIAL NOTICE: Termination of Vendor Accreditation Agreement — Bandama Charity Foundation</span>
+          </div>
+        </div>
+
+        <!-- Reason Display -->
+        <div class="p-3 rounded-xl bg-rose-50/60 border border-rose-200">
+          <span class="text-[10px] font-bold text-rose-900 uppercase block mb-1">Official Reason for Termination</span>
+          <p id="tnm-reason" class="text-slate-800 italic text-xs m-0">Contractual termination by BCF-SL.</p>
+        </div>
+
+        <!-- Letterhead Transmission Copy Preview -->
+        <div>
+          <div class="flex items-center justify-between mb-1.5">
+            <span class="text-xs font-extrabold text-slate-800 uppercase tracking-wider">Letterhead Transmission Copy</span>
+            <span class="text-[10px] font-bold text-slate-400">Institutional Notice</span>
+          </div>
+          <pre id="tnm-letter-preview" class="p-3.5 rounded-xl bg-slate-900 text-slate-100 font-mono text-[11px] leading-relaxed overflow-x-auto whitespace-pre-wrap max-h-48 border border-slate-800"></pre>
+        </div>
+      </div>
+
+      <!-- Footer -->
+      <div class="flex items-center justify-between pt-3 border-t border-slate-100 mt-4">
+        <button id="tnm-resend-btn" onclick="resendCurrentTerminationNotice()" class="px-4 py-2 rounded-xl bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 text-xs font-extrabold flex items-center gap-1.5 shadow-2xs cursor-pointer">
+          <span class="material-symbols-outlined text-[16px]">refresh</span>
+          <span>Resend Notice via SMTP</span>
+        </button>
+
+        <button onclick="closeTerminationNoticeModal()" class="px-4 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-xs font-bold text-slate-700 cursor-pointer">
+          Close
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- REINSTATE / RENEW VENDOR AGREEMENT MODAL -->
+  <div id="reinstate-vendor-modal" class="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs hidden flex items-center justify-center p-3 sm:p-4 overflow-y-auto">
+    <div class="bg-white rounded-2xl max-w-xl w-full p-5 sm:p-6 shadow-2xl border border-slate-200 flex flex-col my-auto max-h-[92vh]">
+      <!-- Header -->
+      <div class="flex items-center justify-between border-b border-slate-100 pb-3 mb-4">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-xl bg-emerald-700 text-white flex items-center justify-center font-black text-sm shrink-0 shadow-sm">
+            <span class="material-symbols-outlined text-[22px]">restart_alt</span>
+          </div>
+          <div>
+            <h3 class="text-base sm:text-lg font-extrabold text-slate-900 font-headline">Reinstate &amp; Renew Vendor Agreement</h3>
+            <p class="text-xs text-slate-500">Restore active procurement standing &amp; notify vendor official contact</p>
+          </div>
+        </div>
+        <button type="button" onclick="closeReinstateModal()" class="w-8 h-8 rounded-lg text-slate-400 hover:text-slate-600 hover:bg-slate-100 flex items-center justify-center cursor-pointer">
+          <span class="material-symbols-outlined text-[20px]">close</span>
+        </button>
+      </div>
+
+      <!-- Form Body -->
+      <form id="reinstate-vendor-form" onsubmit="handleReinstateFormSubmit(event)" class="flex-1 overflow-y-auto pr-1 space-y-4 text-xs">
+        <input type="hidden" id="reinstate-vendor-id-input" value=""/>
+
+        <!-- Vendor Summary Card -->
+        <div class="p-3.5 rounded-xl bg-slate-50 border border-slate-200 space-y-2">
+          <div class="flex items-center justify-between">
+            <span class="text-[10px] text-slate-400 font-bold uppercase">Vendor Name</span>
+            <span id="reinstate-vendor-name" class="font-bold text-slate-900 text-xs">Vendor Name</span>
+          </div>
+          <div class="flex items-center justify-between">
+            <span class="text-[10px] text-slate-400 font-bold uppercase">Vendor ID</span>
+            <span id="reinstate-vendor-id-display" class="font-mono text-slate-700 font-bold text-xs">BCF-SUP-2026-0001</span>
+          </div>
+          <div class="flex items-center justify-between">
+            <span class="text-[10px] text-slate-400 font-bold uppercase">Designated Official Email</span>
+            <span id="reinstate-vendor-email-display" class="font-mono text-primary font-bold text-xs">vendor@example.com</span>
+          </div>
+          <div class="flex items-center justify-between pt-2 border-t border-slate-200/80">
+            <span class="text-[10px] text-slate-400 font-bold uppercase">Previous Termination Reason</span>
+            <span id="reinstate-previous-reason" class="font-medium text-rose-700 text-xs italic">Breach of terms</span>
+          </div>
+          <div class="flex items-center justify-between pt-1">
+            <span class="text-[10px] text-slate-400 font-bold uppercase">Historical Commitment Ledger</span>
+            <span id="reinstate-vendor-history-display" class="font-semibold text-slate-800 text-xs">0 Orders • NLe 0.00 Total Spend</span>
+          </div>
+        </div>
+
+        <!-- Informational Callout -->
+        <div class="p-3.5 rounded-xl bg-emerald-50 border border-emerald-200 flex items-start gap-2.5">
+          <span class="material-symbols-outlined text-emerald-700 text-[20px] shrink-0 mt-0.5">verified_user</span>
+          <div class="text-[11.5px] text-emerald-950 leading-relaxed font-medium">
+            <strong>Reinstatement Governance Effect:</strong> Reinstating this agreement restores active accreditation. The vendor will <strong>immediately become eligible for RFQ notifications, bidding, and new Purchase Orders</strong>. All historical order records remain permanently retained.
+          </div>
+        </div>
+
+        <!-- Reinstatement Reason Input -->
+        <div>
+          <label class="block font-bold text-slate-800 mb-1 text-xs">
+            Reason for Agreement Reinstatement / Renewal *
+          </label>
+          <textarea
+            id="reinstate-reason-input"
+            required
+            rows="3"
+            placeholder="State official justification for agreement reinstatement / renewal, e.g.: Remediation of previous breach, submission of renewed NRA tax clearance and NASSIT certificates, satisfactory resolution of compliance audit, or executive committee authorization to resume active vendor standing..."
+            class="w-full px-3 py-2.5 rounded-xl border border-slate-300 bg-white text-xs text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-600 transition"
+          ></textarea>
+        </div>
+
+        <!-- Recipient Email Address Input (Editable) -->
+        <div>
+          <label class="block font-bold text-slate-800 mb-1 text-xs">
+            Official Notification Email Address (Recipient) *
+          </label>
+          <div class="relative">
+            <span class="material-symbols-outlined absolute left-3 top-2.5 text-slate-400 text-[18px]">mail</span>
+            <input
+              type="email"
+              id="reinstate-recipient-email-input"
+              required
+              placeholder="e.g. vendor@example.com or your test email"
+              class="w-full pl-9 pr-3 py-2 rounded-xl border border-slate-300 bg-white text-xs text-slate-900 font-mono focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-600 transition"
+            />
+          </div>
+          <p class="text-[11px] text-slate-500 mt-1">
+            Official BCF-SL reinstatement and renewal notice will be transmitted directly to this email address via Gmail SMTP.
+          </p>
+        </div>
+
+        <!-- Send Email Checkbox -->
+        <div class="p-3 rounded-xl bg-blue-50/70 border border-blue-200/70 flex items-start gap-2.5">
+          <input
+            type="checkbox"
+            id="reinstate-send-email-check"
+            checked
+            class="rounded text-primary focus:ring-primary/20 mt-0.5 shrink-0"
+          />
+          <label for="reinstate-send-email-check" class="text-[11.5px] text-blue-950 font-semibold cursor-pointer">
+            Dispatch official Reinstatement Notice email to vendor designated official email (<span id="reinstate-vendor-email-target" class="font-mono font-bold text-primary">vendor@example.com</span>) via Gmail SMTP
+          </label>
+        </div>
+
+        <!-- Footer Buttons -->
+        <div class="flex items-center justify-end gap-2 pt-3 border-t border-slate-100">
+          <button
+            type="button"
+            onclick="closeReinstateModal()"
+            class="px-4 py-2 rounded-xl border border-slate-200 hover:bg-slate-100 text-xs font-bold text-slate-600 cursor-pointer"
+          >
+            Cancel
+          </button>
+          <button
+            type="submit"
+            id="reinstate-submit-btn"
+            class="px-5 py-2 rounded-xl bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-extrabold shadow-md active:scale-95 flex items-center gap-1.5 cursor-pointer"
+          >
+            <span class="material-symbols-outlined text-[16px]">restart_alt</span>
+            <span>Confirm &amp; Reinstate Agreement</span>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- OFFICIAL REINSTATEMENT NOTICE CONFIRMATION MODAL -->
+  <div id="reinstatement-notice-modal" class="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs hidden flex items-center justify-center p-3 sm:p-4 overflow-y-auto">
+    <div class="bg-white rounded-2xl max-w-2xl w-full p-5 sm:p-6 shadow-2xl border border-slate-200 flex flex-col my-auto max-h-[92vh]">
+      <!-- Header -->
+      <div class="flex items-center justify-between border-b border-slate-100 pb-3 mb-4">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-xl bg-emerald-700 text-white flex items-center justify-center font-black text-sm shrink-0 shadow-sm">
+            <span class="material-symbols-outlined text-[22px]">mark_email_read</span>
+          </div>
+          <div>
+            <h3 class="text-base sm:text-lg font-extrabold text-slate-900 font-headline">Vendor Agreement Reinstated &amp; Renewed</h3>
+            <p class="text-xs text-slate-500">Official notification dispatched via BCF-SL Administration Hub SMTP</p>
+          </div>
+        </div>
+        <button type="button" onclick="closeReinstatementNoticeModal()" class="w-8 h-8 rounded-lg text-slate-400 hover:text-slate-600 hover:bg-slate-100 flex items-center justify-center cursor-pointer">
+          <span class="material-symbols-outlined text-[20px]">close</span>
+        </button>
+      </div>
+
+      <!-- Body -->
+      <div class="flex-1 overflow-y-auto pr-1 space-y-4 text-xs">
+        <!-- Live Transmission Status Banner -->
+        <div id="rnm-status-box" class="p-3 rounded-xl bg-slate-50 border border-slate-200"></div>
+
+        <!-- Statement Highlight -->
+        <div class="p-4 rounded-xl bg-emerald-50/90 border-2 border-emerald-300">
+          <div class="flex items-start gap-3">
+            <span class="material-symbols-outlined text-emerald-700 text-[24px] shrink-0 mt-0.5">verified</span>
+            <div>
+              <span class="font-extrabold text-emerald-950 text-xs uppercase tracking-wider block mb-1">
+                Official Statement of Agreement Reinstatement
+              </span>
+              <p class="text-emerald-900 text-xs font-semibold leading-relaxed m-0">
+                The Master Vendor Agreement between <strong>Bandama Charity Foundation – Sierra Leone (BCF-SL)</strong> and <strong id="rnm-vendor-name">The Vendor</strong> has been officially reinstated and renewed. Vendor is once again eligible for RFQ invitations, bidding awards, and new purchase orders.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Transmission Metadata Grid -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 p-3.5 rounded-xl bg-slate-50 border border-slate-200">
+          <div>
+            <span class="text-[10px] text-slate-400 font-bold uppercase block">Recipient Official Email</span>
+            <span id="rnm-recipient-email" class="font-mono text-primary font-bold text-xs break-all">vendor@example.com</span>
+          </div>
+          <div>
+            <span class="text-[10px] text-slate-400 font-bold uppercase block">Authorized Sender</span>
+            <span class="font-semibold text-slate-800 text-xs">BCF-SL Administration Hub &lt;bandamacharityfoundationsl@gmail.com&gt;</span>
+          </div>
+          <div>
+            <span class="text-[10px] text-slate-400 font-bold uppercase block">Vendor Reference ID</span>
+            <span id="rnm-vendor-id" class="font-mono text-slate-900 font-bold text-xs">BCF-SUP-2026-0001</span>
+          </div>
+          <div>
+            <span class="text-[10px] text-slate-400 font-bold uppercase block">Delivery Channel</span>
+            <span class="font-semibold text-emerald-700 text-xs flex items-center gap-1">
+              <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+              <span>Gmail SMTP (SSL Port 465)</span>
+            </span>
+          </div>
+          <div>
+            <span class="text-[10px] text-slate-400 font-bold uppercase block">Effective Date</span>
+            <span id="rnm-effective-date" class="font-mono text-slate-900 font-bold text-xs">2026-10-05</span>
+          </div>
+          <div>
+            <span class="text-[10px] text-slate-400 font-bold uppercase block">Procurement Standing</span>
+            <span class="font-bold text-emerald-700 text-xs">Restored to Active / Compliant &bull; RFQ &amp; PO Eligible</span>
+          </div>
+          <div class="sm:col-span-2">
+            <span class="text-[10px] text-slate-400 font-bold uppercase block">Subject Line</span>
+            <span id="rnm-subject" class="font-semibold text-slate-800 text-xs">OFFICIAL NOTICE: Reinstatement &amp; Renewal of Vendor Accreditation Agreement — Bandama Charity Foundation</span>
+          </div>
+        </div>
+
+        <!-- Reason Display -->
+        <div class="p-3 rounded-xl bg-emerald-50/60 border border-emerald-200">
+          <span class="text-[10px] font-bold text-emerald-900 uppercase block mb-1">Official Reason for Reinstatement</span>
+          <p id="rnm-reason" class="text-slate-800 italic text-xs m-0">Agreement officially reinstated following governance review.</p>
+        </div>
+
+        <!-- Letterhead Transmission Copy Preview -->
+        <div>
+          <div class="flex items-center justify-between mb-1.5">
+            <span class="text-xs font-extrabold text-slate-800 uppercase tracking-wider">Letterhead Transmission Copy</span>
+            <span class="text-[10px] font-bold text-slate-400">Institutional Notice</span>
+          </div>
+          <pre id="rnm-letter-preview" class="p-3.5 rounded-xl bg-slate-900 text-slate-100 font-mono text-[11px] leading-relaxed overflow-x-auto whitespace-pre-wrap max-h-48 border border-slate-800"></pre>
+        </div>
+      </div>
+
+      <!-- Footer -->
+      <div class="flex items-center justify-between pt-3 border-t border-slate-100 mt-4">
+        <button id="rnm-resend-btn" onclick="resendCurrentReinstatementNotice()" class="px-4 py-2 rounded-xl bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-200 text-xs font-extrabold flex items-center gap-1.5 shadow-2xs cursor-pointer">
+          <span class="material-symbols-outlined text-[16px]">refresh</span>
+          <span>Resend Notice via SMTP</span>
+        </button>
+
+        <button onclick="closeReinstatementNoticeModal()" class="px-4 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-xs font-bold text-slate-700 cursor-pointer">
+          Close
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Shared Library -->
+  <script src="../bcf_procurement_shared.js"></script>
+
+  <!-- Controller Logic -->
+  <script>
+    let activeCategory = 'all';
+    let activeCompliance = 'all';
+    let activeDistrict = 'all';
+    let searchQuery = '';
+    let currentDossierSupplier = null;
+
+    document.addEventListener('DOMContentLoaded', () => {
+      // Render shared institutional top bar and tabs
+      BCF_PROCUREMENT.renderHeaderAndTabs('supplier-management');
+
+      // Setup filter chips
+      renderCategoryChips();
+
+      // Render suppliers
+      loadSuppliers();
+
+      // Setup category checkboxes in modal
+      populateModalCategories();
+
+      // Event listeners
+      document.getElementById('supplier-search-input')?.addEventListener('input', (e) => {
+        searchQuery = e.target.value.toLowerCase();
+        renderSuppliers();
+      });
+
+      document.getElementById('filter-compliance-select')?.addEventListener('change', (e) => {
+        activeCompliance = e.target.value;
+        renderSuppliers();
+      });
+
+      document.getElementById('filter-district-select')?.addEventListener('change', (e) => {
+        activeDistrict = e.target.value;
+        renderSuppliers();
+      });
+    });
+
+    function renderCategoryChips() {
+      const container = document.getElementById('category-chips-container');
+      if (!container) return;
+
+      const cats = ['all', ...BCF_PROCUREMENT.POLICY.CATEGORIES];
+      container.innerHTML = cats.map(c => {
+        const isAll = c === 'all';
+        const label = isAll ? 'All Categories' : c;
+        const isActive = activeCategory === c;
+        return `
+          <button
+            type="button"
+            onclick="setCategoryFilter('${c}')"
+            class="px-2.5 py-1 rounded-lg text-xs font-semibold whitespace-nowrap transition cursor-pointer ${
+              isActive
+                ? 'bg-primary text-white shadow-2xs'
+                : 'bg-slate-100 hover:bg-slate-200 text-slate-700'
+            }"
+          >
+            ${label}
+          </button>
+        `;
+      }).join('');
+    }
+
+    function setCategoryFilter(cat) {
+      activeCategory = cat;
+      renderCategoryChips();
+      renderSuppliers();
+    }
+
+    function populateModalCategories() {
+      const container = document.getElementById('sup-categories-checkboxes');
+      if (!container) return;
+
+      container.innerHTML = BCF_PROCUREMENT.POLICY.CATEGORIES.map(cat => `
+        <label class="flex items-center gap-2 text-[11px] text-slate-700 cursor-pointer">
+          <input type="checkbox" name="sup_cat" value="${cat}" class="rounded text-primary focus:ring-primary/20"/>
+          <span class="truncate">${cat}</span>
+        </label>
+      `).join('');
+    }
+
+    function loadSuppliers() {
+      renderSuppliers();
+      updateMetrics();
+    }
+
+    function updateMetrics() {
+      const list = BCF_PROCUREMENT.getSuppliers();
+      const compliant = list.filter(s => s.complianceStatus === 'Compliant').length;
+      const totalOrders = list.reduce((sum, s) => sum + (s.totalOrders || 0), 0);
+      const totalSpend = list.reduce((sum, s) => sum + (s.totalSpend || 0), 0);
+
+      document.getElementById('metric-total-vendors').textContent = list.length;
+      document.getElementById('metric-compliant-vendors').textContent = compliant;
+      document.getElementById('metric-compliance-pct').textContent = list.length > 0 ? Math.round((compliant / list.length) * 100) + '%' : '0%';
+      document.getElementById('metric-total-orders').textContent = totalOrders;
+      document.getElementById('metric-total-spend').textContent = BCF_PROCUREMENT.formatCurrency(totalSpend);
+    }
+
+    function renderSuppliers() {
+      const container = document.getElementById('suppliers-container');
+      const emptyState = document.getElementById('suppliers-empty-state');
+      if (!container) return;
+
+      let list = BCF_PROCUREMENT.getSuppliers();
+
+      // Filtering
+      list = list.filter(s => {
+        const isTerminated = s.status === 'Terminated' || s.agreementStatus === 'Terminated' || s.complianceStatus === 'Terminated';
+        const matchesCategory = activeCategory === 'all' || (s.categories && s.categories.includes(activeCategory));
+        const matchesCompliance = activeCompliance === 'all' || 
+          (activeCompliance === 'Terminated' ? isTerminated : (s.complianceStatus === activeCompliance && !isTerminated));
+        const matchesDistrict = activeDistrict === 'all' || s.district === activeDistrict;
+        const matchesSearch = !searchQuery || 
+          (s.name && s.name.toLowerCase().includes(searchQuery)) ||
+          (s.tradingName && s.tradingName.toLowerCase().includes(searchQuery)) ||
+          (s.contactPerson && s.contactPerson.toLowerCase().includes(searchQuery)) ||
+          (s.taxId && s.taxId.toLowerCase().includes(searchQuery)) ||
+          (s.registrationNo && s.registrationNo.toLowerCase().includes(searchQuery)) ||
+          (s.categories && s.categories.some(c => c.toLowerCase().includes(searchQuery)));
+
+        return matchesCategory && matchesCompliance && matchesDistrict && matchesSearch;
+      });
+
+      if (list.length === 0) {
+        container.innerHTML = '';
+        emptyState?.classList.remove('hidden');
+        return;
+      }
+
+      emptyState?.classList.add('hidden');
+
+      container.innerHTML = list.map(s => {
+        const isTerminated = s.status === 'Terminated' || s.agreementStatus === 'Terminated' || s.complianceStatus === 'Terminated';
+        const isCompliant = s.complianceStatus === 'Compliant' && !isTerminated;
+        
+        let badgeColor = 'bg-amber-100 text-amber-800 border-amber-300';
+        let badgeLabel = s.complianceStatus || 'Active';
+        if (isTerminated) {
+          badgeColor = 'bg-rose-100 text-rose-800 border-rose-300 font-extrabold';
+          badgeLabel = 'Agreement Terminated';
+        } else if (isCompliant) {
+          badgeColor = 'bg-emerald-100 text-emerald-800 border-emerald-300';
+          badgeLabel = 'Compliant';
+        }
+
+        const rating = s.rating || 4.0;
+        const stars = '★'.repeat(Math.floor(rating)) + (rating % 1 !== 0 ? '½' : '');
+
+        return `
+          <div class="bg-white rounded-2xl border ${isTerminated ? 'border-rose-200 ring-1 ring-rose-200/50' : 'border-slate-200'} shadow-xs hover:shadow-md transition flex flex-col justify-between p-4 sm:p-5">
+            <div>
+              <!-- Card Top -->
+              <div class="flex items-start justify-between gap-3 mb-3">
+                <div class="flex items-center gap-3">
+                  <div class="w-10 h-10 rounded-xl ${isTerminated ? 'bg-rose-100 text-rose-700' : 'bg-primary/10 text-primary'} flex items-center justify-center font-black text-sm shrink-0">
+                    ${BCF_PROCUREMENT.getInitials(s.tradingName || s.name)}
+                  </div>
+                  <div>
+                    <h3 class="text-sm font-extrabold text-slate-900 leading-tight">${s.name}</h3>
+                    <span class="text-[11px] text-slate-500 font-mono">${s.id}</span>
+                  </div>
+                </div>
+                <span class="px-2 py-0.5 rounded-full text-[10px] font-extrabold border ${badgeColor} shrink-0">
+                  ${badgeLabel}
+                </span>
+              </div>
+
+              <!-- Categories -->
+              <div class="flex flex-wrap gap-1 mb-3">
+                ${(s.categories || []).slice(0, 2).map(cat => `
+                  <span class="px-2 py-0.5 rounded-md bg-slate-100 text-slate-700 text-[10px] font-bold">
+                    ${cat}
+                  </span>
+                `).join('')}
+                ${(s.categories || []).length > 2 ? `<span class="px-1.5 py-0.5 text-[10px] text-slate-400 font-bold">+${s.categories.length - 2} more</span>` : ''}
+              </div>
+
+              <!-- Details Grid -->
+              <div class="space-y-1.5 text-xs text-slate-600 bg-slate-50/70 p-3 rounded-xl border border-slate-100 mb-3">
+                <div class="flex items-center justify-between">
+                  <span class="text-slate-400">Contact:</span>
+                  <span class="font-bold text-slate-800">${s.contactPerson}</span>
+                </div>
+                <div class="flex items-center justify-between">
+                  <span class="text-slate-400">Phone:</span>
+                  <span class="font-mono text-slate-700">${s.phone}</span>
+                </div>
+                <div class="flex items-center justify-between">
+                  <span class="text-slate-400">NRA TIN:</span>
+                  <span class="font-mono text-slate-800 font-bold">${s.taxId}</span>
+                </div>
+                <div class="flex items-center justify-between">
+                  <span class="text-slate-400">District:</span>
+                  <span class="font-semibold text-slate-700">${s.district || 'Sierra Leone'}</span>
+                </div>
+              </div>
+
+              <!-- Spend & Rating Bar -->
+              <div class="grid grid-cols-2 gap-2 text-xs pt-1 border-t border-slate-100">
+                <div>
+                  <span class="text-[10px] uppercase font-bold text-slate-400 block">Orders Fulfilled</span>
+                  <span class="font-mono font-bold text-slate-900">${s.totalOrders || 0} POs</span>
+                </div>
+                <div>
+                  <span class="text-[10px] uppercase font-bold text-slate-400 block">Cumulative Spend</span>
+                  <span class="font-mono font-black ${isTerminated ? 'text-rose-700' : 'text-primary'}">${BCF_PROCUREMENT.formatCurrency(s.totalSpend || 0)}</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Card Actions -->
+            <div class="flex items-center justify-between pt-3 mt-3 border-t border-slate-100 gap-2">
+              <button onclick="viewDossier('${s.id}')" class="flex-1 py-1.5 px-2.5 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-800 text-xs font-bold transition flex items-center justify-center gap-1 cursor-pointer">
+                <span class="material-symbols-outlined text-[16px]">folder_shared</span>
+                <span>Dossier</span>
+              </button>
+              <button onclick="editSupplier('${s.id}')" class="p-1.5 rounded-lg border border-slate-200 hover:bg-slate-50 text-slate-600 transition cursor-pointer" title="Edit Vendor Details">
+                <span class="material-symbols-outlined text-[16px]">edit</span>
+              </button>
+              ${isTerminated ? `
+                <button onclick="openTerminationNoticeModalForId('${s.id}')" class="p-1.5 rounded-lg bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 transition cursor-pointer" title="View Agreement Termination Notice & Reason">
+                  <span class="material-symbols-outlined text-[16px]">block</span>
+                </button>
+                <button onclick="openReinstateModal('${s.id}')" class="p-1.5 rounded-lg bg-emerald-50 hover:bg-emerald-100 text-emerald-700 border border-emerald-200 transition cursor-pointer" title="Reinstate & Renew Agreement with this Vendor">
+                  <span class="material-symbols-outlined text-[16px]">restart_alt</span>
+                </button>
+              ` : `
+                <button onclick="raiseRequisitionForSupplier('${s.id}')" class="p-1.5 rounded-lg bg-emerald-50 hover:bg-emerald-100 text-emerald-800 transition cursor-pointer" title="Create Requisition / Order">
+                  <span class="material-symbols-outlined text-[16px]">add_shopping_cart</span>
+                </button>
+                <button onclick="openTerminateModal('${s.id}')" class="p-1.5 rounded-lg bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 transition cursor-pointer" title="Terminate Agreement with this Vendor">
+                  <span class="material-symbols-outlined text-[16px]">person_cancel</span>
+                </button>
+              `}
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function resetFilters() {
+      activeCategory = 'all';
+      activeCompliance = 'all';
+      activeDistrict = 'all';
+      searchQuery = '';
+      document.getElementById('supplier-search-input').value = '';
+      document.getElementById('filter-compliance-select').value = 'all';
+      document.getElementById('filter-district-select').value = 'all';
+      renderCategoryChips();
+      renderSuppliers();
+    }
+
+    function openSupplierModal(supplierId = null) {
+      const modal = document.getElementById('supplier-modal');
+      const form = document.getElementById('supplier-form');
+      form.reset();
+
+      if (supplierId) {
+        const s = BCF_PROCUREMENT.getSupplier(supplierId);
+        if (s) {
+          document.getElementById('modal-title').textContent = 'Edit Vendor Record';
+          document.getElementById('sup-id').value = s.id;
+          document.getElementById('sup-name').value = s.name || '';
+          document.getElementById('sup-trading-name').value = s.tradingName || '';
+          document.getElementById('sup-reg-no').value = s.registrationNo || '';
+          document.getElementById('sup-tax-id').value = s.taxId || '';
+          document.getElementById('sup-compliance-status').value = s.complianceStatus || 'Compliant';
+          document.getElementById('sup-contact-person').value = s.contactPerson || '';
+          document.getElementById('sup-phone').value = s.phone || '';
+          document.getElementById('sup-email').value = s.email || '';
+          document.getElementById('sup-address').value = s.address || '';
+          document.getElementById('sup-district').value = s.district || 'Western Area Urban';
+          document.getElementById('sup-bank-name').value = s.bankName || '';
+          document.getElementById('sup-bank-account').value = s.bankAccount || '';
+
+          // Set checkboxes
+          document.querySelectorAll('input[name="sup_cat"]').forEach(cb => {
+            cb.checked = (s.categories || []).includes(cb.value);
+          });
+        }
+      } else {
+        document.getElementById('modal-title').textContent = 'Register Verified Vendor';
+        document.getElementById('sup-id').value = '';
+      }
+
+      modal.classList.remove('hidden');
+    }
+
+    function closeSupplierModal() {
+      document.getElementById('supplier-modal').classList.add('hidden');
+    }
+
+    function handleSupplierSubmit(e) {
+      e.preventDefault();
+      const id = document.getElementById('sup-id').value || null;
+
+      const checkedCategories = Array.from(document.querySelectorAll('input[name="sup_cat"]:checked')).map(cb => cb.value);
+      if (checkedCategories.length === 0) {
+        alert('Please select at least one supply category.');
+        return;
+      }
+
+      const supplier = {
+        id,
+        name: document.getElementById('sup-name').value.trim(),
+        tradingName: document.getElementById('sup-trading-name').value.trim() || document.getElementById('sup-name').value.trim(),
+        registrationNo: document.getElementById('sup-reg-no').value.trim(),
+        taxId: document.getElementById('sup-tax-id').value.trim(),
+        complianceStatus: document.getElementById('sup-compliance-status').value,
+        contactPerson: document.getElementById('sup-contact-person').value.trim(),
+        phone: document.getElementById('sup-phone').value.trim(),
+        email: document.getElementById('sup-email').value.trim(),
+        address: document.getElementById('sup-address').value.trim(),
+        district: document.getElementById('sup-district').value,
+        bankName: document.getElementById('sup-bank-name').value.trim(),
+        bankAccount: document.getElementById('sup-bank-account').value.trim(),
+        categories: checkedCategories
+      };
+
+      const saved = BCF_PROCUREMENT.saveSupplier(supplier);
+      closeSupplierModal();
+      loadSuppliers();
+      BCF_PROCUREMENT.showToast(`Supplier "${saved.name}" successfully recorded in master data. Dispatching official enlistment email...`, 'info');
+      
+      // Automatically send official enlistment email to vendor's Official Email Address
+      dispatchVendorEnlistmentEmail(saved);
+    }
+
+    function editSupplier(id) {
+      openSupplierModal(id);
+    }
+
+    function viewDossier(id) {
+      const s = BCF_PROCUREMENT.getSupplier(id);
+      if (!s) return;
+      currentDossierSupplier = s;
+
+      const isTerminated = s.status === 'Terminated' || s.agreementStatus === 'Terminated' || s.complianceStatus === 'Terminated';
+
+      document.getElementById('dossier-name').textContent = s.name;
+      document.getElementById('dossier-avatar').textContent = BCF_PROCUREMENT.getInitials(s.tradingName || s.name);
+      document.getElementById('dossier-subtitle').textContent = `${s.id} • Registered ${BCF_PROCUREMENT.formatDate(s.registeredDate)}`;
+
+      const badge = document.getElementById('dossier-badge');
+      if (isTerminated) {
+        badge.className = 'px-2.5 py-0.5 rounded-full text-[10px] font-extrabold bg-rose-100 text-rose-800 border border-rose-300';
+        badge.textContent = 'Agreement Terminated';
+      } else {
+        const isCompliant = s.complianceStatus === 'Compliant';
+        badge.className = `px-2.5 py-0.5 rounded-full text-[10px] font-extrabold border ${isCompliant ? 'bg-emerald-100 text-emerald-800 border-emerald-300' : 'bg-amber-100 text-amber-800 border-amber-300'}`;
+        badge.textContent = s.complianceStatus || 'Compliant';
+      }
+
+      // Find all POs linked to this supplier automatically (retaining full history!)
+      const poList = (BCF_PROCUREMENT.getSupplierOrders ? BCF_PROCUREMENT.getSupplierOrders(s.id) : null) || BCF_PROCUREMENT.getPurchaseOrders().filter(p => 
+        (p.supplierId && s.id && String(p.supplierId).trim().toLowerCase() === String(s.id).trim().toLowerCase()) ||
+        (p.supplierName && s.name && String(p.supplierName).trim().toLowerCase() === String(s.name).trim().toLowerCase()) ||
+        (p.supplierName && s.tradingName && String(p.supplierName).trim().toLowerCase() === String(s.tradingName).trim().toLowerCase())
+      );
+      const cumulativeSpend = poList.reduce((sum, po) => sum + (parseFloat(po.totalAmount) || 0), 0);
+
+      const content = document.getElementById('dossier-content');
+      content.innerHTML = `
+        ${isTerminated ? `
+          <!-- Agreement Terminated Notice Banner -->
+          <div class="p-4 rounded-xl bg-rose-50 border-2 border-rose-300 mb-2">
+            <div class="flex items-start gap-3">
+              <span class="material-symbols-outlined text-rose-700 text-[24px] shrink-0 mt-0.5">block</span>
+              <div class="w-full">
+                <div class="flex items-center justify-between mb-1">
+                  <span class="font-extrabold text-rose-950 text-xs uppercase tracking-wider">
+                    Accreditation Agreement Terminated
+                  </span>
+                  <span class="text-[11px] font-mono font-bold text-rose-800">
+                    Effective: ${BCF_PROCUREMENT.formatDate(s.terminatedAt || s.terminationDate || new Date().toISOString())}
+                  </span>
+                </div>
+                <p class="text-rose-900 text-xs leading-relaxed m-0 font-medium">
+                  <strong>Official Reason:</strong> "${s.terminationReason || 'Official termination of vendor accreditation agreement by Bandama Charity Foundation.'}"
+                </p>
+                <div class="mt-2 text-[11px] text-rose-800 font-medium">
+                  Vendor is strictly excluded from all RFQs, bid submissions, and purchase orders. Historical orders (${poList.length} POs, ${BCF_PROCUREMENT.formatCurrency(cumulativeSpend)}) remain permanently preserved in this ledger for audit.
+                </div>
+              </div>
+            </div>
+          </div>
+        ` : ''}
+
+        <!-- Governance & Tax Credentials -->
+        <div class="p-3.5 rounded-xl bg-slate-50 border border-slate-200">
+          <span class="text-xs font-extrabold text-slate-800 uppercase tracking-wider block mb-2">Legal &amp; Statutory Compliance</span>
+          <div class="grid grid-cols-2 sm:grid-cols-3 gap-2.5">
+            <div>
+              <span class="text-[10px] text-slate-400 font-bold block">Business Reg. No</span>
+              <span class="font-mono text-slate-900 font-bold">${s.registrationNo || '—'}</span>
+            </div>
+            <div>
+              <span class="text-[10px] text-slate-400 font-bold block">NRA Tax TIN</span>
+              <span class="font-mono text-slate-900 font-bold">${s.taxId || '—'}</span>
+            </div>
+            <div>
+              <span class="text-[10px] text-slate-400 font-bold block">NASSIT Status</span>
+              <span class="font-bold text-emerald-700">Verified Cleared</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Banking Details -->
+        <div class="p-3.5 rounded-xl bg-blue-50/70 border border-blue-200/60">
+          <span class="text-xs font-extrabold text-blue-900 uppercase tracking-wider block mb-2">Banking &amp; Settlement Account</span>
+          <div class="grid grid-cols-2 gap-2.5">
+            <div>
+              <span class="text-[10px] text-slate-500 font-bold block">Bank Name</span>
+              <span class="font-bold text-slate-900">${s.bankName || '—'}</span>
+            </div>
+            <div>
+              <span class="text-[10px] text-slate-500 font-bold block">Account Number</span>
+              <span class="font-mono text-slate-900 font-bold">${s.bankAccount || '—'}</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Contact & Location -->
+        <div class="p-3.5 rounded-xl bg-slate-50 border border-slate-200">
+          <span class="text-xs font-extrabold text-slate-800 uppercase tracking-wider block mb-2">Contact &amp; Physical Location</span>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+            <div>
+              <span class="text-[10px] text-slate-400 font-bold block">Primary Representative</span>
+              <span class="font-bold text-slate-800">${s.contactPerson} (${s.phone})</span>
+            </div>
+            <div>
+              <span class="text-[10px] text-slate-400 font-bold block">Email Address</span>
+              <span class="text-primary font-semibold">${s.email}</span>
+            </div>
+            <div class="sm:col-span-2">
+              <span class="text-[10px] text-slate-400 font-bold block">Address</span>
+              <span class="text-slate-800">${s.address}, ${s.district}</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Linked Purchase Orders -->
+        <div>
+          <div class="flex items-center justify-between mb-2">
+            <span class="text-xs font-extrabold text-slate-900 uppercase tracking-wider">Historical Orders (${poList.length})</span>
+            <span class="text-xs font-black text-primary font-mono">${BCF_PROCUREMENT.formatCurrency(cumulativeSpend)} Total</span>
+          </div>
+
+          ${poList.length === 0 ? `
+            <div class="p-4 bg-slate-50 rounded-xl text-center text-slate-400 text-xs">
+              No purchase orders issued to this vendor yet.
+            </div>
+          ` : `
+            <div class="space-y-2 max-h-48 overflow-y-auto">
+              ${poList.map(po => `
+                <div class="p-3 rounded-xl border border-slate-200 bg-white flex items-center justify-between text-xs">
+                  <div>
+                    <span class="font-mono font-bold text-slate-900">${po.poNumber}</span>
+                    <span class="text-slate-500 ml-2">• ${BCF_PROCUREMENT.formatDate(po.issuedDate)}</span>
+                    <div class="text-[11px] text-slate-500 mt-0.5">${po.programmeName || 'General Procurement'}</div>
+                  </div>
+                  <div class="text-right">
+                    <span class="font-mono font-black text-primary block">${BCF_PROCUREMENT.formatCurrency(po.totalAmount)}</span>
+                    <span class="px-2 py-0.2 rounded text-[10px] font-bold bg-blue-50 text-blue-800 border border-blue-200">${po.status}</span>
+                  </div>
+                </div>
+              `).join('')}
+            </div>
+          `}
+        </div>
+      `;
+
+      const prBtn = document.getElementById('dossier-create-pr-btn');
+      const termBtn = document.getElementById('dossier-terminate-btn');
+      const reinstateBtn = document.getElementById('dossier-reinstate-btn');
+      const emailBtn = document.getElementById('dossier-send-email-btn');
+
+      if (isTerminated) {
+        if (prBtn) prBtn.classList.add('hidden');
+        if (emailBtn) emailBtn.classList.add('hidden');
+        if (termBtn) {
+          termBtn.className = 'px-3.5 py-2 rounded-xl bg-rose-100 hover:bg-rose-200 text-rose-800 border border-rose-300 text-xs font-bold flex items-center gap-1.5 shadow-2xs cursor-pointer';
+          termBtn.innerHTML = '<span class="material-symbols-outlined text-[16px] text-rose-700">block</span><span>View Termination Notice</span>';
+          termBtn.onclick = () => openTerminationNoticeModalForCurrentVendor();
+        }
+        if (reinstateBtn) {
+          reinstateBtn.classList.remove('hidden');
+          reinstateBtn.onclick = () => openReinstateModalForCurrentVendor();
+        }
+      } else {
+        if (prBtn) {
+          prBtn.classList.remove('hidden');
+          prBtn.onclick = () => raiseRequisitionForSupplier(s.id);
+        }
+        if (emailBtn) emailBtn.classList.remove('hidden');
+        if (termBtn) {
+          termBtn.className = 'px-3.5 py-2 rounded-xl bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 text-xs font-bold flex items-center gap-1.5 shadow-2xs cursor-pointer';
+          termBtn.innerHTML = '<span class="material-symbols-outlined text-[16px] text-rose-600">person_cancel</span><span>Terminate Agreement</span>';
+          termBtn.onclick = () => openTerminateModalForCurrentVendor();
+        }
+        if (reinstateBtn) {
+          reinstateBtn.classList.add('hidden');
+        }
+      }
+
+      document.getElementById('dossier-modal').classList.remove('hidden');
+    }
+
+    function closeDossierModal() {
+      document.getElementById('dossier-modal').classList.add('hidden');
+    }
+
+    function raiseRequisitionForSupplier(supplierId) {
+      closeDossierModal();
+      localStorage.setItem('bcf_target_supplier_id', supplierId);
+      BCF_PROCUREMENT.switchTab('purchase-requisition');
+    }
+
+    function exportSuppliersCsv() {
+      const list = BCF_PROCUREMENT.getSuppliers();
+      const headers = ['ID', 'Name', 'Trading Name', 'Registration No', 'Tax TIN', 'Compliance Status', 'Contact Person', 'Phone', 'Email', 'District', 'Bank Name', 'Account No', 'Total Orders', 'Total Spend NLe'];
+      const rows = list.map(s => [
+        s.id,
+        `"${s.name.replace(/"/g, '""')}"`,
+        `"${(s.tradingName || '').replace(/"/g, '""')}"`,
+        s.registrationNo || '',
+        s.taxId || '',
+        s.complianceStatus || '',
+        `"${(s.contactPerson || '').replace(/"/g, '""')}"`,
+        s.phone || '',
+        s.email || '',
+        s.district || '',
+        `"${(s.bankName || '').replace(/"/g, '""')}"`,
+        `"${s.bankAccount || ''}"`,
+        s.totalOrders || 0,
+        s.totalSpend || 0
+      ]);
+
+      const csvContent = 'data:text/csv;charset=utf-8,' + [headers.join(','), ...rows.map(e => e.join(','))].join('\n');
+      const encodedUri = encodeURI(csvContent);
+      const link = document.createElement('a');
+      link.setAttribute('href', encodedUri);
+      link.setAttribute('download', `BCF_SL_Suppliers_Master_${new Date().toISOString().split('T')[0]}.csv`);
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      BCF_PROCUREMENT.showToast('Master Supplier CSV exported successfully.', 'success');
+    }
+
+    // ─────────────────────────────────────────────────────────────
+    //  OFFICIAL VENDOR ENLISTMENT EMAIL DISPATCH & MODAL
+    // ─────────────────────────────────────────────────────────────
+    let lastEnlistedSupplier = null;
+
+    async function dispatchVendorEnlistmentEmail(supplier) {
+      if (!supplier || !supplier.email || !supplier.email.includes('@')) {
+        console.warn('Vendor official email missing or invalid:', supplier?.email);
+        return;
+      }
+      lastEnlistedSupplier = supplier;
+
+      try {
+        const result = await BCF_PROCUREMENT.sendVendorEnlistmentEmail(supplier);
+        if (result && result.success) {
+          BCF_PROCUREMENT.showToast(`Official enlistment confirmation dispatched via Gmail SMTP to ${supplier.email}!`, 'success');
+          openVendorEmailReceiptModal(supplier, result);
+        } else {
+          console.warn('Vendor enlistment email notice:', result?.error);
+          BCF_PROCUREMENT.showToast(`Vendor registered. Email dispatch status: ${result?.error || 'Check server configuration'}`, 'info');
+        }
+      } catch (err) {
+        console.error('Failed to dispatch vendor enlistment email:', err);
+      }
+    }
+
+    function openVendorEmailReceiptModal(supplier, result) {
+      lastEnlistedSupplier = supplier;
+      const categories = Array.isArray(supplier.categories) ? supplier.categories.join(', ') : (supplier.categories || 'General Procurement');
+
+      document.getElementById('vem-vendor-name').textContent = `${supplier.name} (${supplier.tradingName || supplier.name})`;
+      document.getElementById('vem-recipient-email').textContent = supplier.email;
+      document.getElementById('vem-vendor-id').textContent = supplier.id || 'BCF-SUP-2026-0001';
+      document.getElementById('vem-subject').textContent = `OFFICIAL NOTIFICATION: Enlistment in BCF-SL Approved Vendor & Supplier Registry [${supplier.id}]`;
+
+      const letterText = `BANDAMA CHARITY FOUNDATION – SIERRA LEONE (BCF-SL)
+CENTRAL PROCUREMENT & SUPPLY CHAIN DIRECTORATE
+Official Registration: SL-NNGO-2023-084
+Official Dispatch From: BCF-SL Administration Hub <bandamacharityfoundationsl@gmail.com> | Phone: +23278242826
+
+OFFICIAL STATEMENT OF ENLISTMENT:
+This serves as official confirmation from the Directorate of Procurement & Supply Chain, Bandama Charity Foundation – Sierra Leone (BCF-SL), that ${supplier.name} has been verified, accredited, and officially enrolled into the BCF-SL Approved Vendor & Supplier Master List.
+
+• Unique Vendor ID: ${supplier.id}
+• Legal Company Name: ${supplier.name}
+• Trading Name: ${supplier.tradingName || supplier.name}
+• Business Reg No: ${supplier.registrationNo || '—'}
+• NRA Tax TIN: ${supplier.taxId || '—'}
+• Compliance Standing: ${supplier.complianceStatus || 'Compliant'}
+• Approved Supply Lines: ${categories}
+• Operational Address: ${supplier.address || 'Sierra Leone'}, ${supplier.district || 'Sierra Leone'}
+• Primary Representative: ${supplier.contactPerson} (${supplier.phone})
+• Designated Official Email: ${supplier.email}
+• Settlement Bank Details: ${supplier.bankName || '—'} (Acc: ${supplier.bankAccount || '—'})
+
+YOUR ORGANIZATION IS NOW AN ACCREDITED INSTITUTIONAL VENDOR FOR BCF-SL PROCUREMENT ACTIVITIES, DONOR-FUNDED AID PROGRAMS, AND COMMUNITY INITIATIVES ACROSS SIERRA LEONE.
+
+Your firm is certified to receive direct Requests for Quotations (RFQs), invitations to competitive bidding, and Purchase Orders (POs) issued by BCF-SL. All future procurement notices, purchase awards, and contract references will be dispatched directly to this official email address (${supplier.email}).`;
+
+      document.getElementById('vem-letter-preview').textContent = letterText;
+      document.getElementById('vendor-email-modal').classList.remove('hidden');
+    }
+
+    function closeVendorEmailModal() {
+      document.getElementById('vendor-email-modal').classList.add('hidden');
+    }
+
+    async function resendCurrentVendorEmail() {
+      if (!lastEnlistedSupplier) return;
+      const btn = document.getElementById('vem-resend-btn');
+      if (btn) {
+        btn.disabled = true;
+        btn.innerHTML = '<span class="material-symbols-outlined text-[16px] animate-spin">refresh</span><span>Sending...</span>';
+      }
+      const res = await BCF_PROCUREMENT.sendVendorEnlistmentEmail(lastEnlistedSupplier);
+      if (btn) {
+        btn.disabled = false;
+        btn.innerHTML = '<span class="material-symbols-outlined text-[16px]">done_all</span><span>Sent Successfully!</span>';
+        setTimeout(() => {
+          btn.innerHTML = '<span class="material-symbols-outlined text-[16px]">refresh</span><span>Resend Email via SMTP</span>';
+        }, 2000);
+      }
+      if (res && res.success) {
+        BCF_PROCUREMENT.showToast(`Enlistment email re-sent via Gmail SMTP to ${lastEnlistedSupplier.email}!`, 'success');
+      } else {
+        BCF_PROCUREMENT.showToast(`Resend notice: ${res?.error || 'Failed'}`, 'error');
+      }
+    }
+
+    async function sendEnlistmentNoticeForCurrentVendor() {
+      if (!currentDossierSupplier) return;
+      BCF_PROCUREMENT.showToast(`Dispatching official enlistment email to ${currentDossierSupplier.email}...`, 'info');
+      const res = await BCF_PROCUREMENT.sendVendorEnlistmentEmail(currentDossierSupplier);
+      if (res && res.success) {
+        BCF_PROCUREMENT.showToast(`Official enlistment confirmation dispatched to ${currentDossierSupplier.email}!`, 'success');
+        openVendorEmailReceiptModal(currentDossierSupplier, res);
+      } else {
+        BCF_PROCUREMENT.showToast(`Dispatch status: ${res?.error || 'Check connection'}`, 'error');
+      }
+    }
+
+    // ─────────────────────────────────────────────────────────────
+    //  VENDOR AGREEMENT TERMINATION CONTROLLER & MODAL
+    // ─────────────────────────────────────────────────────────────
+    let pendingTerminationSupplier = null;
+    let currentTerminatedSupplier = null;
+    let currentTerminationReason = '';
+
+    function openTerminateModal(supplierId) {
+      const s = BCF_PROCUREMENT.getSupplier(supplierId);
+      if (!s) return;
+      pendingTerminationSupplier = s;
+
+      document.getElementById('term-vendor-id-input').value = s.id;
+      document.getElementById('term-vendor-name').textContent = `${s.name} ${s.tradingName ? '(' + s.tradingName + ')' : ''}`;
+      document.getElementById('term-vendor-id-display').textContent = s.id;
+      document.getElementById('term-vendor-email-display').textContent = s.email || '—';
+      document.getElementById('term-vendor-email-target').textContent = s.email || 'Official Vendor Email';
+
+      const emailInput = document.getElementById('term-recipient-email-input');
+      if (emailInput) {
+        emailInput.value = s.email || '';
+      }
+
+      // Calculate total orders and total spend to display (fully retained!)
+      const poList = (BCF_PROCUREMENT.getSupplierOrders ? BCF_PROCUREMENT.getSupplierOrders(s.id) : null) || BCF_PROCUREMENT.getPurchaseOrders().filter(p => 
+        (p.supplierId && s.id && String(p.supplierId).trim().toLowerCase() === String(s.id).trim().toLowerCase()) ||
+        (p.supplierName && s.name && String(p.supplierName).trim().toLowerCase() === String(s.name).trim().toLowerCase())
+      );
+      const totalSpend = poList.reduce((sum, p) => sum + (parseFloat(p.totalAmount) || 0), 0);
+      document.getElementById('term-vendor-history-display').textContent = `${poList.length || s.totalOrders || 0} Orders • ${BCF_PROCUREMENT.formatCurrency(totalSpend || s.totalSpend || 0)} Total Spend`;
+
+      document.getElementById('term-reason-input').value = '';
+      document.getElementById('term-send-email-check').checked = true;
+
+      document.getElementById('terminate-vendor-modal').classList.remove('hidden');
+    }
+
+    function openTerminateModalForCurrentVendor() {
+      if (currentDossierSupplier) {
+        closeDossierModal();
+        openTerminateModal(currentDossierSupplier.id);
+      }
+    }
+
+    function closeTerminateModal() {
+      document.getElementById('terminate-vendor-modal').classList.add('hidden');
+      pendingTerminationSupplier = null;
+    }
+
+    async function handleTerminateFormSubmit(e) {
+      e.preventDefault();
+      const supplierId = document.getElementById('term-vendor-id-input').value;
+      const reason = document.getElementById('term-reason-input').value.trim();
+      const sendEmail = document.getElementById('term-send-email-check').checked;
+      const overrideEmail = (document.getElementById('term-recipient-email-input')?.value || '').trim();
+
+      if (!supplierId || !reason) {
+        alert('Please specify the official reason for terminating the agreement.');
+        return;
+      }
+
+      if (sendEmail) {
+        const s = BCF_PROCUREMENT.getSupplier(supplierId);
+        const targetEmail = overrideEmail || (s && s.email);
+        if (!targetEmail || !targetEmail.includes('@')) {
+          alert('Please enter a valid official vendor email address before proceeding with email dispatch.');
+          return;
+        }
+      }
+
+      const submitBtn = document.getElementById('term-submit-btn');
+      if (submitBtn) {
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = '<span class="material-symbols-outlined text-[16px] animate-spin">sync</span><span>Terminating...</span>';
+      }
+
+      try {
+        // Terminate agreement in shared procurement core ledger (retains purchase history & spend)
+        const termRes = BCF_PROCUREMENT.terminateVendorAgreement(supplierId, reason);
+        let updatedSupplier = (termRes && termRes.supplier) ? { ...termRes.supplier } : (BCF_PROCUREMENT.getSupplier(supplierId) || {});
+        delete updatedSupplier.supplier;
+        if (overrideEmail && updatedSupplier) {
+          updatedSupplier.email = overrideEmail;
+          BCF_PROCUREMENT.saveSupplier(updatedSupplier);
+        }
+
+        let emailResult = null;
+        if (sendEmail && updatedSupplier && updatedSupplier.email) {
+          try {
+            emailResult = await BCF_PROCUREMENT.sendVendorTerminationEmail(updatedSupplier, reason);
+            if (emailResult && emailResult.success) {
+              BCF_PROCUREMENT.showToast(`Termination notice sent via Gmail SMTP to vendor official email (${updatedSupplier.email})!`, 'success');
+            } else {
+              BCF_PROCUREMENT.showToast(`Agreement terminated. Email status: ${emailResult?.error || 'Check server'}`, 'info');
+            }
+          } catch (mailErr) {
+            console.error('Error sending termination email:', mailErr);
+            BCF_PROCUREMENT.showToast('Agreement terminated. Email dispatch failed.', 'info');
+          }
+        }
+
+        closeTerminateModal();
+        loadSuppliers();
+        BCF_PROCUREMENT.showToast(`Vendor agreement for "${updatedSupplier.name}" successfully terminated.`, 'error');
+
+        // Open official termination notice confirmation modal
+        openTerminationNoticeModal(updatedSupplier, reason, emailResult);
+      } catch (err) {
+        console.error('Termination failed:', err);
+        alert('Failed to terminate agreement: ' + err.message);
+      } finally {
+        if (submitBtn) {
+          submitBtn.disabled = false;
+          submitBtn.innerHTML = '<span class="material-symbols-outlined text-[16px]">person_cancel</span><span>Confirm &amp; Terminate Agreement</span>';
+        }
+      }
+    }
+
+    function openTerminationNoticeModal(supplier, reason, emailResult) {
+      currentTerminatedSupplier = supplier;
+      currentTerminationReason = reason || supplier.terminationReason || 'Official administrative termination by Bandama Charity Foundation.';
+
+      document.getElementById('tnm-vendor-name').textContent = `${supplier.name} (${supplier.tradingName || supplier.name})`;
+      document.getElementById('tnm-recipient-email').textContent = supplier.email || '—';
+      document.getElementById('tnm-vendor-id').textContent = supplier.id;
+      document.getElementById('tnm-effective-date').textContent = BCF_PROCUREMENT.formatDate(supplier.terminatedAt || new Date().toISOString());
+      document.getElementById('tnm-subject').textContent = `OFFICIAL NOTICE: Termination of Vendor Accreditation Agreement — Bandama Charity Foundation [${supplier.id}]`;
+      document.getElementById('tnm-reason').textContent = `"${currentTerminationReason}"`;
+
+      const statusBox = document.getElementById('tnm-status-box');
+      if (statusBox) {
+        if (emailResult && emailResult.success) {
+          statusBox.className = 'p-3 rounded-xl bg-emerald-50 border border-emerald-300 text-emerald-900 text-xs font-semibold flex items-center gap-2';
+          statusBox.innerHTML = `<span class="material-symbols-outlined text-emerald-600 text-[20px]">mark_email_read</span><span>Official Termination Notice successfully transmitted directly to vendor official email: <strong>${supplier.email}</strong> via Gmail SMTP!</span>`;
+        } else {
+          statusBox.className = 'p-3 rounded-xl bg-amber-50 border border-amber-300 text-amber-900 text-xs font-semibold flex items-center gap-2';
+          statusBox.innerHTML = `<span class="material-symbols-outlined text-amber-600 text-[20px]">warning</span><span>Email notice: ${emailResult?.error || 'Email was not dispatched'}. You can click "Resend Notice via SMTP" below to retry.</span>`;
+        }
+      }
+
+      const letterText = `BANDAMA CHARITY FOUNDATION – SIERRA LEONE (BCF-SL)
+CENTRAL PROCUREMENT & SUPPLY CHAIN DIRECTORATE
+Official Dispatch From: BCF-SL Administration Hub <bandamacharityfoundationsl@gmail.com> | Official Inquiries: +23278242826
+Date of Termination Notice: ${new Date().toISOString().split('T')[0]}
+
+NOTICE OF FORMAL AGREEMENT TERMINATION
+To: ${supplier.name} (${supplier.tradingName || supplier.name})
+Vendor Master Reference: ${supplier.id}
+TIN: ${supplier.taxId || '—'} | Designated Official Email: ${supplier.email || '—'}
+
+Please take formal notice that the Central Procurement Directorate of Bandama Charity Foundation (BCF-SL) has exercised its authority to terminate the Vendor Master Accreditation Agreement with your organization, effective immediately.
+
+1. OFFICIAL JUSTIFICATION / REASON:
+"${currentTerminationReason}"
+
+2. EXCLUSION FROM ONGOING PROCUREMENT:
+Effective as of the date of this notice, your organization has been removed from active vendor circulation and is strictly excluded from:
+• Receipt of Requests for Quotation (RFQs) and bidding solicitations
+• Submission of competitive quotes or tenders
+• Issuance of new Purchase Orders (POs) and procurement contract awards
+
+3. RETENTION OF HISTORICAL TRANSACTION RECORDS:
+In strict compliance with statutory NGO financial regulations, donor audit requirements, and BCF-SL procurement standards, all completed purchase orders (${supplier.totalOrders || 0} POs) and cumulative settlement expenditures (${BCF_PROCUREMENT.formatCurrency(supplier.totalSpend || 0)}) will remain permanently archived in the BCF-SL Supplier Master Register for institutional audit and accounting reconciliation.
+
+4. 3-WAY MATCHING & OUTSTANDING ACCOUNTS:
+Any Goods Received Notes (GRNs) certified prior to this notice will be processed in accordance with the standard 3-way matching protocol (PO vs. Delivery Note vs. Invoice) through the Finance Directorate.
+
+Authorized Signatory:
+Directorate of Procurement & Supply Chain
+Bandama Charity Foundation – Sierra Leone (BCF-SL)`;
+
+      document.getElementById('tnm-letter-preview').textContent = letterText;
+      document.getElementById('termination-notice-modal').classList.remove('hidden');
+    }
+
+    function openTerminationNoticeModalForCurrentVendor() {
+      if (currentDossierSupplier) {
+        closeDossierModal();
+        openTerminationNoticeModal(currentDossierSupplier, currentDossierSupplier.terminationReason);
+      }
+    }
+
+    function openTerminationNoticeModalForId(supplierId) {
+      const s = BCF_PROCUREMENT.getSupplier(supplierId);
+      if (s) {
+        openTerminationNoticeModal(s, s.terminationReason);
+      }
+    }
+
+    function closeTerminationNoticeModal() {
+      document.getElementById('termination-notice-modal').classList.add('hidden');
+    }
+
+    async function resendCurrentTerminationNotice() {
+      if (!currentTerminatedSupplier) return;
+      const targetEmail = prompt('Enter official vendor recipient email address for Termination Notice dispatch:', currentTerminatedSupplier.email || '');
+      if (!targetEmail || !targetEmail.trim() || !targetEmail.includes('@')) {
+        alert('A valid official vendor email address is required.');
+        return;
+      }
+      currentTerminatedSupplier.email = targetEmail.trim();
+      BCF_PROCUREMENT.saveSupplier(currentTerminatedSupplier);
+      document.getElementById('tnm-recipient-email').textContent = currentTerminatedSupplier.email;
+
+      const btn = document.getElementById('tnm-resend-btn');
+      if (btn) {
+        btn.disabled = true;
+        btn.innerHTML = '<span class="material-symbols-outlined text-[16px] animate-spin">sync</span><span>Sending Notice...</span>';
+      }
+
+      try {
+        const res = await BCF_PROCUREMENT.sendVendorTerminationEmail(currentTerminatedSupplier, currentTerminationReason);
+        const statusBox = document.getElementById('tnm-status-box');
+        if (res && res.success) {
+          BCF_PROCUREMENT.showToast(`Termination notice re-sent directly to ${currentTerminatedSupplier.email} via Gmail SMTP!`, 'success');
+          if (statusBox) {
+            statusBox.className = 'p-3 rounded-xl bg-emerald-50 border border-emerald-300 text-emerald-900 text-xs font-semibold flex items-center gap-2';
+            statusBox.innerHTML = `<span class="material-symbols-outlined text-emerald-600 text-[20px]">mark_email_read</span><span>Termination Notice successfully transmitted directly to vendor official email: <strong>${currentTerminatedSupplier.email}</strong> via Gmail SMTP!</span>`;
+          }
+        } else {
+          BCF_PROCUREMENT.showToast(`Email notice: ${res?.error || 'Failed to dispatch'}`, 'error');
+          if (statusBox) {
+            statusBox.className = 'p-3 rounded-xl bg-amber-50 border border-amber-300 text-amber-900 text-xs font-semibold flex items-center gap-2';
+            statusBox.innerHTML = `<span class="material-symbols-outlined text-amber-600 text-[20px]">warning</span><span>Email dispatch notice: ${res?.error || 'Failed to dispatch'}.</span>`;
+          }
+        }
+      } catch (err) {
+        console.error('Error re-sending termination notice:', err);
+        BCF_PROCUREMENT.showToast('Failed to resend termination notice.', 'error');
+      } finally {
+        if (btn) {
+          btn.disabled = false;
+          btn.innerHTML = '<span class="material-symbols-outlined text-[16px]">refresh</span><span>Resend Notice via SMTP</span>';
+        }
+      }
+    }
+
+    // ─────────────────────────────────────────────────────────────
+    //  VENDOR AGREEMENT REINSTATEMENT / RENEWAL CONTROLLER & MODAL
+    // ─────────────────────────────────────────────────────────────
+    let pendingReinstatementSupplier = null;
+    let currentReinstatedSupplier = null;
+    let currentReinstatementReason = '';
+
+    function openReinstateModal(supplierId) {
+      const s = BCF_PROCUREMENT.getSupplier(supplierId);
+      if (!s) return;
+      pendingReinstatementSupplier = s;
+
+      document.getElementById('reinstate-vendor-id-input').value = s.id;
+      document.getElementById('reinstate-vendor-name').textContent = `${s.name} ${s.tradingName ? '(' + s.tradingName + ')' : ''}`;
+      document.getElementById('reinstate-vendor-id-display').textContent = s.id;
+      document.getElementById('reinstate-vendor-email-display').textContent = s.email || '—';
+      document.getElementById('reinstate-vendor-email-target').textContent = s.email || 'Official Vendor Email';
+      document.getElementById('reinstate-previous-reason').textContent = `"${s.terminationReason || 'Administrative termination'}"`;
+
+      const emailInput = document.getElementById('reinstate-recipient-email-input');
+      if (emailInput) {
+        emailInput.value = s.email || '';
+      }
+
+      const poList = (BCF_PROCUREMENT.getSupplierOrders ? BCF_PROCUREMENT.getSupplierOrders(s.id) : null) || BCF_PROCUREMENT.getPurchaseOrders().filter(p => 
+        (p.supplierId && s.id && String(p.supplierId).trim().toLowerCase() === String(s.id).trim().toLowerCase()) ||
+        (p.supplierName && s.name && String(p.supplierName).trim().toLowerCase() === String(s.name).trim().toLowerCase())
+      );
+      const totalSpend = poList.reduce((sum, p) => sum + (parseFloat(p.totalAmount) || 0), 0);
+      document.getElementById('reinstate-vendor-history-display').textContent = `${poList.length || s.totalOrders || 0} Orders • ${BCF_PROCUREMENT.formatCurrency(totalSpend || s.totalSpend || 0)} Total Spend`;
+
+      document.getElementById('reinstate-reason-input').value = '';
+      document.getElementById('reinstate-send-email-check').checked = true;
+
+      document.getElementById('reinstate-vendor-modal').classList.remove('hidden');
+    }
+
+    function openReinstateModalForCurrentVendor() {
+      if (currentDossierSupplier) {
+        closeDossierModal();
+        openReinstateModal(currentDossierSupplier.id);
+      }
+    }
+
+    function closeReinstateModal() {
+      document.getElementById('reinstate-vendor-modal').classList.add('hidden');
+      pendingReinstatementSupplier = null;
+    }
+
+    async function handleReinstateFormSubmit(e) {
+      e.preventDefault();
+      const supplierId = document.getElementById('reinstate-vendor-id-input').value;
+      const reason = document.getElementById('reinstate-reason-input').value.trim();
+      const sendEmail = document.getElementById('reinstate-send-email-check').checked;
+      const overrideEmail = (document.getElementById('reinstate-recipient-email-input')?.value || '').trim();
+
+      if (!supplierId || !reason) {
+        alert('Please specify the official justification for agreement reinstatement / renewal.');
+        return;
+      }
+
+      if (sendEmail) {
+        const s = BCF_PROCUREMENT.getSupplier(supplierId);
+        const targetEmail = overrideEmail || (s && s.email);
+        if (!targetEmail || !targetEmail.includes('@')) {
+          alert('Please enter a valid official vendor email address before proceeding with email dispatch.');
+          return;
+        }
+      }
+
+      const submitBtn = document.getElementById('reinstate-submit-btn');
+      if (submitBtn) {
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = '<span class="material-symbols-outlined text-[16px] animate-spin">sync</span><span>Reinstating...</span>';
+      }
+
+      try {
+        // Reinstate agreement in shared procurement core ledger
+        const reinResult = BCF_PROCUREMENT.reinstateVendorAgreement(supplierId, reason);
+        let updatedSupplier = (reinResult && reinResult.supplier) ? { ...reinResult.supplier } : (BCF_PROCUREMENT.getSupplier(supplierId) || {});
+        delete updatedSupplier.supplier;
+        if (overrideEmail && updatedSupplier) {
+          updatedSupplier.email = overrideEmail;
+          BCF_PROCUREMENT.saveSupplier(updatedSupplier);
+        }
+
+        let emailResult = null;
+        if (sendEmail && updatedSupplier && updatedSupplier.email) {
+          try {
+            emailResult = await BCF_PROCUREMENT.sendVendorReinstatementEmail(updatedSupplier, reason);
+            if (emailResult && emailResult.success) {
+              BCF_PROCUREMENT.showToast(`Official reinstatement notice dispatched via Gmail SMTP to vendor official email (${updatedSupplier.email})!`, 'success');
+            } else {
+              BCF_PROCUREMENT.showToast(`Agreement reinstated. Email notice: ${emailResult?.error || 'Check server'}`, 'info');
+            }
+          } catch (mailErr) {
+            console.error('Error sending reinstatement email:', mailErr);
+            BCF_PROCUREMENT.showToast('Agreement reinstated. Email dispatch failed.', 'info');
+          }
+        }
+
+        closeReinstateModal();
+        loadSuppliers();
+        BCF_PROCUREMENT.showToast(`Vendor agreement for "${updatedSupplier.name}" successfully reinstated and renewed!`, 'success');
+
+        // Open official reinstatement notice confirmation modal
+        openReinstatementNoticeModal(updatedSupplier, reason, emailResult);
+      } catch (err) {
+        console.error('Reinstatement failed:', err);
+        alert('Failed to reinstate agreement: ' + err.message);
+      } finally {
+        if (submitBtn) {
+          submitBtn.disabled = false;
+          submitBtn.innerHTML = '<span class="material-symbols-outlined text-[16px]">restart_alt</span><span>Confirm &amp; Reinstate Agreement</span>';
+        }
+      }
+    }
+
+    function openReinstatementNoticeModal(supplier, reason, emailResult) {
+      currentReinstatedSupplier = supplier;
+      currentReinstatementReason = reason || supplier.reinstatementReason || 'Official agreement reinstatement following governance committee review.';
+
+      document.getElementById('rnm-vendor-name').textContent = `${supplier.name} (${supplier.tradingName || supplier.name})`;
+      document.getElementById('rnm-recipient-email').textContent = supplier.email || '—';
+      document.getElementById('rnm-vendor-id').textContent = supplier.id;
+      document.getElementById('rnm-effective-date').textContent = BCF_PROCUREMENT.formatDate(supplier.reinstatedDate || supplier.reinstatedAt || new Date().toISOString());
+      document.getElementById('rnm-subject').textContent = `OFFICIAL NOTICE: Reinstatement & Renewal of Vendor Accreditation Agreement — Bandama Charity Foundation [${supplier.id}]`;
+      document.getElementById('rnm-reason').textContent = `"${currentReinstatementReason}"`;
+
+      const statusBox = document.getElementById('rnm-status-box');
+      if (statusBox) {
+        if (emailResult && emailResult.success) {
+          statusBox.className = 'p-3 rounded-xl bg-emerald-50 border border-emerald-300 text-emerald-900 text-xs font-semibold flex items-center gap-2';
+          statusBox.innerHTML = `<span class="material-symbols-outlined text-emerald-600 text-[20px]">mark_email_read</span><span>Official Reinstatement Notice successfully transmitted directly to vendor official email: <strong>${supplier.email}</strong> via Gmail SMTP!</span>`;
+        } else {
+          statusBox.className = 'p-3 rounded-xl bg-amber-50 border border-amber-300 text-amber-900 text-xs font-semibold flex items-center gap-2';
+          statusBox.innerHTML = `<span class="material-symbols-outlined text-amber-600 text-[20px]">warning</span><span>Email notice: ${emailResult?.error || 'Email was not dispatched'}. You can click "Resend Notice via SMTP" below to retry.</span>`;
+        }
+      }
+
+      const letterText = `BANDAMA CHARITY FOUNDATION – SIERRA LEONE (BCF-SL)
+CENTRAL PROCUREMENT & SUPPLY CHAIN DIRECTORATE
+Official Dispatch From: BCF-SL Administration Hub <bandamacharityfoundationsl@gmail.com> | Official Inquiries: +23278242826
+Date of Reinstatement Notice: ${new Date().toISOString().split('T')[0]}
+
+NOTICE OF AGREEMENT REINSTATEMENT & RENEWAL
+To: ${supplier.name} (${supplier.tradingName || supplier.name})
+Vendor Master Reference: ${supplier.id}
+TIN: ${supplier.taxId || '—'} | Designated Official Email: ${supplier.email || '—'}
+
+Please take formal notice that the Central Procurement Directorate of Bandama Charity Foundation (BCF-SL) has officially REINSTATED AND RENEWED the Vendor Master Accreditation Agreement with your organization, effective immediately.
+
+1. OFFICIAL JUSTIFICATION & BASIS FOR RENEWAL:
+"${currentReinstatementReason}"
+
+2. RESTORATION TO ACTIVE VENDOR ROSTERS:
+Your organization is restored to active and compliant standing on the BCF-SL Approved Vendor & Supplier Master List. Your firm is once again authorized to:
+• Receive Requests for Quotation (RFQs) across your accredited supply categories
+• Submit binding commercial bids and participate in competitive tendering
+• Be awarded Purchase Orders (POs) and execute contracts across all BCF-SL programmes
+
+3. PRESERVATION OF HISTORICAL PERFORMANCE RECORDS:
+All completed purchase orders (${supplier.totalOrders || 0} POs) and cumulative settlement expenditures (${BCF_PROCUREMENT.formatCurrency(supplier.totalSpend || 0)}) remain permanently archived and credited in the BCF-SL Supplier Master Register.
+
+Authorized Signatory:
+Directorate of Procurement & Supply Chain Management
+Bandama Charity Foundation – Sierra Leone (BCF-SL)`;
+
+      document.getElementById('rnm-letter-preview').textContent = letterText;
+      document.getElementById('reinstatement-notice-modal').classList.remove('hidden');
+    }
+
+    function openReinstatementNoticeModalForCurrentVendor() {
+      if (currentDossierSupplier) {
+        closeDossierModal();
+        openReinstatementNoticeModal(currentDossierSupplier, currentDossierSupplier.reinstatementReason);
+      }
+    }
+
+    function openReinstatementNoticeModalForId(supplierId) {
+      const s = BCF_PROCUREMENT.getSupplier(supplierId);
+      if (s) {
+        openReinstatementNoticeModal(s, s.reinstatementReason);
+      }
+    }
+
+    function closeReinstatementNoticeModal() {
+      document.getElementById('reinstatement-notice-modal').classList.add('hidden');
+    }
+
+    async function resendCurrentReinstatementNotice() {
+      if (!currentReinstatedSupplier) return;
+      const targetEmail = prompt('Enter official vendor recipient email address for Reinstatement Notice dispatch:', currentReinstatedSupplier.email || '');
+      if (!targetEmail || !targetEmail.trim() || !targetEmail.includes('@')) {
+        alert('A valid official vendor email address is required.');
+        return;
+      }
+      currentReinstatedSupplier.email = targetEmail.trim();
+      BCF_PROCUREMENT.saveSupplier(currentReinstatedSupplier);
+      document.getElementById('rnm-recipient-email').textContent = currentReinstatedSupplier.email;
+
+      const btn = document.getElementById('rnm-resend-btn');
+      if (btn) {
+        btn.disabled = true;
+        btn.innerHTML = '<span class="material-symbols-outlined text-[16px] animate-spin">sync</span><span>Sending Notice...</span>';
+      }
+
+      try {
+        const res = await BCF_PROCUREMENT.sendVendorReinstatementEmail(currentReinstatedSupplier, currentReinstatementReason);
+        const statusBox = document.getElementById('rnm-status-box');
+        if (res && res.success) {
+          BCF_PROCUREMENT.showToast(`Reinstatement notice re-sent directly to ${currentReinstatedSupplier.email} via Gmail SMTP!`, 'success');
+          if (statusBox) {
+            statusBox.className = 'p-3 rounded-xl bg-emerald-50 border border-emerald-300 text-emerald-900 text-xs font-semibold flex items-center gap-2';
+            statusBox.innerHTML = `<span class="material-symbols-outlined text-emerald-600 text-[20px]">mark_email_read</span><span>Reinstatement Notice successfully transmitted directly to vendor official email: <strong>${currentReinstatedSupplier.email}</strong> via Gmail SMTP!</span>`;
+          }
+        } else {
+          BCF_PROCUREMENT.showToast(`Email notice: ${res?.error || 'Failed to dispatch'}`, 'error');
+          if (statusBox) {
+            statusBox.className = 'p-3 rounded-xl bg-amber-50 border border-amber-300 text-amber-900 text-xs font-semibold flex items-center gap-2';
+            statusBox.innerHTML = `<span class="material-symbols-outlined text-amber-600 text-[20px]">warning</span><span>Email dispatch notice: ${res?.error || 'Failed to dispatch'}.</span>`;
+          }
+        }
+      } catch (err) {
+        console.error('Error re-sending reinstatement notice:', err);
+        BCF_PROCUREMENT.showToast('Failed to resend reinstatement notice.', 'error');
+      } finally {
+        if (btn) {
+          btn.disabled = false;
+          btn.innerHTML = '<span class="material-symbols-outlined text-[16px]">refresh</span><span>Resend Notice via SMTP</span>';
+        }
+      }
+    }
+  </script>
+</body>
+</html>
