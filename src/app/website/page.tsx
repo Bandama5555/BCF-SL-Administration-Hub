@@ -1,11 +1,9 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import Link from "next/link";
-import { PrivacyNoticeBanner } from "@/components/PrivacyNoticeBanner";
 
 export default function BcfPublicWebsitePage() {
-  const [privacyAccepted, setPrivacyAccepted] = useState(false);
   const [donateName, setDonateName] = useState("");
   const [donateEmail, setDonateEmail] = useState("");
   const [donateAmount, setDonateAmount] = useState("100");
@@ -16,62 +14,16 @@ export default function BcfPublicWebsitePage() {
   const [contactMsg, setContactMsg] = useState("");
   const [contactSubmitted, setContactSubmitted] = useState(false);
 
-  // Send visit tracking event
-  const trackVisit = async (formUser?: { name: string; email: string }) => {
-    try {
-      const isAccepted =
-        typeof window !== "undefined" &&
-        localStorage.getItem("bcf_privacy_accepted") === "true";
-
-      const payload: any = {
-        page: "/website",
-        source: "Website",
-        referrer: typeof document !== "undefined" ? document.referrer : "",
-        screen: typeof window !== "undefined" ? `${window.screen.width}x${window.screen.height}` : "1920x1080",
-        language: typeof navigator !== "undefined" ? navigator.language : "en-US",
-        timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
-        privacyAccepted: isAccepted,
-      };
-
-      if (formUser && isAccepted) {
-        payload.user = formUser;
-      }
-
-      await fetch("/api/visitor-analytics/track", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
-      });
-    } catch (err) {
-      console.warn("Website tracking warning:", err);
-    }
-  };
-
-  useEffect(() => {
-    if (typeof window !== "undefined") {
-      const isAccepted = localStorage.getItem("bcf_privacy_accepted") === "true";
-      setPrivacyAccepted(isAccepted);
-      trackVisit();
-    }
-  }, []);
-
-  const handleAcceptNotice = () => {
-    setPrivacyAccepted(true);
-    trackVisit();
-  };
-
   const handleDonate = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!donateEmail) return;
     setDonateSubmitted(true);
-    await trackVisit({ name: donateName || "Anonymous Donor", email: donateEmail });
   };
 
   const handleContact = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!contactEmail) return;
     setContactSubmitted(true);
-    await trackVisit({ name: contactName || "Visitor", email: contactEmail });
   };
 
   return (
@@ -292,9 +244,6 @@ export default function BcfPublicWebsitePage() {
           </div>
         </div>
       </footer>
-
-      {/* Mandatory Privacy Notice Banner */}
-      <PrivacyNoticeBanner onAccept={handleAcceptNotice} />
     </div>
   );
 }

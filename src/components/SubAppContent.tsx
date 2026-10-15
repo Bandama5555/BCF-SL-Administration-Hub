@@ -18,7 +18,7 @@ import { AccessRequestModuleView } from "./access/AccessRequestModuleView";
 import { AccessApprovalModuleView } from "./access/AccessApprovalModuleView";
 import { AccessRevokeView } from "./access/AccessRevokeView";
 import { AccessMasterView } from "./access/AccessMasterView";
-import { VisitorAnalyticsModuleView } from "./visitor-analytics/VisitorAnalyticsModuleView";
+import { PasswordResetAdminView } from "./admin/PasswordResetAdminView";
 
 interface SubAppContentProps {
   module: Module;
@@ -371,8 +371,8 @@ export function SubAppContent({ module, subApp }: SubAppContentProps) {
     );
   }
 
-  // Native Rendering: Visitor Analytics & Security Intelligence Module
-  if (module.slug === "visitor-analytics") {
+  // Native Rendering: Super Admin Module - Reset Password Governance
+  if (module.slug === "super-admin" && subApp.id === "reset-password") {
     return (
       <AppLayout
         title={subApp.label}
@@ -381,16 +381,7 @@ export function SubAppContent({ module, subApp }: SubAppContentProps) {
         activeTab={currentActiveTab}
         onTabChange={handleTabChange}
       >
-        <VisitorAnalyticsModuleView
-          currentTab={
-            subApp.id as
-              | "dashboard"
-              | "visitors"
-              | "login-activity"
-              | "blocked-visitors"
-              | "settings"
-          }
-        />
+        <PasswordResetAdminView />
       </AppLayout>
     );
   }

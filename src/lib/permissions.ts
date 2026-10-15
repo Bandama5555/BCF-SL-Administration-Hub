@@ -214,16 +214,8 @@ export const ACCESS_MATRIX: Record<string, Record<string, Record<RoleCode, Permi
     "login-creation": { SA: "F", CEO: "F", HR: "F", FIN: "-", IAR: "-", PRG: "-", PRC: "-", IT: "F", ST: "-" },
     "account-management": { SA: "F", CEO: "F", HR: "F", FIN: "-", IAR: "-", PRG: "-", PRC: "-", IT: "F", ST: "-" },
     "access-matrix": { SA: "F", CEO: "F", HR: "-", FIN: "-", IAR: "-", PRG: "-", PRC: "-", IT: "F", ST: "-" },
+    "reset-password": { SA: "F", CEO: "-", HR: "-", FIN: "-", IAR: "-", PRG: "-", PRC: "-", IT: "-", ST: "-" },
     "audit-logs": { SA: "F", CEO: "F", HR: "V", FIN: "V", IAR: "F", PRG: "-", PRC: "-", IT: "F", ST: "-" },
-  },
-
-  // ─── Visitor Analytics Module (Exclusive to Super Admin) ───────────────────
-  "visitor-analytics": {
-    "dashboard": { SA: "F", CEO: "-", HR: "-", FIN: "-", IAR: "-", PRG: "-", PRC: "-", IT: "-", ST: "-" },
-    "visitors": { SA: "F", CEO: "-", HR: "-", FIN: "-", IAR: "-", PRG: "-", PRC: "-", IT: "-", ST: "-" },
-    "login-activity": { SA: "F", CEO: "-", HR: "-", FIN: "-", IAR: "-", PRG: "-", PRC: "-", IT: "-", ST: "-" },
-    "blocked-visitors": { SA: "F", CEO: "-", HR: "-", FIN: "-", IAR: "-", PRG: "-", PRC: "-", IT: "-", ST: "-" },
-    "settings": { SA: "F", CEO: "-", HR: "-", FIN: "-", IAR: "-", PRG: "-", PRC: "-", IT: "-", ST: "-" },
   },
 
   // ─── Employee Module ────────────────────────────────────────────────────────

@@ -3,8 +3,6 @@ import "./globals.css";
 import { ThemeProvider } from "@/components/ThemeProvider";
 import { AuthGuard } from "@/components/AuthGuard";
 import { ShellWrapper } from "@/components/ShellWrapper";
-import { VisitorTracker } from "@/components/analytics/VisitorTracker";
-import { PrivacyNoticeBanner } from "@/components/analytics/PrivacyNoticeBanner";
 
 export const viewport: Viewport = {
   width: "device-width",
@@ -69,10 +67,6 @@ export default function RootLayout({
       </head>
       <body suppressHydrationWarning>
         <ThemeProvider>
-          {/* Global Visitor Analytics Beacon & Privacy Notice Banner */}
-          <VisitorTracker />
-          <PrivacyNoticeBanner />
-
           {/*
             AuthGuard checks sessionStorage and redirects to /login if unauthenticated.
             ShellWrapper renders the sidebar+topbar Shell only for non-login routes.

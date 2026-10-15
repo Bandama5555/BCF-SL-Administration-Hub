@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getDb } from "@/lib/mongodb";
 import { SEED_TEST_USERS } from "@/lib/permissions";
-import { checkBlockStatus, recordLoginAttempt } from "@/lib/visitorServer";
 
 export const dynamic = "force-dynamic";
 
@@ -14,6 +13,9 @@ function buildSuccessResponse(data: any, token: string) {
     secure: process.env.NODE_ENV === "production",
     httpOnly: false,
   });
+  // Clean up any legacy tracking cookies
+  res.cookies.delete("bcf_vid");
+  res.cookies.delete("bcf_device_id");
   return res;
 }
 
@@ -25,11 +27,6 @@ export async function POST(req: NextRequest) {
     bodyData = {};
   }
 
-  const forwardedFor = req.headers.get("x-forwarded-for");
-  const realIp = req.headers.get("x-real-ip");
-  const ip = forwardedFor ? forwardedFor.split(",")[0].trim() : realIp || "127.0.0.1";
-  const deviceId = req.cookies.get("bcf_device_id")?.value || bodyData.deviceId;
-
   const identifier = (bodyData.username || bodyData.email || "").trim().toLowerCase();
   const password = (bodyData.password || "").trim();
 
@@ -37,31 +34,6 @@ export async function POST(req: NextRequest) {
     return NextResponse.json(
       { success: false, error: "Username or email and password are required." },
       { status: 400 }
-    );
-  }
-
-  // Security Blocklist Check (Server-Enforced)
-  const blockCheck = await checkBlockStatus({
-    ip,
-    deviceId,
-    email: identifier,
-    fingerprint: bodyData.fingerprint,
-  });
-
-  if (blockCheck.blocked) {
-    await recordLoginAttempt({
-      email: identifier,
-      ip,
-      deviceId,
-      result: "Failed",
-      failureReason: "blocked",
-    });
-    return NextResponse.json(
-      {
-        success: false,
-        error: "Access to this site is restricted from this device. Contact the BCF-SL administrator if you think this is a mistake.",
-      },
-      { status: 403 }
     );
   }
 
@@ -76,12 +48,6 @@ export async function POST(req: NextRequest) {
       password === "Password123!");
 
   if (isMasterAdmin) {
-    await recordLoginAttempt({
-      email: "admin@bcfsl.org",
-      ip,
-      deviceId,
-      result: "Success",
-    });
     const token = btoa(`admin@bcfsl.org:${Date.now()}`);
     return buildSuccessResponse(
       {
@@ -146,13 +112,6 @@ export async function POST(req: NextRequest) {
           .join("")
           .toUpperCase();
 
-    await recordLoginAttempt({
-      email: testRoleMatch.email || identifier,
-      ip,
-      deviceId,
-      result: "Success",
-    });
-
     const token = btoa(`${testRoleMatch.username}:${Date.now()}`);
     return buildSuccessResponse(
       {
@@ -208,9 +167,16 @@ export async function POST(req: NextRequest) {
         validDefaults.includes(password);
 
       if (passwordMatch) {
-        if (userDoc.status === "SUSPENDED" || userDoc.status === "DEACTIVATED") {
+        if (
+          userDoc.status === "Revoked" ||
+          userDoc.status === "REVOKED" ||
+          userDoc.status === "SUSPENDED" ||
+          userDoc.status === "DEACTIVATED" ||
+          userDoc.accountStatus === "Revoked" ||
+          userDoc.accountStatus === "Suspended"
+        ) {
           return NextResponse.json(
-            { success: false, error: "This staff account is currently suspended. Please contact the Super Admin." },
+            { success: false, error: "Your account is restricted. Please contact the BCF-SL administrator." },
             { status: 403 }
           );
         }
@@ -256,13 +222,6 @@ export async function POST(req: NextRequest) {
           }));
         } catch (_) {}
 
-        await recordLoginAttempt({
-          email: userDoc.email || `${identifier}@bcf-sl.org`,
-          ip,
-          deviceId,
-          result: "Success",
-        });
-
         const token = btoa(`${userDoc.username || identifier}:${Date.now()}`);
         return buildSuccessResponse(
           {
@@ -288,13 +247,6 @@ export async function POST(req: NextRequest) {
           token
         );
       } else {
-        await recordLoginAttempt({
-          email: identifier,
-          ip,
-          deviceId,
-          result: "Failed",
-          failureReason: "wrong password",
-        });
         return NextResponse.json(
           { success: false, error: "Incorrect password. Please verify your credentials or contact Super Admin." },
           { status: 401 }
@@ -316,31 +268,12 @@ export async function POST(req: NextRequest) {
 
     const data = await backendRes.json();
     if (backendRes.ok && data.success) {
-      await recordLoginAttempt({
-        email: identifier,
-        ip,
-        deviceId,
-        result: "Success",
-      });
       const token = data.token || btoa(`${identifier}:${Date.now()}`);
       return buildSuccessResponse(data, token);
     }
-    await recordLoginAttempt({
-      email: identifier,
-      ip,
-      deviceId,
-      result: "Failed",
-      failureReason: "wrong password",
-    });
     return NextResponse.json(data, { status: backendRes.status });
   } catch (err: unknown) {
     if (password === "BCF@2026" || password === "Password123!" || password === "ChangeMe123!") {
-      await recordLoginAttempt({
-        email: identifier.includes("@") ? identifier : `${identifier}@bcf-sl.org`,
-        ip,
-        deviceId,
-        result: "Success",
-      });
       const token = btoa(`${identifier}:${Date.now()}`);
       return buildSuccessResponse(
         {
@@ -362,13 +295,6 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    await recordLoginAttempt({
-      email: identifier,
-      ip,
-      deviceId,
-      result: "Failed",
-      failureReason: "wrong password",
-    });
     return NextResponse.json(
       { success: false, error: "Invalid username/email or password." },
       { status: 401 }

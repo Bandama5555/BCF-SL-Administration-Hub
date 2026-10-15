@@ -190,13 +190,9 @@ export const COLLECTIONS = {
   ACCESS_NOTIFICATIONS: "access_notifications",
   ACCESS_SETTINGS: "access_settings",
   ACCESS_REVOCATIONS: "access_revocations",
-  VISITORS: "visitors",
-  VISITOR_SESSIONS: "visitor_sessions",
-  VISITOR_PAGE_VIEWS: "visitor_page_views",
-  LOGIN_ATTEMPTS: "login_attempts",
-  BLOCKED_ENTRIES: "blocked_entries",
-  BLOCKED_ATTEMPTS: "blocked_attempts",
-  VISITOR_SETTINGS: "visitor_settings",
+  PASSWORD_RESET_REQUESTS: "password_reset_requests",
+  PASSWORD_RESET_EVENTS: "password_reset_events",
+  LOGIN_REVOCATIONS: "login_revocations",
 } as const;
 
 export type CollectionName = (typeof COLLECTIONS)[keyof typeof COLLECTIONS];

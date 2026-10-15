@@ -30,45 +30,39 @@ export default function PrivacyPolicyPage() {
           <section>
             <h2 className="text-base font-bold text-slate-900 dark:text-white mb-2">1. Overview and Purpose</h2>
             <p>
-              Bandama Charity Foundation Sierra Leone (BCF-SL) is committed to protecting the privacy, security, and integrity of all visitors to our public website and users of the BCF-SL Administration Hub. This policy details the technical particulars collected, how they are processed, and our strict retention and security safeguards.
+              Bandama Charity Foundation Sierra Leone (BCF-SL) is committed to protecting the privacy, security, and integrity of all users of the BCF-SL Administration Hub and visitors to our public communications portal. This policy details our data protection standards and institutional safeguards.
             </p>
           </section>
 
           <section>
             <h2 className="text-base font-bold text-slate-900 dark:text-white mb-2">2. What Information We Collect</h2>
-            <p className="mb-2">We record technical details necessary for operational security, service delivery, and fraud prevention:</p>
+            <p className="mb-2">
+              We collect only information necessary for organizational administration and charitable operations:
+            </p>
             <ul className="list-disc pl-5 space-y-1.5 text-xs">
-              <li><strong>IP Address &amp; Approximate Location:</strong> Derived country, region, city, and network provider (ISP). Precise GPS coordinates are never requested or stored.</li>
-              <li><strong>Device Identifier:</strong> A stable, pseudonymous identifier derived from secure browser storage and device signals, stored strictly in one-way cryptographic hash format (replacing hardware serial numbers or IMEI).</li>
-              <li><strong>Operating System &amp; Browser:</strong> OS version, browser name and version, screen resolution, language, and system time zone.</li>
-              <li><strong>Personal Particulars (Sign-in &amp; Forms Only):</strong> Your verified name and email address are recorded only when signing in to the Hub or submitting official public forms (contact, newsletter, donations). Unauthenticated visitors are designated as &ldquo;Anonymous&rdquo; and are never guessed.</li>
+              <li><strong>Staff Authentication Credentials:</strong> Username, email, employee ID, and encrypted passwords for verified institutional personnel to access administrative modules.</li>
+              <li><strong>Public Communications &amp; Pledges:</strong> Contact inquiries and philanthropic pledges voluntarily submitted through official public forms.</li>
+              <li><strong>Audit Trail:</strong> Institutional modifications, user role changes, and administrative actions are logged in our tamper-proof audit trail for governance and compliance.</li>
             </ul>
           </section>
 
           <section>
             <h2 className="text-base font-bold text-slate-900 dark:text-white mb-2">3. Prohibited Data Collection</h2>
             <p>
-              We do <strong>not</strong> collect passwords, message content, biometric data, precise GPS coordinates, personal contacts, or any data outside of the BCF-SL website and Administration Hub.
+              We do <strong>not</strong> track passive visitors, collect biometric data, deploy browser fingerprinting or tracking beacons, record satellite GPS locations, or access external data outside of the BCF-SL Administration Hub.
             </p>
           </section>
 
           <section>
-            <h2 className="text-base font-bold text-slate-900 dark:text-white mb-2">4. Data Retention and Deletion Rights</h2>
+            <h2 className="text-base font-bold text-slate-900 dark:text-white mb-2">4. Data Rights and Inquiries</h2>
             <p>
-              Visitor records are retained for a configurable institutional period (default 12 months), after which records are automatically deleted or fully anonymized. Any visitor or employee may request the lookup and deletion of their personal visitor history by contacting the BCF-SL Super Administrator with a valid compliance reason.
-            </p>
-          </section>
-
-          <section>
-            <h2 className="text-base font-bold text-slate-900 dark:text-white mb-2">5. Security, Access Restrictions &amp; Audit Logs</h2>
-            <p>
-              Access to visitor intelligence is strictly restricted to Super Administrators. Every review of records, export, and administrative action is permanently recorded in our tamper-proof institutional audit trail. Devices or accounts engaging in automated credential stuffing or unauthorized intrusions are subject to immediate security restriction.
+              Any employee or member of the public may request inspection or correction of their personal data by contacting the BCF-SL Legal &amp; Compliance Directorate.
             </p>
           </section>
 
           <section className="pt-4 border-t border-slate-200 dark:border-slate-800">
             <p className="text-xs text-slate-500">
-              For privacy inquiries, rights enforcement, or verification, contact: <strong>privacy@bcf-sl.org</strong> or the BCF-SL Legal &amp; Compliance Directorate, Freetown, Sierra Leone.
+              For privacy inquiries, contact: <strong>privacy@bcf-sl.org</strong> or the BCF-SL Administration Directorate, Freetown, Sierra Leone.
             </p>
           </section>
         </div>
